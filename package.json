@@ -1,11 +1,13 @@
 {
   "name": "playwright-template",
   "version": "1.0.0",
-  "description": "## Description",
+  "description": "Modern Playwright test automation template with custom fixtures, reporting, and CI/CD integration.",
   "type": "module",
   "scripts": {
     "test": "npx playwright test",
     "navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
+    "ui": "npx playwright test --ui",
+    "lint": "eslint . --ext .ts,.js",
     "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report/awesome",
     "watch-report": "npx allure watch allure-results"
   },
