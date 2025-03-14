@@ -1,9 +1,6 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
-import {
-  navbarSelectors,
-  NavbarSelectors,
-} from '../../pageObjectsManagers/cinesa/navbar.selectors';
+import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
 
 /**
  * Represents the Cinesa website navigation bar component.

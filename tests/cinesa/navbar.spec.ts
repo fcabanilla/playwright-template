@@ -1,36 +1,36 @@
-import { test } from "@playwright/test";
-import { CookieBanner } from "../../pageObjectsManagers/cinesa/cookieBanner";
-import { Navbar } from "./navbar.steps";
+import { test } from '@playwright/test';
+import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookieBanner';
+import { Navbar } from '../../pageObjectsManagers/cinesa/navbar';
 import {
   assertNavbarElementsVisible,
   assertHomeUrl,
   assertNavClick,
   assertExternalNavClick,
-} from "./navbar.assertions";
-import { baseUrl, internalNavItems, externalNavItem } from "./navbar.data";
+} from './navbar.assertions';
+import { baseUrl, internalNavItems, externalNavItem } from './navbar.data';
 
-test.describe("Cinesa Navbar Tests", () => {
+test.describe('Cinesa Navbar Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navegar al home y aceptar cookies
     const navbar = new Navbar(page);
     const cookieBanner = new CookieBanner(page);
-    
+
     await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
   });
 
-  test("should display all navbar elements", async ({ page }) => {
+  test('should display all navbar elements', async ({ page }) => {
     const navbar = new Navbar(page);
     await assertNavbarElementsVisible(page, navbar.selectors);
   });
 
-  test("should click logo and stay on home", async ({ page }) => {
+  test('should click logo and stay on home', async ({ page }) => {
     const navbar = new Navbar(page);
     await navbar.clickLogo();
     await assertHomeUrl(page, baseUrl);
   });
 
-  test("should click each navbar element and navigate accordingly", async ({
+  test('should click each navbar element and navigate accordingly', async ({
     page,
   }) => {
     const navbar = new Navbar(page);
