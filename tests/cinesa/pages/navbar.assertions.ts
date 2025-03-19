@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { NavbarSelectors } from '../../pageObjectsManagers/cinesa/navbar.selectors';
+import { NavbarSelectors } from '../../../pageObjectsManagers/cinesa/navbar.selectors';
 import * as allure from 'allure-playwright';
 
 /**
@@ -25,7 +25,7 @@ export async function assertNavbarElementsVisible(
       await expect(page.locator(selectors.promociones)).toBeVisible();
     });
     await allure.test.step("Verify 'experiencias' element", async () => {
-      await expect(page.locator(selectors.experiencias)).toBeVisible();
+      await expect.soft(page.locator(selectors.experiencias)).toBeVisible();
     });
     await allure.test.step("Verify 'programas' element", async () => {
       await expect(page.locator(selectors.programas)).toBeVisible();

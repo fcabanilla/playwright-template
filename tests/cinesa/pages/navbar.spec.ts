@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookieBanner';
-import { Navbar } from '../../pageObjectsManagers/cinesa/navbar';
+import { CookieBanner } from '../../../pageObjectsManagers/cinesa/cookieBanner';
+import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar';
 import {
   assertNavbarElementsVisible,
   assertHomeUrl,
