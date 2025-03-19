@@ -1,4 +1,4 @@
-import { NavbarSelectors } from '../../pageObjectsManagers/cinesa/navbar.selectors';
+import { NavbarSelectors } from '../../../pageObjectsManagers/cinesa/navbar.selectors';
 
 // Interfaz para representar un elemento de navegación y su URL esperada
 export interface NavItem {
