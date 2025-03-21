@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "npx playwright test",
-    "navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
+    "test:navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
+    "test:footer": "npx playwright test tests/cinesa/footer.spec.ts",
+    "test:blog": "npx playwright test tests/cinesa/blog.spec.ts",
     "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report/awesome",
     "watch-report": "npx allure watch allure-results"
   },
