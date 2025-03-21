@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "test": "npx playwright test",
-    "navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
+    "test:navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
+    "test:seatpicker": "playwright test tests/cinesa/seatPicker.spec.ts",
+    "ui": "npx playwright test --ui",
+    "lint": "eslint . --ext .ts,.js",
     "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report/awesome",
     "watch-report": "npx allure watch allure-results"
   },
