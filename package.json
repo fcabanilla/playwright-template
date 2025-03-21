@@ -9,8 +9,6 @@
     "test:seatpicker": "playwright test tests/cinesa/seatPicker.spec.ts",
     "ui": "npx playwright test --ui",
     "lint": "eslint . --ext .ts,.js",
-    "test:footer": "npx playwright test tests/cinesa/footer.spec.ts",
-    "test:blog": "npx playwright test tests/cinesa/blog.spec.ts",
     "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report/awesome",
     "watch-report": "npx allure watch allure-results"
   },
