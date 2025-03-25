@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { Blog } from '../../../pageObjectsManagers/cinesa/blog/blog';
 import { assertFirstRelatedArticleRedirection, assertAllRelatedArticlesRedirection } from './blog.assertions';
 

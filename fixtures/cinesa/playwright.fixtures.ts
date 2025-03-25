@@ -1,9 +1,9 @@
 import { test as base } from '@playwright/test';
-import { Navbar } from '../../pageObjectsManagers/cinesa/navbar';
-import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookieBanner';
-import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker';
+import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar';
+import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner';
+import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker';
 import { Blog } from '../../pageObjectsManagers/cinesa/blog/blog';
-import { Footer } from '../../pageObjectsManagers/cinesa/footer';
+import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer';
 
 // Definir un tipo para nuestros fixtures personalizados
 type CustomFixtures = {
