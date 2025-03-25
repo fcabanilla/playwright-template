@@ -56,49 +56,43 @@ export class BlogLandingAssertions {
   }
 
   /**
-   * Iterates over each related article card, clicks it, verifies navigation to a new URL,
-   * and then navigates back to the original Blog Landing page.
-   *
-   * @returns A Promise that resolves when all assertions are complete.
-   */
+ * Iterates over each related article card, clicks its link, verifies navigation to a new URL, 
+ * and then navigates back to the original Blog Landing page.
+ *
+ * @returns A Promise that resolves when all assertions are complete.
+ */
   async expectNavigationThroughRelatedArticles(): Promise<void> {
-    await allure.test.step(
-      'Verifying navigation through each related article',
-      async () => {
-        // Save the original URL of the Blog Landing page.
-        const originalUrl: string = this.page.url();
-        // Get the count of article cards.
-        const count: number = await this.blogLanding.countArticleCards();
-
-        // Use for-of loop over generated indices.
-        for (const index of Array.from(Array(count).keys())) {
-          await allure.test.step(
-            `Navigating through article card at index ${index}`,
-            async () => {
-              // Re-query the locator in each iteration to prevent stale element issues.
-              const articleLocator = this.blogLanding
-                .getArticleCardsLocator()
-                .nth(index);
-              await expect(articleLocator).toBeVisible();
-
-              // Click on the article card.
-              await articleLocator.click();
-              await this.page.waitForLoadState('networkidle');
-
-              // Validate that the URL has changed.
-              const newUrl: string = this.page.url();
-              await expect(newUrl).not.toBe(originalUrl);
-
-              // Navigate back to the original Blog Landing page.
-              await this.page.goBack();
-              await this.page.waitForLoadState('networkidle');
-
-              // Confirm that we have returned to the original URL.
-              await expect(this.page.url()).toBe(originalUrl);
-            }
-          );
-        }
+    await allure.test.step('Verifying navigation through each related article', async () => {
+      // Save the original URL of the Blog Landing page.
+      const originalUrl: string = this.page.url();
+      // Get the count of article cards.
+      const count: number = await this.blogLanding.countArticleCards();
+  
+      // Use for-of loop over generated indices.
+      for (const index of Array.from(Array(count).keys())) {
+        await allure.test.step(`Navigating through article card at index ${index}`, async () => {
+          // Re-query the locator in each iteration to prevent stale element issues.
+          const articleCardLocator = this.blogLanding.getArticleCardsLocator().nth(index);
+          await expect(articleCardLocator).toBeVisible();
+  
+          // Click on the link inside the article card.
+          const articleLink = articleCardLocator.locator('a.article-card-hero-link');
+          await expect(articleLink).toBeVisible();
+          await articleLink.click();
+          await this.page.waitForLoadState('networkidle');
+  
+          // Validate that the URL has changed.
+          const newUrl: string = this.page.url();
+          await expect(newUrl).not.toBe(originalUrl);
+  
+          // Navigate back to the original Blog Landing page.
+          await this.page.goBack();
+          await this.page.waitForLoadState('networkidle');
+  
+          // Confirm that we have returned to the original URL.
+          await expect(this.page.url()).toBe(originalUrl);
+        });
       }
-    );
+    });
   }
 }
