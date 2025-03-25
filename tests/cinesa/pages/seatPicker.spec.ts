@@ -1,6 +1,6 @@
-import { test } from '../../fixtures/cinesa/playwright.fixtures';
-import { SeatPickerAssertions } from '../../assertions/seatPicker.assertions';
-import { legendData, seatTestData } from './pages/seatPicker.data';
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { SeatPickerAssertions } from '../../../assertions/seatPicker.assertions';
+import { legendData, seatTestData } from './seatPicker.data';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ seatPicker }) => {
