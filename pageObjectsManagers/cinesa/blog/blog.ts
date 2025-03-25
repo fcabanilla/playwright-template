@@ -8,15 +8,11 @@ import { Footer } from '../footer';
 export class Blog {
   private readonly page: Page;
   public selectors: BlogSelectors;
-  public navbar: Navbar;
-  public footer: Footer;
   public body: BlogBody;
   private readonly url: string = 'https://www.cinesa.es/blog-cinesa/';
   constructor(page: Page) {
     this.page = page;
     this.selectors = blogSelectors;
-    this.navbar = new Navbar(page);
-    this.footer = new Footer(page);
     this.body = new BlogBody(page);
   }
 

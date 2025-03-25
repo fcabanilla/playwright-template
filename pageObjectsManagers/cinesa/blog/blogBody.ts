@@ -14,6 +14,6 @@ export class BlogBody {
 
   async getRelatedArticles(): Promise<void> {
     const sections = await this.page.$$(this.selectors.relatedArticlesWrapper);
-    this.relatedArticles = sections.map(() => new RelatedArticles(this.page));
+    this.relatedArticles = sections.map(section => new RelatedArticles(this.page, section));
   }
 }

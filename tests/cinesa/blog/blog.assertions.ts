@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { Blog } from '../../pageObjectsManagers/cinesa/blog/blog';
+import { Blog } from '../../../pageObjectsManagers/cinesa/blog/blog';
 
 export async function assertFirstRelatedArticleRedirection(page: Page, blog: Blog): Promise<void> {
   await blog.body.getRelatedArticles();
