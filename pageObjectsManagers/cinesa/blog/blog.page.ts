@@ -2,8 +2,6 @@ import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { BlogSelectors, blogSelectors } from './blog.selectors';
 import { BlogBody } from './blogBody';
-import { Navbar } from '../navbar/navbar';
-import { Footer } from '../footer/footer';
 
 export class Blog {
   private readonly page: Page;

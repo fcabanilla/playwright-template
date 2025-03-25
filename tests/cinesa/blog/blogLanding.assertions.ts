@@ -44,11 +44,11 @@ export class BlogLandingAssertions {
     await allure.test.step('Verifying article cards visibility', async () => {
       const cardsLocator = this.blogLanding.getArticleCardsLocator();
       const count: number = await cardsLocator.count();
-      for (let i = 0; i < count; i++) {
+      for (const index of Array.from(Array(count).keys())) {
         await allure.test.step(
-          `Verifying article card at index ${i} is visible`,
+          `Verifying article card at index ${index} is visible`,
           async () => {
-            await expect(cardsLocator.nth(i)).toBeVisible();
+            await expect(cardsLocator.nth(index)).toBeVisible();
           }
         );
       }

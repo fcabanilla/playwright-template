@@ -2,16 +2,18 @@ import { test as base } from '@playwright/test';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner';
 import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker';
-import { Blog } from '../../pageObjectsManagers/cinesa/blog/blog';
+import { Blog } from '../../pageObjectsManagers/cinesa/blog/blog.page';
 import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer';
+import { BlogLanding } from '../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 
 // Definir un tipo para nuestros fixtures personalizados
 type CustomFixtures = {
   navbar: Navbar;
   cookieBanner: CookieBanner;
   seatPicker: SeatPicker;
-  blog: Blog; // ...nueva propiedad...
-  footer: Footer; // ...nueva propiedad...
+  blog: Blog;
+  footer: Footer;
+  blogLanding: BlogLanding;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -34,6 +36,10 @@ export const test = base.extend<CustomFixtures>({
   footer: async ({ page }, use) => {
     const footer = new Footer(page);
     await use(footer);
+  },
+  blogLanding: async ({ page }, use) => {
+    const blogLandingPage = new BlogLanding(page);
+    await use(blogLandingPage);
   },
 });
 
