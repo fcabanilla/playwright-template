@@ -1,15 +1,11 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 import { BlogLandingAssertions } from './blogLanding.assertions';
 import { blogLandingData } from './blogLanding.data';
 
 test.describe('Blog Landing Page Tests', () => {
-  let blogLanding: BlogLanding;
   let blogLandingAssertions: BlogLandingAssertions;
 
-  test.beforeEach(async ({ page, blogLanding: blogLandingFixture }) => {
-    // Using the fixture for blogLanding.
-    blogLanding = blogLandingFixture;
+  test.beforeEach(async ({ page, blogLanding }) => {
     blogLandingAssertions = new BlogLandingAssertions(page);
     await blogLanding.navigateToPage();
   });
