@@ -1,7 +1,8 @@
 /**
  * URL for the seat picker page.
  */
-export const url = 'https://www.cinesa.es/compra/butacas/?showtimeId=131-27406';
+// export const url = 'https://www.cinesa.es/compra/butacas/?showtimeId=131-27406';
+export const url = 'https://www.cinesa.es/';
 
 /**
  * Represents the available seat types.
