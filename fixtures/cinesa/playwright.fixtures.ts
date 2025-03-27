@@ -1,8 +1,8 @@
 import { test as base } from '@playwright/test';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
-import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner';
-import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker';
-import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer';
+import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
+import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker.page';
+import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer.page';
 import { BlogLanding } from '../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 import { Cinema } from '../../pageObjectsManagers/cinesa/cinemas/cinema.page';
 import { CinemaDetail } from '../../pageObjectsManagers/cinesa/cinemas/cinemaDetail.page';
