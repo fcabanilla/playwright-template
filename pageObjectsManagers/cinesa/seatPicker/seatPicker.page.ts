@@ -1,14 +1,38 @@
-import { Page } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import * as allure from 'allure-playwright';
-import {
-  SEAT_PICKER_SELECTORS,
-  url as seatPickerUrl,
-  expectedLegendItems,
-} from './seatPicker.selectors';
+import { SEAT_PICKER_SELECTORS } from './seatPicker.selectors';
 
-/** Tipo de asiento disponible (también definido en selectors) */
-export type SeatType = 'normal' | 'vip' | 'wheelchair';
+/**
+ * Possible seat types.
+ */
+export type SeatType =
+  | 'normal'
+  | 'vip'
+  | 'wheelchair'
+  | 'companion'
+  | 'recliner';
 
+/**
+ * Possible seat states.
+ */
+export type SeatState = 'available' | 'selected' | 'unavailable' | 'unknown';
+
+/**
+ * Interface representing a seat in the seat map.
+ */
+export interface Seat {
+  row: number;
+  seatNumber: number;
+  seatType: SeatType;
+  seatState: SeatState;
+  ariaLabel: string;
+  locator: Locator;
+}
+
+/**
+ * The SeatPicker Page Object Model.
+ * Contains methods to interact with the seat picker page.
+ */
 export class SeatPicker {
   readonly page: Page;
 
@@ -17,196 +41,232 @@ export class SeatPicker {
   }
 
   /**
-   * Navega a la página del seat picker.
-   *
-   * @returns Promise que se resuelve cuando la navegación finaliza.
+   * Waits for the seat picker container to be visible.
    */
-  async navigate(): Promise<void> {
-    await allure.test.step('Navigating to seat picker page', async () => {
-      await this.page.goto(seatPickerUrl);
+  async waitForSeatPicker(): Promise<void> {
+    await allure.test.step('Waiting for seat picker container', async () => {
+      await this.page.waitForSelector(SEAT_PICKER_SELECTORS.container, {
+        state: 'visible',
+        timeout: 10000,
+      });
     });
   }
 
   /**
-   * Selecciona un asiento basado en el tipo y un identificador único.
-   *
-   * @param type - Tipo de asiento ('normal', 'vip', 'wheelchair')
-   * @param seatIdentifier - Identificador único del asiento (por ejemplo, el valor del atributo data-seat-id)
+   * Retrieves all seats from the DOM by parsing their aria-label.
    */
-  async selectSeatByType(
-    type: SeatType,
-    seatIdentifier: string
-  ): Promise<void> {
-    await allure.test.step(
-      `Selecting seat of type "${type}" with id "${seatIdentifier}"`,
+  async getAllSeats(): Promise<Seat[]> {
+    return await allure.test.step(
+      'Retrieving all seats from the DOM',
       async () => {
-        let selector = '';
-        switch (type.toLowerCase()) {
-          case 'normal':
-            selector = SEAT_PICKER_SELECTORS.seatNormal;
-            break;
-          case 'vip':
-            selector = SEAT_PICKER_SELECTORS.seatVip;
-            break;
-          case 'wheelchair':
-            selector = SEAT_PICKER_SELECTORS.seatWheelchair;
-            break;
-          default:
-            throw new Error(`Unknown seat type: ${type}`);
+        // Esperamos que el contenedor esté visible
+        await this.waitForSeatPicker();
+
+        // Selecciona todos los asientos con clase genérica
+        const seatLocators = this.page.locator(
+          SEAT_PICKER_SELECTORS.seatGeneric
+        );
+        const count = await seatLocators.count();
+        console.log(`Found ${count} seats`);
+        const seats: Seat[] = [];
+
+        for (let i = 0; i < count; i++) {
+          const seatLocator = seatLocators.nth(i);
+          const ariaLabel =
+            (await seatLocator.getAttribute('aria-label')) || '';
+          const className = (await seatLocator.getAttribute('class')) || '';
+          const pressed = await seatLocator.getAttribute('aria-pressed'); // "true"/"false" o null
+
+          // Parsear la fila y el número a partir del aria-label (ejemplo: "Normal seat 5-9" o "Wheelchair space 1-14")
+          const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
+          const seatIdentifier = `${row}-${seatNumber}`;
+
+          // Determinar el tipo y estado del asiento
+          const seatType = this.getSeatType(className, ariaLabel);
+          const seatState = this.getSeatState(className, pressed);
+
+          seats.push({
+            row,
+            seatNumber,
+            seatType,
+            seatState,
+            ariaLabel,
+            locator: seatLocator,
+          });
         }
-        // Se utiliza el atributo definido en SEAT_PICKER_SELECTORS.seatAttribute
-        const seat = this.page.locator(
-          `${selector}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"]`
-        );
-        await seat.click();
+        // show the list of seats in the console
+        console.log('Seats:', seats);
+        return seats;
       }
     );
   }
 
   /**
-   * Obtiene el estado actual del asiento.
-   *
-   * @param seatIdentifier - Identificador único del asiento
-   * @returns Estado del asiento (por ejemplo, 'available', 'selected', 'unavailable')
+   * Filters the seats to only those available.
    */
-  async getSeatState(seatIdentifier: string): Promise<string> {
-    return await allure.test.step(
-      `Getting state for seat with id "${seatIdentifier}"`,
+  async getAvailableSeats(): Promise<Seat[]> {
+    const allSeats = await this.getAllSeats();
+    return allSeats.filter((s) => s.seatState === 'available');
+  }
+
+  /**
+   * Selects a given seat (click on it).
+   */
+  async selectSeat(seat: Seat): Promise<void> {
+    await allure.test.step(
+      `Selecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
-        const dynamicSelector =
-          `${SEAT_PICKER_SELECTORS.seatNormal}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"], ` +
-          `${SEAT_PICKER_SELECTORS.seatVip}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"], ` +
-          `${SEAT_PICKER_SELECTORS.seatWheelchair}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"]`;
-        const seat = this.page.locator(dynamicSelector);
-        return (await seat.getAttribute('aria-pressed')) || 'unknown';
+        await seat.locator.click();
       }
     );
   }
 
   /**
-   * Obtiene las leyendas presentes en el seat picker.
-   *
-   * @returns Array de textos de las leyendas.
+   * Selects multiple seats given an array of Seat objects.
    */
-  async getLegendItems(): Promise<string[]> {
-    return await allure.test.step(
-      'Retrieving seat picker legend items',
-      async () => {
-        const legend = this.page.locator(SEAT_PICKER_SELECTORS.legend);
-        const items = await legend
-          .locator('.v-seat-picker-legend-item__label')
-          .allTextContents();
-        return items;
-      }
-    );
-  }
-
-  /**
-   * Navega a la página del ticket picker, en caso de que la selección de asientos la dispare.
-   */
-  async navigateToTicketPicker(): Promise<void> {
-    await allure.test.step('Navigating to ticket picker', async () => {
-      await this.page.click(SEAT_PICKER_SELECTORS.ticketPickerButton);
-    });
-  }
-
-  /**
-   * Selecciona múltiples asientos en una sola llamada.
-   *
-   * @param seats - Array de objetos con type y seatIdentifier.
-   */
-  async selectMultipleSeats(
-    seats: { type: SeatType; seatIdentifier: string }[]
-  ): Promise<void> {
-    await allure.test.step('Selecting multiple seats', async () => {
-      for (const { type, seatIdentifier } of seats) {
-        await this.selectSeatByType(type, seatIdentifier);
+  async selectMultipleSeats(seats: Seat[]): Promise<void> {
+    await allure.test.step(`Selecting ${seats.length} seats`, async () => {
+      for (const seat of seats) {
+        await this.selectSeat(seat);
       }
     });
   }
 
   /**
-   * Deselecciona un asiento haciendo clic nuevamente sobre él.
-   *
-   * @param seatIdentifier - Identificador único del asiento.
+   * Selects a random available seat.
+   * Returns the chosen seat.
    */
-  async deselectSeat(seatIdentifier: string): Promise<void> {
-    await allure.test.step(
-      `Deselecting seat with id "${seatIdentifier}"`,
-      async () => {
-        const seat = this.page.locator(
-          `[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"]`
-        );
-        await seat.click();
-      }
-    );
-  }
-
-  /**
-   * Verifica si un asiento está disponible (se asume que "false" en aria-pressed indica disponibilidad).
-   *
-   * @param seatIdentifier - Identificador único del asiento.
-   * @returns true si está disponible, false en caso contrario.
-   */
-  async verifySeatAvailability(seatIdentifier: string): Promise<boolean> {
+  async selectRandomSeat(): Promise<Seat> {
     return await allure.test.step(
-      `Verifying availability for seat with id "${seatIdentifier}"`,
+      'Selecting a random available seat',
       async () => {
-        const state = await this.getSeatState(seatIdentifier);
-        return state === 'false';
+        const availableSeats = await this.getAvailableSeats();
+        if (availableSeats.length === 0) {
+          throw new Error('No available seats found');
+        }
+        const randomIndex = Math.floor(Math.random() * availableSeats.length);
+        const chosenSeat = availableSeats[randomIndex];
+        await this.selectSeat(chosenSeat);
+        return chosenSeat;
       }
     );
   }
 
   /**
-   * Espera hasta que un asiento alcance el estado esperado.
-   *
-   * @param seatIdentifier - Identificador único del asiento.
-   * @param expectedState - Estado esperado (por ejemplo, "true" para seleccionado).
-   * @param timeout - Tiempo máximo de espera en milisegundos (opcional, por defecto 5000).
+   * Selects multiple random available seats.
+   * @param count Number of seats to select.
+   * Returns the list of chosen seats.
    */
-  async waitForSeatState(
-    seatIdentifier: string,
-    expectedState: string,
-    timeout: number = 5000
-  ): Promise<void> {
-    await allure.test.step(
-      `Waiting for seat with id "${seatIdentifier}" to be "${expectedState}"`,
+  async selectRandomSeats(count: number): Promise<Seat[]> {
+    return await allure.test.step(
+      `Selecting ${count} random seats`,
       async () => {
-        const dynamicSelector =
-          `${SEAT_PICKER_SELECTORS.seatNormal}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"], ` +
-          `${SEAT_PICKER_SELECTORS.seatVip}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"], ` +
-          `${SEAT_PICKER_SELECTORS.seatWheelchair}[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"]`;
-
-        await this.page.waitForFunction(
-          (params) => {
-            const { selector, expected } = params;
-            const el = document.querySelector(selector);
-            return el && el.getAttribute('aria-pressed') === expected;
-          },
-          { selector: dynamicSelector, expected: expectedState },
-          { timeout }
-        );
+        const availableSeats = await this.getAvailableSeats();
+        if (availableSeats.length < count) {
+          throw new Error(
+            `Not enough available seats. Needed ${count}, found ${availableSeats.length}`
+          );
+        }
+        const shuffled = this.shuffleArray(availableSeats);
+        const chosenSeats = shuffled.slice(0, count);
+        for (const seat of chosenSeats) {
+          await this.selectSeat(seat);
+        }
+        return chosenSeats;
       }
     );
   }
 
   /**
-   * Captura un screenshot del asiento indicado.
-   *
-   * @param seatIdentifier - Identificador único del asiento.
+   * Confirms the selected seats by clicking the confirm/continue button.
    */
-  async screenshotSeat(seatIdentifier: string): Promise<void> {
+  async confirmSeats(): Promise<void> {
+    await allure.test.step('Confirming selected seats', async () => {
+      await this.page.locator(SEAT_PICKER_SELECTORS.confirmSeatsButton).click();
+    });
+  }
+
+  /**
+   * Deselects a seat by clicking on it if it's selected.
+   */
+  async deselectSeat(seat: Seat): Promise<void> {
     await allure.test.step(
-      `Taking screenshot for seat with id "${seatIdentifier}"`,
+      `Deselecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
-        const seat = this.page.locator(
-          `[${SEAT_PICKER_SELECTORS.seatAttribute}="${seatIdentifier}"]`
-        );
-        await seat.screenshot({ path: `seat-${seatIdentifier}.png` });
+        if (seat.seatState === 'selected') {
+          await seat.locator.click();
+        }
       }
     );
   }
 
-  // Se pueden agregar más funciones según se requiera ampliar la interacción con el seat picker.
+  // ────────────────────────── Helpers ──────────────────────────
+
+  /**
+   * Parses row and seat number from an aria-label.
+   * Expects a format like "Normal seat 5-9" or "Wheelchair space 1-14".
+   */
+  private parseRowAndSeat(ariaLabel: string): {
+    row: number;
+    seatNumber: number;
+  } {
+    const match = ariaLabel.match(/(\d+)[\s-]+(\d+)/);
+    if (!match) {
+      return { row: 0, seatNumber: 0 };
+    }
+    return {
+      row: parseInt(match[1], 10),
+      seatNumber: parseInt(match[2], 10),
+    };
+  }
+
+  /**
+   * Determines the seat type based on the class names or aria-label.
+   */
+  private getSeatType(className: string, ariaLabel: string): SeatType {
+    // Ordena de más específico a más genérico
+    if (className.includes('wheelchair')) {
+      return 'wheelchair';
+    }
+    if (className.includes('companion')) {
+      return 'companion';
+    }
+    if (className.includes('vip')) {
+      return 'vip';
+    }
+    if (className.includes('recliner')) {
+      return 'recliner';
+    }
+
+    // Si no matchea nada anterior, lo consideramos normal
+    return 'normal';
+  }
+
+  /**
+   * Determines the seat state from class names or the aria-pressed attribute.
+   */
+  private getSeatState(className: string, pressed: string | null): SeatState {
+    if (className.includes('--unavailable') || className.includes('--house')) {
+      return 'unavailable';
+    }
+    if (pressed === 'true' || className.includes('--selected')) {
+      return 'selected';
+    }
+    if (pressed === 'false' || className.includes('--available')) {
+      return 'available';
+    }
+    return 'unknown';
+  }
+
+  /**
+   * Shuffles an array using the Fisher-Yates algorithm.
+   */
+  private shuffleArray<T>(array: T[]): T[] {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 }

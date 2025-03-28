@@ -1,7 +1,10 @@
 // cinemaDetail.page.ts
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
-import { cinemaDetailSelectors, CinemaDetailSelectors } from './cinemaDetail.selectors';
+import {
+  cinemaDetailSelectors,
+  CinemaDetailSelectors,
+} from './cinemaDetail.selectors';
 /**
  * Represents the Cinema Detail page.
  * Provides methods to interact with the film list and showtime elements.
@@ -25,15 +28,22 @@ export class CinemaDetail {
    * @returns Promise that resolves to an array of film names.
    */
   async getFilmNames(): Promise<string[]> {
-    return await allure.test.step('Getting list of film names from cinema detail page', async () => {
-      const filmListLocator = this.page.locator(this.selectors.filmList);
-      await filmListLocator.first().waitFor({ state: 'visible', timeout: 5000 });
-      
-      const filmNameLocator = this.page.locator(this.selectors.filmName);
-      await filmNameLocator.first().waitFor({ state: 'visible', timeout: 5000 });
-      
-      return await filmNameLocator.allTextContents();
-    });
+    return await allure.test.step(
+      'Getting list of film names from cinema detail page',
+      async () => {
+        const filmListLocator = this.page.locator(this.selectors.filmList);
+        await filmListLocator
+          .first()
+          .waitFor({ state: 'visible', timeout: 50000 });
+
+        const filmNameLocator = this.page.locator(this.selectors.filmName);
+        await filmNameLocator
+          .first()
+          .waitFor({ state: 'visible', timeout: 50000 });
+
+        return await filmNameLocator.allTextContents();
+      }
+    );
   }
 
   /**
@@ -64,16 +74,19 @@ export class CinemaDetail {
    * @returns Promise that resolves to the name of the selected film.
    */
   async selectRandomFilm(): Promise<string> {
-    return await allure.test.step('Selecting a random film from cinema detail page', async () => {
-      const names = await this.getFilmNames();
-      if (names.length === 0) {
-        throw new Error('No films found on the cinema detail page');
+    return await allure.test.step(
+      'Selecting a random film from cinema detail page',
+      async () => {
+        const names = await this.getFilmNames();
+        if (names.length === 0) {
+          throw new Error('No films found on the cinema detail page');
+        }
+        const randomIndex = Math.floor(Math.random() * names.length);
+        const selectedName = names[randomIndex];
+        await this.selectFilmByName(selectedName);
+        return selectedName;
       }
-      const randomIndex = Math.floor(Math.random() * names.length);
-      const selectedName = names[randomIndex];
-      await this.selectFilmByName(selectedName);
-      return selectedName;
-    });
+    );
   }
 
   /**
@@ -84,20 +97,25 @@ export class CinemaDetail {
    * @throws Error if the film name is not provided.
    */
 
-
   async getShowtimesForFilm(filmName: string): Promise<string[]> {
-    return await allure.test.step('Getting list of showtimes for the selected film', async () => {
-      // Obtiene el contenedor del film filtrando por el nombre de la película
-      const filmContainer = this.page.locator(this.selectors.filmItem, {
-        has: this.page.locator(this.selectors.filmName, { hasText: filmName }),
-      });
-      // Dentro de ese contenedor, busca los elementos de showtime
-      const showtimeLocator = filmContainer.locator(this.selectors.showtime);
-      await showtimeLocator.first().waitFor({ state: 'visible', timeout: 5000 });
-      return await showtimeLocator.allTextContents();
-    });
+    return await allure.test.step(
+      'Getting list of showtimes for the selected film',
+      async () => {
+        // Obtiene el contenedor del film filtrando por el nombre de la película
+        const filmContainer = this.page.locator(this.selectors.filmItem, {
+          has: this.page.locator(this.selectors.filmName, {
+            hasText: filmName,
+          }),
+        });
+        // Dentro de ese contenedor, busca los elementos de showtime
+        const showtimeLocator = filmContainer.locator(this.selectors.showtime);
+        await showtimeLocator
+          .first()
+          .waitFor({ state: 'visible', timeout: 50000 });
+        return await showtimeLocator.allTextContents();
+      }
+    );
   }
-  
 
   /**
    * Clicks on a showtime button that contains the given text.
@@ -106,7 +124,9 @@ export class CinemaDetail {
    */
   async selectShowtimeByText(timeText: string): Promise<void> {
     await allure.test.step(`Selecting showtime "${timeText}"`, async () => {
-      await this.page.locator(this.selectors.showtime, { hasText: timeText }).click();
+      await this.page
+        .locator(this.selectors.showtime, { hasText: timeText })
+        .click();
     });
   }
 
@@ -115,27 +135,36 @@ export class CinemaDetail {
    * @returns Promise that resolves to the text of the selected showtime.
    */
   async selectRandomShowtime(filmName: string): Promise<string> {
-    return await allure.test.step('Selecting a random showtime for the selected film', async () => {
-      const showtimes = await this.getShowtimesForFilm(filmName);
-      if (showtimes.length === 0) {
-        throw new Error('No showtimes found for the selected film');
+    return await allure.test.step(
+      'Selecting a random showtime for the selected film',
+      async () => {
+        const showtimes = await this.getShowtimesForFilm(filmName);
+        if (showtimes.length === 0) {
+          throw new Error('No showtimes found for the selected film');
+        }
+        const randomIndex = Math.floor(Math.random() * showtimes.length);
+        const selectedTime = showtimes[randomIndex];
+        await this.selectShowtimeByText(selectedTime);
+        return selectedTime;
       }
-      const randomIndex = Math.floor(Math.random() * showtimes.length);
-      const selectedTime = showtimes[randomIndex];
-      await this.selectShowtimeByText(selectedTime);
-      return selectedTime;
-    });
-  }  
+    );
+  }
 
   /**
    * Selects a random film and then selects a random showtime for that film.
    * @returns Promise that resolves to an object containing the selected film name and showtime text.
    */
-  async selectRandomFilmAndShowtime(): Promise<{ film: string, showtime: string }> {
-    return await allure.test.step('Selecting a random film and a random showtime', async () => {
-      const film = await this.selectRandomFilm();
-      const showtime = await this.selectRandomShowtime(film);
-      return { film, showtime };
-    });
-  }  
+  async selectRandomFilmAndShowtime(): Promise<{
+    film: string;
+    showtime: string;
+  }> {
+    return await allure.test.step(
+      'Selecting a random film and a random showtime',
+      async () => {
+        const film = await this.selectRandomFilm();
+        const showtime = await this.selectRandomShowtime(film);
+        return { film, showtime };
+      }
+    );
+  }
 }

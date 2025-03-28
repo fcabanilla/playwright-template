@@ -3,8 +3,8 @@ import { SeatPickerAssertions } from '../../../assertions/seatPicker.assertions'
 import { legendData, seatTestData } from './seatPicker.data';
 
 test.describe('Seat Picker', () => {
-  test.beforeEach(async ({ seatPicker }) => {
-    await seatPicker.navigate();
+  test.beforeEach(async ({ page, seatPicker }) => {
+    await page.goto('https://www.cinesa.es/');
   });
 
   // test('should verify seat legend and change seat state', async ({
@@ -24,17 +24,24 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
   }) => {
-    await navbar.navigateToCinemas();
-    //todo validar si sale la ventana de cookies. Revisar como lo resolvio mati.
     await cookieBanner.acceptCookies();
-    await cinema.selectRandomCinema();
-    
-    const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
+    await navbar.navigateToCinemas();
+    const selectedCinema = await cinema.selectRandomCinema();
+    console.log(`Selected cinema: ${selectedCinema}`);
 
-    // Aquí puedes agregar aserciones o continuar con el flujo de compra, por ejemplo:
+    const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
     console.log(`Selected film: ${film} at showtime: ${showtime}`);
-    const currentUrl = await page.url();
-    console.log("Current URL is:", currentUrl);
+
+    // Selecciona un asiento aleatorio (o usa selectRandomSeats(n) para varios)
+    const selectedSeat = await seatPicker.selectRandomSeat();
+    console.log(
+      `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}`
+    );
+
+    // Confirmamos la selección de asientos
+    await seatPicker.confirmSeats();
+
+    console.log('Current URL is:', await page.url());
   });
 
   // test('simulate a purchase ', async ({ page, seatPicker }) => {
