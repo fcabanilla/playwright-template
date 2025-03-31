@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { CookieBanner } from '../../../pageObjectsManagers/cinesa/cookies/cookieBanner';
-import { Footer } from '../../../pageObjectsManagers/cinesa/footer/footer';
+import { CookieBanner } from '../../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
+import { Footer } from '../../../pageObjectsManagers/cinesa/footer/footer.page';
 import {
   assertFooterElementsVisible,
   assertNavigateToBlog,
