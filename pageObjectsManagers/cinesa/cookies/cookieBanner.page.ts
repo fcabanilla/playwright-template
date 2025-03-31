@@ -15,8 +15,10 @@ export class CookieBanner {
   }
 
   async acceptCookies(): Promise<void> {
-    await allure.test.step('Accepting cookies', async () => {
-      await this.page.click(this.selectors.acceptButton);
-    });
+    if (await this.page.isVisible(this.selectors.acceptButton)) {
+      await allure.test.step('Accepting cookies', async () => {
+        await this.page.click(this.selectors.acceptButton);
+      });
+    }
   }
 }
