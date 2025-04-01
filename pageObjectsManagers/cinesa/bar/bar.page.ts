@@ -18,16 +18,19 @@ export class BarPage {
    */
   async skipBar(): Promise<void> {
     await allure.test.step('Handling the bar page', async () => {
-      const isPopupVisible = await this.page.locator(BAR_SELECTORS.popup).isVisible();
-      if (isPopupVisible) {
-        console.log('Popup detected. Closing it.');
-        await this.page.locator(BAR_SELECTORS.popupCloseButton).click();
-      } else {
-        console.log('No popup detected.');
+      const popup = this.page.locator(BAR_SELECTORS.popup);
+      const closeButton = this.page.locator(BAR_SELECTORS.popupCloseButton);
+      const mainButton = this.page.locator(BAR_SELECTORS.barMainButton);
+
+      if (await popup.isVisible()) {
+        await closeButton.waitFor({ state: 'visible', timeout: 5000 });
+        await closeButton.click();
+        await popup.waitFor({ state: 'hidden', timeout: 5000 });
       }
-      
-      console.log('Clicking the main bar button.');
-      await this.page.locator(BAR_SELECTORS.barMainButton).click();
+
+      await mainButton.waitFor({ state: 'visible', timeout: 5000 });
+      await mainButton.waitFor({ state: 'attached', timeout: 5000 });
+      await mainButton.click();
     });
   }
 }
