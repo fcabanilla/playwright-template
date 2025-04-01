@@ -14,7 +14,8 @@ test.describe('Seat Picker', () => {
     seatPicker,
     ticketPicker,
     loginPage,
-    barPage
+    barPage,
+    purchaseSummary
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
@@ -33,5 +34,6 @@ test.describe('Seat Picker', () => {
     await loginPage.clickContinueAsGuest();
     await ticketPicker.selectTicket();
     await barPage.skipBar();
+    await purchaseSummary.acceptAndContinue()
   });
 });
