@@ -67,9 +67,12 @@ export class Cinema {
    */
   async getCinemaNames(): Promise<string[]> {
     return await allure.test.step('Getting list of cinema names', async () => {
+      await this.page.waitForSelector(this.selectors.cinemaElement, {
+        state: 'attached',
+        timeout: 10000,
+      });
+
       const container = this.getContainer();
-      // Wait for the container to be visible before extracting the names.
-      await container.waitFor({ state: 'visible', timeout: 50000 });
       return await container
         .locator(this.selectors.cinemaName)
         .allTextContents();
@@ -83,6 +86,11 @@ export class Cinema {
    */
   async selectRandomCinema(): Promise<string> {
     return await allure.test.step('Selecting a random cinema', async () => {
+      await this.page.waitForSelector(this.selectors.cinemaElement, {
+        state: 'attached',
+        timeout: 10000,
+      });
+
       const names = await this.getCinemaNames();
       if (names.length === 0) {
         throw new Error('No cinemas found');
@@ -93,6 +101,7 @@ export class Cinema {
       return selectedName;
     });
   }
+
   /**
    * Retrieves and logs the list of cinema names.
    *

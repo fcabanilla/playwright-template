@@ -140,6 +140,10 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting a random available seat',
       async () => {
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+
         const availableSeats = await this.getAvailableSeats();
         if (availableSeats.length === 0) {
           throw new Error('No available seats found');
