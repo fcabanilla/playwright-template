@@ -6,8 +6,8 @@ import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer.page';
 import { BlogLanding } from '../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 import { Cinema } from '../../pageObjectsManagers/cinesa/cinemas/cinema.page';
 import { CinemaDetail } from '../../pageObjectsManagers/cinesa/cinemas/cinemaDetail.page';
+import { LoginPage } from '../../pageObjectsManagers/cinesa/login/login.page';
 
-// Definir un tipo para nuestros fixtures personalizados
 type CustomFixtures = {
   navbar: Navbar;
   cookieBanner: CookieBanner;
@@ -16,6 +16,7 @@ type CustomFixtures = {
   blogLanding: BlogLanding;
   cinema: Cinema;
   cinemaDetail: CinemaDetail;
+  loginPage: LoginPage;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -46,6 +47,10 @@ export const test = base.extend<CustomFixtures>({
   cinemaDetail: async ({ page }, use) => {
     const cinemaDetail = new CinemaDetail(page);
     await use(cinemaDetail);
+  },
+  loginPage: async ({ page }, use) => {
+    const loginPage = new LoginPage(page);
+    await use(loginPage);
   },
 });
 
