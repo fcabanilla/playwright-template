@@ -1,4 +1,4 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, seatPicker }) => {
@@ -12,7 +12,9 @@ test.describe('Seat Picker', () => {
     cinemaDetail,
     cookieBanner,
     seatPicker,
+    ticketPicker,
     loginPage,
+    barPage
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
@@ -28,7 +30,8 @@ test.describe('Seat Picker', () => {
     );
 
     await seatPicker.confirmSeats();
-
     await loginPage.clickContinueAsGuest();
+    await ticketPicker.selectTicket();
+    await barPage.skipBar();
   });
 });

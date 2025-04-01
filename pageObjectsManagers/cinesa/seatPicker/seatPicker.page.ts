@@ -59,10 +59,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Retrieving all seats from the DOM',
       async () => {
-        // Esperamos que el contenedor esté visible
         await this.waitForSeatPicker();
 
-        // Selecciona todos los asientos con clase genérica
         const seatLocators = this.page.locator(
           SEAT_PICKER_SELECTORS.seatGeneric
         );
@@ -81,7 +79,6 @@ export class SeatPicker {
           const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
           const seatIdentifier = `${row}-${seatNumber}`;
 
-          // Determinar el tipo y estado del asiento
           const seatType = this.getSeatType(className, ariaLabel);
           const seatState = this.getSeatState(className, pressed);
 
@@ -94,8 +91,7 @@ export class SeatPicker {
             locator: seatLocator,
           });
         }
-        // show the list of seats in the console
-        console.log('Seats:', seats);
+
         return seats;
       }
     );
@@ -228,7 +224,6 @@ export class SeatPicker {
    * Determines the seat type based on the class names or aria-label.
    */
   private getSeatType(className: string, ariaLabel: string): SeatType {
-    // Ordena de más específico a más genérico
     if (className.includes('wheelchair')) {
       return 'wheelchair';
     }
@@ -242,7 +237,6 @@ export class SeatPicker {
       return 'recliner';
     }
 
-    // Si no matchea nada anterior, lo consideramos normal
     return 'normal';
   }
 

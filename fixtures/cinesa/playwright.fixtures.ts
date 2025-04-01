@@ -7,6 +7,8 @@ import { BlogLanding } from '../../pageObjectsManagers/cinesa/blog/blogLanding.p
 import { Cinema } from '../../pageObjectsManagers/cinesa/cinemas/cinema.page';
 import { CinemaDetail } from '../../pageObjectsManagers/cinesa/cinemas/cinemaDetail.page';
 import { LoginPage } from '../../pageObjectsManagers/cinesa/login/login.page';
+import { TicketPicker } from '../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.page';
+import { BarPage } from '../../pageObjectsManagers/cinesa/bar/bar.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -17,6 +19,8 @@ type CustomFixtures = {
   cinema: Cinema;
   cinemaDetail: CinemaDetail;
   loginPage: LoginPage;
+  ticketPicker: TicketPicker;
+  barPage: BarPage;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -51,6 +55,14 @@ export const test = base.extend<CustomFixtures>({
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
     await use(loginPage);
+  },
+  ticketPicker: async ({ page }, use) => {
+    const ticketPicker = new TicketPicker(page);
+    await use(ticketPicker);
+  },
+  barPage: async ({ page }, use) => {
+    const barPage = new BarPage(page);
+    await use(barPage);
   },
 });
 
