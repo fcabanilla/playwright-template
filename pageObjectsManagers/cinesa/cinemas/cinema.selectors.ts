@@ -18,6 +18,10 @@ export interface CinemaSelectors {
    * Selector for the cinema description within each element.
    */
   cinemaDesc: string;
+  /**
+   * Selector for the filter input.
+   */
+  filterInput: string;
 }
 
 /**
@@ -28,4 +32,5 @@ export const cinemaSelectors: CinemaSelectors = {
   cinemaElement: '.cinema-list-element',
   cinemaName: '.cinema-list-element__name',
   cinemaDesc: '.cinema-list-element__desc',
+  filterInput: 'input.v-input',
 };

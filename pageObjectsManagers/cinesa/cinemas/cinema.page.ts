@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { cinemaSelectors, CinemaSelectors } from './cinema.selectors';
+import { cinemasData } from '../../../tests/cinesa/cinema/cinemas.data';
 
 /**
  * Represents the Cinesa cinema selection page.
@@ -113,5 +114,20 @@ export class Cinema {
       .allTextContents();
     console.log('Cinema Names:', names);
     return names;
+  }
+
+  /**
+   * Selects the Oasiz cinema.
+   *
+   * @returns Promise that resolves to the name of the selected cinema.
+   */
+  async selectOasizCinema(): Promise<string> {
+    return await allure.test.step('Selecting Oasiz cinema', async () => {
+      await this.page.fill(this.selectors.filterInput, cinemasData.oasiz);
+      await this.page.waitForTimeout(1000);
+      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
+      await cinemaElement.click();
+      return cinemasData.oasiz;
+    });
   }
 }

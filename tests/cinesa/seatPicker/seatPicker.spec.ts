@@ -20,13 +20,13 @@ test.describe('Seat Picker', () => {
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectRandomCinema();
+    //const selectedCinema = await cinema.selectRandomCinema();
+    const selectedCinema = await cinema.selectOasizCinema();
     console.log(`Selected cinema: ${selectedCinema}`);
 
     const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
     console.log(`Selected film: ${film} at showtime: ${showtime}`);
 
-    //const selectedSeat = await seatPicker.selectRandomSeat();
     const selectedSeat = await seatPicker.selectLastAvailableSeat();
     console.log(
       `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}`
