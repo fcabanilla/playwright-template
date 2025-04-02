@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { PURCHASE_SUMMARY_SELECTORS } from './purchaseSummary.selectors';
 import { purchaseSummaryTestData } from './purchaseSummary.data';
@@ -22,6 +22,7 @@ export class PurchaseSummary {
     await this.fillForm(firstName, lastName, email, phone);
     await this.acceptTermsAndConditions();
     await this.clickContinue();
+    await this.confirmPopup();
   }
 
   /**
@@ -47,6 +48,19 @@ export class PurchaseSummary {
   private async clickContinue(): Promise<void> {
     await allure.test.step('Clicking the continue button', async () => {
       await this.page.locator(PURCHASE_SUMMARY_SELECTORS.continueButton).click();
+    });
+  }
+
+  /**
+   * Confirms the popup by clicking the confirm button.
+   * @private
+   */
+  private async confirmPopup(): Promise<void> {
+    await allure.test.step('Confirming popup', async () => {
+      const confirmButton = this.page.locator(PURCHASE_SUMMARY_SELECTORS.confirmPopupButton);
+      await confirmButton.waitFor({ state: 'visible' });
+      await expect(confirmButton).toBeEnabled();
+      await confirmButton.click();
     });
   }
 

@@ -8,4 +8,5 @@ export const PURCHASE_SUMMARY_SELECTORS = {
   lastNameInput: '#v-customer-details-form-field__family-name-input',
   emailInput: '#v-customer-details-form-field__email-input',
   phoneInput: '#v-customer-details-form-field__phone-number-input',
+  confirmPopupButton: '.v-modal__container.v-modal__container--mode-auto section.v-modal__body button.v-button.v-button--color-primary.v-button--size-large',
 };

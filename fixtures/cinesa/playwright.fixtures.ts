@@ -10,6 +10,7 @@ import { LoginPage } from '../../pageObjectsManagers/cinesa/login/login.page';
 import { TicketPicker } from '../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.page';
 import { BarPage } from '../../pageObjectsManagers/cinesa/bar/bar.page';
 import { PurchaseSummary } from '../../pageObjectsManagers/cinesa/purchaseSummary/purchaseSummary.page';
+import { PaymentPage } from '../../pageObjectsManagers/cinesa/paymentPage/paymentPage.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -23,6 +24,7 @@ type CustomFixtures = {
   ticketPicker: TicketPicker;
   barPage: BarPage;
   purchaseSummary: PurchaseSummary;
+  paymentPage: PaymentPage;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -69,6 +71,10 @@ export const test = base.extend<CustomFixtures>({
   purchaseSummary: async ({ page }, use) => {
     const purchaseSummary = new PurchaseSummary(page);
     await use(purchaseSummary);
+  },
+  paymentPage: async ({ page }, use) => {
+    const paymentPage = new PaymentPage(page);
+    await use(paymentPage);
   },
 });
 
