@@ -1,4 +1,4 @@
-import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, seatPicker }) => {
@@ -26,7 +26,8 @@ test.describe('Seat Picker', () => {
     const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
     console.log(`Selected film: ${film} at showtime: ${showtime}`);
 
-    const selectedSeat = await seatPicker.selectRandomSeat();
+    //const selectedSeat = await seatPicker.selectRandomSeat();
+    const selectedSeat = await seatPicker.selectLastAvailableSeat();
     console.log(
       `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}`
     );

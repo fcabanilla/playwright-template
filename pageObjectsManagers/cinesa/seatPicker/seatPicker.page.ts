@@ -153,6 +153,29 @@ export class SeatPicker {
   }
 
   /**
+   * Selects the last available seat (first available seat from the back).
+   * Returns the chosen seat.
+   */
+  async selectLastAvailableSeat(): Promise<Seat> {
+    return await allure.test.step('Selecting last available seat from back', async () => {
+      await this.page.waitForResponse((response) =>
+        response.url().includes('/seat-availability') && response.status() === 200
+      );
+      const availableSeats = await this.getAvailableSeats();
+      if (availableSeats.length === 0) {
+        throw new Error('No available seats found');
+      }
+      const sortedSeats = availableSeats.sort((a, b) => {
+        if (a.row !== b.row) return b.row - a.row;
+        return b.seatNumber - a.seatNumber;
+      });
+      const chosenSeat = sortedSeats[0];
+      await this.selectSeat(chosenSeat);
+      return chosenSeat;
+    });
+  }
+
+  /**
    * Selects multiple random available seats.
    * @param count Number of seats to select.
    * Returns the list of chosen seats.
