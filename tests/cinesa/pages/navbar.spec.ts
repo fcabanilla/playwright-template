@@ -24,7 +24,7 @@ test.describe('Cinesa Navbar Tests', () => {
     await navbarAssertions.expectHomeUrl(baseUrl);
   });
 
-  test('should click each navbar element and navigate accordingly', async () => {
+  test('should click each navbar element and navigate accordingly hola', async () => {
     // Validación para enlaces internos
     for (const item of internalNavItems) {
       await navbarAssertions.expectNavClick(
