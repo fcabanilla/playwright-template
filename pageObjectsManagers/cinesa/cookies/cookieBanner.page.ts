@@ -15,6 +15,7 @@ export class CookieBanner {
   }
 
   async acceptCookies(): Promise<void> {
+    await this.page.waitForLoadState("networkidle");
     if (await this.page.isVisible(this.selectors.acceptButton)) {
       await allure.test.step('Accepting cookies', async () => {
         await this.page.click(this.selectors.acceptButton);

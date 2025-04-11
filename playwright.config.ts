@@ -36,5 +36,9 @@ export default defineConfig({
     actionTimeout: 60000,
     // Timeout para navegaciones (por ejemplo, page.goto)
     navigationTimeout: 60000,
+
+    launchOptions: {
+      slowMo: 500,
+    },
   },
 });
