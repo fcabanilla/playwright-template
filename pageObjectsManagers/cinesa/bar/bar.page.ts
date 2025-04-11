@@ -28,6 +28,17 @@ export class BarPage {
         await popup.waitFor({ state: 'hidden', timeout: 5000 });
       }
 
+      const modal = this.page.locator(BAR_SELECTORS.modal);
+      if (await modal.isVisible()) {
+        const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
+        await modalButton.waitFor({ state: 'visible', timeout: 5000 });
+        await modalButton.click({ force: true });
+        try {
+          await modal.waitFor({ state: 'hidden', timeout: 2000 });
+        } catch (error) {
+        }
+      }
+
       await mainButton.waitFor({ state: 'visible', timeout: 5000 });
       await mainButton.waitFor({ state: 'attached', timeout: 5000 });
       await mainButton.click();

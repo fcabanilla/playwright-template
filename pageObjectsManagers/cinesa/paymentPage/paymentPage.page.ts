@@ -20,6 +20,7 @@ export class PaymentPage {
   async enterCardData(cardNumber: string = paymentTestData.cardNumber, pin: string = paymentTestData.pin): Promise<void> {
     await allure.test.step('Entering card data (card number & PIN)', async () => {
       await this.page.fill(PAYMENT_SELECTORS.cardNumberInput, cardNumber);
+      await this.page.waitForSelector(PAYMENT_SELECTORS.pinInput, { state: 'visible' });
       await this.page.fill(PAYMENT_SELECTORS.pinInput, pin);
     });
   }
