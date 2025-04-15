@@ -7,6 +7,7 @@
     "test": "npx playwright test",
     "test:navbar": "npx playwright test tests/cinesa/navbar.spec.ts",
     "test:seatpicker": "playwright test tests/cinesa/seatPicker/seatPicker.spec.ts",
+    "test:programs": "playwright test tests/cinesa/programs/programs.spec.ts",
     "test:seatpicker:debug": "playwright test tests/cinesa/seatPicker/seatPicker.spec.ts --debug",
     "test:footer": "npx playwright test tests/cinesa/footer.spec.ts",
     "test:blog": "npx playwright test tests/cinesa/blog.spec.ts",
