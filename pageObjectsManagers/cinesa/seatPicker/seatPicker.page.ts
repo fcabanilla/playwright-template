@@ -30,6 +30,11 @@ export interface Seat {
 }
 
 /**
+ * Maximum number of seats that can be selected.
+ */
+const maxSeatSelection = 9;
+
+/**
  * The SeatPicker Page Object Model.
  * Contains methods to interact with the seat picker page.
  */
@@ -173,6 +178,46 @@ export class SeatPicker {
       await this.selectSeat(chosenSeat);
       return chosenSeat;
     });
+  }
+
+  /**
+   * Selects the specified number of available seats from the back to the front.
+   * Skips unavailable seats. Maximum number of seats is capped at maxSeatSelection.
+   * @param seatCount Number of seats to select.
+   * Returns the list of chosen seats.
+   */
+  async selectLastAvailableSeats(seatCount: number): Promise<Seat[]> {
+    return await allure.test.step(
+      `Selecting ${seatCount} seats from back to front`,
+      async () => {
+        if (seatCount > maxSeatSelection) {
+          throw new Error(`Cannot select more than ${maxSeatSelection} seats`);
+        }
+
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+
+        const availableSeats = await this.getAvailableSeats();
+        if (availableSeats.length < seatCount) {
+          throw new Error(
+            `Not enough available seats. Needed ${seatCount}, found ${availableSeats.length}`
+          );
+        }
+
+        const sortedSeats = availableSeats.sort((a, b) => {
+          if (a.row !== b.row) return b.row - a.row;
+          return b.seatNumber - a.seatNumber;
+        });
+
+        const chosenSeats = sortedSeats.slice(0, seatCount);
+        for (const seat of chosenSeats) {
+          await this.selectSeat(seat);
+        }
+
+        return chosenSeats;
+      }
+    );
   }
 
   /**
