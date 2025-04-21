@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { ProgramsPage } from '../../../pageObjectsManagers/cinesa/programs/programs.page';
 
 test.describe('Programs Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,10 +22,11 @@ test.describe('Programs Page', () => {
     });
     await cookieBanner.acceptCookies();
     await navbar.navigateToPrograms();
-    //
-    // codigo q falta.
-    // pendientes: POM de programas y hacer click en el unlimited 
-    //
+
+    const programsPage = new ProgramsPage(page);
+    await programsPage.waitForProgramsPage();
+    await programsPage.clickUnlimitedButton();
+
     await unlimitedProgramsPage.waitForProgramsPage();
     await unlimitedProgramsPage.takeScreenshot(test.info());
   });

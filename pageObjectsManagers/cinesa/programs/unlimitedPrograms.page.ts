@@ -37,7 +37,20 @@ export class UnlimitedProgramsPage {
    * Waits for the programs page to load completely.
    */
   async waitForProgramsPage(): Promise<void> {
-    //missing code
+    await allure.test.step('Waiting for unlimited programs page to load', async () => {
+      await this.page.waitForSelector(PROGRAMS_SELECTORS.container, {
+        state: 'visible',
+        timeout: 10000,
+      });
+      await this.page.waitForSelector(PROGRAMS_SELECTORS.tarjetas.container, {
+        state: 'visible',
+        timeout: 10000,
+      });
+      await this.page.waitForSelector(PROGRAMS_SELECTORS.tarjetas.card, {
+        state: 'visible',
+        timeout: 10000,
+      });
+    });
   }
 
   /**
