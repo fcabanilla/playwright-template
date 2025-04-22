@@ -21,5 +21,6 @@ export const SIGNUP_SELECTORS = {
   memberPreferencesCheckbox: '[class*="v-member-sign-up-form-field--member-preferences"] .v-checkbox-input__input',
   termsCheckbox: '#v-member-sign-up-form-field__terms-and-conditions-input',
   submitButton: 'button[type="submit"].v-form__submit-button',
-  confirmPasswordInput: '#signup-confirm-password'
+  confirmPasswordInput: '#signup-confirm-password',
+  modalContainer: '.v-modal__container'
 };

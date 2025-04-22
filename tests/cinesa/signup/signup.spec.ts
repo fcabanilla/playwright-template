@@ -1,5 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshotForModal } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/signup.selectors';
 
 test.describe('Signup', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,6 +9,6 @@ test.describe('Signup', () => {
 
   test('Signup display and layout', async ({ page, navbar }, testInfo) => {
     await navbar.navigateToSignup();
-    await takeScreenshot(page, testInfo);
+    await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
   });
 });
