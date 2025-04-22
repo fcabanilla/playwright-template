@@ -52,19 +52,4 @@ export class UnlimitedProgramsPage {
       });
     });
   }
-
-  /**
-   * Takes a screenshot of the programs page for reporting.
-   */
-  async takeScreenshot(testInfo: any): Promise<void> {
-    await allure.test.step('Taking screenshot of programs page', async () => {
-      await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await this.page.waitForTimeout(1000);
-      const screenshotBuffer = await this.page.screenshot({ fullPage: true });
-      await testInfo.attach('Captura de pantalla', {
-        body: screenshotBuffer,
-        contentType: 'image/png'
-      });
-    });
-  }
 }
