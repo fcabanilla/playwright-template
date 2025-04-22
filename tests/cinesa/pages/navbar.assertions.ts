@@ -1,104 +1,96 @@
 import { Page, expect } from '@playwright/test';
 import * as allure from 'allure-playwright';
-import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLanding.page';
+import { navbarSelectors, NavbarSelectors } from '../../../pageObjectsManagers/cinesa/navbar/navbar.selectors';
 
 /**
- * Provides assertions related to the Blog Landing Page.
+ * Provides assertions related to the Navbar.
  */
-export class BlogLandingAssertions {
+export class NavbarAssertions {
   readonly page: Page;
-  readonly blogLanding: BlogLanding;
+  readonly selectors: NavbarSelectors;
 
   /**
-   * Creates a new instance of BlogLandingAssertions.
+   * Creates a new instance of NavbarAssertions.
    *
    * @param page - Playwright Page object.
    */
   constructor(page: Page) {
     this.page = page;
-    this.blogLanding = new BlogLanding(page);
+    this.selectors = navbarSelectors;
   }
 
   /**
-   * Asserts that the number of article cards matches the expected count.
+   * Asserts that all navbar elements are visible on the page.
    *
-   * @param expectedCount - Expected number of article cards.
-   * @returns A Promise that resolves when the assertion is complete.
+   * @returns Promise that resolves when all assertions are complete.
    */
-  async expectArticleCardsCount(expectedCount: number): Promise<void> {
-    await allure.test.step(
-      'Verifying the number of article cards',
-      async () => {
-        const count: number = await this.blogLanding.countArticleCards();
-        await expect(count).toBe(expectedCount);
-      }
-    );
-  }
-
-  /**
-   * Asserts that all article cards are visible on the page.
-   *
-   * @returns A Promise that resolves when all assertions are complete.
-   */
-  async expectArticleCardsVisible(): Promise<void> {
-    await allure.test.step('Verifying article cards visibility', async () => {
-      const cardsLocator = this.blogLanding.getArticleCardsLocator();
-      const count: number = await cardsLocator.count();
-      for (let i = 0; i < count; i++) {
-        await allure.test.step(
-          `Verifying article card at index ${i} is visible`,
-          async () => {
-            await expect(cardsLocator.nth(i)).toBeVisible();
-          }
-        );
-      }
+  async expectNavbarElementsVisible(): Promise<void> {
+    await allure.test.step('Verifying navbar elements visibility', async () => {
+      await allure.test.step("Verify 'Cines' element", async () => {
+        await expect(this.page.locator(this.selectors.cines)).toBeVisible();
+      });
+      await allure.test.step("Verify 'Peliculas' element", async () => {
+        await expect(this.page.locator(this.selectors.peliculas)).toBeVisible();
+      });
+      await allure.test.step("Verify 'Promociones' element", async () => {
+        await expect(this.page.locator(this.selectors.promociones)).toBeVisible();
+      });
+      await allure.test.step("Verify 'Experiencias' element", async () => {
+        await expect(this.page.locator(this.selectors.experiencias)).toBeVisible();
+      });
+      await allure.test.step("Verify 'Programas' element", async () => {
+        await expect(this.page.locator(this.selectors.programas)).toBeVisible();
+      });
+      await allure.test.step("Verify 'Bonos' element", async () => {
+        await expect(this.page.locator(this.selectors.bonos)).toBeVisible();
+      });
     });
   }
 
   /**
-   * Iterates over each related article card, clicks it, verifies navigation to a new URL,
-   * and then navigates back to the original Blog Landing page.
+   * Asserts that the current page URL matches the expected home URL.
    *
-   * @returns A Promise that resolves when all assertions are complete.
+   * @param expectedUrl - The expected home URL.
+   * @returns Promise that resolves when the assertion is complete.
    */
-  async expectNavigationThroughRelatedArticles(): Promise<void> {
-    await allure.test.step(
-      'Verifying navigation through each related article',
-      async () => {
-        // Save the original URL of the Blog Landing page.
-        const originalUrl: string = this.page.url();
-        // Get the count of article cards.
-        const count: number = await this.blogLanding.countArticleCards();
+  async expectHomeUrl(expectedUrl: string): Promise<void> {
+    await allure.test.step('Validating that URL remains home', async () => {
+      await expect(this.page).toHaveURL(expectedUrl);
+    });
+  }
 
-        // Use for-of loop over generated indices.
-        for (const index of Array.from(Array(count).keys())) {
-          await allure.test.step(
-            `Navigating through article card at index ${index}`,
-            async () => {
-              // Re-query the locator in each iteration to prevent stale element issues.
-              const articleLocator = this.blogLanding
-                .getArticleCardsLocator()
-                .nth(index);
-              await expect(articleLocator).toBeVisible();
+  /**
+   * Clicks on a navigation element and verifies that the page navigates to the expected URL.
+   * This method is intended for internal navigation (same tab).
+   *
+   * @param selector - The selector for the navigation element.
+   * @param expectedUrl - The expected destination URL after navigation.
+   * @returns Promise that resolves when navigation and assertion are complete.
+   */
+  async expectNavClick(selector: string, expectedUrl: string): Promise<void> {
+    await allure.test.step(`Clicking on nav element and verifying navigation to ${expectedUrl}`, async () => {
+      await this.page.click(selector);
+      await expect(this.page).toHaveURL(expectedUrl);
+    });
+  }
 
-              // Click on the article card.
-              await articleLocator.click();
-              await this.page.waitForLoadState('networkidle');
-
-              // Validate that the URL has changed.
-              const newUrl: string = this.page.url();
-              await expect(newUrl).not.toBe(originalUrl);
-
-              // Navigate back to the original Blog Landing page.
-              await this.page.goBack();
-              await this.page.waitForLoadState('networkidle');
-
-              // Confirm that we have returned to the original URL.
-              await expect(this.page.url()).toBe(originalUrl);
-            }
-          );
-        }
-      }
-    );
+  /**
+   * Clicks on an external navigation element that opens in a new tab and verifies the URL.
+   *
+   * @param selector - The selector for the external navigation element.
+   * @param expectedUrl - The expected URL in the new tab.
+   * @returns Promise that resolves when navigation, assertion, and tab closure are complete.
+   */
+  async expectExternalNavClick(selector: string, expectedUrl: string): Promise<void> {
+    await allure.test.step(`Clicking on external nav element and verifying navigation to ${expectedUrl} in new tab`, async () => {
+      const [newPage] = await Promise.all([
+        this.page.waitForEvent('popup'),
+        this.page.click(selector),
+      ]);
+      await newPage.waitForLoadState('networkidle');
+      await expect(newPage).toHaveURL(expectedUrl);
+      await newPage.close();
+    });
   }
 }
+

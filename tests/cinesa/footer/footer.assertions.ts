@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { FooterSelectors } from '../../pageObjectsManagers/cinesa/footer.selectors';
+import { FooterSelectors } from '../../../pageObjectsManagers/cinesa/footer/footer.selectors'
 import * as allure from 'allure-playwright';
 import { baseUrl } from './footer.data';
 
