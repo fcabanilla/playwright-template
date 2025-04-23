@@ -1,5 +1,15 @@
-import { Page } from '@playwright/test';
+import { Page, test } from '@playwright/test';
 import { SIGNUP_SELECTORS } from './signup.selectors';
+import {
+  expectEmailErrorVisible,
+  expectConfirmEmailErrorVisible,
+  expectFirstNameErrorVisible,
+  expectLastNameErrorVisible,
+  expectDateOfBirthErrorVisible,
+  expectMobileNumberErrorVisible,
+  expectNationalIdErrorVisible,
+  expectPasswordErrorVisible,
+} from '../../../tests/cinesa/signup/signup.assertions';
 
 export class SignupPage {
   readonly page: Page;
@@ -36,4 +46,71 @@ export class SignupPage {
     await this.page.click(SIGNUP_SELECTORS.submitButton);
   }
 
+  async validateMandatoryFields(): Promise<void> {
+    const page = this.page;
+
+    await test.step('Validate email mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.emailInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await expectEmailErrorVisible(page);
+    });
+
+    await test.step('Validate confirm email mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectConfirmEmailErrorVisible(page);
+    });
+
+    await test.step('Validate first name mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.lastNameInput);
+      await page.waitForTimeout(100);
+      await expectFirstNameErrorVisible(page);
+    });
+
+    await test.step('Validate last name mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.lastNameInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.dateOfBirthInput);
+      await page.waitForTimeout(100);
+      await expectLastNameErrorVisible(page);
+    });
+
+    await test.step('Validate date of birth mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.dateOfBirthInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.mobileNumberInput);
+      await page.waitForTimeout(100);
+      await expectDateOfBirthErrorVisible(page);
+    });
+
+    await test.step('Validate mobile number mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.mobileNumberInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.nationalIdInput);
+      await page.waitForTimeout(100);
+      await expectMobileNumberErrorVisible(page);
+    });
+
+    await test.step('Validate national id mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.nationalIdInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.passwordInput);
+      await page.waitForTimeout(100);
+      await expectNationalIdErrorVisible(page);
+    });
+
+    await test.step('Validate password mandatory', async () => {
+      await page.click(SIGNUP_SELECTORS.passwordInput);
+      await page.waitForTimeout(100);
+      await page.click(SIGNUP_SELECTORS.modalContainer);
+      await page.waitForTimeout(100);
+      await expectPasswordErrorVisible(page);
+    });
+  }
 }

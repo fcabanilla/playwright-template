@@ -11,4 +11,11 @@ test.describe('Signup', () => {
     await navbar.navigateToSignup();
     await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
   });
+
+  test('Validate mandatory fields', async ({ page, navbar, signupPage }, testInfo) => {
+    await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-7217', async () => {});
+    await navbar.navigateToSignup();
+    await signupPage.validateMandatoryFields();
+    await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
+  });
 });

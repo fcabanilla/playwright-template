@@ -1,10 +1,10 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { ProgramsPage } from '../../../pageObjectsManagers/cinesa/programs/programs.page';
+import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Programs Page', () => {
   test.beforeEach(async ({ page }) => {
-    await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {
-    });
+    await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
   });
 
   test('Programs unlimited display and layout from URL', async ({ page, unlimitedProgramsPage, cookieBanner }) => {
@@ -13,7 +13,7 @@ test.describe('Programs Page', () => {
     });
     await cookieBanner.acceptCookies();
     await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
-    await unlimitedProgramsPage.takeScreenshot(test.info());
+    await takeScreenshot(page, test.info());
   });
 
   test('Programs unlimited display and layout from home page', async ({ page, unlimitedProgramsPage, cookieBanner, navbar }) => {
@@ -28,6 +28,6 @@ test.describe('Programs Page', () => {
     await programsPage.clickUnlimitedButton();
 
     await unlimitedProgramsPage.waitForProgramsPage();
-    await unlimitedProgramsPage.takeScreenshot(test.info());
+    await takeScreenshot(page, test.info());
   });
 });
