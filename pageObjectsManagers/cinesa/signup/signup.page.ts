@@ -9,6 +9,7 @@ import {
   expectMobileNumberErrorVisible,
   expectNationalIdErrorVisible,
   expectPasswordErrorVisible,
+  expectNoEmailErrors,
 } from '../../../tests/cinesa/signup/signup.assertions';
 
 export class SignupPage {
@@ -111,6 +112,54 @@ export class SignupPage {
       await page.click(SIGNUP_SELECTORS.modalContainer);
       await page.waitForTimeout(100);
       await expectPasswordErrorVisible(page);
+    });
+  }
+
+  async validateEmailFields(): Promise<void> {
+    const page = this.page;
+
+    await test.step('Validate email without @', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'invalidemail.com');
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await expectEmailErrorVisible(page);
+    });
+
+    await test.step('Validate email without domain', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'user@');
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await expectEmailErrorVisible(page);
+    });
+
+    await test.step('Validate email without dot after @', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'user@mail');
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await expectEmailErrorVisible(page);
+    });
+
+    await test.step('Validate email with dot but no TLD', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'user@mail.');
+      await page.click(SIGNUP_SELECTORS.confirmEmailInput);
+      await page.waitForTimeout(100);
+      await expectEmailErrorVisible(page);
+    });
+
+    await test.step('Validate valid email with random TLD', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'user@mail.la');
+      await page.fill(SIGNUP_SELECTORS.confirmEmailInput, 'user@mail.la');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectNoEmailErrors(page);
+    });
+
+    await test.step('Validate email confirmation mismatch', async () => {
+      await page.fill(SIGNUP_SELECTORS.emailInput, 'test@example.com');
+      await page.fill(SIGNUP_SELECTORS.confirmEmailInput, 'different@example.com');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectConfirmEmailErrorVisible(page);
     });
   }
 }

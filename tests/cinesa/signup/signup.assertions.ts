@@ -32,3 +32,8 @@ export async function expectNationalIdErrorVisible(page: Page) {
 export async function expectPasswordErrorVisible(page: Page) {
   await expect(page.locator(SIGNUP_SELECTORS.passwordInputError)).toBeVisible();
 }
+
+export async function expectNoEmailErrors(page: Page) {
+  await expect(page.locator(SIGNUP_SELECTORS.emailInputError)).toBeHidden();
+  await expect(page.locator(SIGNUP_SELECTORS.confirmEmailInputError)).toBeHidden();
+}
