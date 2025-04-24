@@ -10,6 +10,7 @@ import {
   expectNationalIdErrorVisible,
   expectPasswordErrorVisible,
   expectNoEmailErrors,
+  expectPasswordRuleState,
 } from '../../../tests/cinesa/signup/signup.assertions';
 
 export class SignupPage {
@@ -160,6 +161,80 @@ export class SignupPage {
       await page.click(SIGNUP_SELECTORS.firstNameInput);
       await page.waitForTimeout(100);
       await expectConfirmEmailErrorVisible(page);
+    });
+  }
+
+  async validatePasswordFields(): Promise<void> {
+    const page = this.page;
+
+    await test.step('Validate all rules neutral at start', async () => {
+      for (let i = 0; i < 5; i++) {
+        await expectPasswordRuleState(page, i, 'neutral');
+      }
+    });
+
+    await test.step('Validate only lowercase valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, 'a');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectPasswordRuleState(page, 0, 'invalid'); // mayúscula
+      await expectPasswordRuleState(page, 1, 'valid');   // minúscula
+      await expectPasswordRuleState(page, 2, 'invalid'); // número
+      await expectPasswordRuleState(page, 3, 'invalid'); // especial
+      await expectPasswordRuleState(page, 4, 'invalid'); // min 10
+    });
+
+    await test.step('Validate only uppercase valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, 'A');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectPasswordRuleState(page, 0, 'valid');
+      await expectPasswordRuleState(page, 1, 'invalid');
+      await expectPasswordRuleState(page, 2, 'invalid');
+      await expectPasswordRuleState(page, 3, 'invalid');
+      await expectPasswordRuleState(page, 4, 'invalid');
+    });
+
+    await test.step('Validate only number valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, '1');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectPasswordRuleState(page, 0, 'invalid');
+      await expectPasswordRuleState(page, 1, 'invalid');
+      await expectPasswordRuleState(page, 2, 'valid');
+      await expectPasswordRuleState(page, 3, 'invalid');
+      await expectPasswordRuleState(page, 4, 'invalid');
+    });
+
+    await test.step('Validate only special char valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, '@');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectPasswordRuleState(page, 0, 'invalid');
+      await expectPasswordRuleState(page, 1, 'invalid');
+      await expectPasswordRuleState(page, 2, 'invalid');
+      await expectPasswordRuleState(page, 3, 'valid');
+      await expectPasswordRuleState(page, 4, 'invalid');
+    });
+
+    await test.step('Validate only min 10 chars valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, 'abcdefghij');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      await expectPasswordRuleState(page, 0, 'invalid');
+      await expectPasswordRuleState(page, 1, 'valid');
+      await expectPasswordRuleState(page, 2, 'invalid');
+      await expectPasswordRuleState(page, 3, 'invalid');
+      await expectPasswordRuleState(page, 4, 'valid');
+    });
+
+    await test.step('Validate all rules valid', async () => {
+      await page.fill(SIGNUP_SELECTORS.passwordInput, 'Abcdef12@#');
+      await page.click(SIGNUP_SELECTORS.firstNameInput);
+      await page.waitForTimeout(100);
+      for (let i = 0; i < 5; i++) {
+        await expectPasswordRuleState(page, i, 'valid');
+      }
     });
   }
 }

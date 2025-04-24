@@ -24,4 +24,10 @@ test.describe('Signup', () => {
     await signupPage.validateEmailFields();
     await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
   });
+
+  test('Validate password', async ({ page, navbar, signupPage }, testInfo) => {
+    await navbar.navigateToSignup();
+    await signupPage.validatePasswordFields();
+    await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
+  });
 });
