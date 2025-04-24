@@ -28,6 +28,7 @@ export default defineConfig({
     ],
   ],
   fullyParallel: true,
+  workers: 10,
   use: {
     headless: false, // Ejecuta el navegador de forma visual
     screenshot: 'only-on-failure',
