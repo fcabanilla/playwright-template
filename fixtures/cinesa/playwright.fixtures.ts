@@ -29,6 +29,8 @@ type CustomFixtures = {
   paymentPage: PaymentPage;
   unlimitedProgramsPage: UnlimitedProgramsPage;
   signupPage: SignupPage;
+  whoarewe: Footer;
+  workwithus: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -87,6 +89,12 @@ export const test = base.extend<CustomFixtures>({
   signupPage: async ({ page }, use) => {
     const signupPage = new SignupPage(page);
     await use(signupPage);
+  },
+  whoarewe: async ({ footer }, use) => {
+    await use(footer);
+  },
+  workwithus: async ({ footer }, use) => {
+    await use(footer);
   },
 });
 

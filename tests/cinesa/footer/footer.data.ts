@@ -1,4 +1,4 @@
-import { FooterSelectors } from '../../pageObjectsManagers/cinesa/footer.selectors';
+import { FooterSelectors } from '../../../pageObjectsManagers/cinesa/footer/footer.selectors';
 
 // Interfaz para representar un elemento de navegación y su URL esperada
 export interface FooterNavItem {
@@ -13,8 +13,8 @@ export const baseUrl = 'https://www.cinesa.es';
 export const internalFooterItems: FooterNavItem[] = [
   { selectorKey: 'quienesSomosLink', expectedUrl: `${baseUrl}/quienes-somos/` },
   { selectorKey: 'trabajaConNosotrosLink', expectedUrl: 'https://cinesa-uci.jobtrain.co.uk/cinesajobs/Home/Job' },
-  { selectorKey: 'cinesaBusinessLink', expectedUrl: 'http://www.cinesabusiness.es/' },
-  { selectorKey: 'atencionAlClienteLink', expectedUrl: 'http://ayuda.cinesa.es/' },
+  { selectorKey: 'cinesaBusinessLink', expectedUrl: 'https://www.cinesabusiness.es/' },
+  { selectorKey: 'atencionAlClienteLink', expectedUrl: 'https://ayuda.cinesa.es/hc/es' },
   { selectorKey: 'apoyoInstitucionalLink', expectedUrl: `${baseUrl}/quienes-somos/apoyo-institucional/` },
   { selectorKey: 'transparenciaLink', expectedUrl: `${baseUrl}/quienes-somos/transparencia/` },
   { selectorKey: 'eventosLink', expectedUrl: `${baseUrl}/eventos/` },

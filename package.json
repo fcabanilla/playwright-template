@@ -21,7 +21,9 @@
     "lint": "eslint . --ext .ts,.js",
     "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report/awesome",
     "watch-report": "npx allure watch allure-results",
-    "codegen": "npx playwright codegen https://www.cinesa.es"
+    "codegen": "npx playwright codegen https://www.cinesa.es",
+    "test:whoarewe": "npx playwright test tests/cinesa/whoarewe/whoarewe.spec.ts",
+    "test:workwithus": "npx playwright test tests/cinesa/workwithus/workwithus.spec.ts"
   },
   "repository": {
     "type": "git",
