@@ -35,6 +35,14 @@ type CustomFixtures = {
   customerservice: Footer;
   institutionalsupport: Footer;
   transparency: Footer;
+  events: Footer;
+  cinesaluxe: Footer;
+  salaspremium: Footer;
+  infantil: Footer;
+  ciclos: Footer;
+  blogcinesa: Footer;
+  legalNotice: Footer;
+  purchaseConditions: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -110,6 +118,30 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   transparency: async ({ footer }, use) => {
+    await use(footer);
+  },
+  events: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cinesaluxe: async ({ footer }, use) => {
+    await use(footer);
+  },
+  salaspremium: async ({ footer }, use) => {
+    await use(footer);
+  },
+  infantil: async ({ footer }, use) => {
+    await use(footer);
+  },
+  ciclos: async ({ footer }, use) => {
+    await use(footer);
+  },
+  blogcinesa: async ({ footer }, use) => {
+    await use(footer);
+  },
+  legalNotice: async ({ footer }, use) => {
+    await use(footer);
+  },
+  purchaseConditions: async ({ footer }, use) => {
     await use(footer);
   },
 });
