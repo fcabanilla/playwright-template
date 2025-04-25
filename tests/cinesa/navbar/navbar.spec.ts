@@ -4,11 +4,9 @@ import { NavbarAssertions } from './navbar.assertions';
 import { baseUrl, internalNavItems, externalNavItem } from './navbar.data';
 
 test.describe('Cinesa Navbar Tests', () => {
-  let navbar: Navbar;
   let navbarAssertions: NavbarAssertions;
 
-  test.beforeEach(async ({ page, cookieBanner }) => {
-    navbar = new Navbar(page);
+  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     navbarAssertions = new NavbarAssertions(page);
     await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
@@ -18,12 +16,12 @@ test.describe('Cinesa Navbar Tests', () => {
     await navbarAssertions.expectNavbarElementsVisible();
   });
 
-  test('should click logo and stay on home', async () => {
+  test('should click logo and stay on home', async ({ navbar }) => {
     await navbar.clickLogo();
     await navbarAssertions.expectHomeUrl(baseUrl);
   });
 
-  test('should click each navbar element and navigate accordingly', async () => {
+  test('should click each navbar element and navigate accordingly', async ({ navbar }) => {
     for (const item of internalNavItems) {
       await navbarAssertions.expectNavClick(
         navbar.selectors[item.selectorKey],
