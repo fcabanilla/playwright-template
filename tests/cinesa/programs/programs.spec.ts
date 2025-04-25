@@ -31,7 +31,9 @@ test.describe('Programs Page', () => {
     await takeScreenshot(page, test.info());
   });
 
-  test('Programs page display and layout', async ({ page, navbar }, testInfo) => {
+  test('Programs page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+    await navbar.navigateToHome();
+    await cookieBanner.acceptCookies();
     await navbar.navigateToPrograms();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Programs page display and layout');
