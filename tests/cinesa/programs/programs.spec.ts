@@ -1,6 +1,7 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { ProgramsPage } from '../../../pageObjectsManagers/cinesa/programs/programs.page';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { assertProgramsRedirection } from './programs.assertions';
 
 test.describe('Programs Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -37,5 +38,13 @@ test.describe('Programs Page', () => {
     await navbar.navigateToPrograms();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Programs page display and layout');
+  });
+
+  test('Cinesa Programs page redirection test', async ({ page, navbar, cookieBanner }) => {
+    await navbar.navigateToHome();
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToPrograms();
+    await page.waitForLoadState('networkidle');
+    assertProgramsRedirection(page);
   });
 });
