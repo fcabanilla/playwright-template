@@ -31,6 +31,10 @@ type CustomFixtures = {
   signupPage: SignupPage;
   whoarewe: Footer;
   workwithus: Footer;
+  cinesabusiness: Footer;
+  customerservice: Footer;
+  institutionalsupport: Footer;
+  transparency: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -94,6 +98,18 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   workwithus: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cinesabusiness: async ({ footer }, use) => {
+    await use(footer);
+  },
+  customerservice: async ({ footer }, use) => {
+    await use(footer);
+  },
+  institutionalsupport: async ({ footer }, use) => {
+    await use(footer);
+  },
+  transparency: async ({ footer }, use) => {
     await use(footer);
   },
 });

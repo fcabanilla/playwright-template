@@ -23,7 +23,11 @@
     "watch-report": "npx allure watch allure-results",
     "codegen": "npx playwright codegen https://www.cinesa.es",
     "test:whoarewe": "npx playwright test tests/cinesa/whoarewe/whoarewe.spec.ts",
-    "test:workwithus": "npx playwright test tests/cinesa/workwithus/workwithus.spec.ts"
+    "test:workwithus": "npx playwright test tests/cinesa/workwithus/workwithus.spec.ts",
+    "test:cinesabusiness": "npx playwright test tests/cinesa/cinesabusiness/cinesabusiness.spec.ts",
+    "test:customerservice": "npx playwright test tests/cinesa/customerservice/customerservice.spec.ts",
+    "test:institutionalsupport": "npx playwright test tests/cinesa/institutionalsupport/institutionalsupport.spec.ts",
+    "test:transparency": "npx playwright test tests/cinesa/transparency/transparency.spec.ts"
   },
   "repository": {
     "type": "git",
