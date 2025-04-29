@@ -43,6 +43,9 @@ type CustomFixtures = {
   blogcinesa: Footer;
   legalNotice: Footer;
   purchaseConditions: Footer;
+  unlimitedConditions: Footer;
+  privacypolicy: Footer;
+  cookiespolicy: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -142,6 +145,15 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   purchaseConditions: async ({ footer }, use) => {
+    await use(footer);
+  },
+  unlimitedConditions: async ({ footer }, use) => {
+    await use(footer);
+  },
+  privacypolicy: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cookiespolicy: async ({ footer }, use) => {
     await use(footer);
   },
 });

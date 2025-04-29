@@ -35,7 +35,10 @@
     "test:ciclos": "npx playwright test tests/cinesa/ciclos/ciclos.spec.ts",
     "test:blogcinesa": "npx playwright test tests/cinesa/blogcinesa/blogcinesa.spec.ts",
     "test:legalnotice": "npx playwright test tests/cinesa/legalNotice/legalNotice.spec.ts",
-    "test:purchaseconditions": "npx playwright test tests/cinesa/purchaseConditions/purchaseConditions.spec.ts"
+    "test:purchaseconditions": "npx playwright test tests/cinesa/purchaseConditions/purchaseConditions.spec.ts",
+    "test:unlimitedconditions": "npx playwright test tests/cinesa/footer/components/unlimitedConditions/unlimitedConditions.spec.ts",
+    "test:privacypolicy": "npx playwright test tests/cinesa/footer/components/privacypolicy/privacypolicy.spec.ts",
+    "test:cookiespolicy": "npx playwright test tests/cinesa/footer/components/cookiespolicy/cookiespolicy.spec.ts"
   },
   "repository": {
     "type": "git",
