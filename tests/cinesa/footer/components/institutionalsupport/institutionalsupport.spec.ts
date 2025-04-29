@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './institutionalsupport.data';
 import { assertInstitutionalSupportNavigation } from './institutionalsupport.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Institutional Support Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {

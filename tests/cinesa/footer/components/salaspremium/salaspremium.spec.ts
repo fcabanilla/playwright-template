@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './salaspremium.data';
 import { assertSalasPremiumNavigation } from './salaspremium.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Salas Premium Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, salaspremium }) => {

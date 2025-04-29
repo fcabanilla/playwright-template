@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './transparency.data';
 import { assertTransparencyNavigation } from './transparency.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Transparency Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, footer }) => {

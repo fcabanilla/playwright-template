@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './customerservice.data';
 import { assertCustomerServiceNavigation } from './customerservice.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Customer Service Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {

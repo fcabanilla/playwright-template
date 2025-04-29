@@ -1,7 +1,7 @@
-import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test, expect } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './events.data';
 import { assertEventsNavigation } from './events.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Eventos Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, events }) => {

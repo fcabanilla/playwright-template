@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './cinesaluxe.data';
 import { assertCinesaLuxeNavigation } from './cinesaluxe.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Cinesa Luxe Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, cinesaluxe }) => {

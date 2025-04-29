@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './purchaseConditions.data';
 import { assertPurchaseConditionsNavigation } from './purchaseConditions.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Purchase Conditions Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, footer }) => {

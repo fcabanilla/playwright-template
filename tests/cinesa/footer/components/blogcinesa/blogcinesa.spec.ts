@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './blogcinesa.data';
 import { assertBlogCinesaNavigation } from './blogcinesa.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Blog de Cinesa Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, footer }) => {

@@ -1,7 +1,7 @@
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { expectedUrl } from './cinesabusiness.data';
 import { assertCinesaBusinessNavigation } from './cinesabusiness.assertions';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Cinesa Business Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, cinesabusiness }) => {
