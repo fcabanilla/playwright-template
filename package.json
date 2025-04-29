@@ -38,7 +38,9 @@
     "test:purchaseconditions": "npx playwright test tests/cinesa/purchaseConditions/purchaseConditions.spec.ts",
     "test:unlimitedconditions": "npx playwright test tests/cinesa/footer/components/unlimitedConditions/unlimitedConditions.spec.ts",
     "test:privacypolicy": "npx playwright test tests/cinesa/footer/components/privacypolicy/privacypolicy.spec.ts",
-    "test:cookiespolicy": "npx playwright test tests/cinesa/footer/components/cookiespolicy/cookiespolicy.spec.ts"
+    "test:cookiespolicy": "npx playwright test tests/cinesa/footer/components/cookiespolicy/cookiespolicy.spec.ts",
+    "test:modernslavery": "npx playwright test tests/cinesa/footer/components/modernSlavery/modernSlavery.spec.ts",
+    "test:codeofconduct": "npx playwright test tests/cinesa/footer/components/codeOfConduct/codeOfConduct.spec.ts"
   },
   "repository": {
     "type": "git",

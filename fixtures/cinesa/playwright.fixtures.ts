@@ -46,6 +46,8 @@ type CustomFixtures = {
   unlimitedConditions: Footer;
   privacypolicy: Footer;
   cookiespolicy: Footer;
+  modernSlavery: Footer;
+  codeOfConduct: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -154,6 +156,12 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   cookiespolicy: async ({ footer }, use) => {
+    await use(footer);
+  },
+  modernSlavery: async ({ footer }, use) => {
+    await use(footer);
+  },
+  codeOfConduct: async ({ footer }, use) => {
     await use(footer);
   },
 });
