@@ -48,6 +48,9 @@ type CustomFixtures = {
   cookiespolicy: Footer;
   modernSlavery: Footer;
   codeOfConduct: Footer;
+  whistleblowing: Footer;
+  androidAppDownload: Footer;
+  appleAppDownload: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -162,6 +165,15 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   codeOfConduct: async ({ footer }, use) => {
+    await use(footer);
+  },
+  whistleblowing: async ({ footer }, use) => {
+    await use(footer);
+  },
+  androidAppDownload: async ({ footer }, use) => {
+    await use(footer);
+  },
+  appleAppDownload: async ({ footer }, use) => {
     await use(footer);
   },
 });

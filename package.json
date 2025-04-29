@@ -40,7 +40,10 @@
     "test:privacypolicy": "npx playwright test tests/cinesa/footer/components/privacypolicy/privacypolicy.spec.ts",
     "test:cookiespolicy": "npx playwright test tests/cinesa/footer/components/cookiespolicy/cookiespolicy.spec.ts",
     "test:modernslavery": "npx playwright test tests/cinesa/footer/components/modernSlavery/modernSlavery.spec.ts",
-    "test:codeofconduct": "npx playwright test tests/cinesa/footer/components/codeOfConduct/codeOfConduct.spec.ts"
+    "test:codeofconduct": "npx playwright test tests/cinesa/footer/components/codeOfConduct/codeOfConduct.spec.ts",
+    "test:whistleblowing": "npx playwright test tests/cinesa/footer/components/whistleblowing/whistleblowing.spec.ts",
+    "test:androidappdownload": "npx playwright test tests/cinesa/footer/components/androidAppDownload/androidAppDownload.spec.ts",
+    "test:appleappdownload": "npx playwright test tests/cinesa/footer/components/appleAppDownload/appleAppDownload.spec.ts"
   },
   "repository": {
     "type": "git",
