@@ -1,5 +1,4 @@
 export interface NavbarSelectors {
-  // Selector para el logo (si se mantiene)
   logo: string;
   cines: string;
   peliculas: string;
@@ -7,10 +6,12 @@ export interface NavbarSelectors {
   experiencias: string;
   programas: string;
   bonos: string;
+  signup: string;
+  signin: string;
 }
 
 export const navbarSelectors: NavbarSelectors = {
-  logo: "[data-testid='navbar-logo']", // ...mantiene el selector de logo si aplica...
+  logo: ".logo a",
   cines: 'nav.header-nav a[href="/cines/"]',
   peliculas: 'nav.header-nav a[href="/peliculas/"]',
   promociones: 'nav.header-nav a[href="/promociones/"]',
@@ -18,4 +19,6 @@ export const navbarSelectors: NavbarSelectors = {
   programas: 'nav.header-nav a[href="/programas/"]',
   bonos:
     'nav.header-nav a[target="_blank"][href="https://www.cinesabusiness.es/promociones.html"]',
+  signup: '.header-sign-up',
+  signin: '.header-sign-in',
 };

@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { cinemaSelectors, CinemaSelectors } from './cinema.selectors';
-import { cinemasData } from '../../../tests/cinesa/cinema/cinemas.data';
+import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
 
 /**
  * Represents the Cinesa cinema selection page.

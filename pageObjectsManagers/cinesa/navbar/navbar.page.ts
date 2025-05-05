@@ -120,4 +120,26 @@ export class Navbar {
       await this.page.click(this.selectors.bonos);
     });
   }
+
+  /**
+   * Hace clic en el botón "Inicia sesión".
+   *
+   * @returns Promise que se resuelve cuando se completa la acción.
+   */
+  async clickSignin(): Promise<void> {
+    await allure.test.step('Clicking on Sign In button', async () => {
+      await this.page.click(this.selectors.signin);
+    });
+  }
+
+  /**
+   * Navega a la página de registro (signup).
+   *
+   * @returns Promise que se resuelve cuando la navegación finaliza.
+   */
+  async navigateToSignup(): Promise<void> {
+    await allure.test.step('Clicking on Signup button', async () => {
+      await this.page.click(this.selectors.signup);
+    });
+  }
 }

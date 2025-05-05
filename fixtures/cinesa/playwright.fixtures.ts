@@ -12,6 +12,7 @@ import { BarPage } from '../../pageObjectsManagers/cinesa/bar/bar.page';
 import { PurchaseSummary } from '../../pageObjectsManagers/cinesa/purchaseSummary/purchaseSummary.page';
 import { PaymentPage } from '../../pageObjectsManagers/cinesa/paymentPage/paymentPage.page';
 import { UnlimitedProgramsPage } from '../../pageObjectsManagers/cinesa/programs/unlimitedPrograms.page';
+import { SignupPage } from '../../pageObjectsManagers/cinesa/signup/signup.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -27,6 +28,29 @@ type CustomFixtures = {
   purchaseSummary: PurchaseSummary;
   paymentPage: PaymentPage;
   unlimitedProgramsPage: UnlimitedProgramsPage;
+  signupPage: SignupPage;
+  whoarewe: Footer;
+  workwithus: Footer;
+  cinesabusiness: Footer;
+  customerservice: Footer;
+  institutionalsupport: Footer;
+  transparency: Footer;
+  events: Footer;
+  cinesaluxe: Footer;
+  salaspremium: Footer;
+  infantil: Footer;
+  ciclos: Footer;
+  blogcinesa: Footer;
+  legalNotice: Footer;
+  purchaseConditions: Footer;
+  unlimitedConditions: Footer;
+  privacypolicy: Footer;
+  cookiespolicy: Footer;
+  modernSlavery: Footer;
+  codeOfConduct: Footer;
+  whistleblowing: Footer;
+  androidAppDownload: Footer;
+  appleAppDownload: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
@@ -81,6 +105,76 @@ export const test = base.extend<CustomFixtures>({
   unlimitedProgramsPage: async ({ page }, use) => {
     const programsPage = new UnlimitedProgramsPage(page);
     await use(programsPage);
+  },
+  signupPage: async ({ page }, use) => {
+    const signupPage = new SignupPage(page);
+    await use(signupPage);
+  },
+  whoarewe: async ({ footer }, use) => {
+    await use(footer);
+  },
+  workwithus: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cinesabusiness: async ({ footer }, use) => {
+    await use(footer);
+  },
+  customerservice: async ({ footer }, use) => {
+    await use(footer);
+  },
+  institutionalsupport: async ({ footer }, use) => {
+    await use(footer);
+  },
+  transparency: async ({ footer }, use) => {
+    await use(footer);
+  },
+  events: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cinesaluxe: async ({ footer }, use) => {
+    await use(footer);
+  },
+  salaspremium: async ({ footer }, use) => {
+    await use(footer);
+  },
+  infantil: async ({ footer }, use) => {
+    await use(footer);
+  },
+  ciclos: async ({ footer }, use) => {
+    await use(footer);
+  },
+  blogcinesa: async ({ footer }, use) => {
+    await use(footer);
+  },
+  legalNotice: async ({ footer }, use) => {
+    await use(footer);
+  },
+  purchaseConditions: async ({ footer }, use) => {
+    await use(footer);
+  },
+  unlimitedConditions: async ({ footer }, use) => {
+    await use(footer);
+  },
+  privacypolicy: async ({ footer }, use) => {
+    await use(footer);
+  },
+  cookiespolicy: async ({ footer }, use) => {
+    await use(footer);
+  },
+  modernSlavery: async ({ footer }, use) => {
+    await use(footer);
+  },
+  codeOfConduct: async ({ footer }, use) => {
+    await use(footer);
+  },
+  whistleblowing: async ({ footer }, use) => {
+    await use(footer);
+  },
+  androidAppDownload: async ({ footer }, use) => {
+    await use(footer);
+  },
+  appleAppDownload: async ({ footer }, use) => {
+    await use(footer);
   },
 });
 

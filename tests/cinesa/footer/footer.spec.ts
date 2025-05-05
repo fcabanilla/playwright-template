@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
 import { CookieBanner } from '../../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
 import { Footer } from '../../../pageObjectsManagers/cinesa/footer/footer.page';
 import {
@@ -7,27 +7,20 @@ import {
 } from './footer.assertions';
 
 test.describe('Cinesa Footer Tests', () => {
-  let footer: Footer;
-  let cookieBanner: CookieBanner;
-
-  test.beforeEach(async ({ page }) => {
-    footer = new Footer(page);
-    cookieBanner = new CookieBanner(page);
-
+  test.beforeEach(async ({ page, footer, cookieBanner }) => {
     await footer.navigateToHome();
 
-    // Aceptar cookies si es necesario
     const acceptButton = page.locator('#onetrust-accept-btn-handler');
     if (await acceptButton.isVisible()) {
       await cookieBanner.acceptCookies();
     }
   });
 
-  test('should display all footer elements', async ({ page }) => {
+  test('should display all footer elements', async ({ page, footer }) => {
     await assertFooterElementsVisible(page, footer.selectors);
   });
 
-  test('should navigate to Cinesa blog page and validate URL', async ({ page }) => {
+  test('should navigate to Cinesa blog page and validate URL', async ({ page, footer }) => {
     await assertNavigateToBlog(page, footer.selectors);
   });
 });
