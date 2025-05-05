@@ -78,14 +78,13 @@ export class SeatPicker {
           const ariaLabel =
             (await seatLocator.getAttribute('aria-label')) || '';
           const className = (await seatLocator.getAttribute('class')) || '';
-          const pressed = await seatLocator.getAttribute('aria-pressed'); // "true"/"false" o null
+          const pressed = await seatLocator.getAttribute('aria-pressed');
 
-          // Parsear la fila y el número a partir del aria-label (ejemplo: "Normal seat 5-9" o "Wheelchair space 1-14")
           const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
           const seatIdentifier = `${row}-${seatNumber}`;
 
           const seatType = this.getSeatType(className, ariaLabel);
-          const seatState = this.getSeatState(className, pressed);
+          const seatState = await this.getSeatState(seatLocator, className, pressed);
 
           seats.push({
             row,
@@ -213,6 +212,7 @@ export class SeatPicker {
         const chosenSeats = sortedSeats.slice(0, seatCount);
         for (const seat of chosenSeats) {
           await this.selectSeat(seat);
+          await this.page.waitForTimeout(300);
         }
 
         return chosenSeats;
@@ -311,16 +311,17 @@ export class SeatPicker {
   /**
    * Determines the seat state from class names or the aria-pressed attribute.
    */
-  private getSeatState(className: string, pressed: string | null): SeatState {
-    if (className.includes('--unavailable') || className.includes('--house')) {
-      return 'unavailable';
+  private async getSeatState(seatLocator: Locator, className: string, pressed: string | null): Promise<SeatState> {
+    const useLocator = seatLocator.locator('use');
+    if (await useLocator.count() > 0) {
+      const href = await useLocator.first().getAttribute('href');
+      if (href?.includes('selected')) return 'selected';
+      if (href?.includes('available')) return 'available';
     }
-    if (pressed === 'true' || className.includes('--selected')) {
-      return 'selected';
-    }
-    if (pressed === 'false' || className.includes('--available')) {
-      return 'available';
-    }
+    
+    if (className.includes('--unavailable') || className.includes('--house')) return 'unavailable';
+    if (pressed === 'true' || className.includes('--selected')) return 'selected';
+    if (pressed === 'false' || className.includes('--available')) return 'available';
     return 'unknown';
   }
 
