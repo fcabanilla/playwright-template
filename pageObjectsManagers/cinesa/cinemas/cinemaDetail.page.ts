@@ -90,6 +90,48 @@ export class CinemaDetail {
   }
 
   /**
+   * Selects a random film from the film list that has normal showtimes.
+   * @returns Promise that resolves to the name of the selected film.
+   */
+  async selectRandomNormalFilm(): Promise<string> {
+    return await allure.test.step(
+      'Selecting a random film with normal showtimes from cinema detail page',
+      async () => {
+        const names = await this.getFilmNames();
+        if (names.length === 0) {
+          throw new Error('No films found on the cinema detail page');
+        }
+
+        const filmsWithNormalShowtimes: string[] = [];
+
+        for (const name of names) {
+          const filmContainer = this.page.locator(this.selectors.filmItem, {
+            has: this.page.locator(this.selectors.filmName, { hasText: name }),
+          });
+
+          const normalShowtimes = await filmContainer.locator(this.selectors.showtime).filter({
+            hasNot: this.page.locator(this.selectors.specialAttributes),
+          });
+
+          if ((await normalShowtimes.count()) > 0) {
+            filmsWithNormalShowtimes.push(name);
+          }
+        }
+
+        if (filmsWithNormalShowtimes.length === 0) {
+          throw new Error('No films with normal showtimes found on the cinema detail page');
+        }
+
+        const randomIndex = Math.floor(Math.random() * filmsWithNormalShowtimes.length);
+        const selectedFilm = filmsWithNormalShowtimes[randomIndex];
+        await this.selectFilmByName(selectedFilm);
+        console.log(`Selected film: ${selectedFilm}`);
+        return selectedFilm;
+      }
+    );
+  }
+
+  /**
    * Retrieves a list of showtime texts available for the currently selected film.
    * @param filmName - The name of the film for which to retrieve showtimes.
    * @returns Promise that resolves to an array of showtime texts.
@@ -146,6 +188,61 @@ export class CinemaDetail {
         const selectedTime = showtimes[randomIndex];
         await this.selectShowtimeByText(selectedTime);
         return selectedTime;
+      }
+    );
+  }
+
+  /**
+   * Selects a random "normal" showtime (without special attributes like "Vose", "iSense", or "D-BOX").
+   * @param filmName - The name of the film for which to retrieve showtimes.
+   * @returns Promise that resolves to the text of the selected showtime.
+   */
+  async selectNormalRandomShowtime(filmName: string): Promise<string> {
+    return await allure.test.step(
+      'Selecting a random normal showtime for the selected film',
+      async () => {
+        const filmContainer = this.page.locator(this.selectors.filmItem, {
+          has: this.page.locator(this.selectors.filmName, {
+            hasText: filmName,
+          }),
+        });
+
+        // Locate all showtime buttons
+        const showtimeLocator = filmContainer.locator(this.selectors.showtime);
+        await showtimeLocator.first().waitFor({ state: 'visible', timeout: 50000 });
+
+        // Filter out showtimes with special attributes
+        const normalShowtimes = await showtimeLocator.filter({
+          hasNot: this.page.locator('.v-attribute__icon--type-standard, .v-attribute__icon--type-hero'),
+        });
+
+        const normalShowtimeTexts = await normalShowtimes.allTextContents();
+        if (normalShowtimeTexts.length === 0) {
+          throw new Error('No normal showtimes found for the selected film');
+        }
+
+        const randomIndex = Math.floor(Math.random() * normalShowtimeTexts.length);
+        const selectedTime = normalShowtimeTexts[randomIndex];
+        await this.selectShowtimeByText(selectedTime);
+        return selectedTime;
+      }
+    );
+  }
+
+  /**
+   * Selects a random film and then selects a random "normal" showtime for that film.
+   * @returns Promise that resolves to an object containing the selected film name and normal showtime text.
+   */
+  async selectNormalRandomFilmAndShowtime(): Promise<{
+    film: string;
+    showtime: string;
+  }> {
+    return await allure.test.step(
+      'Selecting a random film and a random normal showtime',
+      async () => {
+        const film = await this.selectRandomNormalFilm();
+        const showtime = await this.selectNormalRandomShowtime(film);
+        return { film, showtime };
       }
     );
   }

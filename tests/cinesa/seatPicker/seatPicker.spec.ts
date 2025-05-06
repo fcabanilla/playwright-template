@@ -22,7 +22,7 @@ test.describe('Seat Picker', () => {
     const selectedCinema = await cinema.selectOasizCinema();
     console.log(`Selected cinema: ${selectedCinema}`);
 
-    const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
+    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
     console.log(`Selected film: ${film} at showtime: ${showtime}`);
 
     const selectedSeat = await seatPicker.selectLastAvailableSeat();
@@ -55,7 +55,7 @@ test.describe('Seat Picker', () => {
     const selectedCinema = await cinema.selectOasizCinema();
     console.log(`Selected cinema: ${selectedCinema}`);
 
-    const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
+    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
     console.log(`Selected film: ${film} at showtime: ${showtime}`);
 
     const seatsToSelect = 4;
