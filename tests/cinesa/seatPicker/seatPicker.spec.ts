@@ -19,7 +19,7 @@ test.describe('Seat Picker', () => {
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectSantanderCinema();
+    const selectedCinema = await cinema.selectOasizCinema();
     console.log(`Selected cinema: ${selectedCinema}`);
 
     const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
@@ -52,7 +52,7 @@ test.describe('Seat Picker', () => {
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectSantanderCinema();
+    const selectedCinema = await cinema.selectOasizCinema();
     console.log(`Selected cinema: ${selectedCinema}`);
 
     const { film, showtime } = await cinemaDetail.selectRandomFilmAndShowtime();
