@@ -27,7 +27,7 @@ test.describe('Seat Picker', () => {
 
     const selectedSeat = await seatPicker.selectLastAvailableSeat();
     console.log(
-      `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}`
+      `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}, type: ${selectedSeat.seatType}, state: ${selectedSeat.seatState}, aria-label: ${selectedSeat.ariaLabel}`
     );
 
     await seatPicker.confirmSeats();
@@ -62,7 +62,7 @@ test.describe('Seat Picker', () => {
     const selectedSeats = await seatPicker.selectLastAvailableSeats(seatsToSelect);
     selectedSeats.forEach((seat, index) => {
       console.log(
-        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}`
+        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.ariaLabel}`
       );
     });
 

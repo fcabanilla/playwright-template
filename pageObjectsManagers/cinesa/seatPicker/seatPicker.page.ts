@@ -58,6 +58,33 @@ export class SeatPicker {
   }
 
   /**
+   * Waits for the seats to load and ensures they are visible and interactable.
+   */
+  private async waitForSeatsToBeReady(): Promise<void> {
+    await allure.test.step('Waiting for seats to be ready', async () => {
+      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+
+      // Wait for at least one seat to be visible
+      await seatLocators.first().waitFor({ state: 'visible', timeout: 10000 });
+
+      // Ensure all seats have loaded by checking their count
+      const count = await seatLocators.count();
+      if (count === 0) {
+        throw new Error('No seats found after waiting for them to load');
+      }
+
+      // Wait for all seats to have their aria-pressed attribute set
+      await this.page.waitForFunction(
+        (selector) => {
+          const seats = Array.from(document.querySelectorAll(selector));
+          return seats.every((seat) => seat.getAttribute('aria-pressed') !== null);
+        },
+        SEAT_PICKER_SELECTORS.seatGeneric
+      );
+    });
+  }
+
+  /**
    * Retrieves all seats from the DOM by parsing their aria-label.
    */
   async getAllSeats(): Promise<Seat[]> {
@@ -165,6 +192,7 @@ export class SeatPicker {
       await this.page.waitForResponse((response) =>
         response.url().includes('/seat-availability') && response.status() === 200
       );
+      await this.waitForSeatsToBeReady();
       const availableSeats = await this.getAvailableSeats();
       if (availableSeats.length === 0) {
         throw new Error('No available seats found');
@@ -196,7 +224,7 @@ export class SeatPicker {
         await this.page.waitForResponse((response) =>
           response.url().includes('/seat-availability') && response.status() === 200
         );
-
+        await this.waitForSeatsToBeReady();
         const availableSeats = await this.getAvailableSeats();
         if (availableSeats.length < seatCount) {
           throw new Error(
@@ -309,19 +337,35 @@ export class SeatPicker {
   }
 
   /**
-   * Determines the seat state from class names or the aria-pressed attribute.
+   * Determines the seat state from class names, aria-label, or the aria-pressed attribute.
    */
   private async getSeatState(seatLocator: Locator, className: string, pressed: string | null): Promise<SeatState> {
+    const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
     const useLocator = seatLocator.locator('use');
+
+    // Check aria-label for "Unavailable"
+    if (ariaLabel.toLowerCase().includes('unavailable')) {
+      return 'unavailable';
+    }
+
+    // Check for specific icons or href attributes in <use> elements
     if (await useLocator.count() > 0) {
       const href = await useLocator.first().getAttribute('href');
       if (href?.includes('selected')) return 'selected';
       if (href?.includes('available')) return 'available';
+      if (href?.includes('unavailable') || href?.includes('house')) return 'unavailable';
     }
-    
+
+    // Check for specific class names indicating state
     if (className.includes('--unavailable') || className.includes('--house')) return 'unavailable';
-    if (pressed === 'true' || className.includes('--selected')) return 'selected';
-    if (pressed === 'false' || className.includes('--available')) return 'available';
+    if (className.includes('--selected')) return 'selected';
+    if (className.includes('--available')) return 'available';
+
+    // Check aria-pressed attribute as a fallback
+    if (pressed === 'true') return 'selected';
+    if (pressed === 'false') return 'available';
+
+    // Default to unknown if no conditions match
     return 'unknown';
   }
 
