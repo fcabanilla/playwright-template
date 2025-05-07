@@ -14,33 +14,22 @@ export class BarPage {
   }
 
   /**
-   * Handles the bar page by skipping the popup (if present) and clicking the main button.
+   * Handles the bar page by clicking the button inside the modal and the main button.
    */
   async skipBar(): Promise<void> {
-    await allure.test.step('Handling the bar page', async () => {
-      const popup = this.page.locator(BAR_SELECTORS.popup);
-      const closeButton = this.page.locator(BAR_SELECTORS.popupCloseButton);
+    await allure.test.step('Handling the bar modal and main button', async () => {
+      const modal = this.page.locator(BAR_SELECTORS.modal);
+      const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
       const mainButton = this.page.locator(BAR_SELECTORS.barMainButton);
 
-      if (await popup.isVisible()) {
-        await closeButton.waitFor({ state: 'visible', timeout: 5000 });
-        await closeButton.click();
-        await popup.waitFor({ state: 'hidden', timeout: 5000 });
-      }
-
-      const modal = this.page.locator(BAR_SELECTORS.modal);
+      await modal.waitFor({ state: 'visible', timeout: 10000 });
       if (await modal.isVisible()) {
-        const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
         await modalButton.waitFor({ state: 'visible', timeout: 5000 });
-        await modalButton.click({ force: true });
-        try {
-          await modal.waitFor({ state: 'hidden', timeout: 2000 });
-        } catch (error) {
-        }
+        await modalButton.click();
+        await modal.waitFor({ state: 'hidden', timeout: 5000 });
       }
 
       await mainButton.waitFor({ state: 'visible', timeout: 5000 });
-      await mainButton.waitFor({ state: 'attached', timeout: 5000 });
       await mainButton.click();
     });
   }
