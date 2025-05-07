@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { assertWarningMessageDisplayed, assertConfirmButtonDisabled } from './seatPicker.assertions';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, seatPicker }) => {
@@ -72,5 +73,32 @@ test.describe('Seat Picker', () => {
     await barPage.skipBar();
     await purchaseSummary.acceptAndContinue();
     await paymentPage.completePayment();
+  });
+
+  test('Attempt to select seats leaving an empty space between selection', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    const selectedCinema = await cinema.selectOasizCinema();
+    console.log(`Selected cinema: ${selectedCinema}`);
+
+    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    console.log(`Selected film: ${film} at showtime: ${showtime}`);
+
+    const selectedSeats = await seatPicker.selectSeatsWithEmptySpaceBetween();
+    selectedSeats.forEach((seat, index) => {
+      console.log(
+        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.ariaLabel}`
+      );
+    });
+
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
   });
 });

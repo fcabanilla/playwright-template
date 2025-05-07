@@ -274,6 +274,52 @@ export class SeatPicker {
   }
 
   /**
+   * Selects seats with an empty space between them.
+   * Ensures there are three contiguous available seats in the same row.
+   * Selects the first and third seats, leaving the second seat empty.
+   * Returns the list of chosen seats.
+   */
+  async selectSeatsWithEmptySpaceBetween(): Promise<Seat[]> {
+    return await allure.test.step(
+      'Selecting seats with an empty space between them',
+      async () => {
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const availableSeats = await this.getAvailableSeats();
+
+        const seatsByRow = availableSeats.reduce((acc, seat) => {
+          acc[seat.row] = acc[seat.row] || [];
+          acc[seat.row].push(seat);
+          return acc;
+        }, {} as Record<number, Seat[]>);
+
+        for (const row in seatsByRow) {
+          const rowSeats = seatsByRow[row].sort((a, b) => a.seatNumber - b.seatNumber);
+
+          for (let i = 0; i < rowSeats.length - 2; i++) {
+            const firstSeat = rowSeats[i];
+            const secondSeat = rowSeats[i + 1];
+            const thirdSeat = rowSeats[i + 2];
+
+            if (
+              secondSeat.seatNumber === firstSeat.seatNumber + 1 &&
+              thirdSeat.seatNumber === secondSeat.seatNumber + 1
+            ) {
+              await this.selectSeat(firstSeat);
+              await this.selectSeat(thirdSeat);
+              return [firstSeat, thirdSeat];
+            }
+          }
+        }
+
+        throw new Error('No suitable seats found with an empty space between them');
+      }
+    );
+  }
+
+  /**
    * Confirms the selected seats by clicking the confirm/continue button.
    */
   async confirmSeats(): Promise<void> {
@@ -294,6 +340,30 @@ export class SeatPicker {
         }
       }
     );
+  }
+
+  /**
+   * Validates that the red warning message is displayed.
+   */
+  async validateWarningMessage(): Promise<void> {
+    await allure.test.step('Validating red warning message is displayed', async () => {
+      const warningMessage = this.page.locator(SEAT_PICKER_SELECTORS.warningMessage);
+      if (!(await warningMessage.isVisible())) {
+        throw new Error('Red warning message is not displayed');
+      }
+    });
+  }
+
+  /**
+   * Validates that the "Continuar" button is disabled.
+   */
+  async validateConfirmButtonDisabled(): Promise<void> {
+    await allure.test.step('Validating "Continuar" button is disabled', async () => {
+      const confirmButton = this.page.locator(SEAT_PICKER_SELECTORS.disabledConfirmButton);
+      if (!(await confirmButton.isVisible())) {
+        throw new Error('"Continuar" button is not disabled');
+      }
+    });
   }
 
   // ────────────────────────── Helpers ──────────────────────────
