@@ -101,4 +101,31 @@ test.describe('Seat Picker', () => {
     await assertWarningMessageDisplayed(seatPicker.page);
     await assertConfirmButtonDisabled(seatPicker.page);
   });
+
+  test('Attempt to select seats separating group in the same row', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    const selectedCinema = await cinema.selectOasizCinema();
+    console.log(`Selected cinema: ${selectedCinema}`);
+
+    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    console.log(`Selected film: ${film} at showtime: ${showtime}`);
+
+    const selectedSeats = await seatPicker.selectSeatsSeparatingGroupInSameRow();
+    selectedSeats.forEach((seat, index) => {
+      console.log(
+        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.seatState}`
+      );
+    });
+
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
 });

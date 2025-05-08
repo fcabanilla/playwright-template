@@ -132,6 +132,7 @@ export class SeatPicker {
    * Filters the seats to only those available.
    */
   async getAvailableSeats(): Promise<Seat[]> {
+    await this.waitForSeatsToBeReady();
     const allSeats = await this.getAllSeats();
     return allSeats.filter((s) => s.seatState === 'available');
   }
@@ -315,6 +316,62 @@ export class SeatPicker {
         }
 
         throw new Error('No suitable seats found with an empty space between them');
+      }
+    );
+  }
+
+  /**
+   * Selects seats by separating a group in the same row.
+   * Starts searching from the back rows and the first available seat in each row.
+   * Returns the list of chosen seats.
+   */
+  async selectSeatsSeparatingGroupInSameRow(): Promise<Seat[]> {
+    return await allure.test.step(
+      'Selecting seats separating group in the same row',
+      async () => {
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const availableSeats = await this.getAvailableSeats();
+
+        const seatsByRow = availableSeats.reduce((acc, seat) => {
+          acc[seat.row] = acc[seat.row] || [];
+          acc[seat.row].push(seat);
+          return acc;
+        }, {} as Record<number, Seat[]>);
+
+        const sortedRows = Object.keys(seatsByRow)
+          .map(Number)
+          .sort((a, b) => b - a);
+
+        for (const row of sortedRows) {
+          const rowSeats = seatsByRow[row].sort((a, b) => a.seatNumber - b.seatNumber);
+
+          for (let i = 0; i < rowSeats.length - 4; i++) {
+            const firstSeat = rowSeats[i];
+            const secondSeat = rowSeats[i + 1];
+            const thirdSeat = rowSeats[i + 4];
+
+            if (
+              secondSeat.seatNumber === firstSeat.seatNumber + 1 &&
+              thirdSeat.seatNumber === firstSeat.seatNumber + 4
+            ) {
+              await this.selectSeat(firstSeat);
+              await this.page.waitForTimeout(300);
+
+              await this.selectSeat(secondSeat);
+              await this.page.waitForTimeout(300);
+
+              await this.selectSeat(thirdSeat);
+              await this.page.waitForTimeout(300);
+
+              return [firstSeat, secondSeat, thirdSeat];
+            }
+          }
+        }
+
+        throw new Error('No suitable seats found for the test');
       }
     );
   }
