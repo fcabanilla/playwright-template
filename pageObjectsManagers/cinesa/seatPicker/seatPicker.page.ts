@@ -138,13 +138,48 @@ export class SeatPicker {
   }
 
   /**
-   * Selects a given seat (click on it).
+   * Retrieves available seats organized as a matrix (list of lists).
+   * Each sublist represents a row, and each element in the sublist is a seat.
+   */
+  async getAvailableSeatsMatrix(): Promise<Seat[][]> {
+    return await allure.test.step(
+      'Retrieving available seats as a matrix',
+      async () => {
+        const availableSeats = await this.getAvailableSeats();
+        const seatsMatrix: Seat[][] = [];
+        let currentRow: number | null = null;
+        let currentRowSeats: Seat[] = [];
+        for (const seat of availableSeats) {
+          if (currentRow === null || seat.row !== currentRow) {
+            if (currentRowSeats.length > 0) {
+              seatsMatrix.push(currentRowSeats);
+            }
+            currentRow = seat.row;
+            currentRowSeats = [];
+          }
+          currentRowSeats.push(seat);
+        }
+        if (currentRowSeats.length > 0) {
+          seatsMatrix.push(currentRowSeats);
+        }
+        return seatsMatrix;
+      }
+    );
+  }
+
+  /**
+   * Selects a given seat (click on it) and waits for its state to change.
    */
   async selectSeat(seat: Seat): Promise<void> {
     await allure.test.step(
       `Selecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
         await seat.locator.click();
+        const elementHandle = await seat.locator.elementHandle();
+        await this.page.waitForFunction(
+          (element) => element?.getAttribute('aria-pressed') === 'true',
+          elementHandle
+        );
       }
     );
   }
@@ -372,6 +407,59 @@ export class SeatPicker {
         }
 
         throw new Error('No suitable seats found for the test');
+      }
+    );
+  }
+
+  /**
+   * Selects seats by separating a group in different rows.
+   * Finds two available seats in the backmost row (from last row to first row).
+   * Then finds one available seat in the next rows.
+   * Returns the list of chosen seats.
+   */
+  async selectSeatsSeparatingGroupInDifferentRows(): Promise<Seat[]> {
+    return await allure.test.step(
+      'Selecting seats separating group in different rows',
+      async () => {
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const seatsMatrix = await this.getAvailableSeatsMatrix();
+        const selectedSeats: Seat[] = [];
+        for (let rowIndex = seatsMatrix.length - 1; rowIndex >= 0; rowIndex--) {
+          const row = seatsMatrix[rowIndex];
+          const sortedRow = row.sort((a, b) => a.seatNumber - b.seatNumber);
+
+          for (let i = 0; i < sortedRow.length - 1; i++) {
+            const firstSeat = sortedRow[i];
+            const secondSeat = sortedRow[i + 1];
+            if (firstSeat.seatState === 'available' && secondSeat.seatState === 'available') {
+              selectedSeats.push(firstSeat, secondSeat);
+              rowIndex--;
+              break;
+            }
+          }
+          if (selectedSeats.length === 2) {
+            for (; rowIndex >= 0; rowIndex--) {
+              const nextRow = seatsMatrix[rowIndex];
+              if (nextRow.length > 0) {
+                const sortedNextRow = nextRow.sort((a, b) => a.seatNumber - b.seatNumber);
+                selectedSeats.push(sortedNextRow[0]);
+                break;
+              }
+            }
+            break;
+          }
+        }
+        if (selectedSeats.length < 3) {
+          throw new Error('No suitable seats found for the group');
+        }
+        for (const seat of selectedSeats) {
+          await this.selectSeat(seat);
+          await this.page.waitForTimeout(300);
+        }
+        return selectedSeats;
       }
     );
   }

@@ -1,5 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { assertWarningMessageDisplayed, assertConfirmButtonDisabled } from './seatPicker.assertions';
+import { assertWarningMessageDisplayed, assertConfirmButtonDisabled, assertWarningMessageNotDisplayed, assertConfirmButtonEnabled } from './seatPicker.assertions';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, seatPicker }) => {
@@ -20,17 +20,9 @@ test.describe('Seat Picker', () => {
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectOasizCinema();
-    console.log(`Selected cinema: ${selectedCinema}`);
-
-    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    console.log(`Selected film: ${film} at showtime: ${showtime}`);
-
-    const selectedSeat = await seatPicker.selectLastAvailableSeat();
-    console.log(
-      `Selected seat: Row ${selectedSeat.row}, Seat ${selectedSeat.seatNumber}, type: ${selectedSeat.seatType}, state: ${selectedSeat.seatState}, aria-label: ${selectedSeat.ariaLabel}`
-    );
-
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectLastAvailableSeat();
     await seatPicker.confirmSeats();
     await loginPage.clickContinueAsGuest();
     await ticketPicker.selectTicket();
@@ -53,20 +45,10 @@ test.describe('Seat Picker', () => {
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectOasizCinema();
-    console.log(`Selected cinema: ${selectedCinema}`);
-
-    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    console.log(`Selected film: ${film} at showtime: ${showtime}`);
-
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
     const seatsToSelect = 4;
-    const selectedSeats = await seatPicker.selectLastAvailableSeats(seatsToSelect);
-    selectedSeats.forEach((seat, index) => {
-      console.log(
-        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.ariaLabel}`
-      );
-    });
-
+    await seatPicker.selectLastAvailableSeats(seatsToSelect);
     await seatPicker.confirmSeats();
     await loginPage.clickContinueAsGuest();
     await ticketPicker.selectTicket(seatsToSelect);
@@ -85,19 +67,9 @@ test.describe('Seat Picker', () => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectOasizCinema();
-    console.log(`Selected cinema: ${selectedCinema}`);
-
-    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    console.log(`Selected film: ${film} at showtime: ${showtime}`);
-
-    const selectedSeats = await seatPicker.selectSeatsWithEmptySpaceBetween();
-    selectedSeats.forEach((seat, index) => {
-      console.log(
-        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.ariaLabel}`
-      );
-    });
-
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectSeatsWithEmptySpaceBetween();
     await assertWarningMessageDisplayed(seatPicker.page);
     await assertConfirmButtonDisabled(seatPicker.page);
   });
@@ -112,20 +84,32 @@ test.describe('Seat Picker', () => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
-    const selectedCinema = await cinema.selectOasizCinema();
-    console.log(`Selected cinema: ${selectedCinema}`);
-
-    const { film, showtime } = await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    console.log(`Selected film: ${film} at showtime: ${showtime}`);
-
-    const selectedSeats = await seatPicker.selectSeatsSeparatingGroupInSameRow();
-    selectedSeats.forEach((seat, index) => {
-      console.log(
-        `Selected seat ${index + 1}: Row ${seat.row}, Seat ${seat.seatNumber}, type: ${seat.seatType}, state: ${seat.seatState}, aria-label: ${seat.seatState}`
-      );
-    });
-
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectSeatsSeparatingGroupInSameRow();
     await assertWarningMessageDisplayed(seatPicker.page);
     await assertConfirmButtonDisabled(seatPicker.page);
   });
+
+  test('Select seats separating group in different rows', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    loginPage
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectSeatsSeparatingGroupInDifferentRows();
+    await assertWarningMessageNotDisplayed(seatPicker.page);
+    await assertConfirmButtonEnabled(seatPicker.page);
+    await seatPicker.confirmSeats();
+  });
+
 });
+
+
