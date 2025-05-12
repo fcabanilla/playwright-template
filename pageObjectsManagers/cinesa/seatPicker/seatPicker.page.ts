@@ -465,6 +465,53 @@ export class SeatPicker {
   }
 
   /**
+   * Selects more than the maximum allowed seats.
+   * Returns the list of chosen seats.
+   */
+  async selectMoreThanMaxSeats(): Promise<Seat[]> {
+    return await allure.test.step(
+      `Selecting seats to exceed max capacity`,
+      async () => {
+        const extraSeatsToTest = 3; // Number of extra seats to test
+        const seatCount = maxSeatSelection + extraSeatsToTest; // Total seats to select
+
+        await this.page.waitForResponse((response) =>
+          response.url().includes('/seat-availability') && response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const seatsMatrix = await this.getAvailableSeatsMatrix();
+        const selectedSeats: Seat[] = [];
+        let totalSelected = 0;
+
+        for (let rowIndex = seatsMatrix.length - 1; rowIndex >= 0; rowIndex--) {
+          const row = seatsMatrix[rowIndex];
+          const sortedRow = row.sort((a, b) => a.seatNumber - b.seatNumber);
+
+          for (const seat of sortedRow) {
+            if (totalSelected >= seatCount) break;
+            await this.selectSeat(seat);
+            selectedSeats.push(seat);
+            totalSelected++;
+          }
+          if (totalSelected >= seatCount) break;
+        }
+        if (selectedSeats.length !== seatCount) {
+          throw new Error(`Expected to select ${seatCount} seats, but only selected ${selectedSeats.length}`);
+        }
+        await this.page.waitForTimeout(500);
+        for (let i = 0; i < selectedSeats.length; i++) {
+          selectedSeats[i].seatState = await this.getSeatState(
+            selectedSeats[i].locator,
+            await selectedSeats[i].locator.getAttribute('class') || '',
+            await selectedSeats[i].locator.getAttribute('aria-pressed')
+          );
+        }
+        return selectedSeats;
+      }
+    );
+  }
+
+  /**
    * Confirms the selected seats by clicking the confirm/continue button.
    */
   async confirmSeats(): Promise<void> {

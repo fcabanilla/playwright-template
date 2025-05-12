@@ -1,5 +1,12 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { assertWarningMessageDisplayed, assertConfirmButtonDisabled, assertWarningMessageNotDisplayed, assertConfirmButtonEnabled } from './seatPicker.assertions';
+import { 
+  assertWarningMessageDisplayed, 
+  assertConfirmButtonDisabled, 
+  assertWarningMessageNotDisplayed, 
+  assertConfirmButtonEnabled, 
+  assertFirstSeatsDeselected, 
+  assertLastSeatsSelected 
+} from './seatPicker.assertions';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, seatPicker }) => {
@@ -116,12 +123,31 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker
   }) => {
-    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
     await assertConfirmButtonDisabled(seatPicker.page);
+  });
+
+  test('Select more than max seat capacity', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    const selectedSeats = await seatPicker.selectMoreThanMaxSeats();
+    await assertWarningMessageNotDisplayed(seatPicker.page);
+    await assertConfirmButtonEnabled(seatPicker.page);
+    await assertFirstSeatsDeselected(selectedSeats);
+    await assertLastSeatsSelected(selectedSeats);
   });
 });
 
