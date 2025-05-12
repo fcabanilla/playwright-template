@@ -96,8 +96,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker,
-    loginPage
+    seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await cookieBanner.acceptCookies();
@@ -110,6 +109,20 @@ test.describe('Seat Picker', () => {
     await seatPicker.confirmSeats();
   });
 
+  test('No seat selection', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
 });
 
 
