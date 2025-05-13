@@ -512,6 +512,88 @@ export class SeatPicker {
   }
 
   /**
+   * Selects a companion seat.
+   * Finds the first available companion seat and selects it.
+   */
+  async selectCompanionSeat(): Promise<void> {
+    return await allure.test.step('Selecting a companion seat', async () => {
+      await this.page.waitForResponse((response) =>
+        response.url().includes('/seat-availability') && response.status() === 200
+      );
+      await this.waitForSeatsToBeReady();
+      const allSeats = await this.getAllSeats();
+      const companionSeat = allSeats.find((seat) => seat.seatType === 'companion' && seat.seatState === 'available');
+      if (!companionSeat) {
+        throw new Error('No available companion seat found');
+      }
+      await this.selectSeat(companionSeat);
+    });
+  }
+
+  /**
+   * Selects a wheelchair seat and handles the wheelchair modal if it appears.
+   * @param wheelchairSeat The wheelchair seat to select.
+   */
+  async selectWheelchairSeat(wheelchairSeat: Seat): Promise<void> {
+    await allure.test.step(
+      `Selecting wheelchair seat [Row ${wheelchairSeat.row}, Seat ${wheelchairSeat.seatNumber}]`,
+      async () => {
+        await wheelchairSeat.locator.click();
+        const elementHandle = await wheelchairSeat.locator.elementHandle();
+        await this.acceptWheelchairMessage();
+        await this.page.waitForFunction(
+          (element) => element?.getAttribute('aria-pressed') === 'true',
+          elementHandle
+        );
+      }
+    );
+  }
+
+  /**
+   * Selects a companion seat and a contiguous wheelchair seat.
+   * Finds the first available companion seat and its contiguous wheelchair seat, then selects both.
+   */
+  async selectCompanionAndWheelchairSeats(): Promise<void> {
+    return await allure.test.step('Selecting a companion seat and a contiguous wheelchair seat', async () => {
+      await this.page.waitForResponse((response) =>
+        response.url().includes('/seat-availability') && response.status() === 200
+      );
+      await this.waitForSeatsToBeReady();
+      const allSeats = await this.getAllSeats();
+      const companionSeat = allSeats.find((seat) => seat.seatType === 'companion' && seat.seatState === 'available');
+      if (!companionSeat) {
+        throw new Error('No available companion seat found');
+      }
+      const wheelchairSeat = allSeats.find(
+        (seat) =>
+          seat.seatType === 'wheelchair' &&
+          seat.seatState === 'available' &&
+          seat.row === companionSeat.row &&
+          (seat.seatNumber === companionSeat.seatNumber - 1 || seat.seatNumber === companionSeat.seatNumber + 1)
+      );
+      if (!wheelchairSeat) {
+        throw new Error('No contiguous wheelchair seat found for the companion seat');
+      }
+      await this.selectSeat(companionSeat);
+      await this.selectWheelchairSeat(wheelchairSeat);
+    });
+  }
+
+  /**
+   * Handles the wheelchair modal by clicking the "Continue" button.
+   */
+  async acceptWheelchairMessage(): Promise<void> {
+    return await allure.test.step('Handling the wheelchair modal', async () => {
+      const modal = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModal);
+      const continueButton = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModalAcceptButton);
+      await modal.waitFor({ state: 'visible', timeout: 10000 });
+      await continueButton.waitFor({ state: 'visible', timeout: 5000 });
+      await continueButton.click();
+      await modal.waitFor({ state: 'hidden', timeout: 5000 });
+    });
+  }
+
+  /**
    * Confirms the selected seats by clicking the confirm/continue button.
    */
   async confirmSeats(): Promise<void> {

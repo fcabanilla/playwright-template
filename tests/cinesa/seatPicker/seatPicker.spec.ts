@@ -149,6 +149,41 @@ test.describe('Seat Picker', () => {
     await assertFirstSeatsDeselected(selectedSeats);
     await assertLastSeatsSelected(selectedSeats);
   });
+
+  test('Select only companion seat', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectCompanionSeat();
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
+
+  test('Select companion and wheelchair seat', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectCompanionAndWheelchairSeats();
+    await assertWarningMessageNotDisplayed(seatPicker.page);
+    await assertConfirmButtonEnabled(seatPicker.page);
+    await seatPicker.confirmSeats();
+  });
 });
 
 

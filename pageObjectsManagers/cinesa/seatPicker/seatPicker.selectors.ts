@@ -7,4 +7,7 @@ export const SEAT_PICKER_SELECTORS = {
   confirmSeatsButton: '.selected-seats-button',
   warningMessage: '.selected-seats-validation li',
   disabledConfirmButton: '.selected-seats-button[disabled]',
+  wheelchairModal: 'aside.v-modal.wheelchair-modal[role="dialog"]',
+  wheelchairModalAcceptButton: 'aside.v-modal.wheelchair-modal button.accept',
+  wheelchairModalCancelButton: 'aside.wheelchair-modal .cancel',
 };
