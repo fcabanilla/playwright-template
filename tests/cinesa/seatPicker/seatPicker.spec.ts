@@ -185,10 +185,6 @@ test.describe('Seat Picker', () => {
     await seatPicker.confirmSeats();
   });
 
-  //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected
-  //Modifies the above to allow the leaving of a single seat gap so long as it’s only one side and your selection abuts an existing order.
-  //implementacion cuando podamos configurar la sala como querramos. imposible encontrar escenario armado
-
   test('Select one sofa correctly', async ({
     navbar,
     cinema,
@@ -207,6 +203,28 @@ test.describe('Seat Picker', () => {
     await assertConfirmButtonEnabled(seatPicker.page);
     await seatPicker.confirmSeats();
   });
+
+  test('Select sofa leaving 1 space', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectDBoxRandomFilmAndShowtime();
+    await seatPicker.acceptDBoxMessage();
+    await seatPicker.selectMiddleOfThreeContiguousSeats();
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
+
+  //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected
+  //Modifies the above to allow the leaving of a single seat gap so long as it’s only one side and your selection abuts an existing order.
+  //implementacion cuando podamos configurar la sala como querramos. imposible encontrar escenario armado
 });
 
 

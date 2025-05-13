@@ -668,6 +668,34 @@ export class SeatPicker {
   }
 
   /**
+   * Finds three contiguous available seats in a row and selects the middle one.
+   * Throws an error if no such seats are found.
+   */
+  async selectMiddleOfThreeContiguousSeats(): Promise<void> {
+    await allure.test.step('Selecting the middle seat of three contiguous available seats', async () => {
+      const availableSeatsMatrix = await this.getAvailableSeatsMatrix();
+      for (const row of availableSeatsMatrix) {
+        for (let i = 0; i < row.length - 2; i++) {
+          const firstSeat = row[i];
+          const secondSeat = row[i + 1];
+          const thirdSeat = row[i + 2];
+
+          if (
+            firstSeat.seatState === 'available' &&
+            secondSeat.seatState === 'available' &&
+            thirdSeat.seatState === 'available'
+          ) {
+            await this.selectSeat(secondSeat);
+            return;
+          }
+        }
+      }
+
+      throw new Error('No three contiguous available seats found in any row');
+    });
+  }
+
+  /**
    * Handles the wheelchair modal by clicking the "Continue" button.
    */
   async acceptWheelchairMessage(): Promise<void> {
