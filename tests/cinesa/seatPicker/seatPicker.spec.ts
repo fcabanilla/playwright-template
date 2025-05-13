@@ -184,6 +184,10 @@ test.describe('Seat Picker', () => {
     await assertConfirmButtonEnabled(seatPicker.page);
     await seatPicker.confirmSeats();
   });
+
+  //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected
+  //Modifies the above to allow the leaving of a single seat gap so long as it’s only one side and your selection abuts an existing order.
+  //implementacion cuando podamos configurar la sala como querramos. imposible encontrar escenario armado
 });
 
 
