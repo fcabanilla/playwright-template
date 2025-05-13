@@ -264,4 +264,43 @@ export class CinemaDetail {
       }
     );
   }
+
+  /**
+   * Selects a random D-BOX film and showtime.
+   * @returns Promise that resolves to an object containing the selected film name and showtime text.
+   */
+  async selectDBoxRandomFilmAndShowtime(): Promise<{ film: string; showtime: string }> {
+    return await allure.test.step('Selecting a random D-BOX film and showtime', async () => {
+      const names = await this.getFilmNames();
+      if (names.length === 0) {
+        throw new Error('No films found on the cinema detail page');
+      }
+
+      // Shuffle the list of film names to add randomness
+      const shuffledNames = names.sort(() => Math.random() - 0.5);
+
+      for (const name of shuffledNames) {
+        const filmContainer = this.page.locator(this.selectors.filmItem, {
+          has: this.page.locator(this.selectors.filmName, { hasText: name }),
+        });
+
+        // Locate D-BOX showtimes by checking for the presence of the D-BOX icon
+        const dboxShowtimes = await filmContainer.locator(this.selectors.showtime).filter({
+          has: this.page.locator(this.selectors.dboxIcon),
+        });
+
+        if ((await dboxShowtimes.count()) > 0) {
+          await this.selectFilmByName(name);
+          const showtimeTexts = await dboxShowtimes.allTextContents();
+          const randomIndex = Math.floor(Math.random() * showtimeTexts.length);
+          const selectedShowtime = showtimeTexts[randomIndex];
+          await dboxShowtimes.nth(randomIndex).click();
+          console.log("film: " + name + " showtime: " + selectedShowtime);
+          return { film: name, showtime: selectedShowtime };
+        }
+      }
+
+      throw new Error('No D-BOX films with showtimes found on the cinema detail page');
+    });
+  }
 }

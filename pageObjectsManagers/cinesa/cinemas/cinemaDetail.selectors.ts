@@ -23,6 +23,10 @@ export interface CinemaDetailSelectors {
    * Selector for special attributes like "Vose", "iSense", or "D-BOX".
    */
   specialAttributes: string;
+  /**
+   * Selector for the D-BOX icon within a showtime.
+   */
+  dboxIcon: string;
 }
 
 /**
@@ -34,4 +38,5 @@ export const cinemaDetailSelectors: CinemaDetailSelectors = {
   filmName: '.v-showtime-picker-film-details .v-film-title__text',
   showtime: '.v-showtime-picker-site-list .v-showtime-button',
   specialAttributes: '.v-attribute__icon--type-standard, .v-attribute__icon--type-hero',
+  dboxIcon: 'img[alt="D-BOX"]',
 };

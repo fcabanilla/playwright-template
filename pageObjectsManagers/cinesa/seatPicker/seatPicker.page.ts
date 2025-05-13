@@ -129,6 +129,76 @@ export class SeatPicker {
   }
 
   /**
+   * Retrieves all sofa seats from the sofa section in the DOM as a matrix.
+   * Each sublist represents a row, and each element in the sublist is a seat.
+   */
+  async getAllSofaSeats(): Promise<Seat[][]> {
+    return await allure.test.step('Retrieving all sofa seats from the sofa section as a matrix', async () => {
+      await this.waitForSeatPicker();
+
+      // Locate the sofa section
+      const sofaSectionLocator = this.page.locator(SEAT_PICKER_SELECTORS.sofaSection);
+      await sofaSectionLocator.waitFor({ state: 'visible', timeout: 10000 });
+
+      const seatLocators = sofaSectionLocator.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const count = await seatLocators.count();
+      console.log(`Found ${count} seats in the sofa section`);
+
+      if (count === 0) {
+        throw new Error('No seats found in the sofa section after waiting for them to load');
+      }
+
+      const sofaSeats: Seat[] = [];
+
+      for (let i = 0; i < count; i++) {
+        const seatLocator = seatLocators.nth(i);
+        await seatLocator.waitFor({ state: 'visible', timeout: 5000 });
+
+        const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
+        const className = (await seatLocator.getAttribute('class')) || '';
+
+        // Filter for sofa seats based on specific class or aria-label patterns
+        if (className.includes('v-seat-picker-seat--normal') && ariaLabel.toLowerCase().includes('normal seat')) {
+          const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
+          const seatType = this.getSeatType(className, ariaLabel);
+          const seatState = await this.getSeatState(seatLocator, className, null);
+
+          sofaSeats.push({
+            row,
+            seatNumber,
+            seatType,
+            seatState,
+            ariaLabel,
+            locator: seatLocator,
+          });
+        }
+      }
+
+      // Group seats into a matrix by row
+      const seatsMatrix: Seat[][] = [];
+      let currentRow: number | null = null;
+      let currentRowSeats: Seat[] = [];
+
+      for (const seat of sofaSeats.sort((a, b) => a.row - b.row || a.seatNumber - b.seatNumber)) {
+        if (currentRow === null || seat.row !== currentRow) {
+          if (currentRowSeats.length > 0) {
+            seatsMatrix.push(currentRowSeats);
+          }
+          currentRow = seat.row;
+          currentRowSeats = [];
+        }
+        currentRowSeats.push(seat);
+      }
+
+      if (currentRowSeats.length > 0) {
+        seatsMatrix.push(currentRowSeats);
+      }
+
+      return seatsMatrix;
+    });
+  }
+
+  /**
    * Filters the seats to only those available.
    */
   async getAvailableSeats(): Promise<Seat[]> {
@@ -580,6 +650,24 @@ export class SeatPicker {
   }
 
   /**
+   * Selects a sofa seat within a specific section.
+   */
+  async selectSofaSeat(): Promise<void> {
+    await allure.test.step('Selecting a sofa seat within a specific section', async () => {
+      const sofaSeatsMatrix = await this.getAllSofaSeats();
+      for (const row of sofaSeatsMatrix) {
+        for (const seat of row) {
+          if (seat.seatState === 'available') {
+            await this.selectSeat(seat);
+            return;
+          }
+        }
+      }
+      throw new Error('No available sofa seat found in the specified section');
+    });
+  }
+
+  /**
    * Handles the wheelchair modal by clicking the "Continue" button.
    */
   async acceptWheelchairMessage(): Promise<void> {
@@ -590,6 +678,20 @@ export class SeatPicker {
       await continueButton.waitFor({ state: 'visible', timeout: 5000 });
       await continueButton.click();
       await modal.waitFor({ state: 'hidden', timeout: 5000 });
+    });
+  }
+
+  /**
+   * Accepts the D-BOX warning modal by clicking the continue/accept button.
+   */
+  async acceptDBoxMessage(): Promise<void> {
+    await allure.test.step('Accepting the D-BOX warning modal', async () => {
+      const modalSelector = SEAT_PICKER_SELECTORS.dboxModal;
+      const modal = this.page.locator(modalSelector);
+      await modal.waitFor({ state: 'visible', timeout: 5000 });
+
+      const acceptButton = modal.locator('button').first();
+      await acceptButton.click();
     });
   }
 
