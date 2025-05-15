@@ -11,10 +11,18 @@ export class TicketPicker {
 
   /**
    * Adds a ticket by clicking the increment button.
+   * If "seats" is provided, clicks that many times.
    */
-  private async addTicket(): Promise<void> {
-    const incrementButton = this.page.locator(TICKET_PICKER_SELECTORS.incrementButton).first();
-    await incrementButton.click();
+  private async addTicket(seats?: number): Promise<void> {
+    if (typeof seats === 'number' && seats > 0) {
+      for (let i = 0; i < seats; i++) {
+        const incrementButton = this.page.locator(TICKET_PICKER_SELECTORS.incrementButton).first();
+        await incrementButton.click();
+      }
+    } else {
+      const incrementButton = this.page.locator(TICKET_PICKER_SELECTORS.incrementButton).first();
+      await incrementButton.click();
+    }
   }
 
   /**
@@ -37,10 +45,10 @@ export class TicketPicker {
   /**
    * Handles ticket selection, validation, and confirmation.
    */
-  async selectTicket(): Promise<void> {
-    await this.addTicket();
+  async selectTicket(seats?: number): Promise<void> {
+    await this.addTicket(seats);
     const ticketCount = await this.getTicketCount();
-    await assertTicketCount(ticketCount, 1); // Use the assertion for validation
+    await assertTicketCount(ticketCount, seats ?? 1);
     await this.confirmTickets();
   }
 }

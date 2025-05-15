@@ -130,4 +130,14 @@ export class Cinema {
       return cinemasData.oasiz;
     });
   }
+
+  async selectSantanderCinema(): Promise<string> {
+    return await allure.test.step('Selecting Oasiz cinema', async () => {
+      await this.page.fill(this.selectors.filterInput, cinemasData.santander);
+      await this.page.waitForTimeout(1000);
+      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
+      await cinemaElement.click();
+      return cinemasData.santander;
+    });
+  }
 }
