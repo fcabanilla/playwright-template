@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { MOVIES_SELECTORS } from './movies.selectors';
+import { MoviePage } from '../movie/movie.page';
 
 export interface Movie {
   title: string;
@@ -60,10 +61,9 @@ export class MovieList {
    * Clicks on a movie to navigate to its details page.
    */
   async clickMovie(movie: Movie): Promise<void> {
-    const isVisible = await movie.locator.isVisible();
-    if (!isVisible) {
-      await movie.locator.evaluate((el) => el.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-    }
+    await movie.locator.isVisible();
+    await movie.locator.waitFor({ state: 'visible', timeout: 2000 });
+    await this.page.waitForLoadState('domcontentloaded');
     await movie.locator.locator(MOVIES_SELECTORS.movieLink).click();
   }
 
@@ -73,6 +73,7 @@ export class MovieList {
   async clickCarouselNext(): Promise<void> {
     await this.page.locator(MOVIES_SELECTORS.nextButton).waitFor({ state: 'visible', timeout: 5000 });
     await this.page.locator(MOVIES_SELECTORS.nextButton).click();
+    await this.page.waitForSelector(MOVIES_SELECTORS.topMoviesContainer, { state: 'visible', timeout: 5000 });
   }
 
   /**
@@ -86,18 +87,28 @@ export class MovieList {
    * Iterates through all top movies, clicks them, and validates their titles. If clicking a movie times out, clicks the 'Next' button.
    */
   async iterateAndClickMovies(): Promise<void> {
+    let carouselNextCount = 1; 
     const movies = await this.getTopMovies();
     for (let i = 0; i < movies.length; i++) {
       const movie = movies[i];
       console.log(`Iteration: ${i + 1}, Movie Title: ${movie.title}`);
       try {
-        await this.clickMovie(movie);
+        await Promise.race([
+          this.clickMovie(movie),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Click timeout')), 6000))
+        ]);
         await this.validateMovieTitle(movie.title);
         await this.page.goBack();
         await this.loadTopMovies();
       } catch (error) {
-        console.warn(`Failed to click movie: ${movie.title}. Clicking 'Next' button instead.`);
-        await this.clickCarouselNext();
+        for (let i = 0; i < carouselNextCount; i++) {
+          await this.clickCarouselNext();
+          }
+        carouselNextCount++;
+        await this.page.waitForTimeout(3000);
+        await this.validateMovieTitle(movie.title);
+        await this.page.goBack();
+        await this.loadTopMovies();
       }
     }
   }
@@ -106,8 +117,9 @@ export class MovieList {
    * Waits for the movie details page to load and validates the title.
    */
   async validateMovieTitle(expectedTitle: string): Promise<void> {
-    await this.page.waitForSelector(MOVIES_SELECTORS.movieTitle, { state: 'visible' });
-    const actualTitle = await this.page.locator(MOVIES_SELECTORS.movieTitle).innerText();
+    const moviePage = new MoviePage(this.page);
+    await moviePage.waitForPageLoad();
+    const actualTitle = await moviePage.getMovieTitle();
     if (actualTitle.toLowerCase() !== expectedTitle.toLowerCase()) {
       throw new Error(`Expected title "${expectedTitle}" but found "${actualTitle}"`);
     }
