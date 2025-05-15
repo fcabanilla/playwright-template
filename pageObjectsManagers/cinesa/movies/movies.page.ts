@@ -26,6 +26,13 @@ export class MovieList {
   }
 
   /**
+   * Waits for the all movies container to be visible.
+   */
+  async loadAllMovies(): Promise<void> {
+    await this.page.waitForSelector(MOVIES_SELECTORS.allMoviesContainer, { state: 'visible', timeout: 10000 });
+  }
+
+  /**
    * Gets all top movies as a list of Movie objects.
    */
   async getTopMovies(): Promise<Movie[]> {
@@ -45,7 +52,7 @@ export class MovieList {
    * Gets all movies as a list of Movie objects.
    */
   async getAllMovies(): Promise<Movie[]> {
-    //await this.loadTopMovies();
+    await this.loadAllMovies();
     const movieLocators = await this.page.locator(MOVIES_SELECTORS.allMoviesContainer).all();
     const movies: Movie[] = [];
 
@@ -91,7 +98,6 @@ export class MovieList {
     const movies = await this.getTopMovies();
     for (let i = 0; i < movies.length; i++) {
       const movie = movies[i];
-      console.log(`Iteration: ${i + 1}, Movie Title: ${movie.title}`);
       try {
         await Promise.race([
           this.clickMovie(movie),
@@ -110,6 +116,21 @@ export class MovieList {
         await this.page.goBack();
         await this.loadTopMovies();
       }
+    }
+  }
+
+  /**
+   * Selects 5 random movies from the list of all movies and validates their titles.
+   */
+  async navigateThroughRandomMovies(): Promise<void> {
+    const allMovies = await this.getAllMovies();
+    const randomMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 5);
+    for (const movie of randomMovies) {
+      const title = await movie.locator.locator(MOVIES_SELECTORS.movieTitle).innerText();
+      await this.clickMovie(movie);
+      await this.validateMovieTitle(title);
+      await this.page.goBack();
+      await this.loadAllMovies;
     }
   }
 
