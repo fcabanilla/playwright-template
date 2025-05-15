@@ -9,7 +9,7 @@ import {
 } from './seatPicker.assertions';
 
 test.describe('Seat Picker', () => {
-  test.beforeEach(async ({ page, seatPicker }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('https://www.cinesa.es/');
   });
 
