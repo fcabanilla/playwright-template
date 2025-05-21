@@ -121,16 +121,21 @@ export class MovieList {
 
   /**
    * Selects 5 random movies from the list of all movies and validates their titles.
+   * If no movies are found, the function will log a warning and exit gracefully.
    */
   async navigateThroughRandomMovies(): Promise<void> {
     const allMovies = await this.getAllMovies();
+    if (!allMovies.length) {
+      console.warn('No movies found for the selected tab. Skipping test.');
+      return;
+    }
     const randomMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 5);
     for (const movie of randomMovies) {
       const title = await movie.locator.locator(MOVIES_SELECTORS.movieTitle).innerText();
       await this.clickMovie(movie);
       await this.validateMovieTitle(title);
       await this.page.goBack();
-      await this.loadAllMovies;
+      await this.loadAllMovies();
     }
   }
 
@@ -144,5 +149,17 @@ export class MovieList {
     if (actualTitle.toLowerCase() !== expectedTitle.toLowerCase()) {
       throw new Error(`Expected title "${expectedTitle}" but found "${actualTitle}"`);
     }
+  }
+
+  /**
+   * Clicks a tab in the movies tab list by its index (0-based).
+   * 0 = All, 1 = Now Showing, 2 = Coming Soon, 3 = Advance Sale
+   */
+  async clickMoviesTabByIndex(index: number): Promise<void> {
+    const tabButton = this.page.locator('.v-tabs__tab-list .v-tab__button').nth(index);
+    await tabButton.waitFor({ state: 'visible', timeout: 5000 });
+    await tabButton.click();
+    await this.page.waitForTimeout(800);
+    await this.loadAllMovies();
   }
 }
