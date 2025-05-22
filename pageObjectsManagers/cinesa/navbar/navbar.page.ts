@@ -133,6 +133,15 @@ export class Navbar {
   }
 
   /**
+   * Navega a la página de inicio de sesión (sign in).
+   *
+   * @returns Promise que se resuelve cuando la navegación finaliza.
+   */
+  async navigateToSignIn(): Promise<void> {
+    await this.clickSignin();
+  }
+
+  /**
    * Navega a la página de registro (signup).
    *
    * @returns Promise que se resuelve cuando la navegación finaliza.

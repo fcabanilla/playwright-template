@@ -18,4 +18,21 @@ export class LoginPage {
   async clickContinueAsGuest(): Promise<void> {
     await this.page.locator(LOGIN_SELECTORS.continueAsGuestButton).click();
   }
+
+  /**
+   * Rellena los campos de email y password en el login.
+   */
+  async fillData() {
+    const email = `${'matiasslpknt08'}@${'gmail.com'}`;
+    const password = 'EstoEsUnaPrueba.1';
+    await this.page.fill(LOGIN_SELECTORS.emailInput, email);
+    await this.page.fill(LOGIN_SELECTORS.passwordInput, password);
+  }
+
+  /**
+   * Hace click en el botón de submit del login.
+   */
+  async clickSubmit() {
+    await this.page.click(LOGIN_SELECTORS.submitButton);
+  }
 }
