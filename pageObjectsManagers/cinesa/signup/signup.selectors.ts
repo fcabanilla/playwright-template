@@ -16,6 +16,8 @@ export const SIGNUP_SELECTORS = {
   mobileNumberInput: '#v-member-sign-up-form-field__mobile-number-input',
   mobileNumberInputError: '#v-member-sign-up-form-field__mobile-number-input_help-text',
   primarySiteDropdownButton: '#v-member-sign-up-form-field__primary-site-input-button',
+  favoriteCinemaDropdownList: '#v-member-sign-up-form-field__primary-site-input-list',
+  favoriteCinemaDropdownItem: (cinema: string) => `#v-member-sign-up-form-field__primary-site-input-list .v-dropdown-list-item:has-text(\"${cinema}\")`,
   nationalIdInput: '#v-member-sign-up-form-field__national-id-input',
   nationalIdInputError: '#v-member-sign-up-form-field__national-id-input_help-text',
   addressInput: '#v-member-sign-up-form-field__address-input',
@@ -29,6 +31,6 @@ export const SIGNUP_SELECTORS = {
   memberPreferencesCheckbox: '[class*="v-member-sign-up-form-field--member-preferences"] .v-checkbox-input__input',
   termsCheckbox: '#v-member-sign-up-form-field__terms-and-conditions-input',
   submitButton: 'button[type="submit"].v-form__submit-button',
-  confirmPasswordInput: '#signup-confirm-password',
+  confirmPasswordInput: '#email-confirmation-field',
   modalContainer: '.v-modal__container'
 };

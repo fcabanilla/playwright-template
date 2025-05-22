@@ -32,19 +32,81 @@ export class SignupPage {
     await this.page.fill(SIGNUP_SELECTORS.emailInput, email);
   }
 
-  async fillPassword(password: string): Promise<void> {
-    await this.page.fill(SIGNUP_SELECTORS.passwordInput, password);
+  async fillConfirmEmail(email: string): Promise<void> {
+    await this.page.fill(SIGNUP_SELECTORS.confirmEmailInput, email);
   }
 
-  async fillConfirmPassword(password: string): Promise<void> {
-    await this.page.fill(SIGNUP_SELECTORS.confirmPasswordInput, password);
+  async fillDateOfBirth(date: string): Promise<void> {
+    await this.page.fill(SIGNUP_SELECTORS.dateOfBirthInput, date);
+  }
+
+  async fillMobileNumber(mobile: string): Promise<void> {
+    await this.page.fill(SIGNUP_SELECTORS.mobileNumberInput, mobile);
+  }
+
+  async selectFavoriteCinema(cinema: string): Promise<void> {
+    await this.page.click(SIGNUP_SELECTORS.primarySiteDropdownButton);
+    await this.page.waitForSelector(SIGNUP_SELECTORS.favoriteCinemaDropdownList, { state: 'visible' });
+    const itemSelector = SIGNUP_SELECTORS.favoriteCinemaDropdownItem(cinema);
+    await this.page.click(itemSelector);
+  }
+
+  async fillNationalId(id: string): Promise<void> {
+    await this.page.fill(SIGNUP_SELECTORS.nationalIdInput, id);
+  }
+
+  async clickAddPromoCodeButton(): Promise<void> {
+    await this.page.click(SIGNUP_SELECTORS.promoCodeInput + ' ~ button');
+  }
+
+  async fillPassword(password: string): Promise<void> {
+    await this.page.fill(SIGNUP_SELECTORS.passwordInput, password);
   }
 
   async acceptTerms(): Promise<void> {
     await this.page.check(SIGNUP_SELECTORS.termsCheckbox);
   }
 
+  async checkTermsAndConditionsCheckbox(): Promise<void> {
+    // Usa el id del input directamente para asegurar el click correcto
+    await this.page.locator('#v-member-sign-up-form-field__terms-and-conditions-input').check();
+  }
+
   async submit(): Promise<void> {
+    await this.page.click(SIGNUP_SELECTORS.submitButton);
+  }
+
+  async fillData({
+    name,
+    lastName,
+    email,
+    birthDate,
+    phone,
+    favoriteCinema,
+    id,
+    password
+  }: {
+    name: string;
+    lastName: string;
+    email: string;
+    birthDate: string;
+    phone: string;
+    favoriteCinema: string;
+    id: string;
+    password: string;
+  }) {
+    await this.fillFirstName(name);
+    await this.fillLastName(lastName);
+    await this.fillEmail(email);
+    await this.fillConfirmEmail(email); // Confirmación de email debe ser igual al email
+    await this.fillDateOfBirth(birthDate);
+    await this.fillMobileNumber(phone);
+    await this.selectFavoriteCinema(favoriteCinema);
+    await this.fillNationalId(id);
+    await this.fillPassword(password);
+  }
+
+  async clickRegister() {
     await this.page.click(SIGNUP_SELECTORS.submitButton);
   }
 
