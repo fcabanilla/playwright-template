@@ -854,4 +854,19 @@ export class SeatPicker {
     }
     return arr;
   }
+
+  /**
+   * Selecciona aleatoriamente una silla de ruedas disponible.
+   * Lanza un error si no hay ninguna disponible.
+   */
+  async selectRandomAvailableWheelchairSeat(): Promise<void> {
+    const availableSeats = await this.getAvailableSeats();
+    const wheelchairSeats = availableSeats.filter(seat => seat.seatType === 'wheelchair');
+    if (wheelchairSeats.length === 0) {
+      throw new Error('No available wheelchair seats found');
+    }
+    const randomIndex = Math.floor(Math.random() * wheelchairSeats.length);
+    const randomWheelchairSeat = wheelchairSeats[randomIndex];
+    await this.selectWheelchairSeat(randomWheelchairSeat);
+  }
 }
