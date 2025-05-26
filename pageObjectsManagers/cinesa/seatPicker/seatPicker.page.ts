@@ -869,4 +869,65 @@ export class SeatPicker {
     const randomWheelchairSeat = wheelchairSeats[randomIndex];
     await this.selectWheelchairSeat(randomWheelchairSeat);
   }
+
+  /**
+   * Selecciona sofás dejando un espacio vacío entre ellos (en la misma fila de sofás).
+   * Selecciona el primer y tercer sofá disponibles en una fila de sofás con al menos tres disponibles.
+   */
+  async selectSofaSeatsWithEmptySpaceBetween(): Promise<void> {
+    const sofaMatrix = await this.getAllSofaSeats();
+    for (const row of sofaMatrix) {
+      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      if (availableSofas.length >= 3) {
+        await this.selectSeat(availableSofas[0]);
+        await this.selectSeat(availableSofas[2]);
+        return;
+      }
+    }
+    throw new Error('No sofa row with at least three available sofas found');
+  }
+
+  /**
+   * Selecciona sofás separando un grupo en la misma fila (por ejemplo, selecciona el primero y el último de una fila de sofás con al menos tres disponibles).
+   */
+  async selectSofaSeatsSeparatingGroupInSameRow(): Promise<void> {
+    const sofaMatrix = await this.getAllSofaSeats();
+    for (const row of sofaMatrix) {
+      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      if (availableSofas.length >= 3) {
+        await this.selectSeat(availableSofas[0]);
+        await this.selectSeat(availableSofas[availableSofas.length - 1]);
+        return;
+      }
+    }
+    throw new Error('No sofa row with at least three available sofas found');
+  }
+
+  /**
+   * Selecciona sofás separando el grupo en diferentes filas (por ejemplo, uno en una fila y otro en otra).
+   */
+  async selectSofaSeatsSeparatingGroupInDifferentRows(): Promise<void> {
+    const sofaMatrix = await this.getAllSofaSeats();
+    const selected: Seat[] = [];
+    for (const row of sofaMatrix) {
+      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      if (availableSofas.length > 0 && selected.length < 2) {
+        selected.push(availableSofas[0]);
+      }
+      if (selected.length === 2) break;
+    }
+    for (const row of sofaMatrix) {
+      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      if (availableSofas.length > 0 && !selected.includes(availableSofas[0])) {
+        selected.push(availableSofas[0]);
+        break;
+      }
+    }
+    if (selected.length < 3) {
+      throw new Error('Not enough available sofas in different rows');
+    }
+    for (const seat of selected) {
+      await this.selectSeat(seat);
+    }
+  }
 }

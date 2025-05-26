@@ -240,6 +240,61 @@ test.describe('Seat Picker', () => {
     await seatPicker.confirmSeats();
   });
 
+  test('Attempt to select sofa seats leaving an empty space between selection', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectDBoxRandomFilmAndShowtime();
+    await seatPicker.acceptDBoxMessage();
+    await seatPicker.selectSofaSeatsWithEmptySpaceBetween();
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
+
+  test('Attempt to select sofa seats separating group in the same row', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectDBoxRandomFilmAndShowtime();
+    await seatPicker.acceptDBoxMessage();
+    await seatPicker.selectSofaSeatsSeparatingGroupInSameRow();
+    await assertWarningMessageDisplayed(seatPicker.page);
+    await assertConfirmButtonDisabled(seatPicker.page);
+  });
+
+  test('Select sofa seats separating group in different rows', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectDBoxRandomFilmAndShowtime();
+    await seatPicker.acceptDBoxMessage();
+    await seatPicker.selectSofaSeatsSeparatingGroupInDifferentRows();
+    await assertWarningMessageNotDisplayed(seatPicker.page);
+    await assertConfirmButtonEnabled(seatPicker.page);
+    await seatPicker.confirmSeats();
+  });
+
   //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected
   //Modifies the above to allow the leaving of a single seat gap so long as it’s only one side and your selection abuts an existing order.
   //implementacion cuando podamos configurar la sala como querramos. imposible encontrar escenario armado
