@@ -314,6 +314,28 @@ export class SeatPicker {
   }
 
   /**
+   * Selecciona el último sofá disponible (de atrás hacia adelante) y devuelve el objeto Seat completo.
+   */
+  async selectLastAvailableSofaSeat(): Promise<Seat> {
+    return await allure.test.step('Selecting last available sofa seat from back', async () => {
+      await this.waitForSeatsToBeReady();
+      const sofaMatrix = await this.getAllSofaSeats();
+      const allSofas = sofaMatrix.flat();
+      const availableSofas = allSofas.filter(seat => seat.seatState === 'available');
+      if (availableSofas.length === 0) {
+        throw new Error('No available sofa seats found');
+      }
+      const sortedSofas = availableSofas.sort((a, b) => {
+        if (a.row !== b.row) return b.row - a.row;
+        return b.seatNumber - a.seatNumber;
+      });
+      const chosenSofa = sortedSofas[0];
+      await this.selectSeat(chosenSofa);
+      return chosenSofa;
+    });
+  }
+
+  /**
    * Selects the specified number of available seats from the back to the front.
    * Skips unavailable seats. Maximum number of seats is capped at maxSeatSelection.
    * @param seatCount Number of seats to select.
@@ -650,16 +672,16 @@ export class SeatPicker {
   }
 
   /**
-   * Selects a sofa seat within a specific section.
+   * Selects a sofa seat within a specific section and returns the selected Seat object.
    */
-  async selectSofaSeat(): Promise<void> {
-    await allure.test.step('Selecting a sofa seat within a specific section', async () => {
+  async selectSofaSeat(): Promise<Seat> {
+    return await allure.test.step('Selecting a sofa seat within a specific section', async () => {
       const sofaSeatsMatrix = await this.getAllSofaSeats();
       for (const row of sofaSeatsMatrix) {
         for (const seat of row) {
           if (seat.seatState === 'available') {
             await this.selectSeat(seat);
-            return;
+            return seat;
           }
         }
       }
@@ -929,5 +951,36 @@ export class SeatPicker {
     for (const seat of selected) {
       await this.selectSeat(seat);
     }
+  }
+
+  /**
+   * Selecciona un asiento regular y un asiento sofa, y devuelve un array de los tipos de asiento únicos en texto plano (por ejemplo, ['regular', 'dbox']).
+   */
+  async getRegularAndSofaSeatTypes(): Promise<string[]> {
+    const regular = await this.selectLastAvailableSeat();
+    const sofa = await this.selectLastAvailableSofaSeat();
+    const allSeats = await this.getAllSeats();
+    const selectedSeats = allSeats.filter(s => s.seatState === 'selected');
+    const seatTypes: string[] = [];
+    for (const seat of selectedSeats) {
+      const aria = seat.ariaLabel.toLowerCase();
+      const className = (await seat.locator.getAttribute('class'))?.toLowerCase() || '';
+      let isDBox = aria.includes('d-box') || aria.includes('dbox') || className.includes('d-box') || className.includes('dbox');
+      if (!isDBox) {
+        const useLocator = seat.locator.locator('use');
+        if (await useLocator.count() > 0) {
+          const href = (await useLocator.first().getAttribute('href'))?.toLowerCase() || '';
+          if (href.includes('d-box') || href.includes('dbox')) {
+            isDBox = true;
+          }
+        }
+      }
+      if (isDBox) {
+        seatTypes.push('dbox');
+      } else {
+        seatTypes.push('regular');
+      }
+    }
+    return Array.from(new Set(seatTypes));
   }
 }

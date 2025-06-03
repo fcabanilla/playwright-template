@@ -5,8 +5,10 @@ import {
   assertWarningMessageNotDisplayed, 
   assertConfirmButtonEnabled, 
   assertFirstSeatsDeselected, 
-  assertLastSeatsSelected 
+  assertLastSeatsSelected,
+  assertTicketTypeNamesMatchExpectedTexts 
 } from './seatPicker.assertions';
+import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page }) => {
@@ -293,6 +295,28 @@ test.describe('Seat Picker', () => {
     await assertWarningMessageNotDisplayed(seatPicker.page);
     await assertConfirmButtonEnabled(seatPicker.page);
     await seatPicker.confirmSeats();
+  });
+
+  test('should display regular and sofa ticket type', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    ticketPicker,
+    loginPage
+  }) => {
+    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectDBoxRandomFilmAndShowtime();
+    await seatPicker.acceptDBoxMessage();
+    await seatPicker.getRegularAndSofaSeatTypes();
+    await seatPicker.confirmSeats();
+    await loginPage.clickContinueAsGuest();
+    const ticketTypeNames = await ticketPicker.getTicketTypeNames();
+    assertTicketTypeNamesMatchExpectedTexts(ticketTypeNames, ticketTypeMappings);
   });
 
   //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected

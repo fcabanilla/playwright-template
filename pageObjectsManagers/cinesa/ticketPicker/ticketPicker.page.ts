@@ -51,4 +51,27 @@ export class TicketPicker {
     await assertTicketCount(ticketCount, seats ?? 1);
     await this.confirmTickets();
   }
+
+  /**
+   * Retrieves the title/description of each ticket type available in the list.
+   * Returns an array of ticket type names.
+   */
+  async getTicketTypeNames(): Promise<string[]> {
+    await this.page.waitForSelector(TICKET_PICKER_SELECTORS.ticketTitle, { timeout: 7000 });
+    const ticketRows = this.page.locator(TICKET_PICKER_SELECTORS.ticketRow);
+    const count = await ticketRows.count();
+    const names: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const row = ticketRows.nth(i);
+      let name = '';
+      try {
+        name = await row.locator(TICKET_PICKER_SELECTORS.ticketTitle).innerText();
+      } catch (e) {
+        const html = await row.innerHTML();
+        console.log(`No se encontró título en fila ${i}. HTML:`, html);
+      }
+      names.push(name.trim());
+    }
+    return names;
+  }
 }
