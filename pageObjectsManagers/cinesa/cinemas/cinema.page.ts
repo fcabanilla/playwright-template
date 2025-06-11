@@ -132,12 +132,22 @@ export class Cinema {
   }
 
   async selectSantanderCinema(): Promise<string> {
-    return await allure.test.step('Selecting Oasiz cinema', async () => {
+    return await allure.test.step('Selecting Santander cinema', async () => {
       await this.page.fill(this.selectors.filterInput, cinemasData.santander);
       await this.page.waitForTimeout(1000);
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
       await cinemaElement.click();
       return cinemasData.santander;
+    });
+  }
+
+  async selectGrancasaCinema(): Promise<string> {
+    return await allure.test.step('Selecting Grancasa cinema', async () => {
+      await this.page.fill(this.selectors.filterInput, cinemasData.grancasa);
+      await this.page.waitForTimeout(1000);
+      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
+      await cinemaElement.click();
+      return cinemasData.grancasa;
     });
   }
 }
