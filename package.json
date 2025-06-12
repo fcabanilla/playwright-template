@@ -44,7 +44,8 @@
     "test:whistleblowing": "npx playwright test tests/cinesa/footer/components/whistleblowing/whistleblowing.spec.ts",
     "test:androidappdownload": "npx playwright test tests/cinesa/footer/components/androidAppDownload/androidAppDownload.spec.ts",
     "test:appleappdownload": "npx playwright test tests/cinesa/footer/components/appleAppDownload/appleAppDownload.spec.ts",
-    "test:signin": "npx playwright test tests/cinesa/login/login.spec.ts"
+    "test:signin": "npx playwright test tests/cinesa/login/login.spec.ts",
+    "test:bar": "npx playwright test tests/cinesa/bar/bar.spec.ts"
   },
   "repository": {
     "type": "git",
