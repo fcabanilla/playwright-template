@@ -9,6 +9,7 @@ import {
   assertTicketTypeNamesMatchExpectedTexts 
 } from './seatPicker.assertions';
 import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
+import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page }) => {
@@ -621,6 +622,82 @@ test.describe('Seat Picker', () => {
     await loginPage.clickContinueAsGuest();
     const ticketTypeNames = await ticketPicker.getTicketTypeNames();
     assertTicketTypeNamesMatchExpectedTexts(ticketTypeNames, ticketTypeMappings);
+  });
+
+  test('Simulate a Full Purchase with promotional code - Oasiz', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    ticketPicker,
+    loginPage
+  }) => {
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectLastAvailableSeat();
+    await seatPicker.confirmSeats();
+    await loginPage.clickContinueAsGuest();
+    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[0].values[0]);
+  });
+
+  test('Simulate a Full Purchase with promotional code - Grancasa', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    ticketPicker,
+    loginPage
+  }) => {
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectGrancasaCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectLastAvailableSeat();
+    await seatPicker.confirmSeats();
+    await loginPage.clickContinueAsGuest();
+    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[0].values[0]);
+  });
+
+  test('Simulate a Full Purchase with promotional code - La Vanguardia - Oasiz', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    ticketPicker,
+    loginPage
+  }) => {
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectLastAvailableSeat();
+    await seatPicker.confirmSeats();
+    await loginPage.clickContinueAsGuest();
+    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[1].values[0]);
+  });
+
+  test('Simulate a Full Purchase with promotional code - La Vanguardia - Grancasa', async ({
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner,
+    seatPicker,
+    ticketPicker,
+    loginPage
+  }) => {
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectGrancasaCinema();
+    await cinemaDetail.selectNormalRandomFilmAndShowtime();
+    await seatPicker.selectLastAvailableSeat();
+    await seatPicker.confirmSeats();
+    await loginPage.clickContinueAsGuest();
+    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[1].values[0]);
   });
 
   //TODO rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected

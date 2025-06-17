@@ -7,4 +7,10 @@ export const TICKET_PICKER_SELECTORS = {
   incrementButton: '.v-ticket-picker-table-row:first-of-type .v-number-input__button--plus',
   decrementButton: '.v-number-input__button--minus',
   confirmButton: '.order-totals-button-container .v-button',
+  promoAccordionHeader: '[data-testid="accordion-header"]',
+  promoAccordionContent: '.accordion-plus.open .accordion-plus__content',
+  promoInput: '#v-ticket-redemption-code-form-field__code-input',
+  promoComboButton: '#v-ticket-redemption-code-form-field__type-input-button',
+  promoComboOptionText: '.v-dropdown-list .v-dropdown-option__text',
+  promoContinueButton: '.v-form__submit-button',
 };

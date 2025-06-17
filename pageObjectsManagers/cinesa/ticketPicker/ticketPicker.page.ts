@@ -74,4 +74,58 @@ export class TicketPicker {
     }
     return names;
   }
+
+  /**
+   * Abre el acordeón de código promocional si no está abierto.
+   */
+  private async openPromoAccordion(): Promise<void> {
+    const accordionHeader = this.page.locator(TICKET_PICKER_SELECTORS.promoAccordionHeader);
+    await accordionHeader.waitFor({ state: 'visible', timeout: 7000 });
+    const accordionContent = this.page.locator(TICKET_PICKER_SELECTORS.promoAccordionContent);
+    if (!(await accordionContent.isVisible())) {
+      await accordionHeader.click();
+      await accordionContent.waitFor({ state: 'visible', timeout: 3000 });
+    }
+  }
+
+  /**
+   * Rellena el input del código promocional.
+   */
+  private async fillPromoInput(promo: string): Promise<void> {
+    const input = this.page.locator(TICKET_PICKER_SELECTORS.promoInput);
+    await input.waitFor({ state: 'visible', timeout: 3000 });
+    await input.fill(promo);
+  }
+
+  /**
+   * Selecciona la opción del combo de código promocional.
+   */
+  private async selectPromoComboOption(optionText: string): Promise<void> {
+    const comboButton = this.page.locator(TICKET_PICKER_SELECTORS.promoComboButton);
+    await comboButton.waitFor({ state: 'visible', timeout: 3000 });
+    await comboButton.click();
+    const option = this.page.locator(TICKET_PICKER_SELECTORS.promoComboOptionText, { hasText: optionText });
+    await option.first().waitFor({ state: 'visible', timeout: 3000 });
+    await option.first().click();
+  }
+
+  /**
+   * Hace click en el botón continuar del formulario promocional.
+   */
+  private async clickPromoContinue(): Promise<void> {
+    const continueButton = this.page.locator(TICKET_PICKER_SELECTORS.promoContinueButton);
+    await continueButton.waitFor({ state: 'visible', timeout: 3000 });
+    await continueButton.click();
+  }
+
+  /**
+   * Selecciona un código promocional en el acordeón correspondiente.
+   * @param promo Código promocional a ingresar
+   */
+  async selectPromotionalCode(promo: string): Promise<void> {
+    await this.openPromoAccordion();
+    await this.fillPromoInput(promo);
+    await this.selectPromoComboOption(promo);
+    await this.clickPromoContinue();
+  }
 }
