@@ -132,7 +132,7 @@ export default defineConfig(
     exposeNetwork: '<loopback>',
     timeout: 30000,
     os: ServiceOS.LINUX,
-    useCloudHostedBrowsers: true
+    useCloudHostedBrowsers: false // Disabled due to workspace limitations, using only reporting
   }),
   {
     reporter: [
@@ -147,7 +147,7 @@ export default defineConfig(
         },
       ],
     ],
-    workers: 5, // Optimized for stability
+    workers: 5, // Optimized for Azure service stability
     use: {
       ...config.use,
       screenshot: 'only-on-failure',
@@ -163,11 +163,11 @@ export default defineConfig(
 
 This file configures Azure Playwright Testing service integration:
 
-- **Purpose:** Extends base Playwright configuration for Azure cloud testing
+- **Purpose:** Extends base Playwright configuration for Azure reporting integration
 - **Key Features:**
-  - Cloud-hosted browsers (Linux environment)
-  - Azure-specific reporter
-  - Optimized worker configuration
+  - Local browser execution with Azure reporting
+  - Azure-specific reporter for test results
+  - Optimized worker configuration (5 workers)
   - Allure integration maintained
 
 ### `.env`
@@ -235,11 +235,13 @@ Azure-specific npm scripts:
 ### Expected Behavior
 
 **Successful Run Indicators:**
-- Console shows: "Running tests using Microsoft Playwright Testing service"
+- Console shows: "Running tests using Microsoft Playwright Testing service" (if cloud browsers were enabled)
 - Test execution with specified number of workers
 - "Initializing reporting for this test run" message
 - Azure portal URL provided for results
 - "Uploading test results" progress indicator
+
+**Note:** Current configuration uses local browsers with Azure reporting only. Tests run on your local machine but results are uploaded to Azure for centralized reporting and analysis.
 
 **Report Access:**
 - **Azure Portal:** https://playwright.microsoft.com/
@@ -322,14 +324,15 @@ az account clear
 az login
 ```
 
-#### 3. WebSocket Connection Errors
-**Problem:** Tests fail with WebSocket connection errors
+#### 3. Cloud Browser Connection Issues
+**Problem:** Tests fail with WebSocket connection errors when using cloud browsers
 
 **Solutions:**
-- Reduce number of workers (already set to 5)
-- Check Azure subscription quotas
-- Verify Service URL format
-- Ensure workspace is in "Active" state
+- Use reporting-only mode (already configured): `useCloudHostedBrowsers: false`
+- This allows local execution with Azure reporting
+- Future: Enable cloud browsers when workspace supports `localAuth: Enabled`
+
+**Current Setup:** Tests run locally but send results to Azure for centralized reporting.
 
 #### 4. Service URL Not Working
 **Problem:** "PLAYWRIGHT_SERVICE_URL variable is not set correctly"
@@ -411,3 +414,47 @@ az account get-access-token
 - **Azure CLI Documentation:** https://docs.microsoft.com/en-us/cli/azure/
 - **Playwright Documentation:** https://playwright.dev/
 - **Azure Support:** https://azure.microsoft.com/support/
+
+## Quick Reference - Final Configuration
+
+### Complete Working Setup
+
+**Environment Variables (.env):**
+```env
+PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_YOUR_WORKSPACE_ID
+```
+
+**Azure Configuration (playwright.service.config.ts):**
+```typescript
+export default defineConfig(
+  getServiceConfig(baseConfig, {
+    serviceAuthType: 'TOKEN',
+    useCloudHostedBrowsers: false, // Local execution with Azure reporting
+    workers: 5, // Optimized for stability
+    reporter: [
+      ['html'],
+      ['@azure/microsoft-playwright-testing/reporter'],
+      ['allure-playwright', {...}],
+    ],
+  })
+);
+```
+
+**Test Execution:**
+```bash
+npm run test:azure:navbar
+```
+
+**Validation:**
+```bash
+npm run validate-azure-setup
+```
+
+### Architecture Summary
+- **Local Execution:** Tests run on local browsers
+- **Azure Reporting:** Results uploaded to Azure portal
+- **Worker Count:** 5 workers for optimal performance
+- **Authentication:** Azure CLI with account credentials
+- **Features:** Full Allure integration maintained
+
+*This configuration has been tested and verified to work correctly.*

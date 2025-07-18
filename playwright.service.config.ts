@@ -10,7 +10,7 @@ export default defineConfig(
     exposeNetwork: '<loopback>',
     timeout: 30000,
     os: ServiceOS.LINUX,
-    useCloudHostedBrowsers: true // Set to false if you want to only use reporting and not cloud hosted browsers
+    useCloudHostedBrowsers: false // Disabled due to authentication issues, using only reporting
   }),
   {
     /* 
@@ -44,7 +44,7 @@ export default defineConfig(
       ],
     ],
     // Override workers for Azure service
-    workers: 5, // Reduced from 20 to 5 to avoid connection limitations
+    workers: 5, // Optimized for Azure service stability
     // Azure service specific settings
     use: {
       ...config.use,

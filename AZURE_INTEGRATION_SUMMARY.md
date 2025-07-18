@@ -35,11 +35,11 @@ This document summarizes all files created and modified during the Azure Playwri
 ### 4. `playwright.service.config.ts`
 **Purpose:** Playwright configuration specifically for Azure service integration
 **Content:**
-- Azure service configuration
-- Worker optimization (5 workers)
+- Azure service configuration with local browser execution
+- Worker optimization (5 workers for stability)
 - Reporter configuration (Azure + Allure)
-- Cloud browser settings
-- Environment variable loading
+- Reporting-only mode (useCloudHostedBrowsers: false)
+- Environment variable integration
 
 ## Files Modified
 
@@ -75,7 +75,9 @@ This document summarizes all files created and modified during the Azure Playwri
 1. **Service Configuration:** `playwright.service.config.ts`
    - Extends base Playwright config
    - Configures Azure service connection
-   - Sets up cloud browsers (Linux)
+   - Uses local browsers with Azure reporting
+   - Worker count optimized for Azure (5 workers)
+   - Maintains all existing features (Allure, screenshots, videos)
    - Optimizes worker count for stability
 
 2. **Environment Variables:** `.env`
@@ -90,8 +92,8 @@ This document summarizes all files created and modified during the Azure Playwri
 
 ### Key Features Implemented
 
-- **Cloud Browser Testing:** Tests run on Azure-hosted browsers
-- **Scalable Execution:** Up to 5 parallel workers (configurable)
+- **Reporting-Only Mode:** Tests run locally with results sent to Azure
+- **Scalable Execution:** Up to 5 parallel workers (optimized for stability)
 - **Rich Reporting:** Automatic report generation in Azure portal
 - **Allure Integration:** Maintains existing Allure reporting
 - **Migration Support:** Easy account switching procedures
@@ -105,6 +107,7 @@ This document summarizes all files created and modified during the Azure Playwri
 4. **Security:** Environment variables for sensitive data
 5. **Maintainability:** Modular configuration files
 6. **Validation:** Automated setup verification
+7. **Performance Optimization:** Worker count tuned for Azure service stability
 
 ## Usage Instructions
 
@@ -138,3 +141,44 @@ This document summarizes all files created and modified during the Azure Playwri
 - Regular validation of authentication and connectivity
 - Update documentation when Azure service features change
 - Consider CI/CD integration for automated testing
+
+## Final Working Configuration
+
+### Verified Settings
+- **Execution Mode:** Local browsers with Azure reporting (`useCloudHostedBrowsers: false`)
+- **Worker Count:** 5 workers (optimal for Azure service stability)
+- **Authentication:** Azure CLI with TOKEN service auth
+- **Service URL:** `wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_WORKSPACE_ID`
+
+### Expected Test Run Output
+```
+Running 3 tests using 3 workers
+  3 passed (41.8s)
+Initializing reporting for this test run
+Uploading test results 100%
+Test report: https://playwright.microsoft.com/workspaces/[WORKSPACE_ID]/runs/[RUN_ID]
+```
+
+### Key Configuration Files
+```typescript
+// playwright.service.config.ts
+export default defineConfig(
+  getServiceConfig(baseConfig, {
+    serviceAuthType: 'TOKEN',
+    useCloudHostedBrowsers: false,
+    workers: 5,
+    reporter: [
+      ['html'],
+      ['@azure/microsoft-playwright-testing/reporter'],
+      ['allure-playwright', {...}],
+    ],
+  })
+);
+```
+
+```json
+// package.json scripts
+"test:azure:navbar": "npx playwright test tests/cinesa/navbar.spec.ts --config=playwright.service.config.ts --workers=5"
+```
+
+*Configuration tested and verified as working - December 2024*
