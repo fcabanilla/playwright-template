@@ -1,6 +1,6 @@
 # Playwright Template for Automated Testing
 
-This project is a modern base template for building scalable, maintainable automated tests using [Playwright](https://playwright.dev/). It incorporates best practices like the Page Object Model, custom fixtures, automated reporting with Allure, and CI/CD integration.
+This project is a modern base template for building scalable, maintainable automated tests using [Playwright](https://playwright.dev/). It incorporates best practices like the Page Object Model, custom fixtures, automated reporting with Allure, and CI/CD integration with Azure Playwright Testing service.
 
 ## Table of Contents
 
@@ -9,9 +9,11 @@ This project is a modern base template for building scalable, maintainable autom
   - [Features](#features)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Azure Playwright Testing Setup](#azure-playwright-testing-setup)
   - [Project Structure](#project-structure)
   - [Usage](#usage)
     - [Running Tests](#running-tests)
+    - [Running Tests with Azure Playwright Testing](#running-tests-with-azure-playwright-testing)
     - [Allure Reporting](#allure-reporting)
     - [Custom Fixtures](#custom-fixtures)
   - [Configuration](#configuration)
@@ -28,11 +30,14 @@ This project is a modern base template for building scalable, maintainable autom
 - **Cross-Browser Testing:** Easily run tests on Chromium, Firefox, and WebKit.
 - **Data-Driven Testing:** Extendable to support dynamic test data.
 - **CI/CD Ready:** Designed for smooth integration into continuous integration pipelines.
+- **Azure Playwright Testing:** Integrated with Microsoft Azure Playwright Testing service for cloud-based testing.
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - npm or yarn package manager
+- Azure CLI (for Azure Playwright Testing)
+- Azure subscription with Playwright Testing service enabled
 
 ## Installation
 
@@ -57,6 +62,136 @@ This project is a modern base template for building scalable, maintainable autom
    npx playwright install
    ```
 
+## Azure Playwright Testing Setup
+
+This project is configured to work with Microsoft Azure Playwright Testing service for cloud-based testing with high scalability and rich reporting.
+
+### Prerequisites for Azure Integration
+
+- Azure CLI installed on your system
+- Azure subscription with Playwright Testing service enabled
+- Admin access to Azure subscription
+
+### Step 1: Install Azure CLI
+
+**Windows (using winget):**
+```bash
+winget install Microsoft.AzureCLI
+```
+
+**Alternative methods:**
+- Download installer from: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows
+- Using PowerShell: `Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi`
+
+### Step 2: Install Azure Playwright Testing Package
+
+```bash
+npm init @azure/microsoft-playwright-testing
+```
+
+This command will:
+- Install the `@azure/microsoft-playwright-testing` package
+- Create `playwright.service.config.ts` configuration file
+- Set up the basic Azure integration
+
+### Step 3: Authenticate with Azure
+
+```bash
+# Login to Azure
+az login
+
+# If you have multiple tenants, specify the tenant ID
+az login --tenant <YOUR_TENANT_ID>
+```
+
+Use device code authentication if you encounter MFA issues:
+```bash
+az login --use-device-code
+```
+
+### Step 4: Create Azure Resources
+
+1. **Create a resource group:**
+   ```bash
+   az group create --name "playwright-testing-rg" --location "West Europe"
+   ```
+
+2. **Create Playwright Testing Workspace:**
+   - Go to https://portal.azure.com
+   - Search for "Playwright Testing"
+   - Create a new workspace with these settings:
+     - **Resource Group:** playwright-testing-rg
+     - **Workspace Name:** your-workspace-name
+     - **Region:** West Europe
+
+### Step 5: Configure Environment Variables
+
+1. **Get your Service URL from Azure Portal:**
+   - Navigate to your Playwright Testing workspace
+   - Copy the Service URL (should look like: `wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_XXXXX`)
+
+2. **Update your `.env` file:**
+   ```bash
+   # Azure Playwright Testing Configuration
+   PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_YOUR_WORKSPACE_ID
+   ```
+
+### Step 6: Verify Configuration
+
+Test your Azure setup:
+```bash
+npm run test:azure:navbar
+```
+
+### Azure-Specific Scripts
+
+The following npm scripts are available for Azure testing:
+
+- `npm run test:azure` - Run all tests on Azure (5 workers)
+- `npm run test:azure:navbar` - Run navbar tests on Azure
+- `npm run test:azure:seatpicker` - Run seat picker tests on Azure
+- `npm run test:azure:movies` - Run movie tests on Azure
+
+### Azure Configuration Files
+
+- **`playwright.service.config.ts`** - Azure-specific Playwright configuration
+- **`.env`** - Environment variables including Azure service URL
+- **`package.json`** - Contains Azure-specific npm scripts
+
+### Viewing Reports
+
+After running tests with Azure:
+1. **Azure Portal:** https://playwright.microsoft.com/
+2. **Direct workspace:** https://playwright.microsoft.com/workspaces/YOUR_WORKSPACE_ID
+3. **Specific runs:** URLs are provided in the terminal after test execution
+
+### Troubleshooting Azure Setup
+
+**Common Issues:**
+
+1. **WebSocket connection errors:**
+   - Reduce number of workers (configured to 5 in this project)
+   - Check Azure subscription limits
+   - Verify Service URL is correct
+
+2. **Authentication issues:**
+   - Ensure `az login` is successful
+   - Verify tenant ID if using multiple tenants
+   - Try `az login --use-device-code` for MFA issues
+
+3. **Service URL not found:**
+   - Verify workspace is created in Azure Portal
+   - Check the Service URL format in your workspace settings
+   - Ensure the workspace is in "Active" state
+
+### Migration to New Azure Account
+
+When migrating to a new Azure account:
+1. Follow steps 3-5 with the new account credentials
+2. Update the `PLAYWRIGHT_SERVICE_URL` in `.env`
+3. Update any hardcoded references to the old workspace
+4. Test the connection with `npm run test:azure:navbar`
+
 ## Project Structure
 
 ```plaintext
@@ -76,6 +211,9 @@ playwright-template/
 │   └── playwright.fixtures.ts    // Custom Playwright fixtures (see below)
 ├── utils/                        // Helper functions and utilities
 ├── playwright.config.ts          // Global Playwright configuration
+├── playwright.service.config.ts  // Azure Playwright Testing configuration
+├── .env                          // Environment variables (Azure service URL)
+├── AZURE_SETUP.md               // Detailed Azure setup guide
 └── package.json                  // Project metadata and scripts
 ```
 
@@ -108,6 +246,42 @@ playwright-template/
   ```bash
   npx playwright test --project=chromium
   ```
+
+### Running Tests with Azure Playwright Testing
+
+**Azure Playwright Testing** provides cloud-based browser infrastructure with high scalability and rich reporting capabilities.
+
+- **Run all tests on Azure:**
+
+  ```bash
+  npm run test:azure
+  ```
+
+- **Run specific test suites on Azure:**
+
+  ```bash
+  npm run test:azure:navbar          # Run navbar tests
+  npm run test:azure:seatpicker      # Run seat picker tests
+  npm run test:azure:movies          # Run movie tests
+  ```
+
+- **Run tests with custom configuration:**
+
+  ```bash
+  npx playwright test --config=playwright.service.config.ts --workers=5
+  ```
+
+**Azure Test Features:**
+- **Cloud Browsers:** Tests run on cloud-hosted browsers (Linux environment)
+- **Scalability:** Up to 20 parallel workers (configured to 5 for stability)
+- **Rich Reporting:** Automatic upload to Azure Playwright Testing portal
+- **Video & Screenshots:** Captured only on test failures for efficiency
+- **Allure Integration:** Maintains local Allure reporting alongside Azure reports
+
+**Monitoring Azure Test Runs:**
+- **Azure Portal:** https://playwright.microsoft.com/
+- **Your Workspace:** https://playwright.microsoft.com/workspaces/YOUR_WORKSPACE_ID
+- **Test Results:** URLs provided in terminal after each run
 
 ### Allure Reporting
 
