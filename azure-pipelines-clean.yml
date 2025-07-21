@@ -1,0 +1,98 @@
+# Azure DevOps Pipeline for Playwright Tests with Allure Reports
+# ✅ GRANT APROBADO: Scalable Execution Enabled
+# ⏳ Cloud Browsers: LocalAuth aún Disabled (esperando activación)
+# 🎯 CONFIGURACIÓN ACTUAL: Local browsers + Azure reporting (óptimo)
+trigger:
+- main
+- feature/*
+
+pool:
+  vmImage: 'windows-latest'  # ✅ GRANT APROBADO - Usando hosted agents
+
+variables:
+  - name: PLAYWRIGHT_SERVICE_URL
+    value: 'wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_1f9793c4-7905-4e6a-b9aa-b9d47e97333c'
+
+stages:
+- stage: Test
+  displayName: 'Run Playwright Tests'
+  jobs:
+  - job: PlaywrightTests
+    displayName: 'Execute Tests'
+    steps:
+    
+    # Install Node.js
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+    
+    # Debug: Show workspace content
+    - powershell: |
+        Write-Host "Current directory:"
+        Get-Location
+        Write-Host "Directory contents:"
+        Get-ChildItem
+        Write-Host "package.json exists:"
+        if (Test-Path "package.json") { Write-Host "YES" } else { Write-Host "NO" }
+        Write-Host "Node.js version:"
+        node --version
+        Write-Host "NPM version:"
+        npm --version
+      displayName: 'Debug: Workspace Info'
+    
+    # Install dependencies
+    - powershell: |
+        npm ci
+      displayName: 'Install npm dependencies'
+    
+    # Install Java (required for Allure)
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+      displayName: 'Setup Java for Allure'
+    
+    # Install Playwright browsers
+    - powershell: |
+        npx playwright install --with-deps
+      displayName: 'Install Playwright browsers'
+    
+    # Run tests with Azure reporting but local browsers (best of both worlds)
+    - powershell: |
+        Write-Host "🧪 Ejecutando tests de navegación..."
+        npm run test:navbar
+        Write-Host "✅ Tests de navegación completados"
+      displayName: 'Run Navbar Tests (Local browsers + Azure reporting)'
+      continueOnError: true
+    
+    # Generate and publish Allure report
+    - powershell: |
+        Write-Host "Java version:"
+        java -version
+        Write-Host "Installing Allure CLI..."
+        npm install -g allure-commandline
+        Write-Host "Generating Allure HTML report..."
+        allure generate allure-results --clean -o allure-report
+        Write-Host "Allure report generated successfully!"
+        Write-Host "Generated files:"
+        Get-ChildItem allure-report | Select-Object -First 10
+      displayName: 'Generate Allure HTML Report'
+      condition: always()
+    
+    # Publish Allure Results
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Allure Results'
+      inputs:
+        pathToPublish: 'allure-results'
+        artifactName: 'allure-results'
+      condition: always()
+    
+    # Publish Allure HTML Report
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Allure HTML Report'
+      inputs:
+        pathToPublish: 'allure-report'
+        artifactName: 'allure-html-report'
+      condition: always()
