@@ -34,32 +34,11 @@ stages:
         npx playwright install --with-deps
       displayName: 'Install Playwright browsers'
     
-    # Azure CLI login for Azure Playwright Testing
-    - task: AzureCLI@2
-      displayName: 'Azure CLI Login'
-      inputs:
-        azureSubscription: 'azure-playwright-connection'  # Use the name you created
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          echo "Azure CLI authenticated"
-          az account show
-    
-    # Run tests with Azure configuration
+    # Run tests with LOCAL configuration first (to test basic setup)
     - script: |
-        npm run test:azure:navbar
-      displayName: 'Run Navbar Tests'
+        npm run test:navbar
+      displayName: 'Run Navbar Tests (Local)'
       continueOnError: true
-      env:
-        PLAYWRIGHT_SERVICE_URL: $(PLAYWRIGHT_SERVICE_URL)
-    
-    # Run additional test suites
-    - script: |
-        npm run test:azure:movies
-      displayName: 'Run Movies Tests'
-      continueOnError: true
-      env:
-        PLAYWRIGHT_SERVICE_URL: $(PLAYWRIGHT_SERVICE_URL)
     
     # Publish Allure Report - This is the key step from the documentation
     - task: PublishAllureReport@1
@@ -71,12 +50,3 @@ stages:
         reportName: 'Playwright Test Report'
         reportTitle: 'Cinesa E2E Test Results'
       condition: always()  # Always run this step, even if tests fail
-    
-    # Optional: Publish test results in Azure DevOps format too
-    - task: PublishTestResults@2
-      displayName: 'Publish Test Results'
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/test-results.xml'
-        failTaskOnFailedTests: false
-      condition: always()
