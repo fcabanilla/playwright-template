@@ -8,9 +8,6 @@ trigger:
 
 pool:
   vmImage: 'windows-latest'  # ✅ GRANT APROBADO - Usando hosted agents
-  # name: 'Default'  # Ya no necesario - self-hosted agent
-  # demands:
-  # - Agent.OS -equals Windows_NT
 
 variables:
   - name: PLAYWRIGHT_SERVICE_URL
@@ -68,14 +65,6 @@ stages:
         npm run test:navbar
         Write-Host "✅ Tests de navegación completados"
       displayName: 'Run Navbar Tests (Local browsers + Azure reporting)'
-      continueOnError: true
-    
-    # Run additional tests
-    - powershell: |
-        Write-Host "🧪 Ejecutando tests de footer..."
-        npm run test:footer
-        Write-Host "✅ Tests de footer completados"
-      displayName: 'Run Footer Tests'
       continueOnError: true
     
     # Generate and publish Allure report

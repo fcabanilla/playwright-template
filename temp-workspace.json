@@ -1,8 +1,0 @@
-{
-  "location": "westeurope",
-  "properties": {
-    "regionalAffinity": "Enabled",
-    "scalableExecution": "Enabled",
-    "reporting": "Enabled"
-  }
-}
