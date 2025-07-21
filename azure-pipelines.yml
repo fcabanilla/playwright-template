@@ -63,10 +63,23 @@ stages:
         artifactName: 'allure-results'
       condition: always()
     
-    # Generate and publish Allure report (if plugin is available)
-    - task: qameta.allure.publish.AllurePublish@1
-      displayName: 'Publish Allure Report'
-      inputs:
-        testResultsDir: 'allure-results'
+    # Optional: Try to install and use Allure CLI to generate HTML report
+    - script: |
+        echo "Installing Allure CLI..."
+        npm install -g allure-commandline
+        echo "Generating Allure HTML report..."
+        allure generate allure-results --clean -o allure-report
+        echo "List generated files:"
+        ls -la allure-report/
+      displayName: 'Generate Allure HTML Report'
       condition: always()
-      continueOnError: true  # Don't fail if this step fails
+      continueOnError: true
+    
+    # Publish the HTML report as artifact too
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Allure HTML Report'
+      inputs:
+        pathToPublish: 'allure-report'
+        artifactName: 'allure-html-report'
+      condition: always()
+      continueOnError: true
