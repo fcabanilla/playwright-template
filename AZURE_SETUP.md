@@ -1,460 +1,166 @@
-# Azure Playwright Testing - Complete Setup Guide
+# Azure Playwright Testing - Setup Guide
 
-This guide provides comprehensive instructions for setting up and migrating Azure Playwright Testing service integration.
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Step-by-Step Setup](#step-by-step-setup)
-- [Configuration Files](#configuration-files)
-- [Environment Variables](#environment-variables)
-- [Testing the Setup](#testing-the-setup)
-- [Migration Guide](#migration-guide)
-- [Troubleshooting](#troubleshooting)
-- [Azure Portal Operations](#azure-portal-operations)
+Complete guide for setting up Azure Playwright Testing service integration.
 
 ## Prerequisites
 
-Before starting the Azure Playwright Testing setup, ensure you have:
-
-- **Node.js** (v14 or higher)
+- **Node.js** (v14+)
 - **Azure CLI** installed
 - **Azure subscription** with admin access
-- **Playwright Testing service** enabled in your Azure subscription
+- **⚠️ CRITICAL:** Permissions to register Azure features (may not work on free/trial subscriptions)
 
-## Step-by-Step Setup
+## Quick Setup
 
 ### 1. Install Azure CLI
-
-**Windows (Recommended - using winget):**
 ```bash
 winget install Microsoft.AzureCLI
+az --version  # verify installation
 ```
 
-**Alternative Installation Methods:**
-
-**PowerShell (Direct download):**
-```bash
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
-```
-
-**Manual Download:**
-- Visit: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows
-- Download and install the MSI package
-
-**Verify Installation:**
-```bash
-az --version
-```
-
-### 2. Install Azure Playwright Testing Package
-
-Run the following command in your project root:
-
+### 2. Install Azure Playwright Package
 ```bash
 npm init @azure/microsoft-playwright-testing
 ```
 
-**This command will:**
-- Install `@azure/microsoft-playwright-testing` package
-- Create `playwright.service.config.ts` configuration file
-- Set up basic Azure integration structure
+### 3. Register Azure Features (CRITICAL)
+```bash
+# Check current status
+az feature list --namespace Microsoft.AzurePlaywrightService --query "[].{name: name, state: properties.state}" -o table
 
-### 3. Authenticate with Azure
+# Register required features
+az feature register --namespace Microsoft.AzurePlaywrightService --name playwrightServiceBetaAccess
+az feature register --namespace Microsoft.AzurePlaywrightService --name PlaywrightServicePublicPreviewRegions
+az provider register -n Microsoft.AzurePlaywrightService
+```
 
-**Standard Login:**
+**⏱️ Note:** Features may show `Pending` for 24-48 hours. Without registration, workspaces will have `localAuth: Disabled`.
+
+### 4. Authenticate & Create Resources
 ```bash
 az login
-```
-
-**Multi-Tenant Login:**
-If you belong to multiple Azure tenants, specify the tenant ID:
-```bash
-az login --tenant <YOUR_TENANT_ID>
-```
-
-**Device Code Authentication (for MFA issues):**
-```bash
-az login --use-device-code
-```
-
-**Verify Authentication:**
-```bash
-az account show
-```
-
-### 4. Create Azure Resources
-
-**Create Resource Group:**
-```bash
 az group create --name "playwright-testing-rg" --location "West Europe"
 ```
 
-**Create Playwright Testing Workspace (Azure Portal):**
-1. Navigate to: https://portal.azure.com
-2. Search for "Playwright Testing" in the search bar
-3. Select "Microsoft Playwright Testing"
-4. Click "Create"
-5. Fill in the following details:
-   - **Subscription:** Your Azure subscription
+### 5. Create Workspace
+1. Go to https://portal.azure.com/#create/microsoft.playwrighttesting
+2. Fill details:
    - **Resource Group:** playwright-testing-rg
-   - **Workspace Name:** your-workspace-name (e.g., "cinesa-playwright-workspace")
+   - **Workspace Name:** your-workspace-name
    - **Region:** West Europe
-6. Click "Review + Create"
-7. Click "Create"
+3. Click "Create"
 
-### 5. Configure Service URL
-
-**Get Service URL:**
-1. Go to your created workspace in Azure Portal
-2. In the workspace overview, find the "Service URL"
-3. Copy the URL (format: `wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_XXXXX`)
-
-**Update Environment Variables:**
-Create or update `.env` file in your project root:
+### 6. Configure Environment
+Copy the Service URL from Azure Portal and update `.env`:
 ```env
-# Azure Playwright Testing Configuration
 PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_YOUR_WORKSPACE_ID
 ```
 
-### 6. Update Configuration Files
+### 7. Test Configuration
+```bash
+# Validate setup
+npm run validate-azure-setup
 
-**Ensure `playwright.service.config.ts` includes dotenv:**
-```typescript
-import { defineConfig } from '@playwright/test';
-import { getServiceConfig, ServiceOS } from '@azure/microsoft-playwright-testing';
-import config from './playwright.config';
-import 'dotenv/config';
+# Run test with Azure reporting
+npm run test:azure:navbar
+```
 
-export default defineConfig(
-  config,
-  getServiceConfig(config, {
-    exposeNetwork: '<loopback>',
-    timeout: 30000,
-    os: ServiceOS.LINUX,
-    useCloudHostedBrowsers: false // Disabled due to workspace limitations, using only reporting
-  }),
-  {
-    reporter: [
-      ['list'],
-      ['@azure/microsoft-playwright-testing/reporter'],
-      [
-        'allure-playwright',
-        {
-          detail: false,
-          outputFolder: 'allure-results',
-          suiteTitle: false,
-        },
-      ],
-    ],
-    workers: 5, // Optimized for Azure service stability
-    use: {
-      ...config.use,
-      screenshot: 'only-on-failure',
-      video: 'retain-on-failure',
-    },
-  }
-);
+**Expected Output:**
+```
+Running 3 tests using 3 workers
+  3 passed (43.4s)
+Uploading test results 100%
+Test report: https://playwright.microsoft.com/workspaces/YOUR_WORKSPACE_ID/runs/RUN_ID
 ```
 
 ## Configuration Files
 
 ### `playwright.service.config.ts`
-
-This file configures Azure Playwright Testing service integration:
-
-- **Purpose:** Extends base Playwright configuration for Azure reporting integration
-- **Key Features:**
-  - Local browser execution with Azure reporting
-  - Azure-specific reporter for test results
-  - Optimized worker configuration (5 workers)
-  - Allure integration maintained
-
-### `.env`
-
-Environment variables for Azure configuration:
-
-```env
-# Outlook credentials (existing)
-OUTLOOK_USER=your-email@outlook.com
-OUTLOOK_PASS=your-app-password
-
-# Azure Playwright Testing Configuration
-PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_YOUR_WORKSPACE_ID
-```
-
-### `package.json` Scripts
-
-Azure-specific npm scripts:
-
-```json
-{
-  "scripts": {
-    "test:azure": "npx playwright test --config=playwright.service.config.ts --workers=5",
-    "test:azure:navbar": "npx playwright test tests/cinesa/navbar/navbar.spec.ts --config=playwright.service.config.ts --workers=5",
-    "test:azure:seatpicker": "npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts --config=playwright.service.config.ts --workers=5",
-    "test:azure:movies": "npx playwright test tests/cinesa/movies/movies.spec.ts --config=playwright.service.config.ts --workers=5"
-  }
-}
-```
-
-## Environment Variables
-
-### Required Variables
-
-| Variable | Description | Format | Example |
-|----------|-------------|---------|---------|
-| `PLAYWRIGHT_SERVICE_URL` | Azure service endpoint | `wss://region.api.playwright.microsoft.com/accounts/region_workspaceId` | `wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_abc123` |
-
-### Optional Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PLAYWRIGHT_SERVICE_WORKERS` | Number of parallel workers | 5 |
-| `PLAYWRIGHT_SERVICE_TIMEOUT` | Test timeout in milliseconds | 30000 |
-
-## Testing the Setup
-
-### Verify Configuration
-
-1. **Check Azure Authentication:**
-   ```bash
-   az account show
-   ```
-
-2. **Test Single Spec:**
-   ```bash
-   npm run test:azure:navbar
-   ```
-
-3. **Run All Tests:**
-   ```bash
-   npm run test:azure
-   ```
-
-### Expected Behavior
-
-**Successful Run Indicators:**
-- Console shows: "Running tests using Microsoft Playwright Testing service" (if cloud browsers were enabled)
-- Test execution with specified number of workers
-- "Initializing reporting for this test run" message
-- Azure portal URL provided for results
-- "Uploading test results" progress indicator
-
-**Note:** Current configuration uses local browsers with Azure reporting only. Tests run on your local machine but results are uploaded to Azure for centralized reporting and analysis.
-
-**Report Access:**
-- **Azure Portal:** https://playwright.microsoft.com/
-- **Workspace Direct:** https://playwright.microsoft.com/workspaces/YOUR_WORKSPACE_ID
-- **Specific Run:** URL provided in terminal output
-
-## Migration Guide
-
-### When Migrating to New Azure Account
-
-Follow these steps to migrate from one Azure account to another:
-
-#### 1. Prepare New Account
-```bash
-# Logout from current account
-az logout
-
-# Login to new account
-az login --tenant <NEW_TENANT_ID>
-
-# Verify new account
-az account show
-```
-
-#### 2. Create Resources in New Account
-```bash
-# Create new resource group
-az group create --name "playwright-testing-rg-new" --location "West Europe"
-```
-
-#### 3. Create New Workspace
-1. Follow Step 4 of setup guide with new account
-2. Use new resource group name
-3. Choose new workspace name
-
-#### 4. Update Configuration
-```bash
-# Update .env file with new Service URL
-PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_NEW_WORKSPACE_ID
-```
-
-#### 5. Test New Configuration
-```bash
-npm run test:azure:navbar
-```
-
-#### 6. Update Documentation
-- Update any hardcoded workspace IDs in documentation
-- Update team access permissions in new workspace
-- Update CI/CD pipeline configurations
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-#### 1. Azure CLI Not Recognized
-**Problem:** `az` command not found after installation
-
-**Solutions:**
-```bash
-# Refresh PATH environment variable
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-
-# Or restart terminal/VS Code
-```
-
-#### 2. Authentication Failures
-**Problem:** Login fails with MFA or tenant issues
-
-**Solutions:**
-```bash
-# Use device code authentication
-az login --use-device-code
-
-# Specify tenant explicitly
-az login --tenant <TENANT_ID>
-
-# Clear Azure CLI cache
-az account clear
-az login
-```
-
-#### 3. Cloud Browser Connection Issues
-**Problem:** Tests fail with WebSocket connection errors when using cloud browsers
-
-**Solutions:**
-- Use reporting-only mode (already configured): `useCloudHostedBrowsers: false`
-- This allows local execution with Azure reporting
-- Future: Enable cloud browsers when workspace supports `localAuth: Enabled`
-
-**Current Setup:** Tests run locally but send results to Azure for centralized reporting.
-
-#### 4. Service URL Not Working
-**Problem:** "PLAYWRIGHT_SERVICE_URL variable is not set correctly"
-
-**Solutions:**
-```bash
-# Verify .env file location (project root)
-# Check URL format
-wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_XXXXX
-
-# Ensure dotenv is imported in config
-# Check for typos in workspace ID
-```
-
-#### 5. Resource Creation Failures
-**Problem:** Cannot create resources in Azure
-
-**Solutions:**
-- Verify subscription has Playwright Testing service enabled
-- Check user permissions (need Contributor role)
-- Ensure resource group exists
-- Try different region if current is unavailable
-
-### Debug Commands
-
-```bash
-# Check current Azure account
-az account show
-
-# List available subscriptions
-az account list
-
-# Check resource group
-az group show --name "playwright-testing-rg"
-
-# Test Azure CLI connectivity
-az account get-access-token
-```
-
-## Azure Portal Operations
-
-### Accessing Your Workspace
-
-1. **Azure Portal:** https://portal.azure.com
-2. **Search:** "Playwright Testing"
-3. **Select:** Your workspace from the list
-4. **Overview:** View workspace details and Service URL
-
-### Workspace Management
-
-**Key Information Available:**
-- Workspace ID and Service URL
-- Resource group and subscription details
-- Regional settings and quotas
-- Test run history and metrics
-
-**Operations Available:**
-- View test run reports
-- Monitor workspace usage
-- Configure access permissions
-- Download test artifacts
-
-### Test Run Monitoring
-
-**Direct Access:** https://playwright.microsoft.com/workspaces/YOUR_WORKSPACE_ID
-
-**Available Features:**
-- Real-time test execution monitoring
-- Detailed test result analysis
-- Video and screenshot artifacts
-- Test duration and performance metrics
-- Historical run comparisons
-
----
-
-## Support and Resources
-
-- **Azure Playwright Testing Documentation:** https://aka.ms/mpt/quickstart
-- **Azure CLI Documentation:** https://docs.microsoft.com/en-us/cli/azure/
-- **Playwright Documentation:** https://playwright.dev/
-- **Azure Support:** https://azure.microsoft.com/support/
-
-## Quick Reference - Final Configuration
-
-### Complete Working Setup
-
-**Environment Variables (.env):**
-```env
-PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_YOUR_WORKSPACE_ID
-```
-
-**Azure Configuration (playwright.service.config.ts):**
+Azure configuration extending base Playwright setup:
 ```typescript
 export default defineConfig(
-  getServiceConfig(baseConfig, {
-    serviceAuthType: 'TOKEN',
-    useCloudHostedBrowsers: false, // Local execution with Azure reporting
+  config,
+  getServiceConfig(config, {
+    useCloudHostedBrowsers: false, // Local browsers + Azure reporting
     workers: 5, // Optimized for stability
+  }),
+  {
     reporter: [
-      ['html'],
+      ['list'],
       ['@azure/microsoft-playwright-testing/reporter'],
-      ['allure-playwright', {...}],
+      ['allure-playwright', { outputFolder: 'allure-results' }],
     ],
-  })
+  }
 );
 ```
 
-**Test Execution:**
+### Available Scripts
 ```bash
-npm run test:azure:navbar
+npm run test:azure              # All tests
+npm run test:azure:navbar       # Navbar tests
+npm run validate-azure-setup    # Validate configuration
+npm run check-azure-features    # Monitor feature registration
 ```
 
-**Validation:**
+## Troubleshooting
+
+### Common Issues
+
+**1. localAuth: Disabled**
+- **Cause:** Azure features not registered
+- **Solution:** Run feature registration commands and wait 24-48 hours
+
+**2. Azure CLI Not Found**
 ```bash
+# Refresh PATH or restart terminal
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+```
+
+**3. Authentication Failures**
+```bash
+az login --use-device-code  # For MFA issues
+az account clear; az login  # Clear cache
+```
+
+### Debug Commands
+```bash
+# Check feature registration
+az feature list --namespace Microsoft.AzurePlaywrightService --query "[].{name: name, state: properties.state}" -o table
+
+# Check authentication
+az account show
+
+# Validate setup
 npm run validate-azure-setup
 ```
 
-### Architecture Summary
-- **Local Execution:** Tests run on local browsers
-- **Azure Reporting:** Results uploaded to Azure portal
-- **Worker Count:** 5 workers for optimal performance
-- **Authentication:** Azure CLI with account credentials
-- **Features:** Full Allure integration maintained
+## Migration Between Accounts
 
-*This configuration has been tested and verified to work correctly.*
+1. **Logout and login to new account:**
+   ```bash
+   az logout
+   az login --tenant <NEW_TENANT_ID>
+   ```
+
+2. **Create resources in new account**
+3. **Update `.env` with new Service URL**
+4. **Test:** `npm run test:azure:navbar`
+
+## Monitoring and Next Steps
+
+### Monitor Feature Registration
+```bash
+npm run check-azure-features
+```
+
+### When Cloud Browsers Become Available
+1. Features will show "Registered" status
+2. Workspace will show `"localAuth": "Enabled"`
+3. Update: `useCloudHostedBrowsers: true`
+4. Test: `npm run test:azure:navbar`
+
+---
+
+**Current Status (July 2025):**
+- ✅ Local execution + Azure reporting working
+- ⏳ Cloud browsers pending feature registration (24-48 hours)
+- 🔧 Use `npm run check-azure-features` to monitor progress

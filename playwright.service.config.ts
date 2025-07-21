@@ -10,7 +10,7 @@ export default defineConfig(
     exposeNetwork: '<loopback>',
     timeout: 30000,
     os: ServiceOS.LINUX,
-    useCloudHostedBrowsers: false // Disabled due to authentication issues, using only reporting
+    useCloudHostedBrowsers: true // Use Azure cloud browsers (when features are enabled)
   }),
   {
     /* 
