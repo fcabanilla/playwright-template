@@ -38,7 +38,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Azure CLI Login'
       inputs:
-        azureSubscription: 'your-service-connection-name'  # Replace with your service connection
+        azureSubscription: 'azure-playwright-connection'  # Use the name you created
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
