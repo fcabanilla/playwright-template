@@ -1,0 +1,191 @@
+name: Playwright Tests with Azure Allure Integration
+
+on:
+  push:
+    branches: [ main, feature/azure_connection ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  AZURE_STORAGE_ACCOUNT: playwrightreports
+  AZURE_CONTAINER_NAME: allure-reports
+
+jobs:
+  test-and-report:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Java (required for Allure CLI)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'microsoft'
+        java-version: '11'
+        
+    - name: Install Allure CLI
+      run: |
+        curl -o allure-2.24.0.tgz -L https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+        tar -zxf allure-2.24.0.tgz
+        echo "$GITHUB_WORKSPACE/allure-2.24.0/bin" >> $GITHUB_PATH
+      
+    - name: Run Playwright tests with Azure (Cloud Execution)
+      run: npm run test:azure:navbar
+      env:
+        PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
+      continue-on-error: true
+      
+    - name: Generate Allure Report in Cloud Pipeline
+      run: |
+        echo "🎭 Generating Allure Report from Azure test results..."
+        
+        # Check if allure-results exist locally (downloaded from Azure)
+        if [ -d "./allure-results" ] && [ "$(ls -A ./allure-results)" ]; then
+          echo "✅ Allure results found locally"
+          
+          # Generate Allure report using CLI in pipeline
+          allure generate ./allure-results -o ./allure-report --clean
+          
+          if [ -f "./allure-report/index.html" ]; then
+            echo "✅ Allure report generated successfully in cloud pipeline"
+            echo "ALLURE_REPORT_GENERATED=true" >> $GITHUB_ENV
+          else
+            echo "❌ Failed to generate Allure report"
+            echo "ALLURE_REPORT_GENERATED=false" >> $GITHUB_ENV
+          fi
+        else
+          echo "⚠️ No allure-results found locally"
+          echo "ALLURE_REPORT_GENERATED=false" >> $GITHUB_ENV
+        fi
+      continue-on-error: true
+      
+    - name: Comment PR with Allure Report Link
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          if (process.env.ALLURE_REPORT_URL) {
+            const comment = `## 🎭 Allure Test Report
+            
+            ✅ **Reporte de Allure generado exitosamente**
+            
+            📊 **Ver reporte completo**: [${process.env.ALLURE_REPORT_URL}](${process.env.ALLURE_REPORT_URL})
+            
+            🏗️ **Pipeline**: #${{ github.run_number }}
+            📝 **Commit**: ${{ github.sha }}
+            ⏰ **Fecha**: ${new Date().toLocaleString('es-ES')}
+            
+            ---
+            *Reporte generado automáticamente por GitHub Actions*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+          
+    - name: Set job summary with report link
+      run: |
+        if [ ! -z "$ALLURE_REPORT_URL" ]; then
+          echo "## 🎭 Allure Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Reporte generado exitosamente**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Ver reporte**: [$ALLURE_REPORT_URL]($ALLURE_REPORT_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🏗️ **Pipeline**: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "📝 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ **Fecha**: $(date)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Error**: No se pudo generar el reporte de Allure" >> $GITHUB_STEP_SUMMARY
+        fi
+      
+    - name: Azure CLI Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      if: env.ALLURE_REPORT_GENERATED == 'true'
+      continue-on-error: true
+        
+    - name: Publish Allure Report to Azure (Cloud-to-Cloud)
+      if: env.ALLURE_REPORT_GENERATED == 'true'
+      run: |
+        RUN_ID="${{ github.run_id }}"
+        TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+        REPORT_PATH="allure-reports/${TIMESTAMP}_run-${RUN_ID}"
+        
+        echo "🚀 Publishing Allure report to Azure Blob Storage..."
+        echo "📁 Report path: $REPORT_PATH"
+        
+        # Upload generated Allure report to Azure
+        az storage blob upload-batch \
+          --account-name playwrightreports1744 \
+          --destination "\$web/$REPORT_PATH" \
+          --source ./allure-report \
+          --overwrite \
+          --auth-mode login
+        
+        # Generate public URL
+        REPORT_URL="https://playwrightreports1744.z6.web.core.windows.net/$REPORT_PATH/index.html"
+        echo "✅ Allure Report published successfully!"
+        echo "🔗 Report URL: $REPORT_URL"
+        echo "ALLURE_REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
+        
+        # Save report info for easy access
+        echo "{\"url\": \"$REPORT_URL\", \"timestamp\": \"$(date -Iseconds)\", \"runId\": \"$RUN_ID\", \"commit\": \"${{ github.sha }}\"}" > report-info.json
+      continue-on-error: true
+      
+    - name: Comment PR with Test Report Links
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const reportUrl = process.env.ALLURE_REPORT_URL;
+          const azureUrl = "https://playwright.microsoft.com/workspaces/westeurope_1f9793c4-7905-4e6a-b9aa-b9d47e97333c";
+          
+          let reportStatus = "⚠️ Report generation in progress...";
+          let allureLink = "Report generation in progress...";
+          
+          if (reportUrl) {
+            reportStatus = "✅ Reports generated successfully!";
+            allureLink = `[🎭 **Allure Report**](${reportUrl})`;
+          }
+          
+          const comment = `## 📊 Test Execution Complete
+          
+          ${reportStatus}
+          
+          ### 📋 Available Reports:
+          
+          ${allureLink}
+          
+          [📈 **Azure Playwright Dashboard**](${azureUrl})
+          
+          ---
+          
+          **Pipeline Details:**
+          - 🏗️ Run: #${{ github.run_number }}
+          - 📝 Commit: ${context.sha.substring(0, 7)}
+          - ⏰ Date: ${new Date().toLocaleString('es-ES')}
+          - 🌐 Generated in: GitHub Actions → Azure Cloud
+          
+          *Reports generated automatically via cloud-native pipeline*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+      continue-on-error: true
