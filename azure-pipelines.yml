@@ -5,10 +5,10 @@ trigger:
 - feature/*
 
 pool:
-  name: 'Default'  # Usa agente self-hosted local
-  demands:
-  - Agent.OS -equals Windows_NT
-  # vmImage: 'windows-latest'  # Comentado: requiere parallelism grant
+  vmImage: 'windows-latest'  # ✅ GRANT APROBADO - Usando hosted agents
+  # name: 'Default'  # Ya no necesario - self-hosted agent
+  # demands:
+  # - Agent.OS -equals Windows_NT
 
 variables:
   - name: PLAYWRIGHT_SERVICE_URL
@@ -60,10 +60,10 @@ stages:
         npx playwright install --with-deps
       displayName: 'Install Playwright browsers'
     
-    # Run tests with LOCAL configuration first (to test basic setup)
+    # Run tests with Azure reporting but local browsers (best of both worlds)
     - powershell: |
         npm run test:navbar
-      displayName: 'Run Navbar Tests (Local)'
+      displayName: 'Run Navbar Tests (Local browsers + Azure reporting)'
       continueOnError: true
     
     # Generate and publish Allure report
