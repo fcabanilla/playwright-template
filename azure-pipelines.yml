@@ -1,5 +1,7 @@
 # Azure DevOps Pipeline for Playwright Tests with Allure Reports
-# ALTERNATIVA: Self-hosted agent (sin necesidad de grant)
+# ✅ GRANT APROBADO: Scalable Execution Enabled
+# ⏳ Cloud Browsers: LocalAuth aún Disabled (esperando activación)
+# 🎯 CONFIGURACIÓN ACTUAL: Local browsers + Azure reporting (óptimo)
 trigger:
 - main
 - feature/*
