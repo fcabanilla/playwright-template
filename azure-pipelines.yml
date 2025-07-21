@@ -1,0 +1,82 @@
+# Azure DevOps Pipeline for Playwright Tests with Allure Reports
+trigger:
+- main
+- feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: PLAYWRIGHT_SERVICE_URL
+    value: 'wss://westeurope.api.playwright.microsoft.com/accounts/westeurope_1f9793c4-7905-4e6a-b9aa-b9d47e97333c'
+
+stages:
+- stage: Test
+  displayName: 'Run Playwright Tests'
+  jobs:
+  - job: PlaywrightTests
+    displayName: 'Execute Tests'
+    steps:
+    
+    # Install Node.js
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+    
+    # Install dependencies
+    - script: |
+        npm ci
+      displayName: 'Install npm dependencies'
+    
+    # Install Playwright browsers
+    - script: |
+        npx playwright install --with-deps
+      displayName: 'Install Playwright browsers'
+    
+    # Azure CLI login for Azure Playwright Testing
+    - task: AzureCLI@2
+      displayName: 'Azure CLI Login'
+      inputs:
+        azureSubscription: 'your-service-connection-name'  # Replace with your service connection
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Azure CLI authenticated"
+          az account show
+    
+    # Run tests with Azure configuration
+    - script: |
+        npm run test:azure:navbar
+      displayName: 'Run Navbar Tests'
+      continueOnError: true
+      env:
+        PLAYWRIGHT_SERVICE_URL: $(PLAYWRIGHT_SERVICE_URL)
+    
+    # Run additional test suites
+    - script: |
+        npm run test:azure:movies
+      displayName: 'Run Movies Tests'
+      continueOnError: true
+      env:
+        PLAYWRIGHT_SERVICE_URL: $(PLAYWRIGHT_SERVICE_URL)
+    
+    # Publish Allure Report - This is the key step from the documentation
+    - task: PublishAllureReport@1
+      displayName: 'Publish Allure Report'
+      inputs:
+        testResultsDir: 'allure-results'
+        allureVersion: '2.25.0'
+        # Optional parameters as per documentation
+        reportName: 'Playwright Test Report'
+        reportTitle: 'Cinesa E2E Test Results'
+      condition: always()  # Always run this step, even if tests fail
+    
+    # Optional: Publish test results in Azure DevOps format too
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/test-results.xml'
+        failTaskOnFailedTests: false
+      condition: always()
