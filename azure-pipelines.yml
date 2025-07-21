@@ -5,6 +5,7 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
+  # Ensure we have the latest Ubuntu with Node.js support
 
 variables:
   - name: PLAYWRIGHT_SERVICE_URL
@@ -24,6 +25,20 @@ stages:
         versionSpec: '18.x'
       displayName: 'Install Node.js'
     
+    # Debug: Show workspace content
+    - script: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -la
+        echo "package.json exists:"
+        test -f package.json && echo "YES" || echo "NO"
+        echo "Node.js version:"
+        node --version
+        echo "NPM version:"
+        npm --version
+      displayName: 'Debug: Workspace Info'
+    
     # Install dependencies
     - script: |
         npm ci
@@ -40,13 +55,18 @@ stages:
       displayName: 'Run Navbar Tests (Local)'
       continueOnError: true
     
-    # Publish Allure Report - This is the key step from the documentation
-    - task: PublishAllureReport@1
+    # Publish Allure Report - Using basic file publish first
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Allure Results as Artifact'
+      inputs:
+        pathToPublish: 'allure-results'
+        artifactName: 'allure-results'
+      condition: always()
+    
+    # Generate and publish Allure report (if plugin is available)
+    - task: qameta.allure.publish.AllurePublish@1
       displayName: 'Publish Allure Report'
       inputs:
         testResultsDir: 'allure-results'
-        allureVersion: '2.25.0'
-        # Optional parameters as per documentation
-        reportName: 'Playwright Test Report'
-        reportTitle: 'Cinesa E2E Test Results'
-      condition: always()  # Always run this step, even if tests fail
+      condition: always()
+      continueOnError: true  # Don't fail if this step fails
