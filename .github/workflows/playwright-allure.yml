@@ -2,7 +2,7 @@ name: Playwright Tests with Azure Allure Integration
 
 on:
   push:
-    branches: [ main, feature/azure_connection ]
+    branches: [ main, feature/azure_connection, feature/allure_oficial ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
