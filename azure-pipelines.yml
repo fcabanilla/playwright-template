@@ -64,8 +64,18 @@ stages:
     
     # Run tests with Azure reporting but local browsers (best of both worlds)
     - powershell: |
+        Write-Host "🧪 Ejecutando tests de navegación..."
         npm run test:navbar
+        Write-Host "✅ Tests de navegación completados"
       displayName: 'Run Navbar Tests (Local browsers + Azure reporting)'
+      continueOnError: true
+    
+    # Run additional tests
+    - powershell: |
+        Write-Host "🧪 Ejecutando tests de footer..."
+        npm run test:footer
+        Write-Host "✅ Tests de footer completados"
+      displayName: 'Run Footer Tests'
       continueOnError: true
     
     # Generate and publish Allure report
