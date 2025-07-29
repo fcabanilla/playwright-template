@@ -248,6 +248,31 @@ export class CinemaDetail {
   }
 
   /**
+   * Selects a random film and navigates to its details page by clicking on the film title.
+   * @returns Promise that resolves to an object containing the selected film name.
+   */
+  async selectRandomFilmForDetails(): Promise<{ film: string }> {
+    return await allure.test.step(
+      'Selecting a random film and navigating to its details page',
+      async () => {
+        const names = await this.getFilmNames();
+        if (names.length === 0) {
+          throw new Error('No films found on the cinema detail page');
+        }
+        const randomIndex = Math.floor(Math.random() * names.length);
+        const selectedFilm = names[randomIndex];
+        const filmContainer = this.page.locator(this.selectors.filmItem, {
+          has: this.page.locator(this.selectors.filmName, { hasText: selectedFilm }),
+        });
+        const filmTitleLink = filmContainer.locator(this.selectors.filmTitleLink);
+        await filmTitleLink.first().click();
+        console.log(`Selected film: ${selectedFilm}`);
+        return { film: selectedFilm };
+      }
+    );
+  }
+
+  /**
    * Selects a random film and then selects a random showtime for that film.
    * @returns Promise that resolves to an object containing the selected film name and showtime text.
    */
