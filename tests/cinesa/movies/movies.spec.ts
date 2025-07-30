@@ -1,6 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
-import { assertMoviesRedirection, assertMovieSchemaMatches } from './movies.assertions';
+import { assertMoviesRedirection, assertMovieSchemaMatches, assertMovieSchemaURLsAreValid } from './movies.assertions';
 import { MovieList } from '../../../pageObjectsManagers/cinesa/movies/movies.page';
 import { MoviePage } from '../../../pageObjectsManagers/cinesa/movie/movie.page';
 
@@ -96,5 +96,22 @@ test.describe('Cinesa Movies Tests', () => {
     const moviePage = new MoviePage(page);
     const movieSchema = await moviePage.extractMovieSchema();
     await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
+  });
+
+  test('Movie Schema URL validation test - Bug Detection', async ({
+    page,
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner
+  }) => {
+    await page.goto('https://www.cinesa.es/');
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectOasizCinema();
+    await cinemaDetail.selectRandomFilmForDetails();
+    const moviePage = new MoviePage(page);
+    const movieSchema = await moviePage.extractMovieSchema();
+    await assertMovieSchemaURLsAreValid(movieSchema);
   });
 });

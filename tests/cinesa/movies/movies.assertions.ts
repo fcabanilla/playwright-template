@@ -48,3 +48,34 @@ export function assertMovieSchemaMatches(
   expect(Array.isArray(movieSchema.genre), 'Genre should be an array').toBeTruthy();
   expect(movieSchema.genre.length, 'Genre array should not be empty').toBeGreaterThan(0);
 }
+
+/**
+ * Validates that all URLs in the movie schema are properly formatted and valid.
+ * This function checks for common URL issues like concatenated 'undefined' values.
+ * @param movieSchema The movie schema extracted from the page.
+ */
+export function assertMovieSchemaURLsAreValid(movieSchema: any): void {
+  const validateURL = (url: string, fieldName: string): void => {
+    expect(url, `${fieldName} should not be empty`).toBeTruthy();
+    expect(url, `${fieldName} should not contain 'undefined': ${url}`).not.toContain('undefined');
+    expect(url, `${fieldName} should not contain 'null': ${url}`).not.toContain('null');
+    expect(url, `${fieldName} should start with http:// or https://: ${url}`).toMatch(/^https?:\/\//);
+    expect(url, `${fieldName} should not have malformed concatenation: ${url}`).not.toMatch(/undefined$/);
+    expect(url, `${fieldName} should not have malformed concatenation: ${url}`).not.toMatch(/null$/);
+    try {
+      new URL(url);
+    } catch (error) {
+      throw new Error(`${fieldName} is not a valid URL: ${url}`);
+    }
+  };
+  if (movieSchema.url) {
+    validateURL(movieSchema.url, 'Movie URL');
+  }
+  if (movieSchema.image) {
+    validateURL(movieSchema.image, 'Movie image URL');
+  }
+  if (movieSchema.trailer && movieSchema.trailer.url) {
+    validateURL(movieSchema.trailer.url, 'Movie trailer URL');
+  }
+  console.log('✅ All URLs in movie schema are valid');
+}
