@@ -328,4 +328,42 @@ export class CinemaDetail {
       throw new Error('No D-BOX films with showtimes found on the cinema detail page');
     });
   }
+
+  /**
+   * Extracts and returns the cinema schema JSON-LD data from the page.
+   * @returns Promise that resolves to the cinema schema data.
+   */
+  async extractCinemaSchema(): Promise<any> {
+    return await allure.test.step('Extracting cinema schema from page', async () => {
+      await this.page.waitForLoadState('networkidle');
+      await this.page.waitForTimeout(2000);
+      const reactHelmetJsonLd = this.page.locator('script[data-react-helmet="true"][type="application/ld+json"]');
+      const reactHelmetCount = await reactHelmetJsonLd.count();
+      if (reactHelmetCount > 0) {
+        const scriptContent = await reactHelmetJsonLd.first().textContent();
+        if (!scriptContent) {
+          throw new Error('React Helmet cinema schema script content is empty');
+        } 
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(`Failed to parse React Helmet cinema schema JSON: ${error}`);
+        }
+      }      
+      const jsonLdScripts = this.page.locator('script[type="application/ld+json"]');
+      const jsonLdCount = await jsonLdScripts.count();
+      if (jsonLdCount > 0) {
+        const scriptContent = await jsonLdScripts.first().textContent();
+        if (!scriptContent) {
+          throw new Error('Cinema schema script content is empty');
+        }
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(`Failed to parse cinema schema JSON: ${error}`);
+        }
+      }
+      throw new Error('Cinema schema script not found on the page');
+    });
+  }
 }

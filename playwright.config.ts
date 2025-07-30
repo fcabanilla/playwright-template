@@ -28,7 +28,7 @@ export default defineConfig({
     ],
   ],
   fullyParallel: true,
-  workers: 10,
+  workers: 5, // Optimized for stability and performance balance
   use: {
     headless: false, // Ejecuta el navegador de forma visual
     screenshot: 'only-on-failure',

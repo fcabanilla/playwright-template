@@ -1,7 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
-import { assertMoviesRedirection } from './movies.assertions';
-import { assertMovieSchemaMatches } from '../seatPicker/seatPicker.assertions';
+import { assertMoviesRedirection, assertMovieSchemaMatches } from './movies.assertions';
 import { MovieList } from '../../../pageObjectsManagers/cinesa/movies/movies.page';
 import { MoviePage } from '../../../pageObjectsManagers/cinesa/movie/movie.page';
 
@@ -65,7 +64,7 @@ test.describe('Cinesa Movies Tests', () => {
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Movie Schema validation test', async ({
+  test('Oasiz Movie Schema validation test', async ({
     page,
     navbar,
     cinema,
@@ -76,6 +75,23 @@ test.describe('Cinesa Movies Tests', () => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
+    const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
+    const moviePage = new MoviePage(page);
+    const movieSchema = await moviePage.extractMovieSchema();
+    await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
+  });
+
+  test('Grancasa Movie Schema validation test', async ({
+    page,
+    navbar,
+    cinema,
+    cinemaDetail,
+    cookieBanner
+  }) => {
+    await page.goto('https://www.cinesa.es/');
+    await cookieBanner.acceptCookies();
+    await navbar.navigateToCinemas();
+    await cinema.selectGrancasaCinema();
     const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
     const moviePage = new MoviePage(page);
     const movieSchema = await moviePage.extractMovieSchema();
