@@ -14,6 +14,7 @@ import { PaymentPage } from '../../pageObjectsManagers/cinesa/paymentPage/paymen
 import { UnlimitedProgramsPage } from '../../pageObjectsManagers/cinesa/programs/unlimitedPrograms.page';
 import { SignupPage } from '../../pageObjectsManagers/cinesa/signup/signup.page';
 import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
+import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analytics.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -28,6 +29,7 @@ type CustomFixtures = {
   barPage: BarPage;
   purchaseSummary: PurchaseSummary;
   paymentPage: PaymentPage;
+  analyticsPage: AnalyticsPage;
   unlimitedProgramsPage: UnlimitedProgramsPage;
   signupPage: SignupPage;
   mailing: Mailing;
@@ -103,6 +105,10 @@ export const test = base.extend<CustomFixtures>({
   paymentPage: async ({ page }, use) => {
     const paymentPage = new PaymentPage(page);
     await use(paymentPage);
+  },
+  analyticsPage: async ({ page }, use) => {
+    const analyticsPage = new AnalyticsPage(page);
+    await use(analyticsPage);
   },
   unlimitedProgramsPage: async ({ page }, use) => {
     const programsPage = new UnlimitedProgramsPage(page);
