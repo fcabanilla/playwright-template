@@ -46,7 +46,8 @@
     "test:appleappdownload": "npx playwright test tests/cinesa/footer/components/appleAppDownload/appleAppDownload.spec.ts",
     "test:signin": "npx playwright test tests/cinesa/login/login.spec.ts",
     "test:bar": "npx playwright test tests/cinesa/bar/bar.spec.ts",
-    "test:mailing": "npx playwright test tests/cinesa/mailing/mailing.spec.ts"
+    "test:mailing": "npx playwright test tests/cinesa/mailing/mailing.spec.ts",
+    "test:analytics": "npx playwright test tests/cinesa/analytics/analytics.spec.ts"
   },
   "repository": {
     "type": "git",

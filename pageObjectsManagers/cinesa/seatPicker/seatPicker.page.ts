@@ -244,10 +244,15 @@ export class SeatPicker {
     await allure.test.step(
       `Selecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
-        // Handle any modal that might be blocking the interaction
-        await this.handleShowtimeAttributeModal();
+        // First attempt to click the seat
+        try {
+          await seat.locator.click({ timeout: 3000 });
+        } catch (error) {
+          // If click fails (likely due to modal), handle modal and try again
+          await this.handleShowtimeAttributeModal();
+          await seat.locator.click();
+        }
         
-        await seat.locator.click();
         const elementHandle = await seat.locator.elementHandle();
         await this.page.waitForFunction(
           (element) => element?.getAttribute('aria-pressed') === 'true',
@@ -757,20 +762,25 @@ export class SeatPicker {
         const modal = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModal);
         
         // Check if modal is visible with a short timeout
-        await modal.waitFor({ state: 'visible', timeout: 2000 });
+        await modal.waitFor({ state: 'visible', timeout: 1000 });
         
-        // Try to find close button first, then accept button
-        const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton);
-        const acceptButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton);
+        // Try to find and click the accept button first (most common case)
+        const acceptButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton).first();
         
-        if (await closeButton.isVisible()) {
-          await closeButton.click();
-        } else if (await acceptButton.isVisible()) {
+        if (await acceptButton.isVisible()) {
           await acceptButton.click();
+          console.log('Clicked accept button on showtime attribute modal');
+        } else {
+          // Try close button as fallback
+          const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton);
+          if (await closeButton.isVisible()) {
+            await closeButton.click();
+            console.log('Clicked close button on showtime attribute modal');
+          }
         }
         
         // Wait for modal to disappear
-        await modal.waitFor({ state: 'hidden', timeout: 3000 });
+        await modal.waitFor({ state: 'hidden', timeout: 5000 });
         
       } catch (error) {
         // Modal not present or already closed, continue
