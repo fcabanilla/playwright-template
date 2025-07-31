@@ -13,4 +13,7 @@ export const SEAT_PICKER_SELECTORS = {
   dboxModal: 'aside.v-modal[role="dialog"]',
   dboxModalAcceptButton: 'aside.v-modal button.btn--blue--medium',
   sofaSection: '.v-seat-picker-area--category-138-0000000002',
+  showtimeAttributeModal: 'aside.v-modal--generic.showtime-attribute-modal[role="dialog"]',
+  showtimeAttributeModalAcceptButton: 'aside.v-modal--generic.showtime-attribute-modal button',
+  showtimeAttributeModalCloseButton: 'aside.v-modal--generic.showtime-attribute-modal .v-modal__close',
 };

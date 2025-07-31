@@ -244,6 +244,9 @@ export class SeatPicker {
     await allure.test.step(
       `Selecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
+        // Handle any modal that might be blocking the interaction
+        await this.handleShowtimeAttributeModal();
+        
         await seat.locator.click();
         const elementHandle = await seat.locator.elementHandle();
         await this.page.waitForFunction(
@@ -742,6 +745,37 @@ export class SeatPicker {
 
       const acceptButton = modal.locator('button').first();
       await acceptButton.click();
+    });
+  }
+
+  /**
+   * Handles the showtime attribute modal by dismissing it if it appears.
+   */
+  async handleShowtimeAttributeModal(): Promise<void> {
+    await allure.test.step('Handling showtime attribute modal if present', async () => {
+      try {
+        const modal = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModal);
+        
+        // Check if modal is visible with a short timeout
+        await modal.waitFor({ state: 'visible', timeout: 2000 });
+        
+        // Try to find close button first, then accept button
+        const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton);
+        const acceptButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton);
+        
+        if (await closeButton.isVisible()) {
+          await closeButton.click();
+        } else if (await acceptButton.isVisible()) {
+          await acceptButton.click();
+        }
+        
+        // Wait for modal to disappear
+        await modal.waitFor({ state: 'hidden', timeout: 3000 });
+        
+      } catch (error) {
+        // Modal not present or already closed, continue
+        console.log('Showtime attribute modal not present or already handled');
+      }
     });
   }
 
