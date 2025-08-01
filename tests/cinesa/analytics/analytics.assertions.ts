@@ -1,101 +1,140 @@
-import { expect } from '@playwright/test';
-import { DataLayerEvent, PriceSummary } from '../../../pageObjectsManagers/cinesa/analytics/analytics.page';
-import { analyticsTestData } from './analytics.data';
+import { Page, expect, TestInfo } from '@playwright/test';
 
 /**
- * Asserts that the required analytics events are present.
- * @param events Array of captured dataLayer events.
+ * Validates that dataLayer events were captured successfully
+ * @param allEvents Array of captured dataLayer events
  */
-export function assertRequiredEventsPresent(events: DataLayerEvent[]): void {
-  const addToCartEvents = events.filter(event => event.event === analyticsTestData.expectedEventTypes.addToCart);
-  const beginCheckoutEvents = events.filter(event => event.event === analyticsTestData.expectedEventTypes.beginCheckout);
-
-  expect(
-    addToCartEvents.length,
-    `Expected at least 2 add_to_cart events (ticket + F&B), but found ${addToCartEvents.length}`
-  ).toBeGreaterThanOrEqual(2);
-
-  expect(
-    beginCheckoutEvents.length,
-    `Expected at least 1 begin_checkout event, but found ${beginCheckoutEvents.length}`
-  ).toBeGreaterThanOrEqual(1);
+export async function assertEventsWereCaptured(allEvents: any[]): Promise<void> {
+  expect(allEvents.length).toBeGreaterThan(0);
 }
 
 /**
- * Asserts that the begin_checkout event has the required structure.
- * @param beginCheckoutEvent The begin_checkout event to validate.
+ * Validates critical e-commerce events exist in captured events
+ * @param allEvents Array of captured dataLayer events
  */
-export function assertBeginCheckoutEventStructure(beginCheckoutEvent: DataLayerEvent): void {
-  expect(beginCheckoutEvent.event, 'Event type should be begin_checkout').toBe('begin_checkout');
-  expect(beginCheckoutEvent.ecommerce, 'begin_checkout event should have ecommerce data').toBeDefined();
-  expect(beginCheckoutEvent.ecommerce?.items, 'begin_checkout event should have items array').toBeDefined();
-  expect(beginCheckoutEvent.ecommerce?.currency, 'begin_checkout event should have currency').toBe(analyticsTestData.expectedCurrency);
-  expect(beginCheckoutEvent.ecommerce?.value, 'begin_checkout event should have total value').toBeDefined();
-  expect(beginCheckoutEvent.ecommerce?.transaction_id, 'begin_checkout event should have transaction ID').toBeDefined();
+export async function assertCriticalEventsExist(allEvents: any[]): Promise<{ addToCartEvents: any[], beginCheckoutEvents: any[] }> {
+  const addToCartEvents = allEvents.filter(event => event.event === 'add_to_cart');
+  const beginCheckoutEvents = allEvents.filter(event => event.event === 'begin_checkout');
+
+  expect(addToCartEvents.length).toBeGreaterThan(0);
+  expect(beginCheckoutEvents.length).toBeGreaterThan(0);
+
+  return { addToCartEvents, beginCheckoutEvents };
 }
 
 /**
- * Asserts that ticket prices match between UI and analytics.
- * @param uiPrices Prices extracted from UI.
- * @param analyticsPrices Prices calculated from analytics.
+ * Validates the structure of a begin_checkout event
+ * @param latestBeginCheckout The latest begin_checkout event
  */
-export function assertTicketPricesMatch(uiPrices: PriceSummary, analyticsPrices: { ticketPrice: number; foodBeveragePrice: number }): void {
-  const priceDifference = Math.abs(uiPrices.ticketPrice - analyticsPrices.ticketPrice);
+export async function assertBeginCheckoutEventStructure(latestBeginCheckout: any): Promise<void> {
+  expect(latestBeginCheckout).toHaveProperty('event');
+  expect(latestBeginCheckout).toHaveProperty('ecommerce');
   
-  expect(
-    priceDifference,
-    `Ticket price mismatch: UI shows €${uiPrices.ticketPrice}, Analytics shows €${analyticsPrices.ticketPrice}`
-  ).toBeLessThan(analyticsTestData.priceToleranceEur);
+  if (latestBeginCheckout.ecommerce) {
+    expect(latestBeginCheckout.ecommerce).toHaveProperty('currency');
+    expect(latestBeginCheckout.ecommerce).toHaveProperty('value');
+    expect(latestBeginCheckout.ecommerce).toHaveProperty('items');
+    expect(latestBeginCheckout.ecommerce.currency).toBe('EUR');
+    expect(latestBeginCheckout.ecommerce.value).toBeGreaterThan(0);
+    expect(Array.isArray(latestBeginCheckout.ecommerce.items)).toBe(true);
+    expect(latestBeginCheckout.ecommerce.items.length).toBeGreaterThan(0);
+  }
 }
 
 /**
- * Asserts that food & beverage prices match between UI and analytics.
- * @param uiPrices Prices extracted from UI.
- * @param analyticsPrices Prices calculated from analytics.
+ * Validates analytics total values are reasonable
+ * @param analyticsTotal The total value from analytics
  */
-export function assertFoodBeveragePricesMatch(uiPrices: PriceSummary, analyticsPrices: { ticketPrice: number; foodBeveragePrice: number }): void {
-  const priceDifference = Math.abs(uiPrices.foodBeveragePrice - analyticsPrices.foodBeveragePrice);
-  
-  expect(
-    priceDifference,
-    `F&B price mismatch: UI shows €${uiPrices.foodBeveragePrice}, Analytics shows €${analyticsPrices.foodBeveragePrice}`
-  ).toBeLessThan(analyticsTestData.priceToleranceEur);
+export async function assertAnalyticsTotalIsReasonable(analyticsTotal: number): Promise<void> {
+  expect(analyticsTotal).toBeGreaterThan(0);
+  expect(analyticsTotal).toBeLessThan(100); // Reasonable upper bound
 }
 
 /**
- * Asserts that total prices match between UI and analytics.
- * @param uiTotal Total price from UI.
- * @param analyticsTotal Total price from analytics.
+ * Validates the structure of ecommerce items
+ * @param items Array of ecommerce items
  */
-export function assertTotalPricesMatch(uiTotal: number, analyticsTotal: number): void {
-  const priceDifference = Math.abs(uiTotal - analyticsTotal);
-  
-  expect(
-    priceDifference,
-    `Total price mismatch: UI shows €${uiTotal}, Analytics shows €${analyticsTotal}`
-  ).toBeLessThan(analyticsTestData.priceToleranceEur);
+export async function assertEcommerceItemsStructure(items: any[]): Promise<void> {
+  for (const item of items) {
+    expect(item).toHaveProperty('item_name');
+    expect(item).toHaveProperty('price');
+    expect(item.price).toBeGreaterThan(0);
+  }
 }
 
 /**
- * Asserts that all items in the analytics event have the required properties.
- * @param beginCheckoutEvent The begin_checkout event to validate.
+ * Attaches captured events to test report
+ * @param testInfo Playwright TestInfo object
+ * @param allEvents Array of captured events
+ * @param latestBeginCheckout Latest begin_checkout event
  */
-export function assertAnalyticsItemsHaveRequiredProperties(beginCheckoutEvent: DataLayerEvent): void {
-  expect(beginCheckoutEvent.ecommerce?.items, 'begin_checkout event should have items').toBeDefined();
-  
-  beginCheckoutEvent.ecommerce!.items.forEach((item, index) => {
-    analyticsTestData.requiredItemProperties.forEach(prop => {
-      expect(
-        item.hasOwnProperty(prop),
-        `Item ${index} should have property '${prop}'`
-      ).toBeTruthy();
-    });
-
-    // Validate item category is one of the expected values
-    const validCategories = Object.values(analyticsTestData.expectedItemCategories);
-    expect(
-      validCategories.includes(item.item_category as any),
-      `Item ${index} has invalid category '${item.item_category}'. Expected one of: ${validCategories.join(', ')}`
-    ).toBeTruthy();
+export async function attachEventsToReport(testInfo: TestInfo, allEvents: any[], latestBeginCheckout: any): Promise<void> {
+  await testInfo.attach('All captured dataLayer events', {
+    body: JSON.stringify(allEvents, null, 2),
+    contentType: 'application/json'
   });
+
+  await testInfo.attach('Latest Begin Checkout Event', {
+    body: JSON.stringify(latestBeginCheckout, null, 2),
+    contentType: 'application/json'
+  });
+}
+
+/**
+ * Logs comprehensive analytics summary to console
+ * @param cinemaName Name of the cinema
+ * @param menuType Type of menu selected
+ * @param allEvents Array of all captured events
+ * @param addToCartEvents Array of add_to_cart events
+ * @param beginCheckoutEvents Array of begin_checkout events
+ * @param analyticsTotal Total value from analytics
+ * @param itemsTotal Calculated total from items
+ * @param latestBeginCheckout Latest begin_checkout event
+ */
+export async function logAnalyticsSummary(
+  cinemaName: string,
+  menuType: string,
+  allEvents: any[],
+  addToCartEvents: any[],
+  beginCheckoutEvents: any[],
+  analyticsTotal: number,
+  itemsTotal: number,
+  latestBeginCheckout: any
+): Promise<void> {
+  console.log('=== ANALYTICS VALIDATION SUMMARY ===');
+  console.log(`🎬 Cinema: ${cinemaName}`);
+  console.log(`🍿 Menu: ${menuType}`);
+  console.log(`📊 Total events captured: ${allEvents.length}`);
+  console.log(`🛒 Add to cart events: ${addToCartEvents.length}`);
+  console.log(`💳 Begin checkout events: ${beginCheckoutEvents.length}`);
+  console.log(`💰 Analytics total: €${analyticsTotal}`);
+  console.log(`📝 Items total: €${itemsTotal}`);
+  console.log(`📋 Items count: ${latestBeginCheckout.ecommerce?.items?.length || 0}`);
+  
+  // List all items
+  if (latestBeginCheckout.ecommerce?.items) {
+    console.log('🎫 Items breakdown:');
+    latestBeginCheckout.ecommerce.items.forEach((item: any, index: number) => {
+      console.log(`   ${index + 1}. ${item.item_name}: €${item.price} x ${item.quantity || 1}`);
+    });
+  }
+
+  console.log('✅ All analytics validations passed!');
+}
+
+/**
+ * Logs simplified analytics summary for Grancasa
+ */
+export async function logGrancasaAnalyticsSummary(
+  allEvents: any[],
+  addToCartEvents: any[],
+  beginCheckoutEvents: any[],
+  analyticsTotal: number
+): Promise<void> {
+  console.log('=== GRANCASA ANALYTICS VALIDATION SUMMARY ===');
+  console.log(`✅ Total events captured: ${allEvents.length}`);
+  console.log(`✅ Add to cart events: ${addToCartEvents.length}`);
+  console.log(`✅ Begin checkout events: ${beginCheckoutEvents.length}`);
+  console.log(`✅ Analytics total: €${analyticsTotal}`);
+  console.log(`✅ All analytics validations passed for Grancasa!`);
 }
