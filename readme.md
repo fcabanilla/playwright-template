@@ -159,7 +159,12 @@ Then, in your tests you can import these fixtures to simplify setup:
 ```typescript
 // tests/cinesa/navbar.spec.ts
 import { test, expect } from '../fixtures';
-import { assertNavbarElementsVisible, assertHomeUrl, assertNavClick, assertExternalNavClick } from './navbar.assertions';
+import {
+  assertNavbarElementsVisible,
+  assertHomeUrl,
+  assertNavClick,
+  assertExternalNavClick,
+} from './navbar.assertions';
 import { baseUrl, internalNavItems, externalNavItem } from './navbar.data';
 
 test.describe('Cinesa Navbar Tests', () => {
@@ -177,12 +182,23 @@ test.describe('Cinesa Navbar Tests', () => {
     await assertHomeUrl(page, baseUrl);
   });
 
-  test('should click each navbar element and navigate accordingly', async ({ navbar, page }) => {
+  test('should click each navbar element and navigate accordingly', async ({
+    navbar,
+    page,
+  }) => {
     for (const item of internalNavItems) {
-      await assertNavClick(page, navbar.selectors[item.selectorKey], item.expectedUrl);
+      await assertNavClick(
+        page,
+        navbar.selectors[item.selectorKey],
+        item.expectedUrl
+      );
       await navbar.navigateToHome();
     }
-    await assertExternalNavClick(page, navbar.selectors[externalNavItem.selectorKey], externalNavItem.expectedUrl);
+    await assertExternalNavClick(
+      page,
+      navbar.selectors[externalNavItem.selectorKey],
+      externalNavItem.expectedUrl
+    );
   });
 });
 ```
