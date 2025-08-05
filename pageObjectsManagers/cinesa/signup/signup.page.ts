@@ -70,7 +70,6 @@ export class SignupPage {
   }
 
   async checkTermsAndConditionsCheckbox(): Promise<void> {
-    // Usa JavaScript para hacer click directamente en el checkbox
     await this.page.evaluate(() => {
       const checkbox = document.querySelector('#v-member-sign-up-form-field__terms-and-conditions-input') as HTMLInputElement;
       if (checkbox) {
