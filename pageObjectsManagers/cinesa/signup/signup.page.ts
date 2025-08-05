@@ -45,6 +45,8 @@ export class SignupPage {
   }
 
   async selectFavoriteCinema(cinema: string): Promise<void> {
+    await this.page.waitForSelector(SIGNUP_SELECTORS.primarySiteDropdownButton, { state: 'visible', timeout: 10000 });
+    await this.page.locator(SIGNUP_SELECTORS.primarySiteDropdownButton).scrollIntoViewIfNeeded();
     await this.page.click(SIGNUP_SELECTORS.primarySiteDropdownButton);
     await this.page.waitForSelector(SIGNUP_SELECTORS.favoriteCinemaDropdownList, { state: 'visible' });
     const itemSelector = SIGNUP_SELECTORS.favoriteCinemaDropdownItem(cinema);
@@ -68,8 +70,14 @@ export class SignupPage {
   }
 
   async checkTermsAndConditionsCheckbox(): Promise<void> {
-    // Usa el id del input directamente para asegurar el click correcto
-    await this.page.locator('#v-member-sign-up-form-field__terms-and-conditions-input').check();
+    // Usa JavaScript para hacer click directamente en el checkbox
+    await this.page.evaluate(() => {
+      const checkbox = document.querySelector('#v-member-sign-up-form-field__terms-and-conditions-input') as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
   }
 
   async submit(): Promise<void> {
