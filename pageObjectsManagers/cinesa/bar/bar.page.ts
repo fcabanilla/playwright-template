@@ -23,11 +23,16 @@ export class BarPage {
     await allure.test.step('Handling the bar modal', async () => {
       const modal = this.page.locator(BAR_SELECTORS.modal);
       const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
-      await modal.waitFor({ state: 'visible', timeout: 10000 });
-      if (await modal.isVisible()) {
-        await modalButton.waitFor({ state: 'visible', timeout: 5000 });
-        await modalButton.click();
-        await modal.waitFor({ state: 'hidden', timeout: 5000 });
+      
+      try {
+        await modal.waitFor({ state: 'visible', timeout: 10000 });
+        if (await modal.isVisible()) {
+          await modalButton.waitFor({ state: 'visible', timeout: 5000 });
+          await modalButton.click();
+          await modal.waitFor({ state: 'hidden', timeout: 5000 });
+        }
+      } catch (error) {
+        console.log('Bar modal did not appear, continuing...');
       }
     });
   }
