@@ -91,6 +91,7 @@ export class BlogLanding {
    * @returns A Promise that resolves with the number of article cards.
    */
   async countArticleCards(): Promise<number> {
+    await this.page.waitForSelector(this.selectors.articleCard, { timeout: 10000 });
     return await this.getArticleCardsLocator().count();
   }
 }
