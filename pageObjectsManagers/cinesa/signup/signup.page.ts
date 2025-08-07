@@ -105,7 +105,7 @@ export class SignupPage {
     await this.fillFirstName(name);
     await this.fillLastName(lastName);
     await this.fillEmail(email);
-    await this.fillConfirmEmail(email); // Confirmación de email debe ser igual al email
+    await this.fillConfirmEmail(email);
     await this.fillDateOfBirth(birthDate);
     await this.fillMobileNumber(phone);
     await this.selectFavoriteCinema(favoriteCinema);
