@@ -130,14 +130,12 @@ export class AnalyticsPage {
 
         const extractPrice = (text: string): number => {
           if (!text) return 0;
-          // More comprehensive price extraction patterns
           const patterns = [
             /(\d+[,.]?\d*)\s*€/,           // 12.15€ or 12,15€
             /€\s*(\d+[,.]?\d*)/,           // €12.15
             /(\d+[,.]?\d*)\s*EUR/i,        // 12.15 EUR
             /(\d+[,.]?\d*)$/               // Just numbers at end
           ];
-          
           for (const pattern of patterns) {
             const match = text.match(pattern);
             if (match) {
@@ -146,8 +144,6 @@ export class AnalyticsPage {
           }
           return 0;
         };
-
-        // Strategy 1: Try specific selectors
         const trySelectors = (selectorList: string[]): number => {
           let total = 0;
           for (const selector of selectorList) {
@@ -159,54 +155,35 @@ export class AnalyticsPage {
           }
           return total;
         };
-
-        // Extract ticket prices using multiple selectors
         const ticketSelectors = [
           selectors.ticketPrice,
           selectors.ticketPriceAlt,
-          '.entradas .precio',
-          '.tickets .price',
-          '.entrada .precio'
+          ...selectors.ticketPriceSelectors
         ];
         summary.ticketPrice = trySelectors(ticketSelectors);
-
-        // Extract product prices using multiple selectors  
         const productSelectors = [
           selectors.productPrice,
           selectors.productPriceAlt,
-          '.productos .precio',
-          '.products .price',
-          '.producto .precio'
+          ...selectors.productPriceSelectors
         ];
         summary.foodBeveragePrice = trySelectors(productSelectors);
-
-        // Extract total price using multiple selectors
         const totalSelectors = [
           selectors.grandTotal,
           selectors.grandTotalAlt,
-          '.total .precio',
-          '.total-amount',
-          '.precio-total'
+          ...selectors.totalPriceSelectors
         ];
         const extractedTotal = trySelectors(totalSelectors);
         if (extractedTotal > summary.totalPrice) {
           summary.totalPrice = extractedTotal;
         }
-
-        // Extract taxes
         const taxSelectors = [
           selectors.taxes,
           selectors.taxesAlt,
-          '.impuestos .precio',
-          '.tax-amount'
+          ...selectors.taxSelectors
         ];
         summary.taxes = trySelectors(taxSelectors);
-
-        // Strategy 2: If we didn't find prices, try a more general approach
         if (summary.ticketPrice === 0 && summary.foodBeveragePrice === 0 && summary.totalPrice === 0) {
-          console.log('No prices found with specific selectors, trying general approach...');
-          
-          // Find all elements that contain Euro symbol or price-like text
+          console.log('No prices found with specific selectors, trying general approach...');          
           const allElements = document.querySelectorAll('*');
           const pricesFound: { element: Element; price: number; text: string }[] = [];
           
@@ -217,40 +194,28 @@ export class AnalyticsPage {
               pricesFound.push({ element: el, price, text: text.trim() });
             }
           });
-
-          // Log what we found for debugging
           console.log('Prices found in DOM:', pricesFound.map(p => ({ price: p.price, text: p.text })));
-
-          // Try to categorize prices based on context
           pricesFound.forEach(({ element, price, text }) => {
             const elementText = element.textContent?.toLowerCase() || '';
             const parentText = element.parentElement?.textContent?.toLowerCase() || '';
             const contextText = (elementText + ' ' + parentText).toLowerCase();
-
-            // Look for ticket/entrada indicators
-            if (contextText.includes('entrada') || contextText.includes('ticket') || contextText.includes('butaca')) {
+            if (selectors.contextKeywords.ticket.some(keyword => contextText.includes(keyword))) {
               summary.ticketPrice += price;
             }
-            // Look for product/menu indicators
-            else if (contextText.includes('menu') || contextText.includes('producto') || contextText.includes('comida') || contextText.includes('bebida')) {
+            else if (selectors.contextKeywords.foodBeverage.some(keyword => contextText.includes(keyword))) {
               summary.foodBeveragePrice += price;
             }
-            // Look for total indicators
-            else if (contextText.includes('total') || contextText.includes('final')) {
+            else if (selectors.contextKeywords.total.some(keyword => contextText.includes(keyword))) {
               if (price > summary.totalPrice) {
                 summary.totalPrice = price;
               }
             }
-            // Look for tax indicators
-            else if (contextText.includes('impuesto') || contextText.includes('iva') || contextText.includes('tax')) {
+            else if (selectors.contextKeywords.tax.some(keyword => contextText.includes(keyword))) {
               summary.taxes += price;
             }
           });
         }
-
-        // Log final summary for debugging
         console.log('Final price summary:', summary);
-
         return summary;
       }, ANALYTICS_SELECTORS);
     });
