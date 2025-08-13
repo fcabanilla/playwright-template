@@ -2,6 +2,14 @@ import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { ANALYTICS_SELECTORS } from './analytics.selectors';
 
+// Extend window interface to include Google Analytics dataLayer and our custom properties
+declare global {
+  interface Window {
+    dataLayer: any[];
+    dataLayerEvents: any[];
+  }
+}
+
 export interface DataLayerEvent {
   event: string;
   gtm?: {
