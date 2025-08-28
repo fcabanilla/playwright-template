@@ -8,21 +8,13 @@ export default defineConfig({
     [
       'allure-playwright',
       {
-        detail: false,
+        detail: true,
         outputFolder: 'allure-results',
-        suiteTitle: false,
-        links: {
-          issue: {
-            nameTemplate: 'Issue #%s',
-            urlTemplate: 'https://issues.example.com/%s',
-          },
-          tms: {
-            nameTemplate: 'TMS #%s',
-            urlTemplate: 'https://tms.example.com/%s',
-          },
-          jira: {
-            urlTemplate: (v) => `https://jira.example.com/browse/${v}`,
-          },
+        suiteTitle: true,
+        environmentInfo: {
+          Project: 'UCI Cinemas Test Suite',
+          Environment: 'Test',
+          Browser: 'Chromium',
         },
       },
     ],
