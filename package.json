@@ -51,7 +51,16 @@
     "test:signin": "npx playwright test tests/cinesa/login/login.spec.ts",
     "test:bar": "npx playwright test tests/cinesa/bar/bar.spec.ts",
     "test:mailing": "npx playwright test tests/cinesa/mailing/mailing.spec.ts",
-    "test:analytics": "npx playwright test tests/cinesa/analytics/analytics.spec.ts"
+    "test:analytics": "npx playwright test tests/cinesa/analytics/analytics.spec.ts",
+    "test:uci:all": "npx playwright test tests/uci/",
+    "test:uci:headed": "npx playwright test tests/uci/ --headed",
+    "test:uci:debug": "npx playwright test tests/uci/ --debug",
+    "test:cinesa:staging": "TEST_ENV=staging npx playwright test tests/cinesa/",
+    "test:uci:staging": "TEST_ENV=staging npx playwright test tests/uci/",
+    "test:cinesa:dev": "TEST_ENV=development npx playwright test tests/cinesa/",
+    "test:uci:dev": "TEST_ENV=development npx playwright test tests/uci/",
+    "codegen:cinesa:staging": "TEST_ENV=staging npx playwright codegen",
+    "codegen:uci:staging": "TEST_ENV=staging npx playwright codegen"
   },
   "repository": {
     "type": "git",

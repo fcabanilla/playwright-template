@@ -58,7 +58,10 @@ export class NavbarAssertions {
    */
   async expectHomeUrl(expectedUrl: string): Promise<void> {
     await allure.test.step('Validating that URL remains home', async () => {
-      await expect(this.page).toHaveURL(new RegExp(expectedUrl));
+      // Make the URL matching more flexible to handle www vs non-www and trailing slashes
+      const normalizedExpected = expectedUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+      const urlPattern = new RegExp(`https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`);
+      await expect(this.page).toHaveURL(urlPattern);
     });
   }
 
@@ -72,7 +75,10 @@ export class NavbarAssertions {
     await allure.test.step(
       `Verifying navigation to ${expectedUrl}`,
       async () => {
-        await expect(this.page).toHaveURL(new RegExp(expectedUrl));
+        // Make URL matching more flexible to handle www vs non-www and trailing slashes
+        const normalizedExpected = expectedUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+        const urlPattern = new RegExp(`https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`);
+        await expect(this.page).toHaveURL(urlPattern);
       }
     );
   }

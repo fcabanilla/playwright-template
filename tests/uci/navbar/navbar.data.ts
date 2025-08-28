@@ -1,4 +1,5 @@
 import { NavbarSelectors } from '../../../pageObjectsManagers/uci/navbar/navbar.selectors';
+import { getUCIUrls } from '../../../config/urls';
 
 // Interface for representing a navigation element and its expected URL
 export interface NavItem {
@@ -7,38 +8,35 @@ export interface NavItem {
   displayName: string;
 }
 
-// Base site URL
-export const baseUrl = 'https://ucicinemas.it';
+// Get URLs from centralized configuration
+const urls = getUCIUrls();
 
-// UCI internal navigation elements
-export const internalNavItems: NavItem[] = [
-  {
-    selectorKey: 'cinemas',
-    expectedUrl: `${baseUrl}/cinema`,
-    displayName: 'Cinema',
-  },
-  {
-    selectorKey: 'movies',
-    expectedUrl: `${baseUrl}/film`,
-    displayName: 'Film',
-  },
-  {
-    selectorKey: 'experiences',
-    expectedUrl: `${baseUrl}/esperienze`,
-    displayName: 'Esperienze',
-  },
-  {
-    selectorKey: 'membership',
-    expectedUrl: `${baseUrl}/membership`,
-    displayName: 'Membership',
-  },
-];
+// Base URL for UCI Cinemas
+export const baseUrl = urls.base;
+
+// Internal navigation items that should always be present
+export const internalNavItems = [
+  'Cinema',
+  'Film',
+  'Offerte',
+  'Esperienze',
+  'Membership',
+  'e-Shop',
+] as const;
+
+// External navigation items (sign in button, etc.)
+export const externalNavItems = ['Accedi'] as const;
+
+// All navigation items combined
+export const allNavItems = [...internalNavItems, ...externalNavItems] as const;
 
 // Specific URLs for navigation tests
 export const testUrls = {
   home: baseUrl,
-  cinema: `${baseUrl}/cinema`,
-  film: `${baseUrl}/film`,
-  esperienze: `${baseUrl}/esperienze`,
-  membership: `${baseUrl}/membership`,
+  cinema: urls.navigation.cinemas,
+  film: urls.navigation.movies,
+  offerte: urls.navigation.promotions,
+  esperienze: urls.navigation.experiences,
+  membership: urls.navigation.membership,
+  eShop: urls.navigation.eShop!,
 } as const;

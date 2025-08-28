@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
+import { getUCIUrls } from '../../../config/urls';
 
 /**
  * Represents the UCI Cinemas website navigation bar component.
@@ -11,7 +12,7 @@ export class Navbar {
    * Base URL for the UCI Cinemas website.
    * @private
    */
-  private readonly url: string = 'https://ucicinemas.it/';
+  private readonly url: string;
 
   /**
    * Playwright page instance to interact with.
@@ -31,6 +32,7 @@ export class Navbar {
   constructor(page: Page) {
     this.page = page;
     this.selectors = navbarSelectors;
+    this.url = getUCIUrls().base;
   }
 
   /**
