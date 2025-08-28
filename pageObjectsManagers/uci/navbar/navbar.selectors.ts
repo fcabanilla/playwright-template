@@ -10,13 +10,13 @@ export interface NavbarSelectors {
 }
 
 export const navbarSelectors: NavbarSelectors = {
-  // Navigation element selectors
-  logo: '[name="store logo"]',
+  // Navigation element selectors based on HTML structure
+  logo: 'a[href="/"] img', // Logo image inside link to home
   cinemas: 'a[href="/cinema"]',
   movies: 'p.cursor-pointer:has-text("Film")',
   promotions: 'p.cursor-pointer:has-text("Offerte")',
-  experiences: 'text=Esperienze',
+  experiences: 'p.cursor-pointer:has-text("Esperienze")',
   membership: 'a[href="/membership"]',
-  eShop: 'text=e-Shop',
-  signin: '.btn-icon',
+  eShop: 'a[href="https://shop.ucicinemas.it"]',
+  signin: 'a[href*="login.ucicinemas.it"]',
 };

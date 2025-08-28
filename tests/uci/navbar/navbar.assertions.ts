@@ -1,16 +1,13 @@
 import { Page, expect } from '@playwright/test';
 import * as allure from 'allure-playwright';
-import {
-  navbarSelectors,
-  NavbarSelectors,
-} from '../../../pageObjectsManagers/uci/navbar/navbar.selectors';
+import { Navbar } from '../../../pageObjectsManagers/uci/navbar/navbar.page';
 
 /**
  * Provides assertions related to the UCI Cinemas Navbar.
+ * This class should ONLY use the POM methods, never directly access Playwright API.
  */
 export class NavbarAssertions {
-  readonly page: Page;
-  readonly selectors: NavbarSelectors;
+  readonly navbar: Navbar;
 
   /**
    * Creates a new instance of NavbarAssertions.
@@ -18,8 +15,7 @@ export class NavbarAssertions {
    * @param page - Playwright Page object.
    */
   constructor(page: Page) {
-    this.page = page;
-    this.selectors = navbarSelectors;
+    this.navbar = new Navbar(page);
   }
 
   /**
@@ -28,25 +24,24 @@ export class NavbarAssertions {
   async expectNavbarElementsVisible(): Promise<void> {
     await allure.test.step('Verifying navbar elements visibility', async () => {
       await allure.test.step("Verify 'Cinema' element", async () => {
-        await expect(this.page.locator(this.selectors.cinemas)).toBeVisible();
+        const isVisible = await this.navbar.isCinemasVisible();
+        expect(isVisible).toBe(true);
       });
       await allure.test.step("Verify 'Film' element", async () => {
-        await expect(this.page.locator(this.selectors.movies)).toBeVisible();
+        const isVisible = await this.navbar.isMoviesVisible();
+        expect(isVisible).toBe(true);
       });
       await allure.test.step("Verify 'Offerte' element", async () => {
-        await expect(
-          this.page.locator(this.selectors.promotions)
-        ).toBeVisible();
+        const isVisible = await this.navbar.isPromotionsVisible();
+        expect(isVisible).toBe(true);
       });
       await allure.test.step("Verify 'Esperienze' element", async () => {
-        await expect(
-          this.page.locator(this.selectors.experiences)
-        ).toBeVisible();
+        const isVisible = await this.navbar.isExperiencesVisible();
+        expect(isVisible).toBe(true);
       });
       await allure.test.step("Verify 'Membership' element", async () => {
-        await expect(
-          this.page.locator(this.selectors.membership)
-        ).toBeVisible();
+        const isVisible = await this.navbar.isMembershipVisible();
+        expect(isVisible).toBe(true);
       });
     });
   }
@@ -59,9 +54,14 @@ export class NavbarAssertions {
   async expectHomeUrl(expectedUrl: string): Promise<void> {
     await allure.test.step('Validating that URL remains home', async () => {
       // Make the URL matching more flexible to handle www vs non-www and trailing slashes
-      const normalizedExpected = expectedUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-      const urlPattern = new RegExp(`https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`);
-      await expect(this.page).toHaveURL(urlPattern);
+      const normalizedExpected = expectedUrl
+        .replace(/^https?:\/\/(www\.)?/, '')
+        .replace(/\/$/, '');
+      const urlPattern = new RegExp(
+        `https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`
+      );
+
+      await this.navbar.validateUrl(urlPattern);
     });
   }
 
@@ -76,9 +76,14 @@ export class NavbarAssertions {
       `Verifying navigation to ${expectedUrl}`,
       async () => {
         // Make URL matching more flexible to handle www vs non-www and trailing slashes
-        const normalizedExpected = expectedUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-        const urlPattern = new RegExp(`https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`);
-        await expect(this.page).toHaveURL(urlPattern);
+        const normalizedExpected = expectedUrl
+          .replace(/^https?:\/\/(www\.)?/, '')
+          .replace(/\/$/, '');
+        const urlPattern = new RegExp(
+          `https?://(www\\.)?${normalizedExpected.replace(/\./g, '\\.')}/?$`
+        );
+
+        await this.navbar.validateUrl(urlPattern);
       }
     );
   }
@@ -91,14 +96,12 @@ export class NavbarAssertions {
       'Verifying promotional modal is closed',
       async () => {
         // Verify that no overlay is visible
-        const overlay = this.page.locator(
-          'div.bg-blue-1\\/80.fixed.w-full.h-full.z-40'
-        );
-        await expect(overlay).not.toBeVisible();
+        const isModalVisible = await this.navbar.isPromoModalVisible();
+        expect(isModalVisible).toBe(false);
 
         // Verify that we can interact with navbar elements
-        const moviesElement = this.page.locator(this.selectors.movies);
-        await expect(moviesElement).toBeVisible();
+        const isMoviesVisible = await this.navbar.isMoviesVisible();
+        expect(isMoviesVisible).toBe(true);
       }
     );
   }
@@ -108,8 +111,8 @@ export class NavbarAssertions {
    */
   async expectLogoFunctionality(): Promise<void> {
     await allure.test.step('Verifying logo functionality', async () => {
-      const logoElement = this.page.locator(this.selectors.logo);
-      await expect(logoElement).toBeVisible();
+      const isLogoVisible = await this.navbar.isLogoVisible();
+      expect(isLogoVisible).toBe(true);
     });
   }
 }

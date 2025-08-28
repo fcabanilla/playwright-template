@@ -1,10 +1,12 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
+import { WebActions } from '../../../core/webActions/webActions';
 
 /**
  * Represents the Cinesa website navigation bar component.
  * Provides methods to interact with navigation elements and navigate to different sections.
+ * This class should only use WebActions, never directly access Playwright API.
  */
 export class Navbar {
   /**
@@ -14,9 +16,9 @@ export class Navbar {
   private readonly url: string = 'https://www.cinesa.es/';
 
   /**
-   * Playwright page instance to interact with.
+   * WebActions instance for all browser interactions.
    */
-  readonly page: Page;
+  readonly webActions: WebActions;
 
   /**
    * Selectors for navbar elements.
@@ -29,7 +31,7 @@ export class Navbar {
    * @param page - The Playwright page object to interact with.
    */
   constructor(page: Page) {
-    this.page = page;
+    this.webActions = new WebActions(page);
     this.selectors = navbarSelectors;
   }
 
@@ -40,8 +42,23 @@ export class Navbar {
    */
   async navigateToHome(): Promise<void> {
     await allure.test.step('Navigating to Cinesa home', async () => {
-      await this.page.goto(this.url);
+      await this.webActions.navigateTo(this.url);
     });
+  }
+
+  /**
+   * Navigates to the Cinesa homepage with Cloudflare protection handling.
+   * Use this method when Cloudflare is detected or expected.
+   *
+   * @returns Promise<boolean> que se resuelve con true si la navegación es exitosa.
+   */
+  async navigateToHomeWithCloudflareHandling(): Promise<boolean> {
+    return await allure.test.step(
+      'Navigating to Cinesa home with Cloudflare handling',
+      async () => {
+        return await this.webActions.navigateToWithCloudflareHandling(this.url);
+      }
+    );
   }
 
   /**
@@ -51,7 +68,7 @@ export class Navbar {
    */
   async clickLogo(): Promise<void> {
     await allure.test.step('Clicking on navbar logo', async () => {
-      await this.page.click(this.selectors.logo);
+      await this.webActions.click(this.selectors.logo);
     });
   }
 
@@ -62,7 +79,7 @@ export class Navbar {
    */
   async navigateToCinemas(): Promise<void> {
     await allure.test.step('Navigating to Cinemas page', async () => {
-      await this.page.click(this.selectors.cines);
+      await this.webActions.click(this.selectors.cines);
     });
   }
 
@@ -73,7 +90,7 @@ export class Navbar {
    */
   async navigateToMovies(): Promise<void> {
     await allure.test.step('Navigating to Movies page', async () => {
-      await this.page.click(this.selectors.peliculas);
+      await this.webActions.click(this.selectors.peliculas);
     });
   }
 
@@ -84,7 +101,7 @@ export class Navbar {
    */
   async navigateToPromotions(): Promise<void> {
     await allure.test.step('Navigating to Promotions page', async () => {
-      await this.page.click(this.selectors.promociones);
+      await this.webActions.click(this.selectors.promociones);
     });
   }
 
@@ -95,7 +112,7 @@ export class Navbar {
    */
   async navigateToExperiences(): Promise<void> {
     await allure.test.step('Navigating to Experiences page', async () => {
-      await this.page.click(this.selectors.experiencias);
+      await this.webActions.click(this.selectors.experiencias);
     });
   }
 
@@ -106,7 +123,7 @@ export class Navbar {
    */
   async navigateToPrograms(): Promise<void> {
     await allure.test.step('Navigating to Programs page', async () => {
-      await this.page.click(this.selectors.programas);
+      await this.webActions.click(this.selectors.programas);
     });
   }
 
@@ -117,7 +134,7 @@ export class Navbar {
    */
   async navigateToCoupons(): Promise<void> {
     await allure.test.step('Navigating to Coupons page', async () => {
-      await this.page.click(this.selectors.bonos);
+      await this.webActions.click(this.selectors.bonos);
     });
   }
 
@@ -128,7 +145,7 @@ export class Navbar {
    */
   async clickSignin(): Promise<void> {
     await allure.test.step('Clicking on Sign In button', async () => {
-      await this.page.click(this.selectors.signin);
+      await this.webActions.click(this.selectors.signin);
     });
   }
 
@@ -148,7 +165,7 @@ export class Navbar {
    */
   async navigateToSignup(): Promise<void> {
     await allure.test.step('Clicking on Signup button', async () => {
-      await this.page.click(this.selectors.signup);
+      await this.webActions.click(this.selectors.signup);
     });
   }
 }

@@ -35,9 +35,9 @@ npm run test:cinemas         # Tests de cines de Cinesa
 ### UCI Cinemas
 
 ```bash
+# Tests específicos de UCI
 npm run test:uci             # Todos los tests de UCI
 npm run test:uci:navbar      # Tests del navbar de UCI
-npm run test:uci:footer      # Tests del footer de UCI
 ```
 
 ### Generación de Código
