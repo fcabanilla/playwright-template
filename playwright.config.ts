@@ -1,13 +1,17 @@
 import { defineConfig } from '@playwright/test';
-import * as os from "node:os";
+import * as os from 'node:os';
 
 export default defineConfig({
+  name: 'UCI Cinemas',
   // Timeout global para cada test (60 segundos)
   timeout: 60000,
 
+  // Directorio de salida para videos, screenshots y traces
+  outputDir: '.allure/playwright-artifacts',
+
   // Configuración base que se aplicará a todos los proyectos
   use: {
-    headless: false, // Ejecuta el navegador de forma visual
+    headless: true, // Ejecuta el navegador sin interfaz gráfica (más ligero)
     screenshot: 'only-on-failure',
     video: 'on',
     // Timeout para acciones individuales (por ejemplo, page.click, page.fill, etc.)
@@ -48,7 +52,7 @@ export default defineConfig({
       testDir: './tests/uci',
       use: {
         ...{
-          headless: false,
+          headless: true,
           screenshot: 'only-on-failure',
           video: 'on',
           actionTimeout: 60000,
@@ -79,7 +83,7 @@ export default defineConfig({
       testDir: './tests/cinesa',
       use: {
         ...{
-          headless: false,
+          headless: true,
           screenshot: 'only-on-failure',
           video: 'on',
           actionTimeout: 60000,
@@ -113,14 +117,46 @@ export default defineConfig({
     [
       'allure-playwright',
       {
+        resultsDir: '.allure/results',
         detail: true,
-        outputFolder: 'allure-results',
-        suiteTitle: true,
+        suiteTitle: false,
+        categories: [
+          {
+            name: '🔒 Cloudflare Protection Issues',
+            messageRegex: '.*(cloudflare|protection|challenge|captcha).*',
+            traceRegex: '.*(cloudflare|TimeoutError|Navigation timeout).*',
+            matchedStatuses: ['FAILED', 'BROKEN'],
+          },
+          {
+            name: '🎭 Modal & Overlay Issues',
+            messageRegex: '.*(modal|overlay|popup|banner|promotional).*',
+            traceRegex: '.*(click intercepted|element not found|not visible).*',
+            matchedStatuses: ['FAILED', 'BROKEN'],
+          },
+          {
+            name: '🧭 Navigation & URL Issues',
+            messageRegex: '.*(navigation|url|redirect|timeout).*',
+            traceRegex: '.*(goto|navigate|waitForURL|expect.*toHaveURL).*',
+            matchedStatuses: ['FAILED', 'BROKEN'],
+          },
+          {
+            name: '🎬 Film Content Issues',
+            messageRegex: '.*(film|movie|title|card).*',
+            traceRegex: '.*(getFilmTitles|selectFilm|film.*not found).*',
+            matchedStatuses: ['FAILED', 'BROKEN'],
+          },
+          {
+            name: '🏢 Cinema Selection Issues',
+            messageRegex: '.*(cinema|location|venue).*',
+            traceRegex: '.*(getCinemaNames|selectCinema|cinema.*not found).*',
+            matchedStatuses: ['FAILED', 'BROKEN'],
+          },
+        ],
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
           Environment: 'Test',
-          Browser: 'Chromium',
-          Note: 'Separated UCI and Cinesa projects',
+          Browser: 'Chromium (Headless)',
+          Note: 'UCI Phase 1 Automation - Clean Test Names',
           os_platform: os.platform(),
           os_release: os.release(),
           os_version: os.version(),

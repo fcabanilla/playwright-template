@@ -1,5 +1,4 @@
 import { test } from '../../../fixtures/uci/playwright.fixtures';
-import { NavbarAssertions } from './navbar.assertions';
 import { baseUrl, internalNavItems, testUrls } from './navbar.data';
 
 test.describe(
@@ -8,11 +7,7 @@ test.describe(
     tag: ['@navbar', '@uci'],
   },
   () => {
-    let navbarAssertions: NavbarAssertions;
-
-    test.beforeEach(async ({ page, navbar, promoModal, cookieBanner }) => {
-      navbarAssertions = new NavbarAssertions(page);
-
+    test.beforeEach(async ({ navbar, promoModal, cookieBanner }) => {
       // 1. Navigate to the homepage
       await navbar.navigateToHome();
 
@@ -25,10 +20,8 @@ test.describe(
 
     test(
       'should display navbar elements correctly',
-      {
-        tag: ['@smoke', '@fast', '@critical'],
-      },
-      async () => {
+      { tag: ['@smoke', '@fast', '@critical'] },
+      async ({ navbarAssertions }) => {
         await navbarAssertions.expectNavbarElementsVisible();
       }
     );
@@ -38,7 +31,7 @@ test.describe(
       {
         tag: ['@navigation', '@fast', '@high'],
       },
-      async ({ navbar }) => {
+      async ({ navbar, navbarAssertions }) => {
         await navbar.navigateToCinemas();
         await navbarAssertions.expectNavClick(testUrls.cinema);
       }
@@ -49,7 +42,7 @@ test.describe(
       {
         tag: ['@navigation', '@slow', '@high'],
       },
-      async ({ navbar }) => {
+      async ({ navbar, navbarAssertions }) => {
         await navbar.navigateToMovies();
         await navbarAssertions.expectNavClick(testUrls.film);
       }
@@ -60,7 +53,7 @@ test.describe(
       {
         tag: ['@navigation', '@slow', '@high'],
       },
-      async ({ navbar }) => {
+      async ({ navbar, navbarAssertions }) => {
         await navbar.navigateToExperiences();
         await navbarAssertions.expectNavClick(testUrls.esperienze);
       }
@@ -71,7 +64,7 @@ test.describe(
       {
         tag: ['@navigation', '@fast', '@medium'],
       },
-      async ({ navbar }) => {
+      async ({ navbar, navbarAssertions }) => {
         await navbar.navigateToMembership();
         await navbarAssertions.expectNavClick(testUrls.membership);
       }
@@ -82,7 +75,7 @@ test.describe(
       {
         tag: ['@navigation', '@fast', '@critical'],
       },
-      async ({ navbar }) => {
+      async ({ navbar, navbarAssertions }) => {
         // First navigate to another page
         await navbar.navigateToCinemas();
         await navbarAssertions.expectNavClick(testUrls.cinema);
@@ -98,7 +91,7 @@ test.describe(
       {
         tag: ['@modal', '@fast', '@medium'],
       },
-      async () => {
+      async ({ navbarAssertions }) => {
         // The promotional modal is handled automatically in beforeEach
         await navbarAssertions.expectHomeUrl(baseUrl);
         await navbarAssertions.expectPromoModalClosed();

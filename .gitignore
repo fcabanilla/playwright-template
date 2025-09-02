@@ -1,7 +1,3 @@
 node_modules/
-allure-results/
-playwright-report/
-test-results/
 .allure/
-allure-report/
 dist/
