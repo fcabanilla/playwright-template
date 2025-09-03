@@ -22,6 +22,45 @@ export interface FilmsSelectors {
   showtimeButton: string;
 }
 
+// Constants for Films page
+export const filmsConstants = {
+  // UCI-specific selectors (primary)
+  uciFilmTitleSelector: 'h2[data-v-64b23b32]',
+  uciFilmsContainer: '[data-v-64b23b32]',
+
+  // Wait times
+  searchWaitTime: 1000,
+  pageLoadTimeout: 10000,
+
+  // Messages
+  noFilmsFoundMessage: 'NO FILMS FOUND',
+
+  // CSS nth-child pattern
+  nthChildPattern: ':nth-child(',
+  firstChildSelector: ':first-child',
+  hasTextPattern: ':has-text("',
+} as const;
+
+// Alternative film title selectors for fallback
+export const alternativeFilmTitleSelectors = [
+  'h2[data-v-64b23b32]',
+  '.film-title',
+  '.movie-title',
+  'h2',
+  'h3',
+  '[class*="title"]',
+] as const;
+
+// Alternative film card selectors for fallback
+export const alternativeFilmCardSelectors = [
+  '.program-list-element',
+  '.film-card',
+  '.movie-card',
+  '[class*="film"]',
+  '[class*="movie"]',
+  '[class*="card"]',
+] as const;
+
 export const filmsSelectors: FilmsSelectors = {
   // Main page elements - based on actual UCI film page structure
   filmsContainer:
