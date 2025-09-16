@@ -1,3 +1,4 @@
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertCinemasRedirection, assertCinemaSchemaMatches } from './cinemas.assertions';
@@ -26,7 +27,7 @@ test.describe('Cinesa Cinemas Tests', () => {
     cinemaDetail,
     cookieBanner
   }) => {
-    await page.goto('https://www.cinesa.es/');
+  await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     const selectedCinemaName = await cinema.selectOasizCinema();
@@ -41,7 +42,8 @@ test.describe('Cinesa Cinemas Tests', () => {
     cinemaDetail,
     cookieBanner
   }) => {
-    await page.goto('https://www.cinesa.es/');
+  const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
+  await page.goto(config.baseUrl);
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     const selectedCinemaName = await cinema.selectGrancasaCinema();

@@ -1,3 +1,4 @@
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { ProgramsPage } from '../../../pageObjectsManagers/cinesa/programs/programs.page';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
@@ -10,7 +11,8 @@ test.describe('Programs Page', () => {
 
   test('Programs unlimited display and layout from URL', async ({ page, unlimitedProgramsPage, cookieBanner }) => {
     await test.step('Navigate to Programs page', async () => {
-      await page.goto('https://www.cinesa.es/unlimited/informacion/');
+  const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
+  await page.goto(config.baseUrl + 'unlimited/informacion/');
     });
     await cookieBanner.acceptCookies();
     await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
@@ -19,7 +21,7 @@ test.describe('Programs Page', () => {
 
   test('Programs unlimited display and layout from home page', async ({ page, unlimitedProgramsPage, cookieBanner, navbar }) => {
     await test.step('Navigate to Home page', async () => {
-      await page.goto('https://www.cinesa.es/');
+      await navbar.navigateToHome();
     });
     await cookieBanner.acceptCookies();
     await navbar.navigateToPrograms();

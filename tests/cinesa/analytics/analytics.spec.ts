@@ -1,3 +1,4 @@
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { analyticsTestData } from './analytics.data';
 import { 
@@ -21,8 +22,8 @@ declare global {
 
 test.describe('Google Analytics DataLayer Validation', () => {
   
-  test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.cinesa.es/');
+  test.beforeEach(async ({ page, navbar }) => {
+    await navbar.navigateToHome();
   });
 
   test('Validate analytics events capture - Oasiz with Classic menu', async ({

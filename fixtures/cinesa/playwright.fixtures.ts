@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
+import { getCinesaConfig, CinesaEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
 import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker.page';
 import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer.page';
@@ -58,10 +59,12 @@ type CustomFixtures = {
 };
 
 export const test = base.extend<CustomFixtures>({
-  navbar: async ({ page }, use) => {
-    const navbar = new Navbar(page);
-    await use(navbar);
-  },
+    navbar: async ({ page }, use) => {
+      const env = process.env.TEST_ENV as CinesaEnvironment || 'production';
+      const config = getCinesaConfig(env);
+      const navbar = new Navbar(page, config.baseUrl);
+      await use(navbar);
+    },
   cookieBanner: async ({ page }, use) => {
     const cookieBanner = new CookieBanner(page);
     await use(cookieBanner);

@@ -4,6 +4,7 @@
   "description": "## Description",
   "type": "module",
   "scripts": {
+  "test:cinesa:preprod": "SET TEST_ENV=preprod && npx playwright test --project=\"Cinesa\" --headed --workers=1",
     "test": "npx playwright test",
     "test:cinesa": "npx playwright test --project='Cinesa'",
     "test:navbar": "npx playwright test tests/cinesa/navbar/navbar.spec.ts",
@@ -57,7 +58,7 @@
     "test:cookiespolicy": "npx playwright test tests/cinesa/footer/components/cookiespolicy/cookiespolicy.spec.ts",
     "test:modernslavery": "npx playwright test tests/cinesa/footer/components/modernSlavery/modernSlavery.spec.ts",
     "test:codeofconduct": "npx playwright test tests/cinesa/footer/components/codeOfConduct/codeOfConduct.spec.ts",
-    "test:whistleblowing": "npx playwright test tests/cinesa/footer/components/whistleblowing/whistleblowing.spec.ts",
+    "test:whistleblowing": "npx playwright test tests/cinesa/footer/components/whistleblowing/whistleblowing.spec.ts",  
     "test:androidappdownload": "npx playwright test tests/cinesa/footer/components/androidAppDownload/androidAppDownload.spec.ts",
     "test:appleappdownload": "npx playwright test tests/cinesa/footer/components/appleAppDownload/appleAppDownload.spec.ts",
     "test:signin": "npx playwright test tests/cinesa/login/login.spec.ts",

@@ -1,11 +1,12 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { getCinesaConfig } from '../../../config/environments';
 import { takeScreenshotForModal } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/signup.selectors';
 import { defaultUser } from './signup.data';
 
 test.describe('Signup', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.cinesa.es/');
+  test.beforeEach(async ({ page, navbar }) => {
+    await navbar.navigateToHome();
   });
 
   test('Signup display and layout', async ({ page, navbar }, testInfo) => {

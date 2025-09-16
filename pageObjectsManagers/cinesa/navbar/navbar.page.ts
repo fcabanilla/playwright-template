@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
 import { WebActions } from '../../../core/webActions/webActions';
+import { EnvironmentConfig } from '../../../config/environments';
 
 /**
  * Represents the Cinesa website navigation bar component.
@@ -10,10 +11,10 @@ import { WebActions } from '../../../core/webActions/webActions';
  */
 export class Navbar {
   /**
-   * Base URL for the Cinesa website.
+   * Base URL for the Cinesa website, injected from environment config.
    * @private
    */
-  private readonly url: string = 'https://www.cinesa.es/';
+    private url: string;
 
   /**
    * WebActions instance for all browser interactions.
@@ -30,9 +31,10 @@ export class Navbar {
    *
    * @param page - The Playwright page object to interact with.
    */
-  constructor(page: Page) {
+  constructor(page: Page, baseUrl?: string) {
     this.webActions = new WebActions(page);
     this.selectors = navbarSelectors;
+    this.url = baseUrl || 'https://www.cinesa.es/';
   }
 
   /**

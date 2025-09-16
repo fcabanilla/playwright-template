@@ -1,3 +1,4 @@
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { 
   assertWarningMessageDisplayed, 
@@ -12,8 +13,8 @@ import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 
 test.describe('Seat Picker', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.cinesa.es/');
+  test.beforeEach(async ({ page, navbar }) => {
+    await navbar.navigateToHome();
   });
 
   test('Simulate a Full Purchase - Oasiz', async ({
