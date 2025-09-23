@@ -57,26 +57,61 @@ This project is a modern base template for building scalable, maintainable autom
    npx playwright install
    ```
 
+
 ## Project Structure
 
 ```plaintext
 playwright-template/
-├── tests/                        // Automated tests (specs, assertions, test data)
-│   └── cinesa/                   // Example tests for Cinesa project
-│       ├── navbar.assertions.ts
-│       ├── navbar.data.ts
-│       ├── navbar.spec.ts
-│       └── navbar.steps.ts
-├── pageObjectsManagers/          // Page objects and selector managers
+├── fixtures/                        # Custom fixtures
 │   └── cinesa/
-│       ├── cookieBanner.selectors.ts
-│       ├── cookieBanner.ts
-│       └── navbar.selectors.ts
-├── fixtures/                     // Custom fixtures for test setup and teardown
-│   └── playwright.fixtures.ts    // Custom Playwright fixtures (see below)
-├── utils/                        // Helper functions and utilities
-├── playwright.config.ts          // Global Playwright configuration
-└── package.json                  // Project metadata and scripts
+│       └── playwright.fixtures.ts   # Fixture config
+├── pageObjectsManagers/             # Page Objects Manager (POM)
+│   └── cinesa/                      # Cinesa-specific
+│       ├── navbar/                  # Navbar component
+│       │   ├── navbar.page.ts
+│       │   └── navbar.selectors.ts
+│       ├── cookies/
+│       ├── footer/
+│       ├── login/
+│       ├── signup/
+│       ├── cinemas/
+│       ├── movies/
+│       ├── seatPicker/
+│       ├── ticketPicker/
+│       ├── paymentPage/
+│       ├── purchaseSummary/
+│       ├── bar/
+│       ├── blog/
+│       ├── programs/
+│       ├── mailing/
+│       └── generic/
+├── tests/                           # Test cases
+│   └── cinesa/                      # Cinesa tests
+│       ├── navbar/
+│       │   ├── navbar.spec.ts
+│       │   ├── navbar.data.ts
+│       │   └── navbar.assertions.ts
+│       ├── footer/
+│       ├── login/
+│       ├── signup/
+│       ├── cinemas/
+│       ├── movies/
+│       ├── seatPicker/
+│       ├── ticketPicker/
+│       ├── paymentPage/
+│       ├── purchaseSummary/
+│       ├── bar/
+│       ├── blog/
+│       ├── programs/
+│       └── mailing/
+├── allure-results/                  # Allure raw results
+├── allure-report/                   # Allure HTML reports
+├── test-results/                    # Playwright native results
+├── playwright.config.ts             # Main config
+├── eslint.config.js                 # ESLint config
+├── package.json                     # Dependencies & scripts
+├── tsconfig.json                    # TypeScript config
+└── readme.md                        # Project docs
 ```
 
 ## Usage
@@ -389,183 +424,13 @@ playwright-template/
 
 ## 🎯 **Patrones de Diseño Implementados**
 
-### **1. 🏛️ Page Object Manager (POM) Modular**
 
-#### **Separación Avanzada de Responsabilidades:**
+### Main Patterns (Examples)
 
-#### Selectores Tipados (TypeScript Interfaces)
-
-```typescript
-// pageObjectsManagers/cinesa/navbar/navbar.selectors.ts
-export interface NavbarSelectors {
-  logo: string;
-  cines: string;
-  peliculas: string;
-  promociones: string;
-  experiencias: string;
-  programas: string;
-  bonos: string;
-  signup: string;
-  signin: string;
-}
-
-export const navbarSelectors: NavbarSelectors = {
-  logo: '.logo a',
-  cines: 'nav.header-nav a[href="/cines/"]',
-  peliculas: 'nav.header-nav a[href="/peliculas/"]',
-  // ... más selectores
-};
-```
-
-#### Classes de Páginas con Documentación JSDoc
-
-```typescript
-// pageObjectsManagers/cinesa/navbar/navbar.page.ts
-/**
- * Represents the Cinesa website navigation bar component.
- * Provides methods to interact with navigation elements and navigate to different sections.
- */
-export class Navbar {
-  private readonly url: string = 'https://www.cinesa.es/';
-  readonly page: Page;
-  readonly selectors: NavbarSelectors;
-
-  /**
-   * Creates a new Navbar instance.
-   * @param page - The Playwright page object to interact with.
-   */
-  constructor(page: Page) {
-    this.page = page;
-    this.selectors = navbarSelectors;
-  }
-
-  /**
-   * Navigates to the Cinesa homepage.
-   * @returns Promise que se resuelve cuando la navegación finaliza.
-   */
-  async navigateToHome(): Promise<void> {
-    await allure.step('Navigate to Cinesa homepage', async () => {
-      await this.page.goto(this.url);
-    });
-  }
-}
-```
-
-**✅ Ventajas sobre demo-cinesa:**
-
-- **Tipado Fuerte**: Interfaces TypeScript para mayor seguridad
-- **Documentación**: JSDoc integrada en todos los métodos
-- **Modularidad**: Cada componente en su propio directorio
-- **Allure Integration**: Steps integrados directamente en métodos
-
-### **2. 🧪 Custom Fixtures Pattern (Extensión Avanzada)**
-
-```typescript
-// fixtures/cinesa/playwright.fixtures.ts
-type CustomFixtures = {
-  navbar: Navbar;
-  cookieBanner: CookieBanner;
-  seatPicker: SeatPicker;
-  footer: Footer;
-  blogLanding: BlogLanding;
-  cinema: Cinema;
-  cinemaDetail: CinemaDetail;
-  loginPage: LoginPage;
-  ticketPicker: TicketPicker;
-  barPage: BarPage;
-  purchaseSummary: PurchaseSummary;
-  paymentPage: PaymentPage;
-  unlimitedProgramsPage: UnlimitedProgramsPage;
-  signupPage: SignupPage;
-  mailing: Mailing;
-  // ... 20+ fixtures más
-};
-
-export const test = base.extend<CustomFixtures>({
-  navbar: async ({ page }, use) => {
-    const navbar = new Navbar(page);
-    await use(navbar);
-  },
-  cookieBanner: async ({ page }, use) => {
-    const cookieBanner = new CookieBanner(page);
-    await use(cookieBanner);
-  },
-  // ... más fixtures
-});
-```
-
-**✅ Beneficios avanzados:**
-
-- **Fixtures Específicos**: 20+ componentes pre-configurados
-- **Lazy Loading**: Instanciación bajo demanda
-- **Type Safety**: Autocompletado completo en IDE
-- **Reutilización Masiva**: Componentes disponibles en todos los tests
-
-### **3. 📊 Data-Driven Testing Pattern**
-
-```typescript
-// tests/cinesa/navbar/navbar.data.ts
-export interface NavItem {
-  selectorKey: keyof NavbarSelectors;
-  expectedUrl: string;
-}
-
-export const baseUrl = 'https://www.cinesa.es';
-
-export const internalNavItems: NavItem[] = [
-  { selectorKey: 'cines', expectedUrl: `${baseUrl}/cines/` },
-  { selectorKey: 'peliculas', expectedUrl: `${baseUrl}/peliculas/` },
-  { selectorKey: 'promociones', expectedUrl: `${baseUrl}/promociones/` },
-  // ... más items
-];
-
-export const externalNavItem: NavItem = {
-  selectorKey: 'bonos',
-  expectedUrl: 'https://www.cinesabusiness.es/promociones.html',
-};
-```
-
-**✅ Ventajas:**
-
-- **Separación de Datos**: Tests y datos completamente separados
-- **Tipado de Datos**: Interfaces para datos de prueba
-- **Mantenibilidad**: Cambios centralizados
-- **Escalabilidad**: Fácil agregar nuevos casos
-
-### **4. 🔍 Assertions Pattern (Aserciones Dedicadas)**
-
-```typescript
-// tests/cinesa/navbar/navbar.assertions.ts
-export class NavbarAssertions {
-  constructor(private page: Page) {}
-
-  async expectNavbarElementsVisible(): Promise<void> {
-    await allure.step('Verify all navbar elements are visible', async () => {
-      // Implementación de verificaciones
-    });
-  }
-
-  async expectHomeUrl(baseUrl: string): Promise<void> {
-    await allure.step('Verify home URL is correct', async () => {
-      await expect(this.page).toHaveURL(baseUrl);
-    });
-  }
-
-  async expectNavClick(selector: string, expectedUrl: string): Promise<void> {
-    await allure.step(`Verify navigation to ${expectedUrl}`, async () => {
-      await this.page.click(selector);
-      await expect(this.page).toHaveURL(expectedUrl);
-    });
-  }
-}
-```
-
-**✅ Beneficios:**
-
-- **Aserciones Reutilizables**: Lógica de verificación centralizada
-- **Allure Steps**: Reportes más detallados
-- **Mantenimiento**: Un solo lugar para cambios
-- **Legibilidad**: Tests más limpios y enfocados
+- **Page Object Model (POM):** Modular classes for each UI component, with TypeScript interfaces for selectors and JSDoc documentation.
+- **Custom Fixtures:** Over 20 fixtures for all components, available in all tests via Playwright's `base.extend`.
+- **Data-Driven Testing:** Test data and selectors are separated from test logic, using TypeScript interfaces for type safety.
+- **Reusable Assertions:** Dedicated assertion classes for each component, with Allure steps for detailed reporting.
 
 ---
 
@@ -649,103 +514,34 @@ reporter: [
 
 ## 🚀 **Scripts NPM Especializados**
 
-### **Tests por Componente**
 
-```json
-{
-  "test:navbar": "npx playwright test tests/cinesa/navbar/navbar.spec.ts",
-  "test:seatpicker": "playwright test tests/cinesa/seatPicker/seatPicker.spec.ts",
-  "test:programs": "playwright test tests/cinesa/programs/programs.spec.ts",
-  "test:footer": "npx playwright test tests/cinesa/footer.spec.ts",
-  "test:blog": "npx playwright test tests/cinesa/blog.spec.ts",
-  "test:signup": "npx playwright test tests/cinesa/signup/signup.spec.ts",
-  "test:movies": "npx playwright test tests/cinesa/movies/movies.spec.ts",
-  "test:cinemas": "npx playwright test tests/cinesa/cinemas/cinemas.spec.ts"
-}
-```
+### Main NPM Scripts
 
-### **Herramientas de Desarrollo**
-
-```json
-{
-  "ui": "npx playwright test --ui",
-  "lint": "eslint . --ext .ts,.js",
-  "report": "npx allure generate allure-results -o allure-report && npx allure open allure-report",
-  "watch-report": "npx allure watch allure-results",
-  "codegen": "npx playwright codegen https://www.cinesa.es"
-}
-```
+- `test` / `test:navbar` / `test:movies` / ...: Run all or specific component tests
+- `ui`: Playwright UI mode
+- `lint`: Run ESLint
+- `report`: Generate and open Allure report
+- `watch-report`: Live Allure report
+- `codegen`: Playwright codegen for selectors
 
 ---
 
 ## 🔧 **Configuraciones Avanzadas**
 
-### **ESLint + Prettier Integration**
 
-```javascript
-// eslint.config.js
-export default [
-  {
-    files: ['**/*.{ts,js}'],
-    ignores: ['node_modules/', 'dist/'],
-    languageOptions: {
-      parser: tsParser,
-      ecmaVersion: 2021,
-      sourceType: 'module',
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-      prettier: prettierPlugin,
-    },
-    rules: {
-      ...js.configs.recommended.rules,
-      ...tsPlugin.configs.recommended.rules,
-      'prettier/prettier': 'error',
-      '@typescript-eslint/no-unused-vars': 'error',
-    },
-  },
-];
-```
+### Tooling
 
-### **TypeScript Módulos ES6**
-
-```json
-// package.json
-{
-  "type": "module",
-  "dependencies": {
-    "dotenv": "^16.5.0",
-    "imapflow": "^1.0.188"
-  }
-}
-```
+- ESLint + Prettier for code quality
+- TypeScript strict mode
+- Allure for advanced reporting
 
 ---
 
 ## 📊 **Cobertura de Funcionalidades**
 
-### **Componentes Implementados (20+)**
+### Implemented Components
 
-| Componente          | Descripción                 | Tests | Status |
-| ------------------- | --------------------------- | ----- | ------ |
-| **Navbar**          | Navegación principal        | ✅    | ✅     |
-| **Footer**          | Pie de página y enlaces     | ✅    | ✅     |
-| **Login/Signup**    | Autenticación de usuarios   | ✅    | ✅     |
-| **Movies**          | Cartelera y detalles        | ✅    | ✅     |
-| **Cinemas**         | Cines y ubicaciones         | ✅    | ✅     |
-| **SeatPicker**      | Selector de asientos        | ✅    | ✅     |
-| **TicketPicker**    | Selector de entradas        | ✅    | ✅     |
-| **PaymentPage**     | Proceso de pago             | ✅    | ✅     |
-| **PurchaseSummary** | Resumen de compra           | ✅    | ✅     |
-| **Bar**             | Servicios del bar           | ✅    | ✅     |
-| **Blog**            | Contenido y noticias        | ✅    | ✅     |
-| **Programs**        | Programas especiales        | ✅    | ✅     |
-| **Promotions**      | Ofertas y promociones       | ✅    | ✅     |
-| **Experiences**     | Experiencias premium        | ✅    | ✅     |
-| **Coupons**         | Sistema de cupones          | ✅    | ✅     |
-| **Mailing**         | Gestión de emails           | ✅    | ✅     |
-| **Cookies**         | Banner y gestión de cookies | ✅    | ✅     |
-
+- Navbar, Footer, Login/Signup, Movies, Cinemas, SeatPicker, TicketPicker, PaymentPage, PurchaseSummary, Bar, Blog, Programs, Promotions, Experiences, Coupons, Mailing, Cookies, and more (20+ total)
 ---
 
 ## 🔄 **Comparación con demo-cinesa**
@@ -774,134 +570,6 @@ export default [
 3. **Base Test Pattern**: Adoptar el patrón de BaseTest de demo-cinesa
 4. **WebActions Wrapper**: Implementar wrapper de acciones como demo-cinesa
 
----
-
-## 🎯 **Fortalezas Únicas**
-
-### **✅ Escalabilidad Extrema**
-
-- **20+ Page Objects**: Cobertura completa del sitio
-- **Fixtures Automatizados**: Setup/teardown transparente
-- **Scripts Granulares**: Tests específicos por componente
-- **Paralelización Optimizada**: 5 workers balanceados
-
-### **✅ Calidad de Código Superior**
-
-- **TypeScript Completo**: Tipado fuerte en todo el proyecto
-- **ESLint + Prettier**: Calidad de código automatizada
-- **JSDoc Documentación**: Métodos completamente documentados
-- **Interfaces Tipadas**: Selectores y datos con tipos
-
-### **✅ Testing Avanzado**
-
-- **Data-Driven**: Separación completa de datos y tests
-- **Assertion Classes**: Lógica de verificación reutilizable
-- **Component Testing**: Tests específicos por componente
-- **Email Integration**: Pruebas de email con ImapFlow
-
-### **✅ Experiencia de Desarrollo**
-
-- **IntelliSense Completo**: Autocompletado en todo el código
-- **Debugging Avanzado**: Playwright UI Mode integrado
-- **Live Reporting**: Allure watch mode
-- **Code Generation**: Playwright codegen integrado
-
----
-
-## 🔮 **Oportunidades de Mejora**
-
-### **1. Adoptar Mejores Prácticas de demo-cinesa**
-
-```typescript
-// Implementar WebActions Wrapper
-export class WebActions {
-  async clickElementWithValidation(
-    locator: string,
-    errorMessage: string
-  ): Promise<void> {
-    await this.verifyElementIsDisplayed(locator, errorMessage);
-    await this.page.click(locator);
-  }
-}
-
-// Implementar BaseTest Pattern
-const test = baseTest.extend<AllFixtures>(getAllFixtures());
-```
-
-### **2. Configuración de Ambientes**
-
-```typescript
-// testConfig.ts (a implementar)
-export const testConfig = {
-  dev: 'https://dev.cinesa.es/',
-  ppe: 'https://ppe.cinesa.es/',
-  prod: 'https://www.cinesa.es/',
-};
-
-// Usar variables de entorno
-const ENVIRONMENT = process.env.ENVIRONMENT || 'prod';
-baseURL: testConfig[ENVIRONMENT],
-```
-
-### **3. Enhanced Error Handling**
-
-```typescript
-// Implementar timeouts configurables
-export const timeouts = {
-  element: 30000,
-  navigation: 60000,
-  action: 10000,
-};
-```
-
-### **4. Visual Regression Testing**
-
-```typescript
-// Implementar comparación visual
-await expect(page).toHaveScreenshot('navbar-component.png');
-```
-
----
-
-## 📚 **Scripts de Comandos Útiles**
-
-### **Ejecución de Tests**
-
-```bash
-# Todos los tests
-npm test
-
-# Test específico por componente
-npm run test:navbar
-npm run test:seatpicker
-npm run test:movies
-
-# Modo UI interactivo
-npm run ui
-
-# Generación de código
-npm run codegen
-```
-
-### **Desarrollo y Debugging**
-
-```bash
-# Linting
-npm run lint
-
-# Reportes
-npm run report
-npm run watch-report
-
-# Tests específicos con debugging
-npx playwright test tests/cinesa/navbar/navbar.spec.ts --debug
-```
-
----
-
-## 🏆 **Conclusión**
-
-El **playwright-template** representa una evolución significativa hacia un framework de testing más maduro y profesional. Mientras que **demo-cinesa** ofrece excelentes patrones base y gestión de ambientes, el **playwright-template** proporciona:
 
 - **Cobertura 7x Mayor**: 20+ componentes vs 3 páginas
 - **Arquitectura Modular**: Separación completa de responsabilidades
@@ -936,36 +604,22 @@ La combinación de ambos enfoques resultaría en el framework de testing definit
 
 Este README actualizado proporciona una guía completa para la instalación, configuración y ejecución de tests, integrando prácticas modernas y aprovechando las capacidades avanzadas de Playwright.
 
+
 ## Cloudflare Bypass & Session State Setup (Preproducción)
 
-> **Importante:** Este flujo solo aplica para preproducción, ya que producción no tiene Cloudflare ni requiere este paso.
+> **Importante:** Solo aplica para preproducción (producción no requiere este paso).
 
-### 1. Generar el archivo de sesión (login manual)
+1. Ejecutá:
+  ```bash
+  npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+  ```
+  - Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
 
-Antes de ejecutar los tests que requieren sesión autenticada y bypass de Cloudflare, debes generar el archivo de estado de sesión. Esto se hace ejecutando la siguiente prueba especial:
-
-```bash
-npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
-```
-
-- Se abrirá el navegador en modo interactivo.
-- Realiza el login manualmente y pasa el challenge de Cloudflare.
-- **No cierres el navegador**: el script detectará automáticamente cuando llegues a la página principal y guardará el estado en `loggedInState.preprod.json`.
-- El navegador se cerrará solo cuando termine.
-
-### 2. Ejecutar los tests automatizados (usando el estado guardado)
-
-Una vez generado el archivo de sesión, puedes correr los tests normalmente y se usará ese estado para saltar el login y Cloudflare:
-
-```bash
-npx playwright test --project='Cinesa' --headed --workers=1
-```
-
-O cualquier script de test que utilice el storageState generado.
-
----
+2. Corré los tests normalmente usando ese storageState:
+  ```bash
+  npx playwright test --project='Cinesa' --headed --workers=1
+  ```
 
 **Notas:**
-- Este mecanismo es solo para entornos de preproducción con Cloudflare.
-- No subas archivos de sesión reales (`loggedInState.preprod.json`) al repositorio. Usa `.gitignore` para protegerlos.
-- Si necesitas compartir el flujo con otros, proporciona un ejemplo vacío y estas instrucciones.
+- No subas archivos de sesión reales al repo (`.gitignore`).
+- Solo para preproducción con Cloudflare.
