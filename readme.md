@@ -256,6 +256,51 @@ jobs:
 
 ---
 
+## 🚦 Ejecución rápida: Producción vs Preproducción
+
+> **¿Cómo corro los tests en cada ambiente?**
+
+### 🔵 Producción (sin Cloudflare, sin login manual)
+
+- Simplemente ejecuta:
+
+```bash
+npm run test:cinesa
+```
+
+O para ver el navegador:
+
+```bash
+npx playwright test --project=Cinesa --headed
+```
+
+No necesitas generar archivos de sesión ni hacer login manual. Todo funciona directo contra producción.
+
+---
+
+### 🟠 Preproducción (con Cloudflare, requiere login manual)
+
+1. **Genera el archivo de sesión:**
+   ```bash
+   npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+   ```
+   - Se abrirá el navegador, haz login y pasa Cloudflare manualmente.
+   - El script guardará el estado en `loggedInState.preprod.json`.
+
+2. **Ejecuta los tests normalmente:**
+   ```bash
+   npm run test:cinesa:preprod
+   # o
+   npx playwright test --project=Cinesa --headed --workers=1
+   ```
+   - Ahora los tests usarán el estado guardado y saltarán login/Cloudflare.
+
+---
+
+> **Tip:** Para staging/dev existen scripts similares (`test:cinesa:staging`, `test:cinesa:dev`).
+
+---
+
 ## 📋 **Contexto Detallado del Proyecto**
 
 ## 🏷️ **Información General**
