@@ -171,13 +171,7 @@ import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookieBanner';
 type MyFixtures = {
   navbar: Navbar;
   cookieBanner: CookieBanner;
-};
 
-export const test = base.extend<MyFixtures>({
-  // Fixture for Navbar instance
-  navbar: async ({ page }, use) => {
-    const navbar = new Navbar(page);
-    await use(navbar);
   },
   // Fixture for CookieBanner instance
   cookieBanner: async ({ page }, use) => {
@@ -563,12 +557,6 @@ reporter: [
 | **Email Testing**      | No implementado      | ImapFlow integrado      |
 | **Environment Config** | Variables de entorno | URL hardcodeada         |
 
-### **Áreas de Mejora Potencial**
-
-1. **Gestión de Ambientes**: Implementar configuración por ambientes como demo-cinesa
-2. **Variables de Entorno**: Usar dotenv para configuración dinámica
-3. **Base Test Pattern**: Adoptar el patrón de BaseTest de demo-cinesa
-4. **WebActions Wrapper**: Implementar wrapper de acciones como demo-cinesa
 
 
 - **Cobertura 7x Mayor**: 20+ componentes vs 3 páginas
