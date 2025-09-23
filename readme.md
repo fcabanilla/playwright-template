@@ -890,3 +890,37 @@ La combinación de ambos enfoques resultaría en el framework de testing definit
 ---
 
 Este README actualizado proporciona una guía completa para la instalación, configuración y ejecución de tests, integrando prácticas modernas y aprovechando las capacidades avanzadas de Playwright.
+
+## Cloudflare Bypass & Session State Setup (Preproducción)
+
+> **Importante:** Este flujo solo aplica para preproducción, ya que producción no tiene Cloudflare ni requiere este paso.
+
+### 1. Generar el archivo de sesión (login manual)
+
+Antes de ejecutar los tests que requieren sesión autenticada y bypass de Cloudflare, debes generar el archivo de estado de sesión. Esto se hace ejecutando la siguiente prueba especial:
+
+```bash
+npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+```
+
+- Se abrirá el navegador en modo interactivo.
+- Realiza el login manualmente y pasa el challenge de Cloudflare.
+- **No cierres el navegador**: el script detectará automáticamente cuando llegues a la página principal y guardará el estado en `loggedInState.preprod.json`.
+- El navegador se cerrará solo cuando termine.
+
+### 2. Ejecutar los tests automatizados (usando el estado guardado)
+
+Una vez generado el archivo de sesión, puedes correr los tests normalmente y se usará ese estado para saltar el login y Cloudflare:
+
+```bash
+npx playwright test --project='Cinesa' --headed --workers=1
+```
+
+O cualquier script de test que utilice el storageState generado.
+
+---
+
+**Notas:**
+- Este mecanismo es solo para entornos de preproducción con Cloudflare.
+- No subas archivos de sesión reales (`loggedInState.preprod.json`) al repositorio. Usa `.gitignore` para protegerlos.
+- Si necesitas compartir el flujo con otros, proporciona un ejemplo vacío y estas instrucciones.

@@ -11,20 +11,20 @@ export default defineConfig({
 
   // Configuración base que se aplicará a todos los proyectos
   use: {
-    headless: true, // Ejecuta el navegador sin interfaz gráfica (más ligero)
+    headless: false, // Ejecuta el navegador con interfaz gráfica para parecer más humano
     screenshot: 'only-on-failure',
     video: 'on',
-    // Timeout para acciones individuales (por ejemplo, page.click, page.fill, etc.)
     actionTimeout: 60000,
-    // Timeout para navegaciones (por ejemplo, page.goto)
     navigationTimeout: 60000,
 
-    // Configuraciones para evadir Cloudflare
+    // Configuraciones agresivas para evadir Cloudflare
     userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1920, height: 1080 },
-
-    // Headers adicionales para parecer más humano
+    locale: 'es-ES',
+    permissions: ['clipboard-read', 'clipboard-write'],
+    javaScriptEnabled: true,
+    bypassCSP: true,
     extraHTTPHeaders: {
       Accept:
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -33,12 +33,34 @@ export default defineConfig({
       'sec-ch-ua':
         '"Google Chrome";v="120", "Not_A Brand";v="8", "Chromium";v="120"',
       'sec-ch-ua-mobile': '?0',
-      'sec-ch-ua-platform': '"macOS"',
+      'sec-ch-ua-platform': '"Windows"',
       'Sec-Fetch-Dest': 'document',
       'Sec-Fetch-Mode': 'navigate',
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
       'Upgrade-Insecure-Requests': '1',
+      DNT: '1',
+      Pragma: 'no-cache',
+      'Cache-Control': 'no-cache',
+    },
+    launchOptions: {
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--disable-features=VizDisplayCompositor',
+        '--disable-extensions',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--start-maximized',
+        '--window-size=1920,1080',
+      ],
     },
   },
 
@@ -57,6 +79,10 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
+          // Usa el estado guardado para saltar login/cloudflare
+          storageState: process.env.TEST_ENV === 'preprod'
+            ? 'loggedInState.preprod.json'
+            : 'loggedInState.json',
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [

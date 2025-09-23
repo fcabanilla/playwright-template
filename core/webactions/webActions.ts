@@ -1,9 +1,7 @@
 import { expect } from '@playwright/test';
 
-// Temporary any types to bypass TypeScript issues
 type Page = any;
 type Locator = any;
-import { CloudflareHandler } from './cloudflareHandler';
 
 /**
  * WebActions provides a unified, abstracted interface for all Playwright browser interactions.
@@ -11,7 +9,6 @@ import { CloudflareHandler } from './cloudflareHandler';
  * and maintainability across the entire test automation framework.
  *
  * Features:
- * - Cloudflare protection handling
  * - Overlay and modal management
  * - Robust element interaction with wait strategies
  * - Screenshot and debugging capabilities
@@ -20,7 +17,6 @@ import { CloudflareHandler } from './cloudflareHandler';
  * @example
  * ```typescript
  * const webActions = new WebActions(page);
- * await webActions.navigateToWithCloudflareHandling('https://www.ucicinemas.it');
  * await webActions.clickWithOverlayHandling('.movie-button');
  * const isVisible = await webActions.isVisible('.navbar');
  * ```
@@ -30,11 +26,9 @@ import { CloudflareHandler } from './cloudflareHandler';
  */
 export class WebActions {
   readonly page: Page;
-  readonly cloudflareHandler: CloudflareHandler;
 
   /**
    * Creates a new WebActions instance with the provided page context.
-   * Initializes the CloudflareHandler for anti-detection capabilities.
    *
    * @param {Page} page - Playwright Page object for browser interactions
    *
@@ -47,12 +41,10 @@ export class WebActions {
    */
   constructor(page: Page) {
     this.page = page;
-    this.cloudflareHandler = new CloudflareHandler(page);
   }
 
   /**
    * Navigates to the specified URL using standard Playwright navigation.
-   * For pages with Cloudflare protection, use navigateToWithCloudflareHandling instead.
    *
    * @param {string} url - The target URL to navigate to
    * @returns {Promise<void>} Resolves when navigation is complete
@@ -88,13 +80,7 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  async navigateToWithCloudflareHandling(url: string): Promise<boolean> {
-    // Setup anti-detection measures first
-    await this.cloudflareHandler.setupAntiDetection();
-
-    // Navigate with Cloudflare handling
-    return await this.cloudflareHandler.navigateWithCloudflareHandling(url);
-  }
+  
 
   /**
    * Performs a standard click action on an element identified by CSS selector.

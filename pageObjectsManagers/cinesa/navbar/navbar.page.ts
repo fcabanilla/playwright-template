@@ -48,20 +48,6 @@ export class Navbar {
     });
   }
 
-  /**
-   * Navigates to the Cinesa homepage with Cloudflare protection handling.
-   * Use this method when Cloudflare is detected or expected.
-   *
-   * @returns Promise<boolean> que se resuelve con true si la navegación es exitosa.
-   */
-  async navigateToHomeWithCloudflareHandling(): Promise<boolean> {
-    return await allure.test.step(
-      'Navigating to Cinesa home with Cloudflare handling',
-      async () => {
-        return await this.webActions.navigateToWithCloudflareHandling(this.url);
-      }
-    );
-  }
 
   /**
    * Clicks on the Cinesa logo in the navbar (usually returns to the homepage).

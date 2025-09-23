@@ -1,0 +1,101 @@
+{
+  "cookies": [
+    {
+      "name": "CF_AppSession",
+      "value": "nc97f56b0360b5ce4",
+      "domain": "preprod-web.ocgtest.es",
+      "path": "/",
+      "expires": 1758737856.442887,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__cf_bm",
+      "value": ".xs343EpUt6luGQidQ4GP_AdvS7J1VJHaeo58pR8ngE-1758651455-1.0.1.1-auObnrU8ghPJhgnDXZxP1DNU1fDIrKQB9e7IYDti7xCbS6Aypd7t63z5NFAlCffMqS4FIRF7ulUHqwR49ac0e9Fw8Cqh7kOW9ydWVvq48nk",
+      "domain": ".ocgtest.es",
+      "path": "/",
+      "expires": 1758653256.443023,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "CF_Authorization",
+      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjU1MzZmM2MzOGM1OWQzY2I5YzY1MTUzYTQ4NjA4YmFjNTRkNzZmYjUzNjk1ZDk2YTg2M2Y4ZWIwZDJjNzg2MDgifQ.eyJhdWQiOlsiMzY0ZTA3ODQ2OTAyYjY4Y2U5NjBkMTE3MTE0ZTQ0YjMyMGYxNWM4Yzc3MWZiNzE0NmYwMDMwNGU1YWFkNGIwNSJdLCJlbWFpbCI6Im0ubWFuemFuZWxsaUBvZGVvbi5jb20iLCJhY2NvdW50X2lkIjoiMjFmNzU1MjMzMTQ4YmIzNmNhNGQyOTI3MGNiYWQzOTYiLCJleHAiOjE3NTk4NjEwODAsImlhdCI6MTc1ODY1MTQ4MCwibmJmIjoxNzU4NjUxNDgwLCJpc3MiOiJodHRwczovL2NpbmVzYS5jbG91ZGZsYXJlYWNjZXNzLmNvbSIsInN1YiI6IjEzNmNjMzY0LTZmMjEtNWNhZC1hNTY4LWRjYTEyMDE1YjliMCIsImlkZW50aXR5Ijp7ImVtYWlsIjoibS5tYW56YW5lbGxpQG9kZW9uLmNvbSIsImlkcCI6eyJpZCI6IjE3ZmYyOGExLTY4Y2EtNDIxNC1iYjZjLWU3NzA4NjI2ZDM1NiIsInR5cGUiOiJvbmV0aW1lcGluIn0sImdlbyI6eyJjb3VudHJ5IjoiUFQifSwidXNlcl91dWlkIjoiMTM2Y2MzNjQtNmYyMS01Y2FkLWE1NjgtZGNhMTIwMTViOWIwIiwiYWNjb3VudF9pZCI6IjIxZjc1NTIzMzE0OGJiMzZjYTRkMjkyNzBjYmFkMzk2IiwiaWF0IjoxNzU4NjUxNDgwLCJpcCI6IjE0OS4yMi44Ni4xOSIsImF1dGhfc3RhdHVzIjoiTk9ORSIsImNvbW1vbl9uYW1lIjoiIiwic2VydmljZV90b2tlbl9pZCI6IiIsInNlcnZpY2VfdG9rZW5fc3RhdHVzIjpmYWxzZSwiaXNfd2FycCI6ZmFsc2UsImlzX2dhdGV3YXkiOmZhbHNlLCJkZXZpY2VfaWQiOiIiLCJtdGxzX2F1dGgiOnsiY2VydF9pc3N1ZXJfZG4iOiIiLCJjZXJ0X3NlcmlhbCI6IiIsImNlcnRfaXNzdWVyX3NraSI6IiIsImNlcnRfcHJlc2VudGVkIjp0cnVlLCJjb21tb25fbmFtZSI6IiIsImF1dGhfc3RhdHVzIjoiTk9ORSJ9LCJ2ZXJzaW9uIjoyfSwidHlwZSI6Im9yZyIsImlkZW50aXR5X25vbmNlIjoiSHV2Z1AzUERQTm9WNjh1RCJ9.BZLGhKeTCZvZiaBy9y76-ZguXUahij0r92CLMr_rWJkhD0MdP_OSRYIfacxEqdW08VyzBkylrrYL2iEZmuhRkL7KrcR5GJ1u1cFQ4IIK8RPRlNcqOVappLxVTCyTpFJpQ1ezQOsDrzurLAsUdRoDf9JUed5HgzyFghjvJOfFV6Di0QSX0Nvcx44dfq022C0rqkVEz2oc3jp7WFYFSoWmgR2kzSbpb4mFWA1cUIsXBZQVxofdKRfiRSGNNOeJwVaST9AREz-v9pCP2PqasyJMjl4wlXPfPIVJFtLDmXVtmnYsMS-dzk8Y4kjG7mApYlXeA2EJEhX-WBnOetCeY7Vjmw",
+      "domain": "cinesa.cloudflareaccess.com",
+      "path": "/",
+      "expires": 1759861082.835851,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "CF_Device",
+      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjU1MzZmM2MzOGM1OWQzY2I5YzY1MTUzYTQ4NjA4YmFjNTRkNzZmYjUzNjk1ZDk2YTg2M2Y4ZWIwZDJjNzg2MDgifQ.eyJ0eXBlIjoidHJ1c3RlZF9kZXZpY2UiLCJpc3MiOiJodHRwczovL2NpbmVzYS5jbG91ZGZsYXJlYWNjZXNzLmNvbSIsImlhdCI6MTc1ODY1MTQ4MCwiZXhwIjoxNzYxMjQzNDgwLCJqdGkiOiJEZEN3NEVzVkJhRDF0MkQzZm5RWUh5aDd0Vkk4b3l2MyIsImVtYWlscyI6WyJtLm1hbnphbmVsbGlAb2Rlb24uY29tIl19.H3G3773dn4ZFO3gh5qGcwyBibLnKWrkdRK9gQu8oMDtT63bWIv2O30N37VcGvKRmxwp0vRbXuxw1fSW6PMVZXuwzJDnGdelTm0zQ7zO-E_orgQhvY53Nc27BbQVLPf9YyNUOMc4q7PbTLjuoL4zTDdIN-ErresCalYU-gII-NP-glTehXhxTBfUTb72PH2foTBa3SLZTJIpVtwPSkOJ3fXeV5wjw0PhRKoS3tBMZXLU3mubJts9mZjUdMOsqV-QAra07UHiQhBYc7_ER1KLYGjGelMyVIDpVLw5bX4MJs_ymYDli-rm2_KfEK_8Zff5BeG6RCbId2Ha8ClqjfOzeKg",
+      "domain": "cinesa.cloudflareaccess.com",
+      "path": "/",
+      "expires": 1761243482.836295,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "CF_Authorization",
+      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjU1MzZmM2MzOGM1OWQzY2I5YzY1MTUzYTQ4NjA4YmFjNTRkNzZmYjUzNjk1ZDk2YTg2M2Y4ZWIwZDJjNzg2MDgifQ.eyJhdWQiOlsiY2FmNzMyNWFkNzhlMzAxMGI5MjNiNjYzODhlYmUyYTU0NDY0MjI5OTFjNjlhOGM5NDBhY2E0YzQ4NjM3YjBkMCJdLCJlbWFpbCI6Im0ubWFuemFuZWxsaUBvZGVvbi5jb20iLCJleHAiOjE3NTk4NjEwODAsImlhdCI6MTc1ODY1MTQ4MCwibmJmIjoxNzU4NjUxNDgwLCJpc3MiOiJodHRwczovL2NpbmVzYS5jbG91ZGZsYXJlYWNjZXNzLmNvbSIsInR5cGUiOiJhcHAiLCJpZGVudGl0eV9ub25jZSI6Ikh1dmdQM1BEUE5vVjY4dUQiLCJzdWIiOiIxMzZjYzM2NC02ZjIxLTVjYWQtYTU2OC1kY2ExMjAxNWI5YjAiLCJjb3VudHJ5IjoiUFQifQ.E6500HeychSPTz6a5gDdZbQwX8lz6RWvL8NizzJSdZ54vR_iJ9e_3fQTbWG9an4MQd7JpQsoa-hs7Qk6qidPV7zkYdb4CMT41vh-np2obu5hBGxmGkoH_iuAOuj3-2sufYhHgwn0QMpONLenx_5fxlpY6lcfDZi5igQoSfWiDFeIsM58nwpqccCwQlwVoAlE7S_PnJFfxfuzF6n0BmjOHV97uGeKPze33nG7rbduSkC7_n2LbEqyPjaIK1S6RwNGnBr504yraUWHTIjwZnkEi2sXY4Ws5BG8SZifk8BASh5YbzbxQYcBDXoP_p6J8yd-9YXEiDZiQG05ljM-FWv_9A",
+      "domain": "preprod-web.ocgtest.es",
+      "path": "/",
+      "expires": 1759861082.270671,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://preprod-web.ocgtest.es",
+      "localStorage": [
+        {
+          "name": "VistaOmnichannelComponents::notification-domain-store",
+          "value": "{\"json\":{\"userAcceptedCookiesAt\":null},\"meta\":{\"values\":{\"userAcceptedCookiesAt\":[\"undefined\"]}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::version-number",
+          "value": "15.0.0"
+        },
+        {
+          "name": "VistaOmnichannelComponents::sales-data-domain-store",
+          "value": "{\"json\":{\"ticketPricesByShowtimeId\":{},\"ticketTypesById\":{},\"itemProfilesBySiteId\":{},\"itemProfileForGiftShop\":{\"loadingState\":\"NotLoaded\"},\"itemAvailabilitiesBySiteId\":{},\"itemAvailabilitiesByItemId\":{},\"itemAvailabilitiesForGiftShop\":{\"loadingState\":\"NotLoaded\"},\"discountAvailabilitiesByDiscountId\":{\"loadingState\":\"NotLoaded\"},\"discountsById\":{},\"sellableItemsForSiteByHopk\":{},\"itemsById\":{},\"itemModifierGroupsById\":{},\"subscriptionBillingOptionsById\":{\"loadingState\":\"NotLoaded\"},\"availableHoursById\":{}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::seating-domain-store",
+          "value": "{\"json\":{\"areaCategories\":{},\"seatLayouts\":{},\"seatAvailabilities\":{},\"seatAvailabilityPreviews\":{}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::preferred-cinema-prompt",
+          "value": "{\"json\":{\"viewed\":false}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::loyalty-domain-store",
+          "value": "{\"json\":{\"balanceTypesById\":{},\"clubsById\":{},\"clubLevelsById\":{},\"customPreferencesById\":{},\"educationLevelsById\":{},\"emailAvailability\":null,\"filmsById\":{},\"friendConfiguration\":{\"loadingState\":\"NotLoaded\"},\"genresById\":{},\"interestsById\":{},\"interestContactMethodsById\":{},\"itemsById\":{},\"masterData\":{\"loadingState\":\"NotLoaded\"},\"memberHash\":null,\"memberPhotoRequirements\":{\"loadingState\":\"NotLoaded\"},\"memberRewards\":{\"loadingState\":\"NotLoaded\"},\"memberWatchlistFilmsById\":{\"loadingState\":\"NotLoaded\"},\"occupationsById\":{},\"rewardsById\":{},\"showtimesById\":{},\"sitesById\":{},\"subscriptionsById\":{},\"ticketTypesById\":{}},\"meta\":{\"values\":{\"emailAvailability\":[\"undefined\"],\"memberHash\":[\"undefined\"]}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::commit-id",
+          "value": "72f3d22f13"
+        },
+        {
+          "name": "VistaOmnichannelComponents::subscription-promo-voucher-applied",
+          "value": "{\"json\":{\"hasAppliedVoucher\":null},\"meta\":{\"values\":{\"hasAppliedVoucher\":[\"undefined\"]}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::browsing-domain-store",
+          "value": "{\"json\":{\"allSiteIds\":{\"loadingState\":\"Loading\"},\"sitesById\":{},\"selectedSiteIds\":[],\"filmsById\":{},\"allFilmIds\":{\"loadingState\":\"NotLoaded\"},\"filmIdsBySiteId\":{},\"allFilmAvailabilities\":{\"loadingState\":\"NotLoaded\"},\"filmAvailabilitiesBySiteId\":{},\"filmAvailabilitiesByQuery\":{},\"filmAdvanceBookingRulesById\":{},\"castAndCrewMembersById\":{},\"genresById\":{},\"censorRatingsById\":{},\"showtimesById\":{},\"showtimeIdsForQueryByBusinessDate\":{},\"showtimeIdsByScreenId\":{},\"showtimeIdsForEventBySite\":{},\"attributesById\":{},\"filmScreeningDatesForQuery\":{},\"screensById\":{},\"trailerUrlsByFilmId\":{},\"eventIdsForAllEvents\":{\"loadingState\":\"NotLoaded\"},\"eventsById\":{}}}"
+        },
+        {
+          "name": "VistaOmnichannelComponents::payment-domain-store",
+          "value": "{\"json\":{\"paymentMethodsForQuery\":{}}}"
+        }
+      ]
+    }
+  ]
+}

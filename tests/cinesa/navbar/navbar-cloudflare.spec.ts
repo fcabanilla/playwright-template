@@ -2,26 +2,22 @@ import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { NavbarAssertions } from './navbar.assertions';
 import { baseUrl } from './navbar.data';
+import { setupCloudflareContextAndPage } from '../../../core/webactions/setupCloudflareContextAndPage';
 
 test.describe('Cinesa Navbar Tests - Cloudflare Safe', () => {
-  let navbarAssertions: NavbarAssertions;
 
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  let context;
+  let page;
+  let navbarAssertions;
+
+  test.beforeEach(async ({ browser }) => {
+    ({ context, page } = await setupCloudflareContextAndPage(browser));
     navbarAssertions = new NavbarAssertions(page);
-
-    // Use Cloudflare-safe navigation for Cinesa
-    const success = await navbar.navigateToHomeWithCloudflareHandling();
-    if (!success) {
-      throw new Error(
-        'Failed to navigate past Cloudflare protection on Cinesa'
-      );
-    }
-
-    await cookieBanner.acceptCookies();
   });
 
   test('@smoke @critical @navbar @cinesa should display all navbar elements safely', async () => {
     await navbarAssertions.expectNavbarElementsVisible();
+    await context.close();
   });
 
   test('@fast @navbar @cinesa should click logo and stay on home safely', async ({
