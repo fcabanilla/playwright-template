@@ -604,8 +604,14 @@ Este README actualizado proporciona una guía completa para la instalación, con
   - Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
 
 2. Corré los tests normalmente usando ese storageState:
+  ```powershell
+  # Preproducción (PowerShell en Windows):
+  $env:TEST_ENV="preprod"; npx playwright test --project='Cinesa' --headed --workers=5
+  ```
+
   ```bash
-  npx playwright test --project='Cinesa' --headed --workers=1
+  # Producción (todos los sistemas):
+  npx playwright test --project='Cinesa' --headed --workers=5
   ```
 
 **Notas:**
