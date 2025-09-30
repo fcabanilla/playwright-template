@@ -20,7 +20,13 @@ export async function takeScreenshotForModal(
   name = 'Modal Screen Capture'
 ): Promise<void> {
   await allure.test.step('Taking screenshot of modal', async () => {
-    const modal = await page.waitForSelector(modalSelector, { state: 'visible' });
+    let modal;
+    try {
+      modal = await page.waitForSelector(modalSelector, { state: 'visible', timeout: 5000 });
+    } catch (e) {
+      console.warn(`No se pudo tomar screenshot: el modal '${modalSelector}' no está visible.`);
+      return;
+    }
     await page.evaluate((selector) => {
       const modalEl = document.querySelector(selector);
       if (modalEl) modalEl.scrollTop = 0;

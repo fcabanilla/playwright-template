@@ -179,7 +179,7 @@ export class SignupPage {
     await test.step('Validate password mandatory', async () => {
       await page.click(SIGNUP_SELECTORS.passwordInput);
       await page.waitForTimeout(100);
-      await page.click(SIGNUP_SELECTORS.modalContainer);
+      await page.click(SIGNUP_SELECTORS.nationalIdInput);
       await page.waitForTimeout(100);
       await expectPasswordErrorVisible(page);
     });
