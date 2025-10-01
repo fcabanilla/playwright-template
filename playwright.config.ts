@@ -47,6 +47,12 @@ export default defineConfig({
 
   // Proyectos separados para UCI y Cinesa
   projects: [
+    // Setup para autenticación en Cinesa
+    {
+      name: 'setup-cinesa',
+      testMatch: /.*\.setup\.ts/,
+      testDir: './tests/cinesa',
+    },
     {
       name: 'UCI Cinemas',
       testDir: './tests/uci',
@@ -81,6 +87,7 @@ export default defineConfig({
     {
       name: 'Cinesa',
       testDir: './tests/cinesa',
+      dependencies: ['setup-cinesa'],
       use: {
         ...{
           headless: true,
@@ -88,6 +95,8 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
+          // Usar el estado de autenticación guardado
+          storageState: './playwright/.auth/cinesa-user.json',
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
