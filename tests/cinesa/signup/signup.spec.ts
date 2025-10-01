@@ -14,7 +14,7 @@ test.describe('Signup', () => {
     await takeScreenshotForModal(page, testInfo, SIGNUP_SELECTORS.modalContainer);
   });
 
-  test('Validate mandatory fields', async ({ page, navbar, signupPage }, testInfo) => {
+  test('Validate mandatory fields DEMO test', async ({ page, navbar, signupPage }, testInfo) => {
     await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-7217', async () => {});
     await navbar.navigateToSignup();
     await signupPage.validateMandatoryFields();
