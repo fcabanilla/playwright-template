@@ -391,7 +391,7 @@ npx playwright test --project=Cinesa --headed
 
 1. **Generar estado de sesión:**
    ```bash
-   npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+   npx playwright test tests/cinesa/cloudflare/*.spec.ts --headed
    ```
 
 2. **Ejecutar tests:**

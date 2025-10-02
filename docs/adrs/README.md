@@ -1,118 +1,118 @@
 # Architectural Decision Records (ADRs)
 
-Este directorio contiene los registros de decisiones arquitecturales para el Cinema Multi-Platform Test Automation Framework.
+This directory contains the Architectural Decision Records (ADRs) for the Cinema Multi-Platform Test Automation Framework.
 
-## ¿Qué son los ADRs?
+## What are ADRs?
 
-Los Architectural Decision Records (ADRs) documentan decisiones importantes de arquitectura, el contexto en el que se tomaron, y las consecuencias de esas decisiones. Ayudan a los equipos a entender por qué se tomaron ciertas decisiones y facilitan futuras decisiones arquitecturales.
+Architectural Decision Records (ADRs) document important architecture decisions, the context in which they were made, and the consequences of those decisions. They help teams understand why certain choices were made and facilitate future architectural decisions.
 
-## Formato
+## Format
 
-Todos los ADRs siguen la plantilla definida en [`_template.md`](./_template.md).
+All ADRs follow the template defined in [`_template.md`](./_template.md).
 
-## Estado de las Decisiones
+## Decision Status
 
-- **Propuesto**: Decisión propuesta pero no implementada
-- **Aceptado**: Decisión tomada e implementada
-- **Rechazado**: Decisión considerada pero rechazada
-- **Deprecated**: Decisión que ya no es relevante
-- **Sustituido por ADR-XXX**: Decisión reemplazada por otra
+- **Proposed**: Decision proposed but not yet implemented
+- **Accepted**: Decision made and implemented
+- **Rejected**: Decision considered but rejected
+- **Deprecated**: Decision that is no longer relevant
+- **Superseded by ADR-XXX**: Decision replaced by another
 
-## Índice de ADRs
+## ADR Index
 
-| ADR                                        | Título                                             | Estado   | Fecha      | Autor       |
+| ADR                                        | Title                                              | Status   | Date       | Author      |
 | ------------------------------------------ | -------------------------------------------------- | -------- | ---------- | ----------- |
-| [001](./0001-playwright-framework.md)      | Adopción de Playwright como Framework Principal    | Aceptado | 2024-08-15 | @fcabanilla |
-| [002](./0002-typescript-strict-mode.md)    | Implementación de TypeScript en Modo Estricto      | Aceptado | 2024-08-20 | @fcabanilla |
-| [003](./0003-multi-cinema-architecture.md) | Arquitectura Multi-Cinema con Namespaces Separados | Aceptado | 2024-08-25 | @fcabanilla |
+| [001](./0001-playwright-framework.md)      | Adoption of Playwright as Main Framework           | Accepted | 2024-08-15 | @fcabanilla |
+| [002](./0002-typescript-strict-mode.md)    | Implementation of TypeScript in Strict Mode        | Accepted | 2024-08-20 | @fcabanilla |
+| [003](./0003-multi-cinema-architecture.md) | Multi-Cinema Architecture with Separate Namespaces | Accepted | 2024-08-25 | @fcabanilla |
 
-## Decisiones por Categoría
+## Decisions by Category
 
-### Framework y Tecnologías Core
+### Core Framework and Technologies
 
-- **ADR-001**: Playwright como framework de automatización principal
-- **ADR-002**: TypeScript strict mode para type safety
+- **ADR-001**: Playwright as the main automation framework
+- **ADR-002**: TypeScript strict mode for type safety
 
-### Arquitectura del Sistema
+### System Architecture
 
-- **ADR-003**: Estructura multi-cinema con namespaces separados
+- **ADR-003**: Multi-cinema structure with separate namespaces
 
-### Futuras Decisiones Planificadas
+## Planned Future Decisions
 
-#### Q4 2024 - Q1 2025
+### Q4 2024 - Q1 2025
 
-- **ADR-004**: Estrategia de CI/CD y pipeline de deployment
-- **ADR-005**: Implementación de API testing integration
+- **ADR-004**: CI/CD strategy and deployment pipeline
+- **ADR-005**: API testing integration implementation
 - **ADR-006**: Visual regression testing approach
 
-#### Q1 2025 - Q2 2025
+### Q1 2025 - Q2 2025
 
-- **ADR-007**: Mobile testing strategy y responsive validation
+- **ADR-007**: Mobile testing strategy and responsive validation
 - **ADR-008**: Performance testing integration
-- **ADR-009**: Test data management y synthetic data generation
+- **ADR-009**: Test data management and synthetic data generation
 
-## Proceso para Nuevos ADRs
+## Process for New ADRs
 
-### Cuándo Crear un ADR
+### When to Create an ADR
 
-Crea un ADR cuando:
+Create an ADR when:
 
-- Tomas una decisión arquitectural que será difícil de revertir
-- La decisión afecta múltiples componentes del sistema
-- Hay múltiples opciones viables con trade-offs significativos
-- La decisión requiere justificación para futuras referencias
-- Equipos o stakeholders necesitan entender el contexto de la decisión
+- Making an architectural decision that will be difficult to reverse
+- The decision affects multiple system components
+- There are multiple viable options with significant trade-offs
+- The decision requires justification for future reference
+- Teams or stakeholders need to understand the decision context
 
-### Cómo Crear un ADR
+### How to Create an ADR
 
-1. **Copia la plantilla**: Usa [`_template.md`](./_template.md) como base
-2. **Asigna número**: Usa el siguiente número secuencial (ADR-004, ADR-005, etc.)
-3. **Completa todas las secciones**: Especialmente contexto, alternativas y consecuencias
-4. **Solicita review**: Al menos 2 reviews antes de marcar como "Aceptado"
-5. **Actualiza este índice**: Agrega la entrada correspondiente
-6. **Comunica la decisión**: Share con el equipo y stakeholders relevantes
+1. **Copy the template**: Use [`_template.md`](./_template.md) as a base
+2. **Assign number**: Use the next sequential number (ADR-004, ADR-005, etc.)
+3. **Complete all sections**: Especially context, alternatives, and consequences
+4. **Request review**: At least 2 reviews before marking as "Accepted"
+5. **Update this index**: Add the corresponding entry
+6. **Communicate the decision**: Share with the team and relevant stakeholders
 
-### Template de Filename
+### Filename Template
 
 ```text
 XXXX-brief-decision-title.md
 ```
 
-Ejemplos:
+Examples:
 
 - `0004-cicd-pipeline-strategy.md`
 - `0005-api-testing-integration.md`
 - `0006-visual-regression-approach.md`
 
-## Guidelines para Escritura
+## Writing Guidelines
 
-### Contexto Claro
+### Clear Context
 
-- Explica **por qué** la decisión es necesaria
-- Proporciona suficiente background para que alguien nuevo pueda entender
+- Explain **why** the decision is necessary
+- Provide sufficient background for newcomers to understand
 - Include relevant technical and business constraints
 
-### Alternativas Detalladas
+### Detailed Alternatives
 
-- Lista **todas** las opciones consideradas seriamente
-- Explain pros and cons objetivamente
-- Provide clear rationale para por qué otras opciones fueron rechazadas
+- List **all** seriously considered options
+- Explain pros and cons objectively
+- Provide clear rationale for why other options were rejected
 
-### Consecuencias Honestas
+### Honest Consequences
 
-- Include tanto consecuencias positivas como negativas
-- Be realistic about trade-offs y limitations
+- Include both positive and negative consequences
+- Be realistic about trade-offs and limitations
 - Consider long-term implications
 
-### Implementación Práctica
+### Practical Implementation
 
 - Provide actionable implementation steps
-- Define success criteria claramente
-- Include rollback plan cuando sea apropiado
+- Define success criteria clearly
+- Include rollback plan when appropriate
 
-## Referencias y Recursos
+## References and Resources
 
-### Sobre ADRs
+### About ADRs
 
 - [Documenting Architecture Decisions - Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions)
 - [ADR GitHub Repository](https://github.com/joelparkerhenderson/architecture_decision_record)
@@ -120,11 +120,11 @@ Ejemplos:
 
 ### Tools
 
-- [ADR Tools](https://github.com/npryce/adr-tools) - Command line tools para managing ADRs
-- [Log4brains](https://github.com/thomvaill/log4brains) - Web UI para browsing ADRs
+- [ADR Tools](https://github.com/npryce/adr-tools) - Command line tools for managing ADRs
+- [Log4brains](https://github.com/thomvaill/log4brains) - Web UI for browsing ADRs
 
 ---
 
-**Mantenido por**: Cinema Automation Team (@fcabanilla)  
-**Última actualización**: 2 de octubre de 2025  
-**Próxima revisión**: Q1 2025
+**Maintained by**: Cinema Automation Team (@fcabanilla)  
+**Last updated**: October 2, 2025  
+**Next review**: Q1 2025

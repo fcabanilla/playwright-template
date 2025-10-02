@@ -185,4 +185,4 @@ Playwright será el framework base para toda la automatización de tests end-to-
 
 ---
 
-**Decisión validada**: La adopción de Playwright ha sido exitosa, cumpliendo todos los criterios de éxito establecidos y superando expectativas en several áreas clave.
+**Decisión validada**: La adopción de Playwright ha sido exitosa, cumpliendo todos los criterios de éxito establecidos y superando expectativas en varias áreas clave.
