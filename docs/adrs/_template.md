@@ -1,118 +1,118 @@
-# ADR-XXX: [Título de la Decisión]
+# ADR-XXX: [Decision Title]
 
-**Estado**: [Propuesto | Aceptado | Rechazado | Deprecated | Sustituido por ADR-YYY]
+**Status**: [Proposed | Accepted | Rejected | Deprecated | Superseded by ADR-YYY]
 
-**Fecha**: YYYY-MM-DD
+**Date**: YYYY-MM-DD
 
-**Autores**: [@username]
+**Authors**: [@username]
 
-**Revisores**: [@username, @username]
+**Reviewers**: [@username, @username]
 
-## Contexto
+## Context
 
-Describe el contexto y el problema que estamos intentando resolver. ¿Qué fuerzas están en juego? ¿Qué requisitos técnicos, de negocio o de equipo están involucrados?
+Describe the context and the problem we are trying to solve. What forces are at play? What technical, business, or team requirements are involved?
 
-### Antecedentes
+### Background
 
-- Proporciona información de fondo relevante
-- Enlaces a issues, documentos o discusiones previas
-- Descripción del estado actual si aplica
+- Provide relevant background information
+- Links to issues, documents, or previous discussions
+- Description of the current state if applicable
 
-### Fuerzas en Juego
+### Forces at Play
 
-- Lista de factores que influyen en la decisión
-- Restricciones técnicas o de negocio
-- Requisitos no funcionales relevantes
-- Consideraciones de equipo o proceso
+- List of factors influencing the decision
+- Technical or business constraints
+- Relevant non-functional requirements
+- Team or process considerations
 
-## Decisión
+## Decision
 
-Describir la decisión que hemos tomado de manera clara y concisa.
+Describe the decision we have made clearly and concisely.
 
-### Opción Elegida
+### Chosen Option
 
-**[Nombre de la opción elegida]**
+**[Name of the chosen option]**
 
-Explicación detallada de la decisión tomada y por qué fue seleccionada.
+Detailed explanation of the decision and why it was selected.
 
-### Alternativas Consideradas
+### Considered Alternatives
 
-#### Opción A: [Nombre]
-
-- **Pros**:
-  - Ventaja 1
-  - Ventaja 2
-- **Contras**:
-  - Desventaja 1
-  - Desventaja 2
-- **Razón de rechazo**: Explicación específica
-
-#### Opción B: [Nombre]
+#### Option A: [Name]
 
 - **Pros**:
-  - Ventaja 1
-  - Ventaja 2
-- **Contras**:
-  - Desventaja 1
-  - Desventaja 2
-- **Razón de rechazo**: Explicación específica
+  - Advantage 1
+  - Advantage 2
+- **Cons**:
+  - Disadvantage 1
+  - Disadvantage 2
+- **Reason for rejection**: Specific explanation
 
-## Consecuencias
+#### Option B: [Name]
 
-### Positivas
+- **Pros**:
+  - Advantage 1
+  - Advantage 2
+- **Cons**:
+  - Disadvantage 1
+  - Disadvantage 2
+- **Reason for rejection**: Specific explanation
 
-- Listar los beneficios esperados
-- Cómo esto ayuda a resolver el problema
-- Mejoras en calidad, productividad, etc.
+## Consequences
 
-### Negativas
+### Positive
 
-- Desventajas o trade-offs
-- Nuevas limitaciones introducidas
-- Riesgos potenciales
+- List expected benefits
+- How this helps solve the problem
+- Improvements in quality, productivity, etc.
 
-### Neutrales
+### Negative
 
-- Cambios que son ni positivos ni negativos
-- Nuevas responsabilidades o procesos
-- Impactos en otros sistemas
+- Disadvantages or trade-offs
+- New limitations introduced
+- Potential risks
 
-## Implementación
+### Neutral
 
-### Plan de Implementación
+- Changes that are neither positive nor negative
+- New responsibilities or processes
+- Impacts on other systems
 
-1. **Paso 1**: Descripción del primer paso
-2. **Paso 2**: Descripción del segundo paso
-3. **Paso N**: Descripción del último paso
+## Implementation
 
-### Criterios de Éxito
+### Implementation Plan
 
-- ¿Cómo sabremos que la implementación fue exitosa?
-- Métricas específicas a monitorear
-- Validaciones o tests a realizar
+1. **Step 1**: Description of the first step
+2. **Step 2**: Description of the second step
+3. **Step N**: Description of the last step
+
+### Success Criteria
+
+- How will we know the implementation was successful?
+- Specific metrics to monitor
+- Validations or tests to perform
 
 ### Rollback Plan
 
-- ¿Cómo revertir la decisión si es necesario?
-- Estrategia de mitigación de riesgos
-- Puntos de no retorno
+- How to revert the decision if necessary
+- Risk mitigation strategy
+- Points of no return
 
-## Notas
+## Notes
 
-### Enlaces Relacionados
+### Related Links
 
 - [Issue #123](link-to-issue)
-- [Documento de diseño](link-to-doc)
-- [Discusión en Slack](link-to-discussion)
+- [Design document](link-to-doc)
+- [Slack discussion](link-to-discussion)
 
-### Actualización
+### Update
 
-- **Última revisión**: YYYY-MM-DD por [@username]
-- **Próxima revisión**: YYYY-MM-DD
-- **Estado de implementación**: [No iniciado | En progreso | Completado]
+- **Last review**: YYYY-MM-DD by [@username]
+- **Next review**: YYYY-MM-DD
+- **Implementation status**: [Not started | In progress | Completed]
 
 ---
 
 **Template Version**: 1.0  
-**Creado**: 2 de octubre de 2025  
-**Mantenido por**: Cinema Automation Team
+**Created**: October 2, 2025  
+**Maintained by**: Cinema Automation Team
