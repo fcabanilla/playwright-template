@@ -1,306 +1,311 @@
-# 🤝 Guía de Contribución
+# 🤝 Contributing Guide
 
-Gracias por tu interés en contribuir al **Cinema Multi-Platform Test Automation Framework**. Esta guía te ayudará a entender nuestro proceso de contribución y las mejores prácticas del proyecto.
+Thank you for your interest in contributing to the **Cinema Multi-Platform Test Automation Framework**. This guide will help you understand our contribution process and project best practices.
 
-## 🎯 Tipos de Contribuciones Bienvenidas
+## 🎯 Welcome Contributions
 
-- **🐛 Corrección de bugs** en tests existentes
-- **✨ Nuevos test cases** para funcionalidades no cubiertas
-- **🏗️ Mejoras en Page Objects** y arquitectura
-- **📝 Mejoras en documentación**
-- **🚀 Optimizaciones de rendimiento**
-- **🔧 Herramientas de desarrollo** y automatización
+- **🐛 Bug fixes** in existing tests
+- **✨ New test cases** for uncovered functionalities
+- **🏗️ Page Objects improvements** and architecture
+- **📝 Documentation improvements**
+- **🚀 Performance optimizations**
+- **🔧 Development tools** and automation
 
-## 🌊 Flujo de Pull Requests
+## 🌊 Pull Request Workflow
 
-### 1. Preparación
+### 1. Preparation
 
 ```bash
-# Fork del repositorio y clonar tu fork
-git clone https://github.com/TU-USUARIO/playwright-template.git
+# Fork repository and clone your fork
+git clone https://github.com/YOUR-USERNAME/playwright-template.git
 cd playwright-template
 
-# Configurar upstream
+# Configure upstream
 git remote add upstream https://github.com/fcabanilla/playwright-template.git
 
-# Instalar dependencias
+# Install dependencies
 npm install
 npx playwright install
 ```
 
-### 2. Crear Rama de Funcionalidad
+### 2. Create Feature Branch
 
 ```bash
-# Crear rama desde main actualizado
+# Create branch from updated main
 git checkout main
 git pull upstream main
-git checkout -b feature/nombre-descriptivo
+git checkout -b feature/descriptive-name
 
-# O para bugs
-git checkout -b fix/descripcion-del-bug
+# Or for bugs
+git checkout -b fix/bug-description
 
-# O para documentación
-git checkout -b docs/area-mejorada
+# Or for documentation
+git checkout -b docs/improved-area
 ```
 
-### 3. Convenciones de Ramas
+### 3. Branch Conventions
 
-| Tipo | Prefijo | Ejemplo | Descripción |
-|------|---------|---------|-------------|
-| Funcionalidad | `feature/` | `feature/uci-payment-flow` | Nueva funcionalidad |
-| Corrección | `fix/` | `fix/navbar-selector-update` | Corrección de bugs |
-| Documentación | `docs/` | `docs/api-testing-guide` | Mejoras de documentación |
-| Refactor | `refactor/` | `refactor/page-object-structure` | Reestructuración de código |
-| Performance | `perf/` | `perf/test-execution-speed` | Optimizaciones |
-| Chore | `chore/` | `chore/update-dependencies` | Tareas de mantenimiento |
+| Type          | Prefix      | Example                          | Description                |
+| ------------- | ----------- | -------------------------------- | -------------------------- |
+| Feature       | `feature/`  | `feature/uci-payment-flow`       | New functionality          |
+| Fix           | `fix/`      | `fix/navbar-selector-update`     | Bug fixes                  |
+| Documentation | `docs/`     | `docs/api-testing-guide`         | Documentation improvements |
+| Refactor      | `refactor/` | `refactor/page-object-structure` | Code restructuring         |
+| Performance   | `perf/`     | `perf/test-execution-speed`      | Optimizations              |
+| Chore         | `chore/`    | `chore/update-dependencies`      | Maintenance tasks          |
 
-### 4. Desarrollo
+### 4. Development
 
-#### Tamaño de PRs
-- **Máximo 400 líneas** de cambios por PR
-- **Un concepto por PR** - no mezclar funcionalidades
-- **Tests incluidos** para toda nueva funcionalidad
+#### PR Size Guidelines
 
-#### Estructura de Commits
-Seguimos **Conventional Commits** para mensajes claros y automatzación:
+- **Maximum 400 lines** of changes per PR
+- **One concept per PR** - don't mix functionalities
+- **Tests included** for all new functionality
+
+#### Commit Structure
+
+We follow **Conventional Commits** for clear messages and automation:
 
 ```
-<tipo>[scope opcional]: <descripción>
+<type>[optional scope]: <description>
 
-[cuerpo opcional]
+[optional body]
 
-[footer opcional]
+[optional footer]
 ```
 
-#### Ejemplos de Commits
+#### Commit Examples
 
 ```bash
-# Funcionalidades
-feat(cinesa): agregar test de flujo de pago completo
-feat(uci): implementar page object para selección de asientos
-feat(core): agregar manejo de overlays en WebActions
+# Features
+feat(cinesa): add complete payment flow test
+feat(uci): implement seat selection page object
+feat(core): add overlay handling in WebActions
 
-# Correcciones
-fix(navbar): actualizar selectores después de rediseño
-fix(seatpicker): corregir timeout en selección múltiple
-fix(config): resolver configuración de entorno preprod
+# Fixes
+fix(navbar): update selectors after redesign
+fix(seatpicker): correct timeout in multiple selection
+fix(config): resolve preprod environment configuration
 
-# Documentación
-docs(readme): actualizar guía de instalación
-docs(contributing): agregar ejemplos de page objects
-docs(adr): documentar decisión de uso de Allure 3
+# Documentation
+docs(readme): update installation guide
+docs(contributing): add page object examples
+docs(adr): document Allure 3 usage decision
 
 # Refactoring
-refactor(fixtures): simplificar inyección de dependencias
-refactor(assertions): mover aserciones a clases dedicadas
+refactor(fixtures): simplify dependency injection
+refactor(assertions): move assertions to dedicated classes
 
 # Performance
-perf(tests): reducir tiempo de ejecución en 30%
-perf(selectors): optimizar estrategias de wait
+perf(tests): reduce execution time by 30%
+perf(selectors): optimize wait strategies
 
 # Chores
-chore(deps): actualizar Playwright a v1.50.1
-chore(lint): configurar ESLint para TypeScript estricto
+chore(deps): update Playwright to v1.50.1
+chore(lint): configure ESLint for strict TypeScript
 ```
 
-### 5. Checks Locales Antes del PR
+### 5. Local Checks Before PR
 
-#### Tests y Linting
+#### Tests and Linting
 
 ```bash
-# 1. Ejecutar linting
+# 1. Run linting
 npm run lint
 
-# 2. Ejecutar tests relevantes
-npm run test:cinesa:navbar  # Para cambios en navbar
-npm run test:uci:smoke      # Para cambios en UCI
+# 2. Run relevant tests
+npm run test:cinesa:navbar  # For navbar changes
+npm run test:uci:smoke      # For UCI changes
 
-# 3. Ejecutar suite completa (recomendado)
+# 3. Run complete suite (recommended)
 npm run test:cinesa
 npm run test:uci
 
-# 4. Generar reporte
+# 4. Generate report
 npm run report:generate
 ```
 
-#### Verificaciones Obligatorias
+#### Mandatory Verifications
 
 ```bash
-# Verificar que no hay errores de TypeScript
+# Verify no TypeScript errors
 npx tsc --noEmit
 
-# Verificar que los tests pasan
+# Verify tests pass
 npm test
 
-# Verificar formato de código
+# Verify code format
 npm run lint
 ```
 
-### 6. Crear Pull Request
+### 6. Create Pull Request
 
-#### Template de PR
+#### PR Template
 
 ```markdown
-## 📋 Descripción
+## 📋 Description
 
-Descripción clara y concisa de los cambios realizados.
+Clear and concise description of implemented changes.
 
-## 🎯 Tipo de Cambio
+## 🎯 Change Type
 
-- [ ] 🐛 Bug fix (cambio que corrige un problema)
-- [ ] ✨ Nueva funcionalidad (cambio que agrega funcionalidad)
-- [ ] 💥 Breaking change (fix o feature que causa cambios incompatibles)
-- [ ] 📝 Documentación (cambios solo en documentación)
-- [ ] 🎨 Refactoring (cambios que no agregan funcionalidad ni corrigen bugs)
-- [ ] ⚡ Performance (cambios que mejoran rendimiento)
-- [ ] 🧪 Tests (agregar tests faltantes o corregir existentes)
+- [ ] 🐛 Bug fix (change that fixes an issue)
+- [ ] ✨ New feature (change that adds functionality)
+- [ ] 💥 Breaking change (fix or feature causing incompatible changes)
+- [ ] 📝 Documentation (documentation-only changes)
+- [ ] 🎨 Refactoring (changes that don't add functionality or fix bugs)
+- [ ] ⚡ Performance (changes that improve performance)
+- [ ] 🧪 Tests (adding missing tests or correcting existing ones)
 
-## 🧪 Tests Realizados
+## 🧪 Testing Performed
 
-- [ ] Tests unitarios pasan
-- [ ] Tests de integración pasan
-- [ ] Tests manuales realizados (describir cuáles)
-- [ ] Reporte Allure generado y revisado
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual tests performed (describe which ones)
+- [ ] Allure report generated and reviewed
 
 ## 📝 Checklist
 
-- [ ] Mi código sigue las convenciones del proyecto
-- [ ] He realizado self-review de mi código
-- [ ] He comentado código complejo cuando es necesario
-- [ ] He actualizado documentación relevante
-- [ ] Mis cambios no generan nuevos warnings
-- [ ] He agregado tests que prueban mi fix/feature
-- [ ] Tests nuevos y existentes pasan localmente
+- [ ] My code follows project conventions
+- [ ] I have performed self-review of my code
+- [ ] I have commented complex code when necessary
+- [ ] I have updated relevant documentation
+- [ ] My changes don't generate new warnings
+- [ ] I have added tests that prove my fix/feature
+- [ ] New and existing tests pass locally
 
-## 🔗 Issues Relacionados
+## 🔗 Related Issues
 
 Closes #(issue)
 
-## 📷 Screenshots (si aplica)
+## 📷 Screenshots (if applicable)
 
-Si hay cambios visuales, incluir screenshots del antes/después.
+If there are visual changes, include before/after screenshots.
 
-## 📚 Documentación Adicional
+## 📚 Additional Documentation
 
-Enlaces a documentación relevante o explicaciones adicionales.
+Links to relevant documentation or additional explanations.
 ```
 
-#### Etiquetas de PR
+#### PR Labels
 
-- `scope:cinesa` - Cambios específicos de Cinesa
-- `scope:uci` - Cambios específicos de UCI
-- `scope:core` - Cambios en funcionalidades centrales
-- `type:feature` - Nueva funcionalidad
-- `type:bugfix` - Corrección de error
-- `type:docs` - Cambios en documentación
-- `priority:high` - Alta prioridad
-- `priority:medium` - Prioridad media
-- `priority:low` - Baja prioridad
+- `scope:cinesa` - Cinesa-specific changes
+- `scope:uci` - UCI-specific changes
+- `scope:core` - Core functionality changes
+- `type:feature` - New functionality
+- `type:bugfix` - Error correction
+- `type:docs` - Documentation changes
+- `priority:high` - High priority
+- `priority:medium` - Medium priority
+- `priority:low` - Low priority
 
-### 7. Revisión de Código
+### 7. Code Review
 
-#### Criterios de Aprobación
+#### Approval Criteria
 
-- **2 approvals mínimos** para cambios en `main`
-- **1 approval mínimo** para cambios en `develop`
-- **Owner approval requerido** para cambios arquitecturales
+- **2 approvals minimum** for changes to `main`
+- **1 approval minimum** for changes to `develop`
+- **Owner approval required** for architectural changes
 
-#### Proceso de Review
+#### Review Process
 
-1. **Automated checks** deben pasar (linting, tests)
-2. **Code review** por al menos un maintainer
-3. **Testing verification** en entorno de pruebas
-4. **Documentation review** si hay cambios en docs
+1. **Automated checks** must pass (linting, tests)
+2. **Code review** by at least one maintainer
+3. **Testing verification** in test environment
+4. **Documentation review** if there are doc changes
 
-## 🚨 Política de Issues
+## 🚨 Issues Policy
 
-### Crear un Issue
+### Create an Issue
 
 #### Bug Report
 
 ```markdown
-**🐛 Descripción del Bug**
-Descripción clara y concisa del problema.
+**🐛 Bug Description**
+Clear and concise description of the problem.
 
-**🔄 Pasos para Reproducir**
-1. Ir a '...'
-2. Hacer click en '...'
-3. Ver error
+**🔄 Steps to Reproduce**
 
-**📋 Comportamiento Esperado**
-Descripción de lo que debería pasar.
+1. Go to '...'
+2. Click on '...'
+3. See error
+
+**📋 Expected Behavior**
+Description of what should happen.
 
 **📷 Screenshots**
-Si aplica, agregar screenshots.
+If applicable, add screenshots.
 
-**🖥️ Entorno**
+**🖥️ Environment**
+
 - OS: [e.g. iOS]
 - Browser: [e.g. chrome, safari]
 - Version: [e.g. 22]
 
-**📝 Contexto Adicional**
-Cualquier otra información relevante.
+**📝 Additional Context**
+Any other relevant information.
 ```
 
 #### Feature Request
 
 ```markdown
-**✨ Descripción de la Funcionalidad**
-Descripción clara de la funcionalidad propuesta.
+**✨ Feature Description**
+Clear description of the proposed functionality.
 
-**🎯 Problema que Resuelve**
-Explicar qué problema soluciona esta funcionalidad.
+**🎯 Problem It Solves**
+Explain what problem this functionality solves.
 
-**💡 Solución Propuesta**
-Descripción de cómo debería funcionar.
+**💡 Proposed Solution**
+Description of how it should work.
 
-**🔄 Alternativas Consideradas**
-Otras alternativas que consideraste.
+**🔄 Alternatives Considered**
+Other alternatives you considered.
 
-**📋 Criterios de Aceptación**
-- [ ] Criterio 1
-- [ ] Criterio 2
-- [ ] Criterio 3
+**📋 Acceptance Criteria**
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
 ```
 
-### Triage de Issues
+### Issue Triage
 
-#### Etiquetas de Prioridad
+#### Priority Labels
 
-- 🔥 `priority:critical` - Bloquea funcionalidad principal
-- ⚠️ `priority:high` - Afecta funcionalidad importante
-- 📋 `priority:medium` - Mejora general
+- 🔥 `priority:critical` - Blocks main functionality
+- ⚠️ `priority:high` - Affects important functionality
+- 📋 `priority:medium` - General improvement
 - 💡 `priority:low` - Nice to have
 
-#### Etiquetas de Tipo
+#### Type Labels
 
-- 🐛 `type:bug` - Error en código existente
-- ✨ `type:enhancement` - Nueva funcionalidad
-- 📝 `type:documentation` - Mejoras en documentación
-- ❓ `type:question` - Pregunta sobre el proyecto
-- 🏗️ `type:architecture` - Cambios arquitecturales
+- 🐛 `type:bug` - Error in existing code
+- ✨ `type:enhancement` - New functionality
+- 📝 `type:documentation` - Documentation improvements
+- ❓ `type:question` - Question about the project
+- 🏗️ `type:architecture` - Architectural changes
 
-#### Etiquetas de Estado
+#### Status Labels
 
-- 🔍 `status:investigating` - Investigando el problema
-- 📋 `status:planned` - Planificado para desarrollo
-- 🔄 `status:in-progress` - En desarrollo activo
-- ⏳ `status:blocked` - Bloqueado por dependencias
-- ✅ `status:ready-for-review` - Listo para revisión
+- 🔍 `status:investigating` - Investigating the problem
+- 📋 `status:planned` - Planned for development
+- 🔄 `status:in-progress` - In active development
+- ⏳ `status:blocked` - Blocked by dependencies
+- ✅ `status:ready-for-review` - Ready for review
 
-## 🎯 Convenciones de Código
+## 🎯 Code Conventions
 
 ### TypeScript
 
 ```typescript
-// ✅ Bueno: Interfaces claras y tipos explícitos
+// ✅ Good: Clear interfaces and explicit types
 interface MovieSelectors {
   readonly movieCard: string;
   readonly movieTitle: string;
   readonly movieRating: string;
 }
 
-// ✅ Bueno: Documentación JSDoc
+// ✅ Good: JSDoc documentation
 /**
  * Handles movie selection and validation for cinema platforms
  * @param movieId - Unique identifier for the movie
@@ -310,7 +315,7 @@ async selectMovie(movieId: string): Promise<MovieDetails> {
   // Implementation
 }
 
-// ❌ Malo: Tipos any y falta de documentación
+// ❌ Bad: any types and lack of documentation
 async selectMovie(movieId: any) {
   // Implementation
 }
@@ -319,7 +324,7 @@ async selectMovie(movieId: any) {
 ### Page Objects
 
 ```typescript
-// ✅ Bueno: Page Object bien estructurado
+// ✅ Good: Well-structured Page Object
 export class MoviePage {
   constructor(private page: Page) {}
 
@@ -341,12 +346,12 @@ export class MoviePage {
 ### Tests
 
 ```typescript
-// ✅ Bueno: Tests descriptivos con pasos claros
+// ✅ Good: Descriptive tests with clear steps
 test.describe('Movie Selection Flow', () => {
   test('should select movie and proceed to seat selection', async ({
     page,
     moviePage,
-    seatPage
+    seatPage,
   }) => {
     await test.step('Navigate to movies page', async () => {
       await moviePage.navigate();
@@ -363,69 +368,69 @@ test.describe('Movie Selection Flow', () => {
 });
 ```
 
-## 🔧 Herramientas de Desarrollo
+## 🔧 Development Tools
 
-### Setup Local
+### Local Setup
 
 ```bash
-# Verificar setup
-npm run lint          # Verificar código
-npm run test          # Ejecutar tests
-npm run report        # Ver reporte
+# Verify setup
+npm run lint          # Verify code
+npm run test          # Execute tests
+npm run report        # View report
 
-# Herramientas útiles
-npm run ui            # Playwright UI para debug
-npm run codegen       # Generar selectores automáticamente
+# Useful tools
+npm run ui            # Playwright UI for debug
+npm run codegen       # Generate selectors automatically
 ```
 
 ### Debugging
 
 ```typescript
-// Debug con pausa
+// Debug with pause
 await page.pause();
 
-// Debug con screenshots
+// Debug with screenshots
 await page.screenshot({ path: 'debug.png' });
 
-// Debug con logs
+// Debug with logs
 console.log('Current URL:', page.url());
 ```
 
-## 📋 Standards de Calidad
+## 📋 Quality Standards
 
 ### Code Coverage
 
-- **Mínimo 80%** de cobertura para nuevos Page Objects
-- **Tests obligatorios** para toda nueva funcionalidad
-- **Regression tests** para fixes de bugs
+- **Minimum 80%** coverage for new Page Objects
+- **Mandatory tests** for all new functionality
+- **Regression tests** for bug fixes
 
 ### Performance
 
-- **Tests deben ejecutar** en menos de 5 minutos
-- **Page Objects optimizados** con estrategias de wait eficientes
-- **Selectores robustos** que no dependan de implementación
+- **Tests must execute** in less than 5 minutes
+- **Optimized Page Objects** with efficient wait strategies
+- **Robust selectors** that don't depend on implementation
 
 ### Documentation
 
-- **JSDoc obligatorio** para métodos públicos
-- **README actualizado** para nuevas funcionalidades
-- **ADRs documentados** para decisiones arquitecturales
+- **Mandatory JSDoc** for public methods
+- **Updated README** for new functionalities
+- **Documented ADRs** for architectural decisions
 
-## 🆘 Obtener Ayuda
+## 🆘 Getting Help
 
-### Canales de Comunicación
+### Communication Channels
 
-- **GitHub Issues** - Para bugs y feature requests
-- **GitHub Discussions** - Para preguntas generales
-- **Pull Request Comments** - Para feedback específico
+- **GitHub Issues** - For bugs and feature requests
+- **GitHub Discussions** - For general questions
+- **Pull Request Comments** - For specific feedback
 
-### Contactos
+### Contacts
 
-- **Maintainer Principal**: @fcabanilla
-- **Team Cinesa**: @team-cinesa
-- **Team UCI**: @team-uci
+- **Main Maintainer**: @fcabanilla
+- **Cinesa Team**: @team-cinesa
+- **UCI Team**: @team-uci
 
-### Recursos Útiles
+### Useful Resources
 
 - [Playwright Documentation](https://playwright.dev/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
@@ -434,13 +439,19 @@ console.log('Current URL:', page.url());
 
 ---
 
-## 🏆 Reconocimientos
+## 🏆 Acknowledgments
 
-Agradecemos a todos los contribuidores que hacen posible este proyecto:
+We thank all contributors who make this project possible:
 
-- Seguimiento de contribuciones en [Contributors](../../graphs/contributors)
-- Wall of fame en releases importantes
+- Contribution tracking in [Contributors](../../graphs/contributors)
+- Wall of fame in important releases
 
 ---
 
-**¡Gracias por contribuir! 🎉** Tu ayuda hace que este framework sea cada vez mejor para toda la comunidad de testing de cines.
+**Thank you for contributing! 🎉** Your help makes this framework better for the entire cinema testing community.
+
+---
+
+> **Available in other languages:**
+>
+> - [Español](./CONTRIBUTING.es.md) | **English** (current)

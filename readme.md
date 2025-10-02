@@ -1,411 +1,761 @@
-# 🎬 Cinema Multi-Platform Test Automation Framework
+# 🎬 Cinema Multi-Platform Test Automation Framework# 🎬 Cinema Multi-Platform Test Automation Framework
 
-Framework de automatización de pruebas end-to-end para múltiples cadenas de cines utilizando **Playwright** con **TypeScript**. Soporta **Cinesa** (España) y **UCI Cinemas** (Italia) con arquitectura escalable para futuras expansiones.
+End-to-end test automation framework for multiple cinema chains using **Playwright** with **TypeScript**. Supports **Cinesa** (Spain) and **UCI Cinemas** (Italy) with scalable architecture for future expansions.Framework de automatización de pruebas end-to-end para múltiples cadenas de cines utilizando **Playwright** con **TypeScript**. Soporta **Cinesa** (España) y **UCI Cinemas** (Italia) con arquitectura escalable para futuras expansiones.
 
-## 🎯 Propósito del Proyecto
+## 🎯 Project Purpose## 🎯 Propósito del Proyecto
 
-Este proyecto resuelve la necesidad de **automatización de pruebas consistente** para múltiples plataformas de cines, garantizando:
+This project solves the need for **consistent test automation** across multiple cinema platforms, ensuring:Este proyecto resuelve la necesidad de **automatización de pruebas consistente** para múltiples plataformas de cines, garantizando:
 
-- **Calidad uniforme** entre diferentes marcas de cines
-- **Detección temprana** de regresiones en funcionalidades críticas
-- **Validación automatizada** de flujos de compra end-to-end
-- **Reducción de tiempo** en validaciones manuales repetitivas
+- **Uniform quality** across different cinema brands- **Calidad uniforme** entre diferentes marcas de cines
 
-### Impacto Esperado
+- **Early detection** of regressions in critical functionalities - **Detección temprana** de regresiones en funcionalidades críticas
 
-- 🚀 **90% reducción** en tiempo de validación manual
-- 🎯 **95% cobertura** de flujos críticos de usuario
-- 📊 **Reportes detallados** con métricas de calidad
-- 🔄 **Integración continua** con CI/CD
+- **Automated validation** of end-to-end purchase flows- **Validación automatizada** de flujos de compra end-to-end
 
-## 📁 Estructura del Proyecto
+- **Reduced time** on repetitive manual validations- **Reducción de tiempo** en validaciones manuales repetitivas
+
+### Expected Impact### Impacto Esperado
+
+- 🚀 **90% reduction** in manual validation time- 🚀 **90% reducción** en tiempo de validación manual
+
+- 🎯 **95% coverage** of critical user flows- 🎯 **95% cobertura** de flujos críticos de usuario
+
+- 📊 **Detailed reports** with quality metrics- 📊 **Reportes detallados** con métricas de calidad
+
+- 🔄 **Continuous integration** with CI/CD- 🔄 **Integración continua** con CI/CD
+
+## 📁 Project Structure## 📁 Estructura del Proyecto
 
 ```
-playwright-template/
-├── 📁 config/                  # Configuraciones por entorno
-│   ├── environments.ts        # URLs y configuraciones por plataforma
-│   └── urls.ts                # Mapeo centralizado de URLs
-├── 📁 core/                   # Funcionalidades base del framework
-│   ├── assertions/            # Aserciones personalizadas
-│   ├── base/                  # Clases base y abstracciones
-│   ├── types/                 # Definiciones de tipos TypeScript
-│   └── webactions/            # Acciones web unificadas
-├── 📁 fixtures/               # Inyección de dependencias por plataforma
-│   ├── cinesa/               # Fixtures específicos de Cinesa
-│   └── uci/                  # Fixtures específicos de UCI
-├── 📁 pageObjectsManagers/    # Page Objects por plataforma
-│   ├── cinesa/               # Page Objects de Cinesa
-│   │   ├── navbar/           # Navegación
-│   │   ├── movies/           # Películas
-│   │   ├── cinemas/          # Cines
-│   │   ├── login/            # Autenticación
-│   │   └── seatPicker/       # Selección de asientos
-│   └── uci/                  # Page Objects de UCI
-├── 📁 tests/                 # Suites de pruebas por plataforma
-│   ├── cinesa/               # Tests de Cinesa (33 casos)
-│   └── uci/                  # Tests de UCI (en desarrollo)
-├── 📁 docs/                  # Documentación del proyecto
-├── 📁 allure-report/         # Reportes HTML generados
-└── 📁 test-results/          # Resultados nativos de Playwright
+
+playwright-template/playwright-template/
+
+├── 📁 config/                  # Environment configurations├── 📁 config/                  # Configuraciones por entorno
+
+│   ├── environments.ts        # URLs and platform configurations  │   ├── environments.ts        # URLs y configuraciones por plataforma
+
+│   └── urls.ts                # Centralized URL mappings│   └── urls.ts                # Mapeo centralizado de URLs
+
+├── 📁 core/                   # Framework base functionalities├── 📁 core/                   # Funcionalidades base del framework
+
+│   ├── assertions/            # Custom assertions│   ├── assertions/            # Aserciones personalizadas
+
+│   ├── base/                  # Base classes and abstractions│   ├── base/                  # Clases base y abstracciones
+
+│   ├── types/                 # TypeScript type definitions│   ├── types/                 # Definiciones de tipos TypeScript
+
+│   └── webactions/            # Unified web actions│   └── webactions/            # Acciones web unificadas
+
+├── 📁 fixtures/               # Dependency injection per platform├── 📁 fixtures/               # Inyección de dependencias por plataforma
+
+│   ├── cinesa/               # Cinesa-specific fixtures│   ├── cinesa/               # Fixtures específicos de Cinesa
+
+│   └── uci/                  # UCI-specific fixtures│   └── uci/                  # Fixtures específicos de UCI
+
+├── 📁 pageObjectsManagers/    # Page Objects per platform├── 📁 pageObjectsManagers/    # Page Objects por plataforma
+
+│   ├── cinesa/               # Cinesa Page Objects│   ├── cinesa/               # Page Objects de Cinesa
+
+│   │   ├── navbar/           # Navigation│   │   ├── navbar/           # Navegación
+
+│   │   ├── movies/           # Movies│   │   ├── movies/           # Películas
+
+│   │   ├── cinemas/          # Cinemas│   │   ├── cinemas/          # Cines
+
+│   │   ├── login/            # Authentication│   │   ├── login/            # Autenticación
+
+│   │   └── seatPicker/       # Seat selection│   │   └── seatPicker/       # Selección de asientos
+
+│   └── uci/                  # UCI Page Objects│   └── uci/                  # Page Objects de UCI
+
+├── 📁 tests/                 # Test suites per platform├── 📁 tests/                 # Suites de pruebas por plataforma
+
+│   ├── cinesa/               # Cinesa tests (33 cases)│   ├── cinesa/               # Tests de Cinesa (33 casos)
+
+│   └── uci/                  # UCI tests (in development)│   └── uci/                  # Tests de UCI (en desarrollo)
+
+├── 📁 docs/                  # Project documentation├── 📁 docs/                  # Documentación del proyecto
+
+├── 📁 allure-report/         # Generated HTML reports├── 📁 allure-report/         # Reportes HTML generados
+
+└── 📁 test-results/          # Playwright native results└── 📁 test-results/          # Resultados nativos de Playwright
+
 ```
 
-## ⚡ Inicio Rápido
+## ⚡ Quick Start## ⚡ Inicio Rápido
 
-### Prerrequisitos
+### Prerequisites### Prerrequisitos
 
-- **Node.js** 18+ 
-- **npm** o **yarn**
-- **Git** configurado
+- **Node.js** 18+ - **Node.js** 18+
 
-### Instalación
+- **npm** or **yarn**- **npm** o **yarn**
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/fcabanilla/playwright-template.git
-cd playwright-template
+- **Git** configured- **Git** configurado
 
-# 2. Instalar dependencias
-npm install
+### Installation### Instalación
 
-# 3. Instalar navegadores de Playwright
-npx playwright install
+`bash`bash
 
-# 4. Verificar instalación
-npm run test:cinesa:navbar
+# 1. Clone repository# 1. Clonar el repositorio
+
+git clone https://github.com/fcabanilla/playwright-template.gitgit clone https://github.com/fcabanilla/playwright-template.git
+
+cd playwright-templatecd playwright-template
+
+# 2. Install dependencies# 2. Instalar dependencias
+
+npm installnpm install
+
+# 3. Install Playwright browsers# 3. Instalar navegadores de Playwright
+
+npx playwright installnpx playwright install
+
+# 4. Verify installation# 4. Verificar instalación
+
+npm run test:cinesa:navbarnpm run test:cinesa:navbar
+
+````
+
+
+
+### Main Commands### Comandos Principales
+
+
+
+#### Test Execution#### Ejecución de Tests
+
+
+
+```bash```bash
+
+# Complete tests per platform# Tests completos por plataforma
+
+npm run test:cinesa              # All Cinesa testsnpm run test:cinesa              # Todos los tests de Cinesa
+
+npm run test:uci                 # All UCI testsnpm run test:uci                 # Todos los tests de UCI
+
+
+
+# Tests by functionality (Cinesa)# Tests por funcionalidad (Cinesa)
+
+npm run test:navbar              # Navigationnpm run test:navbar              # Navegación
+
+npm run test:movies              # Moviesnpm run test:movies              # Películas
+
+npm run test:cinemas             # Cinemasnpm run test:cinemas             # Cines
+
+npm run test:signup              # User registrationnpm run test:signup              # Registro de usuarios
+
+npm run test:seatpicker          # Seat selectionnpm run test:seatpicker          # Selección de asientos
+
+
+
+# UCI specific tests# Tests específicos UCI
+
+npm run test:uci:navbar          # UCI navigationnpm run test:uci:navbar          # Navegación UCI
+
+npm run test:uci:smoke           # UCI smoke testsnpm run test:uci:smoke           # Tests de humo UCI
+
+npm run test:uci:critical        # UCI critical testsnpm run test:uci:critical        # Tests críticos UCI
+
+
+
+# Execution modes# Modos de ejecución
+
+npm run test -- --headed         # With graphical interfacenpm run test -- --headed         # Con interfaz gráfica
+
+npm run test -- --debug          # Step-by-step debug modenpm run test -- --debug          # Modo debug paso a paso
+
+npm run ui                       # Interactive Playwright UInpm run ui                       # Playwright UI interactiva
+
+````
+
+#### Report Generation#### Generación de Reportes
+
+`bash`bash
+
+# Generate and open Allure report# Generar y abrir reporte Allure
+
+npm run report # Generate and open automaticallynpm run report # Genera y abre automáticamente
+
+npm run report:generate # Generate onlynpm run report:generate # Solo generar
+
+npm run report:open # Open existing onlynpm run report:open # Solo abrir existente
+
+npm run report:clean # Clean previous reportsnpm run report:clean # Limpiar reportes anteriores
+
+````
+
+
+
+#### Development and Debug#### Desarrollo y Debug
+
+
+
+```bash```bash
+
+# Code generators# Generadores de código
+
+npm run codegen                  # Cinesa code generationnpm run codegen                  # Cinesa code generation
+
+npm run codegen:uci              # UCI code generationnpm run codegen:uci              # UCI code generation
+
+
+
+# Linting and formatting# Linting y formato
+
+npm run lint                     # Verify code with ESLintnpm run lint                     # Verificar código con ESLint
+
+````
+
+### Environment Configuration### Configuración por Entornos
+
+`bash`bash
+
+# Cinesa - different environments# Cinesa - diferentes entornos
+
+npm run test:cinesa:staging # Staging environmentnpm run test:cinesa:staging # Entorno staging
+
+npm run test:cinesa:dev # Development environmentnpm run test:cinesa:dev # Entorno desarrollo
+
+TEST_ENV=preprod npm run test:cinesa # PreproductionTEST_ENV=preprod npm run test:cinesa # Preproducción
+
+# UCI - different environments # UCI - diferentes entornos
+
+npm run test:uci:staging # Staging environmentnpm run test:uci:staging # Entorno staging
+
+npm run test:uci:dev # Development environmentnpm run test:uci:dev # Entorno desarrollo
+
 ```
 
-### Comandos Principales
 
-#### Ejecución de Tests
 
-```bash
-# Tests completos por plataforma
-npm run test:cinesa              # Todos los tests de Cinesa
-npm run test:uci                 # Todos los tests de UCI
+## 🏗️ System Architecture## 🏗️ Arquitectura del Sistema
 
-# Tests por funcionalidad (Cinesa)
-npm run test:navbar              # Navegación
-npm run test:movies              # Películas
-npm run test:cinemas             # Cines
-npm run test:signup              # Registro de usuarios
-npm run test:seatpicker          # Selección de asientos
 
-# Tests específicos UCI
-npm run test:uci:navbar          # Navegación UCI
-npm run test:uci:smoke           # Tests de humo UCI
-npm run test:uci:critical        # Tests críticos UCI
 
-# Modos de ejecución
-npm run test -- --headed         # Con interfaz gráfica
-npm run test -- --debug          # Modo debug paso a paso
-npm run ui                       # Playwright UI interactiva
+**Framework Layer Architecture:****Arquitectura en Capas del Framework:**
+
+
+
+**Test Layer (Test Layer)****Test Layer (Capa de Pruebas)**
+
+- **Test Cases**: Specific test cases organized by functionality- **Test Cases**: Casos de prueba específicos organizados por funcionalidad
+
+- **Test Fixtures**: Dependency injection system for automatic setup- **Test Fixtures**: Sistema de inyección de dependencias para setup automático
+
+
+
+**Page Object Layer (UI Abstraction Layer)****Page Object Layer (Capa de Abstracción UI)**
+
+- **Page Object Managers**: Centralized managers for UI interactions- **Page Object Managers**: Gestores centralizados para interacciones con UI
+
+- **Cinesa Pages**: Cinesa platform-specific Page Objects- **Cinesa Pages**: Page Objects específicos para la plataforma Cinesa
+
+- **UCI Pages**: UCI platform-specific Page Objects- **UCI Pages**: Page Objects específicos para la plataforma UCI
+
+
+
+**Core Layer (Central Layer)****Core Layer (Capa Central)**
+
+- **WebActions**: Unified API for all browser interactions- **WebActions**: API unificada para todas las interacciones con browser
+
+- **Assertions**: Reusable and extensible validation engine- **Assertions**: Motor de validaciones reutilizable y extensible
+
+- **Base Classes**: Base classes providing common functionality- **Base Classes**: Clases base que proporcionan funcionalidad común
+
+
+
+**Configuration Layer (Configuration Layer)****Configuration Layer (Capa de Configuración)**
+
+- **Environments**: Environment-specific configurations (prod, staging, dev)- **Environments**: Configuraciones específicas por entorno (prod, staging, dev)
+
+- **Playwright Config**: Central framework configuration- **Playwright Config**: Configuración central del framework de testing
+
+
+
+**External Systems:****Sistemas Externos:**
+
+- **Cinesa Website**: Main target platform for testing- **Cinesa Website**: Plataforma principal objetivo de las pruebas
+
+- **UCI Website**: Second supported cinema platform- **UCI Website**: Segunda plataforma de cines soportada
+
+- **Allure Reports**: Detailed reporting system with analytics- **Allure Reports**: Sistema de reportes detallados con analytics
+
+
+
+**Dependency Flow:****Flujo de Dependencias:**
+
 ```
 
-#### Generación de Reportes
+Test Cases → Page Objects → WebActions → BrowserTest Cases → Page Objects → WebActions → Browser
 
-```bash
-# Generar y abrir reporte Allure
-npm run report                   # Genera y abre automáticamente
-npm run report:generate          # Solo generar
-npm run report:open              # Solo abrir existente
-npm run report:clean             # Limpiar reportes anteriores
-```
+Fixtures → Configuration → Environment SetupFixtures → Configuration → Environment Setup
 
-#### Desarrollo y Debug
+All Layers → Allure Reports (output)All Layers → Allure Reports (output)
 
-```bash
-# Generadores de código
-npm run codegen                  # Cinesa code generation
-npm run codegen:uci              # UCI code generation
+````
 
-# Linting y formato
-npm run lint                     # Verificar código con ESLint
-```
 
-### Configuración por Entornos
 
-```bash
-# Cinesa - diferentes entornos
-npm run test:cinesa:staging      # Entorno staging
-npm run test:cinesa:dev          # Entorno desarrollo
-TEST_ENV=preprod npm run test:cinesa  # Preproducción
+### Test Execution Flow### Flujo de Ejecución de Tests
 
-# UCI - diferentes entornos  
-npm run test:uci:staging         # Entorno staging
-npm run test:uci:dev             # Entorno desarrollo
-```
 
-## 🏗️ Arquitectura del Sistema
 
-**Arquitectura en Capas del Framework:**
+**Framework Execution Sequence:****Secuencia de Ejecución del Framework:**
 
-**Test Layer (Capa de Pruebas)**
-- **Test Cases**: Casos de prueba específicos organizados por funcionalidad
-- **Test Fixtures**: Sistema de inyección de dependencias para setup automático
 
-**Page Object Layer (Capa de Abstracción UI)**
-- **Page Object Managers**: Gestores centralizados para interacciones con UI
-- **Cinesa Pages**: Page Objects específicos para la plataforma Cinesa
-- **UCI Pages**: Page Objects específicos para la plataforma UCI
 
-**Core Layer (Capa Central)**
-- **WebActions**: API unificada para todas las interacciones con browser
-- **Assertions**: Motor de validaciones reutilizable y extensible
-- **Base Classes**: Clases base que proporcionan funcionalidad común
+1. **Test Case Initiation**: Test case requests necessary dependencies1. **Test Case Initiation**: El test case solicita las dependencias necesarias
 
-**Configuration Layer (Capa de Configuración)**
-- **Environments**: Configuraciones específicas por entorno (prod, staging, dev)
-- **Playwright Config**: Configuración central del framework de testing
+2. **Fixture Setup**: Fixture system creates Page Object instances2. **Fixture Setup**: El sistema de fixtures crea instancias de Page Objects
 
-**Sistemas Externos:**
-- **Cinesa Website**: Plataforma principal objetivo de las pruebas
-- **UCI Website**: Segunda plataforma de cines soportada
-- **Allure Reports**: Sistema de reportes detallados con analytics
+3. **Page Object Actions**: Page Objects execute specific UI actions3. **Page Object Actions**: Los Page Objects ejecutan acciones específicas de UI
 
-**Flujo de Dependencias:**
-```
-Test Cases → Page Objects → WebActions → Browser
-Fixtures → Configuration → Environment Setup
-All Layers → Allure Reports (output)
-```
+4. **WebActions Layer**: Translates actions to specific Playwright commands4. **WebActions Layer**: Traduce acciones a comandos Playwright específicos
 
-### Flujo de Ejecución de Tests
+5. **Browser Interaction**: Browser executes HTTP interactions and DOM manipulation5. **Browser Interaction**: El browser ejecuta interacciones HTTP y manipulación DOM
 
-**Secuencia de Ejecución del Framework:**
+6. **Website Response**: Website responds with state changes and data6. **Website Response**: El sitio web responde con cambios de estado y datos
 
-1. **Test Case Initiation**: El test case solicita las dependencias necesarias
-2. **Fixture Setup**: El sistema de fixtures crea instancias de Page Objects
-3. **Page Object Actions**: Los Page Objects ejecutan acciones específicas de UI
-4. **WebActions Layer**: Traduce acciones a comandos Playwright específicos
-5. **Browser Interaction**: El browser ejecuta interacciones HTTP y manipulación DOM
-6. **Website Response**: El sitio web responde con cambios de estado y datos
 
-**Flujo de Retorno de Información:**
 
-1. **Browser Results**: El browser retorna resultados de las interacciones
-2. **WebActions Processing**: WebActions procesa y estructura los resultados
-3. **Page Object State**: Los Page Objects actualizan estados y extraen datos
-4. **Test Validation**: El test case evalúa aserciones y validaciones
-5. **Result Reporting**: Los resultados se envían al sistema de reportes
+**Information Return Flow:****Flujo de Retorno de Información:**
 
-**Características del Flujo:**
-- **Timeout Management**: 60 segundos por acción, 30 segundos para navegación
-- **Error Handling**: Retry automático con backoff exponencial
-- **Resource Cleanup**: Liberación automática de recursos al finalizar
-- **Parallel Execution**: Hasta 5 workers simultáneos para optimizar tiempo
 
-## 🚀 Primer PR en ≤ 1 Hora
 
-### Guía para Nuevos Desarrolladores
+1. **Browser Results**: Browser returns interaction results1. **Browser Results**: El browser retorna resultados de las interacciones
 
-#### Paso 1: Setup del Entorno (15 min)
+2. **WebActions Processing**: WebActions processes and structures results2. **WebActions Processing**: WebActions procesa y estructura los resultados
 
-```bash
-# Clonar y configurar
-git clone [repo-url]
-cd playwright-template
-npm install
-npx playwright install
+3. **Page Object State**: Page Objects update states and extract data3. **Page Object State**: Los Page Objects actualizan estados y extraen datos
 
-# Verificar que todo funciona
-npm run test:cinesa:navbar
-```
+4. **Test Validation**: Test case evaluates assertions and validations4. **Test Validation**: El test case evalúa aserciones y validaciones
 
-#### Paso 2: Explorar un Test Existente (15 min)
+5. **Result Reporting**: Results are sent to reporting system5. **Result Reporting**: Los resultados se envían al sistema de reportes
 
-```typescript
-// Examinar: tests/cinesa/navbar/navbar.spec.ts
-import { test } from '../../fixtures/cinesa/playwright.fixtures';
 
-test('Navbar should display logo and main navigation', async ({ 
-  page, 
-  navbarPage 
-}) => {
-  await page.goto('/');
-  await navbarPage.verifyLogoIsVisible();
-  await navbarPage.verifyMainNavigationItems();
-});
-```
 
-#### Paso 3: Crear tu Primer Test (20 min)
+**Flow Characteristics:****Características del Flujo:**
 
-```bash
-# Crear una nueva rama
-git checkout -b feature/mi-primer-test
+- **Timeout Management**: 60 seconds per action, 30 seconds for navigation- **Timeout Management**: 60 segundos por acción, 30 segundos para navegación
 
-# Crear archivo de test
-touch tests/cinesa/mi-test/mi-primer-test.spec.ts
-```
+- **Error Handling**: Automatic retry with exponential backoff- **Error Handling**: Retry automático con backoff exponencial
 
-```typescript
-// Contenido básico para tu primer test
-import { test, expect } from '../../fixtures/cinesa/playwright.fixtures';
+- **Resource Cleanup**: Automatic resource cleanup on completion- **Resource Cleanup**: Liberación automática de recursos al finalizar
 
-test.describe('Mi Primer Test', () => {
-  test('Verificar título de la página', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveTitle(/Cinesa/);
-  });
-});
-```
+- **Parallel Execution**: Up to 5 simultaneous workers for time optimization- **Parallel Execution**: Hasta 5 workers simultáneos para optimizar tiempo
 
-#### Paso 4: Ejecutar y Validar (5 min)
 
-```bash
-# Ejecutar tu test
-npx playwright test tests/cinesa/mi-test/mi-primer-test.spec.ts
 
-# Ver reporte
-npm run report:generate
-npm run report:open
-```
+## 🚀 First PR in ≤ 1 Hour## 🚀 Primer PR en ≤ 1 Hora
 
-#### Paso 5: Crear PR (5 min)
 
-```bash
-# Commit y push
-git add .
-git commit -m "feat: agregar mi primer test de título"
-git push origin feature/mi-primer-test
 
-# Crear PR en GitHub con la plantilla proporcionada
-```
+### Guide for New Developers### Guía para Nuevos Desarrolladores
 
-## 📋 Estado del Proyecto
 
-### Métricas Actuales
 
-- ✅ **33 Test Cases** implementados (Cinesa)
-- ✅ **5 Áreas funcionales** cubiertas
-- ✅ **88.2% Tasa de éxito** en ejecuciones
-- ✅ **100% Integración** con Azure DevOps
-- 🔄 **UCI Tests** en desarrollo
+#### Step 1: Environment Setup (15 min)#### Paso 1: Setup del Entorno (15 min)
 
-### Roadmap
 
-#### Q4 2024
+
+```bash```bash
+
+# Clone and configure# Clonar y configurar
+
+git clone [repo-url]git clone [repo-url]
+
+cd playwright-templatecd playwright-template
+
+npm installnpm install
+
+npx playwright installnpx playwright install
+
+
+
+# Verify everything works# Verificar que todo funciona
+
+npm run test:cinesa:navbarnpm run test:cinesa:navbar
+
+````
+
+#### Step 2: Explore an Existing Test (15 min)#### Paso 2: Explorar un Test Existente (15 min)
+
+`typescript`typescript
+
+// Examine: tests/cinesa/navbar/navbar.spec.ts// Examinar: tests/cinesa/navbar/navbar.spec.ts
+
+import { test } from '../../fixtures/cinesa/playwright.fixtures';import { test } from '../../fixtures/cinesa/playwright.fixtures';
+
+test('Navbar should display logo and main navigation', async ({ test('Navbar should display logo and main navigation', async ({
+
+page, page,
+
+navbarPage navbarPage
+
+}) => {}) => {
+
+await page.goto('/'); await page.goto('/');
+
+await navbarPage.verifyLogoIsVisible(); await navbarPage.verifyLogoIsVisible();
+
+await navbarPage.verifyMainNavigationItems(); await navbarPage.verifyMainNavigationItems();
+
+});});
+
+````
+
+
+
+#### Step 3: Create Your First Test (20 min)#### Paso 3: Crear tu Primer Test (20 min)
+
+
+
+```bash```bash
+
+# Create new branch# Crear una nueva rama
+
+git checkout -b feature/my-first-testgit checkout -b feature/mi-primer-test
+
+
+
+# Create test file# Crear archivo de test
+
+touch tests/cinesa/my-test/my-first-test.spec.tstouch tests/cinesa/mi-test/mi-primer-test.spec.ts
+
+````
+
+`typescript`typescript
+
+// Basic content for your first test// Contenido básico para tu primer test
+
+import { test, expect } from '../../fixtures/cinesa/playwright.fixtures';import { test, expect } from '../../fixtures/cinesa/playwright.fixtures';
+
+test.describe('My First Test', () => {test.describe('Mi Primer Test', () => {
+
+test('Verify page title', async ({ page }) => { test('Verificar título de la página', async ({ page }) => {
+
+    await page.goto('/');    await page.goto('/');
+
+    await expect(page).toHaveTitle(/Cinesa/);    await expect(page).toHaveTitle(/Cinesa/);
+
+}); });
+
+});});
+
+````
+
+
+
+#### Step 4: Execute and Validate (5 min)#### Paso 4: Ejecutar y Validar (5 min)
+
+
+
+```bash```bash
+
+# Execute your test# Ejecutar tu test
+
+npx playwright test tests/cinesa/my-test/my-first-test.spec.tsnpx playwright test tests/cinesa/mi-test/mi-primer-test.spec.ts
+
+
+
+# View report# Ver reporte
+
+npm run report:generatenpm run report:generate
+
+npm run report:opennpm run report:open
+
+````
+
+#### Step 5: Create PR (5 min)#### Paso 5: Crear PR (5 min)
+
+`bash`bash
+
+# Commit and push# Commit y push
+
+git add .git add .
+
+git commit -m "feat: add my first title test"git commit -m "feat: agregar mi primer test de título"
+
+git push origin feature/my-first-testgit push origin feature/mi-primer-test
+
+# Create PR on GitHub with provided template# Crear PR en GitHub con la plantilla proporcionada
+
+````
+
+
+
+## 📋 Project Status## 📋 Estado del Proyecto
+
+
+
+### Current Metrics### Métricas Actuales
+
+
+
+- ✅ **33 Test Cases** implemented (Cinesa)- ✅ **33 Test Cases** implementados (Cinesa)
+
+- ✅ **5 Functional Areas** covered- ✅ **5 Áreas funcionales** cubiertas
+
+- ✅ **88.2% Success Rate** in executions- ✅ **88.2% Tasa de éxito** en ejecuciones
+
+- ✅ **100% Integration** with Azure DevOps- ✅ **100% Integración** con Azure DevOps
+
+- 🔄 **UCI Tests** in development- 🔄 **UCI Tests** en desarrollo
+
+
+
+### Roadmap### Roadmap
+
+
+
+#### Q4 2024#### Q4 2024
+
 - ✅ Framework base Cinesa completo
-- ✅ Integración Allure 3 con tema oscuro
-- ✅ Azure DevOps complete setup
+
+- ✅ Complete Cinesa base framework- ✅ Integración Allure 3 con tema oscuro
+
+- ✅ Allure 3 integration with dark theme- ✅ Azure DevOps complete setup
+
+- ✅ Complete Azure DevOps setup
 
 #### Q1 2025
-- 🔄 Expansión UCI Cinemas (en progreso)
-- 📋 API testing integration
-- 🎨 Visual regression testing
 
-#### Q2 2025
+#### Q1 2025- 🔄 Expansión UCI Cinemas (en progreso)
+
+- 📋 API testing integration
+
+- 🔄 UCI Cinemas expansion (in progress)- 🎨 Visual regression testing
+
+- 📋 API testing integration
+
+- 🎨 Visual regression testing#### Q2 2025
+
 - 🚀 CI/CD GitHub Actions
-- 📱 Mobile responsive testing
+
+#### Q2 2025- 📱 Mobile responsive testing
+
 - 📊 Performance benchmarking
 
-## 🔗 Enlaces Importantes
+- 🚀 CI/CD GitHub Actions
+
+- 📱 Mobile responsive testing## 🔗 Enlaces Importantes
+
+- 📊 Performance benchmarking
 
 - [Documentación Playwright](https://playwright.dev/)
-- [Allure Reports](https://docs.qameta.io/allure/)
-- [Azure DevOps Project](https://dev.azure.com/[org]/[project])
-- [Architectural Decision Records](./docs/adrs/)
 
-## ❓ FAQ
+## 🔗 Important Links- [Allure Reports](https://docs.qameta.io/allure/)
+
+- [Azure DevOps Project](https://dev.azure.com/[org]/[project])
+
+- [Playwright Documentation](https://playwright.dev/)- [Architectural Decision Records](./docs/adrs/)
+
+- [Allure Reports](https://docs.qameta.io/allure/)
+
+- [Azure DevOps Project](https://dev.azure.com/[org]/[project])## ❓ FAQ
+
+- [Architectural Decision Records](./docs/adrs/)
 
 ### ¿Cómo agregar una nueva plataforma de cines?
 
-1. Crear estructura en `pageObjectsManagers/nueva-plataforma/`
-2. Agregar configuración en `config/environments.ts`
-3. Crear fixtures en `fixtures/nueva-plataforma/`
-4. Configurar proyecto en `playwright.config.ts`
+## ❓ FAQ
 
-### ¿Por qué algunos tests fallan con "Cloudflare protection"?
+1. Crear estructura en `pageObjectsManagers/nueva-plataforma/`
+
+### How to add a new cinema platform?2. Agregar configuración en `config/environments.ts`
+
+3. Crear fixtures en `fixtures/nueva-plataforma/`
+
+1. Create structure in `pageObjectsManagers/new-platform/`4. Configurar proyecto en `playwright.config.ts`
+
+2. Add configuration in `config/environments.ts`
+
+3. Create fixtures in `fixtures/new-platform/`### ¿Por qué algunos tests fallan con "Cloudflare protection"?
+
+4. Configure project in `playwright.config.ts`
 
 UCI Cinemas usa protección Cloudflare. Usa el método `navigateToWithCloudflareHandling()` para el primer acceso y asegúrate de tener `storageState` configurado.
 
+### Why do some tests fail with "Cloudflare protection"?
+
 ### ¿Cómo ejecutar tests en paralelo de forma segura?
 
+UCI Cinemas uses Cloudflare protection. Use the `navigateToWithCloudflareHandling()` method for first access and ensure you have `storageState` configured.
+
 ```bash
-# Para tests independientes
+
+### How to run tests in parallel safely?# Para tests independientes
+
 npm run test -- --workers=5
 
-# Para tests con dependencias
-npm run test -- --workers=1
+```bash
+
+# For independent tests# Para tests con dependencias
+
+npm run test -- --workers=5npm run test -- --workers=1
+
 ```
 
-### ¿Cómo agregar un nuevo test case?
+# For tests with dependencies
+
+npm run test -- --workers=1### ¿Cómo agregar un nuevo test case?
+
+```
 
 1. Identificar la funcionalidad y plataforma
-2. Ubicar o crear el Page Object correspondiente
-3. Crear el archivo `.spec.ts` en la carpeta apropiada
-4. Usar fixtures existentes para inyección de dependencias
-5. Agregar tags apropiados (`@smoke`, `@critical`, etc.)
 
-### ¿Cómo interpretar los reportes Allure?
+### How to add a new test case?2. Ubicar o crear el Page Object correspondiente
+
+3. Crear el archivo `.spec.ts` en la carpeta apropiada
+
+1. Identify functionality and platform4. Usar fixtures existentes para inyección de dependencias
+
+2. Locate or create corresponding Page Object5. Agregar tags apropiados (`@smoke`, `@critical`, etc.)
+
+3. Create `.spec.ts` file in appropriate folder
+
+4. Use existing fixtures for dependency injection### ¿Cómo interpretar los reportes Allure?
+
+5. Add appropriate tags (`@smoke`, `@critical`, etc.)
 
 - **🔒 Cloudflare Protection Issues**: Problemas de acceso
-- **🎭 Modal & Overlay Issues**: Elementos que bloquean interacciones
-- **🧭 Navigation & URL Issues**: Problemas de navegación
-- **🎬 Film Content Issues**: Problemas con contenido de películas
-- **🏢 Cinema Selection Issues**: Problemas con selección de cines
 
-### ¿Qué hacer si un test está flaky (inestable)?
+### How to interpret Allure reports?- **🎭 Modal & Overlay Issues**: Elementos que bloquean interacciones
+
+- **🧭 Navigation & URL Issues**: Problemas de navegación
+
+- **🔒 Cloudflare Protection Issues**: Access problems- **🎬 Film Content Issues**: Problemas con contenido de películas
+
+- **🎭 Modal & Overlay Issues**: Elements blocking interactions- **🏢 Cinema Selection Issues**: Problemas con selección de cines
+
+- **🧭 Navigation & URL Issues**: Navigation problems
+
+- **🎬 Film Content Issues**: Movie content problems### ¿Qué hacer si un test está flaky (inestable)?
+
+- **🏢 Cinema Selection Issues**: Cinema selection problems
 
 1. Revisar selectores CSS - podrían haber cambiado
-2. Verificar timeouts - ajustar en `config/environments.ts`
-3. Comprobar overlays - usar `clickWithOverlayHandling()`
-4. Revisar estado de la aplicación - validar precondiciones
 
-### ¿Cómo contribuir con nuevas funcionalidades?
+### What to do if a test is flaky (unstable)?2. Verificar timeouts - ajustar en `config/environments.ts`
+
+3. Comprobar overlays - usar `clickWithOverlayHandling()`
+
+1. Review CSS selectors - they might have changed4. Revisar estado de la aplicación - validar precondiciones
+
+2. Check timeouts - adjust in `config/environments.ts`
+
+3. Check overlays - use `clickWithOverlayHandling()`### ¿Cómo contribuir con nuevas funcionalidades?
+
+4. Review application state - validate preconditions
 
 1. Revisar [CONTRIBUTING.md](./CONTRIBUTING.md)
-2. Crear issue en Azure DevOps o GitHub
-3. Seguir convenciones de código en [STYLEGUIDE.md](./docs/STYLEGUIDE.md)
-4. Crear PR con tests incluidos
 
-### ¿Cómo configurar diferentes entornos?
+### How to contribute new functionalities?2. Crear issue en Azure DevOps o GitHub
+
+3. Seguir convenciones de código en [STYLEGUIDE.md](./docs/STYLEGUIDE.md)
+
+1. Review [CONTRIBUTING.md](./CONTRIBUTING.md)4. Crear PR con tests incluidos
+
+2. Create issue in Azure DevOps or GitHub
+
+3. Follow code conventions in [STYLEGUIDE.md](./docs/STYLEGUIDE.md)### ¿Cómo configurar diferentes entornos?
+
+4. Create PR with included tests
 
 ```bash
-# Variables de entorno
-export TEST_ENV=staging
-export CINESA_BASE_URL=https://staging.cinesa.es
-export UCI_BASE_URL=https://staging.uci.it
 
-# O usar comandos específicos
-npm run test:cinesa:staging
+### How to configure different environments?# Variables de entorno
+
+export TEST_ENV=staging
+
+```bashexport CINESA_BASE_URL=https://staging.cinesa.es
+
+# Environment variablesexport UCI_BASE_URL=https://staging.uci.it
+
+export TEST_ENV=staging
+
+export CINESA_BASE_URL=https://staging.cinesa.es# O usar comandos específicos
+
+export UCI_BASE_URL=https://staging.uci.itnpm run test:cinesa:staging
+
 npm run test:uci:dev
+
+# Or use specific commands```
+
+npm run test:cinesa:staging
+
+npm run test:uci:dev---
+
 ```
 
----
+**Versión del Framework**: 1.0.0
 
-**Versión del Framework**: 1.0.0  
-**Última Actualización**: 2 de octubre de 2025  
+---**Última Actualización**: 2 de octubre de 2025
+
 **Contacto**: Federico Cabanilla (@fcabanilla)
 
-## 🚦 Ejecución Rápida por Entornos
+**Framework Version**: 1.0.0
+
+**Last Updated**: October 2, 2025  ## 🚦 Ejecución Rápida por Entornos
+
+**Contact**: Federico Cabanilla (@fcabanilla)
 
 ### 🔵 Producción (sin Cloudflare)
 
+## 🚦 Quick Execution by Environments
+
 ```bash
-npm run test:cinesa
+
+### 🔵 Production (without Cloudflare)npm run test:cinesa
+
 # O con interfaz gráfica
-npx playwright test --project=Cinesa --headed
+
+```bashnpx playwright test --project=Cinesa --headed
+
+npm run test:cinesa```
+
+# Or with graphical interface
+
+npx playwright test --project=Cinesa --headed### 🟠 Preproducción (con Cloudflare)
+
 ```
 
-### 🟠 Preproducción (con Cloudflare)
-
 1. **Generar estado de sesión:**
-   ```bash
+
+### 🟠 Preproduction (with Cloudflare)   ```bash
+
    npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
-   ```
 
-2. **Ejecutar tests:**
+1. **Generate session state:**   ```
+
    ```bash
-   npm run test:cinesa:preprod
-   ```
 
-## Table of Contents
+   npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed2. **Ejecutar tests:**
+
+   ```   ```bash
+
+   npm run test:cinesa:preprod
+
+2. **Execute tests:**   ```
+
+   ```bash
+
+   npm run test:cinesa:preprod## Table of Contents
+
+   ```
 
 - [Playwright Template for Automated Testing](#playwright-template-for-automated-testing)
-  - [Table of Contents](#table-of-contents)
+
+---  - [Table of Contents](#table-of-contents)
+
   - [Features](#features)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+
+> **Available in other languages:**  - [Prerequisites](#prerequisites)
+
+> - [Español](./README.es.md) | **English** (current)  - [Installation](#installation)
+
   - [Project Structure](#project-structure)
   - [Usage](#usage)
     - [Running Tests](#running-tests)
@@ -1014,3 +1364,4 @@ Este README actualizado proporciona una guía completa para la instalación, con
 **Notas:**
 - No subas archivos de sesión reales al repo (`.gitignore`).
 - Solo para preproducción con Cloudflare.
+````
