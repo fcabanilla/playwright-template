@@ -4,16 +4,16 @@ This guide defines code conventions, style, and best practices to maintain consi
 
 ## 📋 Table of Contents
 
-- [General Principles](#-general-principles)
-- [Naming Conventions](#-naming-conventions)
-- [Layer Structure](#-layer-structure)
-- [TypeScript Guidelines](#-typescript-guidelines)
-- [Page Objects Pattern](#-page-objects-pattern)
-- [Test Organization](#-test-organization)
-- [Documentation (JSDoc)](#-documentation-jsdoc)
-- [Logging and Debugging](#-logging-and-debugging)
-- [Testing Best Practices](#-testing-best-practices)
-- [Repository Examples](#-repository-examples)
+- [General Principles](#general-principles)
+- [Naming Conventions](#naming-conventions)
+- [Layer Structure](#layer-structure)
+- [TypeScript Guidelines](#typescript-guidelines)
+- [Page Objects Pattern](#page-objects-pattern)
+- [Test Organization](#test-organization)
+- [Documentation (JSDoc)](#documentation-jsdoc)
+- [Logging and Debugging](#logging-and-debugging)
+- [Testing Best Practices](#testing-best-practices)
+- [Repository Examples](#repository-examples)
 
 ## 🎯 General Principles
 
@@ -45,7 +45,7 @@ async function selMov(title: string): Promise<void>;
 
 ### Files and Directories
 
-```
+```text
 # ✅ Correct file structure
 pageObjectsManagers/
 ├── cinesa/
@@ -124,7 +124,7 @@ test.describe('Cinesa Navbar Navigation', () => {
 
 ### Layer Architecture
 
-```
+```text
 📁 Test Layer (tests/)
     ├── *.spec.ts              # Test cases
     ├── *.data.ts              # Test data

@@ -4,15 +4,15 @@ This document outlines the system architecture, design decisions, and structural
 
 ## 📋 Table of Contents
 
-- [System Overview](#-system-overview)
-- [Architectural Patterns](#-architectural-patterns)
-- [Component Architecture](#-component-architecture)
-- [Data Flow](#-data-flow)
-- [Platform Integration](#-platform-integration)
-- [Environment Configuration](#-environment-configuration)
-- [Testing Strategy](#-testing-strategy)
-- [Scalability and Maintenance](#-scalability-and-maintenance)
-- [Technology Decisions](#-technology-decisions)
+- [System Overview](#system-overview)
+- [Architectural Patterns](#architectural-patterns)
+- [Component Architecture](#component-architecture)
+- [Data Flow](#data-flow)
+- [Platform Integration](#platform-integration)
+- [Environment Configuration](#environment-configuration)
+- [Testing Strategy](#testing-strategy)
+- [Scalability and Maintenance](#scalability-and-maintenance)
+- [Technology Decisions](#technology-decisions)
 
 ## 🎯 System Overview
 
@@ -28,14 +28,14 @@ The framework is designed to perform end-to-end testing of cinema platforms with
 
 ### Stakeholders
 
-**Primary Stakeholders**
+#### Primary Stakeholders
 
 - QA Engineers: Daily test execution and maintenance
 - Developers: Integration with CI/CD pipelines
 - Product Teams: Feature validation and regression testing
 - DevOps: Infrastructure and deployment automation
 
-**Secondary Stakeholders**
+#### Secondary Stakeholders
 
 - Business Analysts: Acceptance criteria validation
 - Support Teams: Issue reproduction and diagnosis
@@ -49,7 +49,7 @@ The framework is designed to perform end-to-end testing of cinema platforms with
 
 The framework follows an enhanced Page Object Model with clear separation of concerns:
 
-```
+```text
 Component Structure:
 ├── Page Objects (pageObjectsManagers/)
 │   ├── Component Pages (.page.ts)
@@ -135,9 +135,9 @@ const moviePage = new MoviePage(page, config);
 
 ### Layer Architecture
 
-**Layer 1: Test Orchestration**
+#### Layer 1: Test Orchestration
 
-```
+```text
 Tests (tests/)
 ├── Cinesa Platform Tests
 │   ├── User Flows (booking/, navigation/)
@@ -152,9 +152,9 @@ Tests (tests/)
     └── Test Helpers
 ```
 
-**Layer 2: Page Abstraction**
+#### Layer 2: Page Abstraction
 
-```
+```text
 Page Objects (pageObjectsManagers/)
 ├── Cinesa Components
 │   ├── Navigation (navbar/, footer/)
@@ -171,9 +171,9 @@ Page Objects (pageObjectsManagers/)
     └── Generic Form Handlers
 ```
 
-**Layer 3: Core Functionality**
+#### Layer 3: Core Functionality
 
-```
+```text
 Core Services (core/)
 ├── WebActions
 │   ├── Browser Interactions
@@ -193,9 +193,9 @@ Core Services (core/)
     └── Test Data Models
 ```
 
-**Layer 4: Configuration**
+#### Layer 4: Configuration
 
-```
+```text
 Configuration (config/)
 ├── Environment Configs
 │   ├── Production Settings
@@ -250,7 +250,7 @@ Configuration (config/)
 
 **Environment Loading**:
 
-```
+```text
 Environment Selection → Configuration Loading → Platform Initialization
 
 Environment Variables (CI/CD)
@@ -274,7 +274,7 @@ Test Execution
 
 **Test Data Flow**:
 
-```
+```text
 Static Data Files → Data Builders → Test Fixtures → Test Execution
 
 JSON Data Files (.data.ts)
@@ -365,7 +365,7 @@ Cleanup and Reset
 
 **Multi-Environment Support**:
 
-```
+```text
 Environment Hierarchy:
 ├── Production (www.cinesa.es, www.uci.it)
 ├── Staging (staging.cinesa.es, staging.uci.it)
@@ -408,7 +408,7 @@ const environments = {
 
 **Multi-Browser Strategy**:
 
-```
+```text
 Browser Matrix:
 ├── Chrome (Latest, Latest-1)
 ├── Firefox (Latest, ESR)
@@ -469,7 +469,7 @@ Browser Matrix:
 
 **Data Management Approach**:
 
-```
+```text
 Test Data Hierarchy:
 ├── Static Data (JSON files)
 ├── Generated Data (Builders/Factories)

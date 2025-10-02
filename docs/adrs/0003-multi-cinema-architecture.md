@@ -33,11 +33,31 @@ El proyecto debe soportar múltiples cadenas de cines (inicialmente Cinesa y UCI
 
 ### Opción Elegida
 
-**Arquitectura Multi-Cinema con Namespaces Separados por Plataforma**
+#### Arquitectura multi-cinema con separación por plataforma
 
-Implementar una estructura organizacional que separe completamente cada plataforma de cinema en su propio namespace, manteniendo un core compartido para funcionalidades comunes.
+Implementaremos una arquitectura que permita gestionar múltiples cadenas de cines (Cinesa, UCI) con componentes compartidos y específicos por plataforma.
 
+```text
+playwright-template/
+├── pageObjectsManagers/
+│   ├── cinesa/           # Componentes específicos Cinesa
+│   ├── uci/              # Componentes específicos UCI
+│   └── shared/           # Componentes reutilizables
+├── tests/
+│   ├── cinesa/           # Tests específicos Cinesa
+│   ├── uci/              # Tests específicos UCI
+│   └── shared/           # Tests comunes
+├── fixtures/
+│   ├── cinesa.fixtures.ts
+│   ├── uci.fixtures.ts
+│   └── shared.fixtures.ts
+└── config/
+    ├── cinesa.config.ts
+    ├── uci.config.ts
+    └── base.config.ts
 ```
+
+```text
 playwright-template/
 ├── core/                    # Shared abstractions
 ├── config/                  # Environment configurations

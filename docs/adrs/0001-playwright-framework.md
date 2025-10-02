@@ -34,7 +34,7 @@ El proyecto requiere un framework de automatización de pruebas end-to-end robus
 
 ### Opción Elegida
 
-**Playwright v1.50+ como framework principal de automatización**
+#### Playwright v1.50+ como framework principal de automatización
 
 Playwright será el framework base para toda la automatización de tests end-to-end, proporcionando la funcionalidad core para interacción con browsers y validación de aplicaciones web.
 

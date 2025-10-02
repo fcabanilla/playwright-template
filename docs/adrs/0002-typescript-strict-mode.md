@@ -33,7 +33,7 @@ El framework de automatización requiere type safety, mantenibilidad a largo pla
 
 ### Opción Elegida
 
-**TypeScript 5.8+ en modo estricto para toda la base de código**
+#### TypeScript 5.8+ en modo estricto para toda la base de código
 
 Implementar TypeScript con configuración estricta (`strict: true`) para todos los archivos del proyecto, incluyendo tests, Page Objects, configuraciones y utilities.
 
