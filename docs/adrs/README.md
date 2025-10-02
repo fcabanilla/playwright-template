@@ -74,7 +74,7 @@ Crea un ADR cuando:
 
 ### Template de Filename
 
-```
+```text
 XXXX-brief-decision-title.md
 ```
 

@@ -66,7 +66,7 @@ git checkout -b docs/improved-area
 
 We follow **Conventional Commits** for clear messages and automation:
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]
