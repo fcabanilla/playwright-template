@@ -1,6 +1,403 @@
-# Playwright Template for Automated Testing
+# 🎬 Cinema Multi-Platform Test Automation Framework
 
-This project is a modern base template for building scalable, maintainable automated tests using [Playwright](https://playwright.dev/). It incorporates best practices like the Page Object Model, custom fixtures, automated reporting with Allure, and CI/CD integration.
+Framework de automatización de pruebas end-to-end para múltiples cadenas de cines utilizando **Playwright** con **TypeScript**. Soporta **Cinesa** (España) y **UCI Cinemas** (Italia) con arquitectura escalable para futuras expansiones.
+
+## 🎯 Propósito del Proyecto
+
+Este proyecto resuelve la necesidad de **automatización de pruebas consistente** para múltiples plataformas de cines, garantizando:
+
+- **Calidad uniforme** entre diferentes marcas de cines
+- **Detección temprana** de regresiones en funcionalidades críticas
+- **Validación automatizada** de flujos de compra end-to-end
+- **Reducción de tiempo** en validaciones manuales repetitivas
+
+### Impacto Esperado
+
+- 🚀 **90% reducción** en tiempo de validación manual
+- 🎯 **95% cobertura** de flujos críticos de usuario
+- 📊 **Reportes detallados** con métricas de calidad
+- 🔄 **Integración continua** con CI/CD
+
+## 📁 Estructura del Proyecto
+
+```
+playwright-template/
+├── 📁 config/                  # Configuraciones por entorno
+│   ├── environments.ts        # URLs y configuraciones por plataforma
+│   └── urls.ts                # Mapeo centralizado de URLs
+├── 📁 core/                   # Funcionalidades base del framework
+│   ├── assertions/            # Aserciones personalizadas
+│   ├── base/                  # Clases base y abstracciones
+│   ├── types/                 # Definiciones de tipos TypeScript
+│   └── webactions/            # Acciones web unificadas
+├── 📁 fixtures/               # Inyección de dependencias por plataforma
+│   ├── cinesa/               # Fixtures específicos de Cinesa
+│   └── uci/                  # Fixtures específicos de UCI
+├── 📁 pageObjectsManagers/    # Page Objects por plataforma
+│   ├── cinesa/               # Page Objects de Cinesa
+│   │   ├── navbar/           # Navegación
+│   │   ├── movies/           # Películas
+│   │   ├── cinemas/          # Cines
+│   │   ├── login/            # Autenticación
+│   │   └── seatPicker/       # Selección de asientos
+│   └── uci/                  # Page Objects de UCI
+├── 📁 tests/                 # Suites de pruebas por plataforma
+│   ├── cinesa/               # Tests de Cinesa (33 casos)
+│   └── uci/                  # Tests de UCI (en desarrollo)
+├── 📁 docs/                  # Documentación del proyecto
+├── 📁 allure-report/         # Reportes HTML generados
+└── 📁 test-results/          # Resultados nativos de Playwright
+```
+
+## ⚡ Inicio Rápido
+
+### Prerrequisitos
+
+- **Node.js** 18+ 
+- **npm** o **yarn**
+- **Git** configurado
+
+### Instalación
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/fcabanilla/playwright-template.git
+cd playwright-template
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Instalar navegadores de Playwright
+npx playwright install
+
+# 4. Verificar instalación
+npm run test:cinesa:navbar
+```
+
+### Comandos Principales
+
+#### Ejecución de Tests
+
+```bash
+# Tests completos por plataforma
+npm run test:cinesa              # Todos los tests de Cinesa
+npm run test:uci                 # Todos los tests de UCI
+
+# Tests por funcionalidad (Cinesa)
+npm run test:navbar              # Navegación
+npm run test:movies              # Películas
+npm run test:cinemas             # Cines
+npm run test:signup              # Registro de usuarios
+npm run test:seatpicker          # Selección de asientos
+
+# Tests específicos UCI
+npm run test:uci:navbar          # Navegación UCI
+npm run test:uci:smoke           # Tests de humo UCI
+npm run test:uci:critical        # Tests críticos UCI
+
+# Modos de ejecución
+npm run test -- --headed         # Con interfaz gráfica
+npm run test -- --debug          # Modo debug paso a paso
+npm run ui                       # Playwright UI interactiva
+```
+
+#### Generación de Reportes
+
+```bash
+# Generar y abrir reporte Allure
+npm run report                   # Genera y abre automáticamente
+npm run report:generate          # Solo generar
+npm run report:open              # Solo abrir existente
+npm run report:clean             # Limpiar reportes anteriores
+```
+
+#### Desarrollo y Debug
+
+```bash
+# Generadores de código
+npm run codegen                  # Cinesa code generation
+npm run codegen:uci              # UCI code generation
+
+# Linting y formato
+npm run lint                     # Verificar código con ESLint
+```
+
+### Configuración por Entornos
+
+```bash
+# Cinesa - diferentes entornos
+npm run test:cinesa:staging      # Entorno staging
+npm run test:cinesa:dev          # Entorno desarrollo
+TEST_ENV=preprod npm run test:cinesa  # Preproducción
+
+# UCI - diferentes entornos  
+npm run test:uci:staging         # Entorno staging
+npm run test:uci:dev             # Entorno desarrollo
+```
+
+## 🏗️ Arquitectura del Sistema
+
+**Arquitectura en Capas del Framework:**
+
+**Test Layer (Capa de Pruebas)**
+- **Test Cases**: Casos de prueba específicos organizados por funcionalidad
+- **Test Fixtures**: Sistema de inyección de dependencias para setup automático
+
+**Page Object Layer (Capa de Abstracción UI)**
+- **Page Object Managers**: Gestores centralizados para interacciones con UI
+- **Cinesa Pages**: Page Objects específicos para la plataforma Cinesa
+- **UCI Pages**: Page Objects específicos para la plataforma UCI
+
+**Core Layer (Capa Central)**
+- **WebActions**: API unificada para todas las interacciones con browser
+- **Assertions**: Motor de validaciones reutilizable y extensible
+- **Base Classes**: Clases base que proporcionan funcionalidad común
+
+**Configuration Layer (Capa de Configuración)**
+- **Environments**: Configuraciones específicas por entorno (prod, staging, dev)
+- **Playwright Config**: Configuración central del framework de testing
+
+**Sistemas Externos:**
+- **Cinesa Website**: Plataforma principal objetivo de las pruebas
+- **UCI Website**: Segunda plataforma de cines soportada
+- **Allure Reports**: Sistema de reportes detallados con analytics
+
+**Flujo de Dependencias:**
+```
+Test Cases → Page Objects → WebActions → Browser
+Fixtures → Configuration → Environment Setup
+All Layers → Allure Reports (output)
+```
+
+### Flujo de Ejecución de Tests
+
+**Secuencia de Ejecución del Framework:**
+
+1. **Test Case Initiation**: El test case solicita las dependencias necesarias
+2. **Fixture Setup**: El sistema de fixtures crea instancias de Page Objects
+3. **Page Object Actions**: Los Page Objects ejecutan acciones específicas de UI
+4. **WebActions Layer**: Traduce acciones a comandos Playwright específicos
+5. **Browser Interaction**: El browser ejecuta interacciones HTTP y manipulación DOM
+6. **Website Response**: El sitio web responde con cambios de estado y datos
+
+**Flujo de Retorno de Información:**
+
+1. **Browser Results**: El browser retorna resultados de las interacciones
+2. **WebActions Processing**: WebActions procesa y estructura los resultados
+3. **Page Object State**: Los Page Objects actualizan estados y extraen datos
+4. **Test Validation**: El test case evalúa aserciones y validaciones
+5. **Result Reporting**: Los resultados se envían al sistema de reportes
+
+**Características del Flujo:**
+- **Timeout Management**: 60 segundos por acción, 30 segundos para navegación
+- **Error Handling**: Retry automático con backoff exponencial
+- **Resource Cleanup**: Liberación automática de recursos al finalizar
+- **Parallel Execution**: Hasta 5 workers simultáneos para optimizar tiempo
+
+## 🚀 Primer PR en ≤ 1 Hora
+
+### Guía para Nuevos Desarrolladores
+
+#### Paso 1: Setup del Entorno (15 min)
+
+```bash
+# Clonar y configurar
+git clone [repo-url]
+cd playwright-template
+npm install
+npx playwright install
+
+# Verificar que todo funciona
+npm run test:cinesa:navbar
+```
+
+#### Paso 2: Explorar un Test Existente (15 min)
+
+```typescript
+// Examinar: tests/cinesa/navbar/navbar.spec.ts
+import { test } from '../../fixtures/cinesa/playwright.fixtures';
+
+test('Navbar should display logo and main navigation', async ({ 
+  page, 
+  navbarPage 
+}) => {
+  await page.goto('/');
+  await navbarPage.verifyLogoIsVisible();
+  await navbarPage.verifyMainNavigationItems();
+});
+```
+
+#### Paso 3: Crear tu Primer Test (20 min)
+
+```bash
+# Crear una nueva rama
+git checkout -b feature/mi-primer-test
+
+# Crear archivo de test
+touch tests/cinesa/mi-test/mi-primer-test.spec.ts
+```
+
+```typescript
+// Contenido básico para tu primer test
+import { test, expect } from '../../fixtures/cinesa/playwright.fixtures';
+
+test.describe('Mi Primer Test', () => {
+  test('Verificar título de la página', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveTitle(/Cinesa/);
+  });
+});
+```
+
+#### Paso 4: Ejecutar y Validar (5 min)
+
+```bash
+# Ejecutar tu test
+npx playwright test tests/cinesa/mi-test/mi-primer-test.spec.ts
+
+# Ver reporte
+npm run report:generate
+npm run report:open
+```
+
+#### Paso 5: Crear PR (5 min)
+
+```bash
+# Commit y push
+git add .
+git commit -m "feat: agregar mi primer test de título"
+git push origin feature/mi-primer-test
+
+# Crear PR en GitHub con la plantilla proporcionada
+```
+
+## 📋 Estado del Proyecto
+
+### Métricas Actuales
+
+- ✅ **33 Test Cases** implementados (Cinesa)
+- ✅ **5 Áreas funcionales** cubiertas
+- ✅ **88.2% Tasa de éxito** en ejecuciones
+- ✅ **100% Integración** con Azure DevOps
+- 🔄 **UCI Tests** en desarrollo
+
+### Roadmap
+
+#### Q4 2024
+- ✅ Framework base Cinesa completo
+- ✅ Integración Allure 3 con tema oscuro
+- ✅ Azure DevOps complete setup
+
+#### Q1 2025
+- 🔄 Expansión UCI Cinemas (en progreso)
+- 📋 API testing integration
+- 🎨 Visual regression testing
+
+#### Q2 2025
+- 🚀 CI/CD GitHub Actions
+- 📱 Mobile responsive testing
+- 📊 Performance benchmarking
+
+## 🔗 Enlaces Importantes
+
+- [Documentación Playwright](https://playwright.dev/)
+- [Allure Reports](https://docs.qameta.io/allure/)
+- [Azure DevOps Project](https://dev.azure.com/[org]/[project])
+- [Architectural Decision Records](./docs/adrs/)
+
+## ❓ FAQ
+
+### ¿Cómo agregar una nueva plataforma de cines?
+
+1. Crear estructura en `pageObjectsManagers/nueva-plataforma/`
+2. Agregar configuración en `config/environments.ts`
+3. Crear fixtures en `fixtures/nueva-plataforma/`
+4. Configurar proyecto en `playwright.config.ts`
+
+### ¿Por qué algunos tests fallan con "Cloudflare protection"?
+
+UCI Cinemas usa protección Cloudflare. Usa el método `navigateToWithCloudflareHandling()` para el primer acceso y asegúrate de tener `storageState` configurado.
+
+### ¿Cómo ejecutar tests en paralelo de forma segura?
+
+```bash
+# Para tests independientes
+npm run test -- --workers=5
+
+# Para tests con dependencias
+npm run test -- --workers=1
+```
+
+### ¿Cómo agregar un nuevo test case?
+
+1. Identificar la funcionalidad y plataforma
+2. Ubicar o crear el Page Object correspondiente
+3. Crear el archivo `.spec.ts` en la carpeta apropiada
+4. Usar fixtures existentes para inyección de dependencias
+5. Agregar tags apropiados (`@smoke`, `@critical`, etc.)
+
+### ¿Cómo interpretar los reportes Allure?
+
+- **🔒 Cloudflare Protection Issues**: Problemas de acceso
+- **🎭 Modal & Overlay Issues**: Elementos que bloquean interacciones
+- **🧭 Navigation & URL Issues**: Problemas de navegación
+- **🎬 Film Content Issues**: Problemas con contenido de películas
+- **🏢 Cinema Selection Issues**: Problemas con selección de cines
+
+### ¿Qué hacer si un test está flaky (inestable)?
+
+1. Revisar selectores CSS - podrían haber cambiado
+2. Verificar timeouts - ajustar en `config/environments.ts`
+3. Comprobar overlays - usar `clickWithOverlayHandling()`
+4. Revisar estado de la aplicación - validar precondiciones
+
+### ¿Cómo contribuir con nuevas funcionalidades?
+
+1. Revisar [CONTRIBUTING.md](./CONTRIBUTING.md)
+2. Crear issue en Azure DevOps o GitHub
+3. Seguir convenciones de código en [STYLEGUIDE.md](./docs/STYLEGUIDE.md)
+4. Crear PR con tests incluidos
+
+### ¿Cómo configurar diferentes entornos?
+
+```bash
+# Variables de entorno
+export TEST_ENV=staging
+export CINESA_BASE_URL=https://staging.cinesa.es
+export UCI_BASE_URL=https://staging.uci.it
+
+# O usar comandos específicos
+npm run test:cinesa:staging
+npm run test:uci:dev
+```
+
+---
+
+**Versión del Framework**: 1.0.0  
+**Última Actualización**: 2 de octubre de 2025  
+**Contacto**: Federico Cabanilla (@fcabanilla)
+
+## 🚦 Ejecución Rápida por Entornos
+
+### 🔵 Producción (sin Cloudflare)
+
+```bash
+npm run test:cinesa
+# O con interfaz gráfica
+npx playwright test --project=Cinesa --headed
+```
+
+### 🟠 Preproducción (con Cloudflare)
+
+1. **Generar estado de sesión:**
+   ```bash
+   npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+   ```
+
+2. **Ejecutar tests:**
+   ```bash
+   npm run test:cinesa:preprod
+   ```
 
 ## Table of Contents
 
