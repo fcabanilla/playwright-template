@@ -53,7 +53,7 @@ playwright-template/
 
 ### Prerrequisitos
 
-- **Node.js** 18+ 
+- **Node.js** 18+
 - **npm** o **yarn**
 - **Git** configurado
 
@@ -130,7 +130,7 @@ npm run test:cinesa:staging      # Entorno staging
 npm run test:cinesa:dev          # Entorno desarrollo
 TEST_ENV=preprod npm run test:cinesa  # Preproducción
 
-# UCI - diferentes entornos  
+# UCI - diferentes entornos
 npm run test:uci:staging         # Entorno staging
 npm run test:uci:dev             # Entorno desarrollo
 ```
@@ -140,29 +140,35 @@ npm run test:uci:dev             # Entorno desarrollo
 **Arquitectura en Capas del Framework:**
 
 **Test Layer (Capa de Pruebas)**
+
 - **Test Cases**: Casos de prueba específicos organizados por funcionalidad
 - **Test Fixtures**: Sistema de inyección de dependencias para setup automático
 
 **Page Object Layer (Capa de Abstracción UI)**
+
 - **Page Object Managers**: Gestores centralizados para interacciones con UI
 - **Cinesa Pages**: Page Objects específicos para la plataforma Cinesa
 - **UCI Pages**: Page Objects específicos para la plataforma UCI
 
 **Core Layer (Capa Central)**
+
 - **WebActions**: API unificada para todas las interacciones con browser
 - **Assertions**: Motor de validaciones reutilizable y extensible
 - **Base Classes**: Clases base que proporcionan funcionalidad común
 
 **Configuration Layer (Capa de Configuración)**
+
 - **Environments**: Configuraciones específicas por entorno (prod, staging, dev)
 - **Playwright Config**: Configuración central del framework de testing
 
 **Sistemas Externos:**
+
 - **Cinesa Website**: Plataforma principal objetivo de las pruebas
 - **UCI Website**: Segunda plataforma de cines soportada
 - **Allure Reports**: Sistema de reportes detallados con analytics
 
 **Flujo de Dependencias:**
+
 ```
 Test Cases → Page Objects → WebActions → Browser
 Fixtures → Configuration → Environment Setup
@@ -189,6 +195,7 @@ All Layers → Allure Reports (output)
 5. **Result Reporting**: Los resultados se envían al sistema de reportes
 
 **Características del Flujo:**
+
 - **Timeout Management**: 60 segundos por acción, 30 segundos para navegación
 - **Error Handling**: Retry automático con backoff exponencial
 - **Resource Cleanup**: Liberación automática de recursos al finalizar
@@ -217,9 +224,9 @@ npm run test:cinesa:navbar
 // Examinar: tests/cinesa/navbar/navbar.spec.ts
 import { test } from '../../fixtures/cinesa/playwright.fixtures';
 
-test('Navbar should display logo and main navigation', async ({ 
-  page, 
-  navbarPage 
+test('Navbar should display logo and main navigation', async ({
+  page,
+  navbarPage,
 }) => {
   await page.goto('/');
   await navbarPage.verifyLogoIsVisible();
@@ -284,16 +291,19 @@ git push origin feature/mi-primer-test
 ### Roadmap
 
 #### Q4 2024
+
 - ✅ Framework base Cinesa completo
 - ✅ Integración Allure 3 con tema oscuro
 - ✅ Azure DevOps complete setup
 
 #### Q1 2025
+
 - 🔄 Expansión UCI Cinemas (en progreso)
 - 📋 API testing integration
 - 🎨 Visual regression testing
 
 #### Q2 2025
+
 - 🚀 CI/CD GitHub Actions
 - 📱 Mobile responsive testing
 - 📊 Performance benchmarking
@@ -390,6 +400,7 @@ npx playwright test --project=Cinesa --headed
 ### 🟠 Preproducción (con Cloudflare)
 
 1. **Generar estado de sesión:**
+
    ```bash
    npx playwright test tests/cinesa/cloudflare/*.spec.ts --headed
    ```
@@ -453,7 +464,6 @@ npx playwright test --project=Cinesa --headed
    ```bash
    npx playwright install
    ```
-
 
 ## Project Structure
 
@@ -707,9 +717,11 @@ No necesitas generar archivos de sesión ni hacer login manual. Todo funciona di
 ### 🟠 Preproducción (con Cloudflare, requiere login manual)
 
 1. **Genera el archivo de sesión:**
+
    ```bash
    npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
    ```
+
    - Se abrirá el navegador, haz login y pasa Cloudflare manualmente.
    - El script guardará el estado en `loggedInState.preprod.json`.
 
@@ -815,7 +827,6 @@ playwright-template/
 
 ## 🎯 **Patrones de Diseño Implementados**
 
-
 ### Main Patterns (Examples)
 
 - **Page Object Model (POM):** Modular classes for each UI component, with TypeScript interfaces for selectors and JSDoc documentation.
@@ -905,7 +916,6 @@ reporter: [
 
 ## 🚀 **Scripts NPM Especializados**
 
-
 ### Main NPM Scripts
 
 - `test` / `test:navbar` / `test:movies` / ...: Run all or specific component tests
@@ -918,7 +928,6 @@ reporter: [
 ---
 
 ## 🔧 **Configuraciones Avanzadas**
-
 
 ### Tooling
 
@@ -933,6 +942,7 @@ reporter: [
 ### Implemented Components
 
 - Navbar, Footer, Login/Signup, Movies, Cinemas, SeatPicker, TicketPicker, PaymentPage, PurchaseSummary, Bar, Blog, Programs, Promotions, Experiences, Coupons, Mailing, Cookies, and more (20+ total)
+
 ---
 
 ## 🔄 **Comparación con demo-cinesa**
@@ -953,8 +963,6 @@ reporter: [
 | **Cobertura**          | Registro únicamente  | 20+ componentes         |
 | **Email Testing**      | No implementado      | ImapFlow integrado      |
 | **Environment Config** | Variables de entorno | URL hardcodeada         |
-
-
 
 - **Cobertura 7x Mayor**: 20+ componentes vs 3 páginas
 - **Arquitectura Modular**: Separación completa de responsabilidades
@@ -989,28 +997,31 @@ La combinación de ambos enfoques resultaría en el framework de testing definit
 
 Este README actualizado proporciona una guía completa para la instalación, configuración y ejecución de tests, integrando prácticas modernas y aprovechando las capacidades avanzadas de Playwright.
 
-
 ## Cloudflare Bypass & Session State Setup (Preproducción)
 
 > **Importante:** Solo aplica para preproducción (producción no requiere este paso).
 
 1. Ejecutá:
-  ```bash
-  npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
-  ```
-  - Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
+
+```bash
+npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
+```
+
+- Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
 
 2. Corré los tests normalmente usando ese storageState:
-  ```powershell
-  # Preproducción (PowerShell en Windows):
-  $env:TEST_ENV="preprod"; npx playwright test --project='Cinesa' --headed --workers=5
-  ```
 
-  ```bash
-  # Producción (todos los sistemas):
-  npx playwright test --project='Cinesa' --headed --workers=5
-  ```
+```powershell
+# Preproducción (PowerShell en Windows):
+$env:TEST_ENV="preprod"; npx playwright test --project='Cinesa' --headed --workers=5
+```
+
+```bash
+# Producción (todos los sistemas):
+npx playwright test --project='Cinesa' --headed --workers=5
+```
 
 **Notas:**
+
 - No subas archivos de sesión reales al repo (`.gitignore`).
 - Solo para preproducción con Cloudflare.
