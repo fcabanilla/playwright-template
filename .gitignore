@@ -1,3 +1,17 @@
 node_modules/
 .allure/
 dist/
+
+# Test results and reports
+test-results/
+allure-report/
+playwright-report/
+
+# Authentication states (should be generated locally)
+loggedInState.preprod.json
+notLoggedInState.json
+*State.json
+
+# Environment files with sensitive data
+.env.local
+.env.*.local
