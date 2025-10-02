@@ -42,12 +42,14 @@ Implementar TypeScript con configuración estricta (`strict: true`) para todos l
 #### Opción A: JavaScript con JSDoc
 
 - **Pros**:
+
   - No overhead de compilación
   - Curva de aprendizaje mínima
   - Tipos opcionales vía JSDoc
   - Compatibilidad directa con Playwright
 
 - **Contras**:
+
   - Type checking limitado y opcional
   - No enforcement de tipos en runtime
   - Documentación de tipos verbosa
@@ -58,11 +60,13 @@ Implementar TypeScript con configuración estricta (`strict: true`) para todos l
 #### Opción B: TypeScript en Modo Permisivo
 
 - **Pros**:
+
   - Gradual adoption posible
   - Menor fricción inicial
   - Flexibilidad para casos edge
 
 - **Contras**:
+
   - Beneficios limitados de type safety
   - Inconsistencia en enforcement
   - `any` types proliferan sin strict mode
@@ -73,10 +77,12 @@ Implementar TypeScript con configuración estricta (`strict: true`) para todos l
 #### Opción C: Flujo de Tipos Mixto (JS + TS)
 
 - **Pros**:
+
   - Migration gradual
   - Flexibilidad por archivo
 
 - **Contras**:
+
   - Inconsistencia en la base de código
   - Confusion sobre estándares
   - Type boundaries complejas
@@ -114,21 +120,25 @@ Implementar TypeScript con configuración estricta (`strict: true`) para todos l
 ### Plan de Implementación
 
 1. **TypeScript Setup** (Día 1-2):
+
    - Instalación de TypeScript 5.8+ y dependencias
    - Configuración de tsconfig.json con strict mode
    - Setup de ts-node para ejecución directa
 
 2. **Core Types Migration** (Semana 1):
+
    - Definición de interfaces base para Page Objects
    - Types para configuraciones de entorno
    - Types para test data y selectors
 
 3. **Page Objects Conversion** (Semana 2):
+
    - Conversión de Page Objects existentes a TypeScript
    - Implementación de interfaces para selectors
    - Type-safe fixtures implementation
 
 4. **Tests Migration** (Semana 3):
+
    - Conversión de test files a TypeScript
    - Type-safe test data implementation
    - Custom assertion types
@@ -192,13 +202,13 @@ interface NavbarActions {
 
 export class NavbarPage implements NavbarActions {
   constructor(private page: Page) {}
-  
+
   private readonly selectors: NavbarSelectors = {
     logo: '[data-testid="navbar-logo"]',
     menuItems: '.navbar-menu-item',
-    loginButton: '[data-testid="login-button"]'
+    loginButton: '[data-testid="login-button"]',
   };
-  
+
   async navigate(): Promise<void> {
     await this.page.goto('/');
   }
@@ -226,8 +236,8 @@ export const cinesaEnvironments: Record<string, EnvironmentConfig> = {
   production: {
     baseUrl: 'https://www.cinesa.es',
     timeouts: { pageLoad: 30000, element: 10000, modal: 15000 },
-    features: { analytics: true, promotionalModals: true, cookieBanners: true }
-  }
+    features: { analytics: true, promotionalModals: true, cookieBanners: true },
+  },
 };
 ```
 

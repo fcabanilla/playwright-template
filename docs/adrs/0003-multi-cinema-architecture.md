@@ -57,12 +57,14 @@ playwright-template/
 #### Opción A: Arquitectura Monolítica Unificada
 
 - **Pros**:
+
   - Máxima reutilización de código
   - Single source of truth para lógica de negocio
   - Menor duplicación aparente
   - Configuración simplificada
 
 - **Contras**:
+
   - Acoplamiento alto entre plataformas
   - Cambios en una plataforma afectan todas
   - Dificultad para manejar diferencias técnicas (Cloudflare, diferentes UIs)
@@ -74,12 +76,14 @@ playwright-template/
 #### Opción B: Repositories Completamente Separados
 
 - **Pros**:
+
   - Aislamiento total entre plataformas
   - Teams pueden trabajar completamente independientes
   - No risk de cross-platform regressions
   - Deployment independiente
 
 - **Contras**:
+
   - Duplicación masiva de código común
   - Maintenance overhead de múltiples repos
   - Sincronización compleja de mejoras comunes
@@ -91,11 +95,13 @@ playwright-template/
 #### Opción C: Plugin/Driver Architecture
 
 - **Pros**:
+
   - Abstracción máxima
   - Pluggable platform implementations
   - Clean separation of concerns
 
 - **Contras**:
+
   - Over-engineering para 2-3 plataformas
   - Complejidad arquitectural alta
   - Performance overhead de abstracciones
@@ -133,16 +139,19 @@ playwright-template/
 ### Plan de Implementación
 
 1. **Core Infrastructure** (Semana 1):
+
    - Setup de estructura de directorios
    - Core abstractions y base classes
    - Shared configuration system
 
 2. **Cinesa Namespace** (Semanas 2-4):
+
    - Migration de existing Cinesa code a namespace
    - Complete Page Object implementation
    - Test suites y fixtures
 
 3. **UCI Namespace** (Semanas 5-7):
+
    - Fresh UCI implementation
    - Cloudflare handling specifics
    - UCI-specific test patterns
@@ -204,8 +213,11 @@ config/environments.ts
 ```typescript
 // core/base/BasePage.ts
 export abstract class BasePage {
-  constructor(protected page: Page, protected webActions: WebActions) {}
-  
+  constructor(
+    protected page: Page,
+    protected webActions: WebActions
+  ) {}
+
   abstract navigate(): Promise<void>;
   abstract verifyPageLoaded(): Promise<void>;
 }
@@ -215,9 +227,9 @@ export abstract class BasePage {
 export class CinesaNavbarPage extends BasePage {
   private selectors = {
     logo: '[data-testid="cinesa-logo"]',
-    menuItems: '.cinesa-nav-menu .item'
+    menuItems: '.cinesa-nav-menu .item',
   };
-  
+
   async navigate(): Promise<void> {
     await this.page.goto('https://www.cinesa.es/');
   }
@@ -227,12 +239,14 @@ export class CinesaNavbarPage extends BasePage {
 export class UCINavbarPage extends BasePage {
   private selectors = {
     logo: '.uci-brand-logo',
-    menuItems: '.navigation-menu li'
+    menuItems: '.navigation-menu li',
   };
-  
+
   async navigate(): Promise<void> {
     // UCI-specific navigation with Cloudflare handling
-    await this.webActions.navigateToWithCloudflareHandling('https://ucicinemas.it/');
+    await this.webActions.navigateToWithCloudflareHandling(
+      'https://ucicinemas.it/'
+    );
   }
 }
 ```
@@ -249,7 +263,7 @@ export const test = base.extend<{
     const webActions = new WebActions(page);
     const navbarPage = new CinesaNavbarPage(page, webActions);
     await use(navbarPage);
-  }
+  },
 });
 
 // fixtures/uci/playwright.fixtures.ts
@@ -261,7 +275,7 @@ export const test = base.extend<{
   cloudflareHandler: async ({ page }, use) => {
     const handler = new CloudflareHandler(page);
     await use(handler);
-  }
+  },
 });
 ```
 

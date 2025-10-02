@@ -43,12 +43,14 @@ Playwright será el framework base para toda la automatización de tests end-to-
 #### Opción A: Selenium WebDriver
 
 - **Pros**:
+
   - Ecosistema maduro con amplia comunidad
   - Soporte para múltiples lenguajes de programación
   - Integración establecida con herramientas de CI/CD
   - Experiencia previa del equipo
 
 - **Contras**:
+
   - Setup complejo para multi-browser testing
   - Performance inferior para aplicaciones modernas
   - Manejo limitado de contenido asíncrono
@@ -60,12 +62,14 @@ Playwright será el framework base para toda la automatización de tests end-to-
 #### Opción B: Cypress
 
 - **Pros**:
+
   - Excelente developer experience y debugging
   - Time-travel debugging único
   - Documentación excelente
   - Community activa
 
 - **Contras**:
+
   - Limitado a Chromium únicamente
   - No soporte nativo para multi-tab/multi-window
   - Problemas conocidos con iframes y subdomains
@@ -76,11 +80,13 @@ Playwright será el framework base para toda la automatización de tests end-to-
 #### Opción C: TestCafe
 
 - **Pros**:
+
   - No requiere WebDriver setup
   - Cross-browser support
   - JavaScript/TypeScript nativo
 
 - **Contras**:
+
   - Performance inferior a Playwright
   - Ecosistema más pequeño
   - Debugging capabilities limitadas
@@ -118,16 +124,19 @@ Playwright será el framework base para toda la automatización de tests end-to-
 ### Plan de Implementación
 
 1. **Setup inicial** (Semana 1):
+
    - Instalación de Playwright y dependencias
    - Configuración básica para ambas plataformas (Cinesa/UCI)
    - Setup de CI/CD pipeline básico
 
 2. **Core framework** (Semanas 2-3):
+
    - Implementación de Page Object Model
    - WebActions layer para abstracciones comunes
    - Fixtures system para dependency injection
 
 3. **Platform-specific implementation** (Semanas 4-6):
+
    - Page Objects para Cinesa platform
    - Cloudflare handling para UCI platform
    - Environment configuration system
