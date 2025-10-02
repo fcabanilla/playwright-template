@@ -23,7 +23,7 @@ This project solves the need for **consistent test automation** across multiple 
 ```text
 playwright-template/
 ├── 📁 config/                  # Environment configurations
-│   ├── environments.ts        # URLs and platform configurations  
+│   ├── environments.ts        # URLs and platform configurations
 │   └── urls.ts                # Centralized URL mappings
 ├── 📁 core/                   # Framework base functionalities
 │   ├── assertions/            # Custom assertions
@@ -157,12 +157,12 @@ npm run test:trace               # With trace recording
 // Example: Movie Page Object
 export class MoviePage {
   constructor(private page: Page) {}
-  
+
   private selectors = {
     movieCard: '[data-testid="movie-card"]',
-    bookButton: '.book-now-button'
+    bookButton: '.book-now-button',
   } as const;
-  
+
   async selectMovie(title: string): Promise<void> {
     await this.page
       .locator(this.selectors.movieCard)
@@ -182,7 +182,7 @@ export const test = base.extend<{
 }>({
   moviePage: async ({ page }, use) => {
     await use(new MoviePage(page));
-  }
+  },
 });
 ```
 
@@ -193,12 +193,12 @@ export const test = base.extend<{
 export const environments = {
   production: {
     cinesa: 'https://www.cinesa.es',
-    uci: 'https://www.uci.it'
+    uci: 'https://www.uci.it',
   },
   staging: {
     cinesa: 'https://staging.cinesa.es',
-    uci: 'https://staging.uci.it'
-  }
+    uci: 'https://staging.uci.it',
+  },
 };
 ```
 
@@ -208,7 +208,7 @@ export const environments = {
 
 ```text
    🔺 E2E Tests (End-to-End User Flows)
-  🔶 Integration Tests (Component Interactions)  
+  🔶 Integration Tests (Component Interactions)
  🔷 Unit Tests (Isolated Component Logic)
 ```
 
@@ -231,6 +231,7 @@ export const environments = {
 - Mobile responsive testing
 
 #### UCI Platform
+
 - Film catalog navigation
 - Theater selection process
 - Booking confirmation flow
@@ -337,6 +338,7 @@ npm run test:authenticated     # Use saved session state
 - **API Testing**: Backend service validation
 
 ### Future Enhancements (2026)
+
 - **Additional Platforms**: Expansion to other cinema chains
 - **AI-Powered Testing**: Intelligent test generation and maintenance
 - **Advanced Analytics**: Predictive quality metrics
@@ -389,7 +391,7 @@ npx playwright install-deps   # Install system dependencies
 ---
 
 **Last Updated**: October 2, 2025  
-**Version**: 1.0.0  
+**Version**: 1.0.0
 
 ---
 
