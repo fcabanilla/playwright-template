@@ -114,6 +114,10 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
+          // Usa el estado guardado para saltar login/cloudflare en preprod
+          storageState: process.env.TEST_ENV === 'preprod'
+            ? 'loggedInState.preprod.json'
+            : undefined,
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // Configuración de URLs por ambiente
-const urls = {
+const urls: Record<string, string> = {
   production: 'https://www.cinesa.es/',
   preprod: 'https://preprod-web.ocgtest.es/',
   staging: 'https://staging.cinesa.es/',
@@ -31,6 +31,6 @@ test('login manual y guarda estado (auto-close)', async ({ browser }) => {
     await page.context().storageState({ path: stateFile });
     await browser.close();
   } catch (e) {
-    console.log('No se detectó el navbar en 30 minutos. Revisa el login o Cloudflare.');
+    console.log('No se detectó el navbar en 60 minutos. Revisa el login o Cloudflare.');
   }
 });

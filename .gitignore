@@ -1,3 +1,7 @@
 node_modules/
 .allure/
 dist/
+
+# Session state files (contienen tokens y cookies sensibles)
+loggedInState*.json
+notLoggedInState.json
