@@ -1,0 +1,134 @@
+# 👥 Code Owners - Cinema Multi-Platform Test Automation Framework
+
+# Este archivo define quién debe revisar cambios específicos en el repositorio.
+# GitHub automáticamente solicita reviews de los code owners apropiados.
+
+# 🏗️ REGLAS GLOBALES
+
+# Dueño principal del repositorio - responsable de arquitectura general
+* @fcabanilla
+
+# 📁 RESPONSABILIDADES POR DIRECTORIO
+
+# Configuración principal y scripts
+/package.json                  @fcabanilla
+/playwright.config.ts          @fcabanilla
+/eslint.config.js             @fcabanilla
+/tsconfig.json                @fcabanilla
+/.github/                     @fcabanilla
+
+# Documentación principal
+/README.md                    @fcabanilla
+/CONTRIBUTING.md              @fcabanilla
+/docs/                        @fcabanilla
+
+# Core framework - requiere review arquitectural
+/core/                        @fcabanilla
+/config/                      @fcabanilla
+
+# 🎬 PLATAFORMA CINESA
+
+# Page Objects Cinesa - equipo especializado en Cinesa
+/pageObjectsManagers/cinesa/   @fcabanilla
+/fixtures/cinesa/             @fcabanilla
+
+# Tests Cinesa por funcionalidad
+/tests/cinesa/navbar/         @fcabanilla
+/tests/cinesa/movies/         @fcabanilla
+/tests/cinesa/cinemas/        @fcabanilla
+/tests/cinesa/login/          @fcabanilla
+/tests/cinesa/signup/         @fcabanilla
+/tests/cinesa/seatPicker/     @fcabanilla
+/tests/cinesa/paymentPage/    @fcabanilla
+/tests/cinesa/purchaseSummary/ @fcabanilla
+
+# Funcionalidades críticas - requieren aprobación adicional
+/tests/cinesa/seatPicker/     @fcabanilla
+/tests/cinesa/paymentPage/    @fcabanilla
+/tests/cinesa/purchaseSummary/ @fcabanilla
+
+# 🎭 PLATAFORMA UCI
+
+# Page Objects UCI - equipo especializado en UCI (TODO: asignar owners específicos)
+/pageObjectsManagers/uci/     @fcabanilla
+/fixtures/uci/               @fcabanilla
+/tests/uci/                  @fcabanilla
+
+# Manejo específico de Cloudflare - requiere experiencia técnica avanzada
+/tests/uci/cloudflare/       @fcabanilla
+/core/webactions/cloudflareHandler.ts @fcabanilla
+
+# 📊 REPORTES Y CI/CD
+
+# Configuración de Allure - especialista en reportes
+/allure.config.js            @fcabanilla
+/.allure/                    @fcabanilla
+
+# Scripts de CI/CD cuando se implementen
+/.github/workflows/          @fcabanilla
+
+# 🔒 ARCHIVOS SENSIBLES
+
+# Archivos de configuración sensibles
+*.env                        @fcabanilla
+*.env.example               @fcabanilla
+/loggedInState*.json        @fcabanilla
+
+# 🧪 TESTS CRÍTICOS
+
+# Tests que afectan flujos de compra - requieren testing exhaustivo
+**/seatPicker/*.spec.ts     @fcabanilla
+**/paymentPage/*.spec.ts    @fcabanilla
+**/purchaseSummary/*.spec.ts @fcabanilla
+
+# Tests de autenticación - seguridad crítica
+**/login/*.spec.ts          @fcabanilla
+**/signup/*.spec.ts         @fcabanilla
+
+# Tests de cloudflare - complejidad técnica alta
+**/cloudflare/*.spec.ts     @fcabanilla
+
+# 📋 PATRONES ESPECIALES
+
+# Cualquier cambio en fixtures base requiere review arquitectural
+**/playwright.fixtures.ts   @fcabanilla
+
+# Cambios en tipos base
+/core/types/                @fcabanilla
+
+# Cambios en WebActions - afecta toda la suite
+/core/webactions/webActions.ts @fcabanilla
+
+# 🚨 ARCHIVOS DE ALTA CRITICIDAD (requieren 2+ approvals)
+
+# Configuración principal de Playwright - cambios críticos
+/playwright.config.ts       @fcabanilla
+
+# Configuración de entornos - impacta todas las plataformas
+/config/environments.ts     @fcabanilla
+
+# ⚙️ REGLAS DE APROVACIÓN
+
+# Para cambios en directorios críticos, se requieren múltiples approvals:
+# - /core/: 2 approvals mínimo
+# - /config/: 2 approvals mínimo  
+# - /**/paymentPage/: 2 approvals mínimo
+# - /**/purchaseSummary/: 2 approvals mínimo
+
+# 📝 NOTAS PARA FUTURAS EXPANSIONES
+
+# TODO: Asignar owners específicos cuando el equipo crezca:
+# /pageObjectsManagers/cinesa/ @team-cinesa @fcabanilla
+# /pageObjectsManagers/uci/ @team-uci @fcabanilla
+# /tests/cinesa/ @team-cinesa @fcabanilla  
+# /tests/uci/ @team-uci @fcabanilla
+
+# TODO: Crear equipos especializados:
+# @team-core-framework - para cambios en /core/
+# @team-qa-leads - para cambios en tests críticos
+# @team-devops - para cambios en CI/CD
+
+# TODO: Configurar branch protection rules que requieran:
+# - Status checks pasando (linting, tests)
+# - Code owner reviews
+# - Up-to-date branch requirement
