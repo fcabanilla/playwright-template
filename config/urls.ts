@@ -65,10 +65,10 @@ export function getCinesaUrls(): NavigationUrls {
     base: baseUrl,
     navigation: {
       cinemas: `${baseUrl}/cines`,
-      movies: `${baseUrl}/cartelera`,
+      movies: `${baseUrl}/peliculas`,
       promotions: `${baseUrl}/promociones`,
       experiences: `${baseUrl}/experiencias`,
-      membership: `${baseUrl}/unlimited`,
+      membership: `${baseUrl}/programas`,
       blog: `${baseUrl}/blog`,
     },
     footer: {
