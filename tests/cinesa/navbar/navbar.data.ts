@@ -1,5 +1,8 @@
 import { NavbarSelectors } from '../../../pageObjectsManagers/cinesa/navbar/navbar.selectors';
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
+import {
+  getCinesaConfig,
+  CinesaEnvironment,
+} from '../../../config/environments';
 
 // Interfaz para representar un elemento de navegación y su URL esperada
 export interface NavItem {
@@ -8,9 +11,11 @@ export interface NavItem {
 }
 
 // Get the current environment configuration
-const env = process.env.TEST_ENV as CinesaEnvironment || 'production';
+const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
 const config = getCinesaConfig(env);
-const cleanBaseUrl = config.baseUrl.endsWith('/') ? config.baseUrl.slice(0, -1) : config.baseUrl;
+const cleanBaseUrl = config.baseUrl.endsWith('/')
+  ? config.baseUrl.slice(0, -1)
+  : config.baseUrl;
 
 // URL base del sitio (dinámica según el entorno)
 export const baseUrl = cleanBaseUrl;

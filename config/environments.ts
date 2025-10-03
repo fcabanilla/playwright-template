@@ -59,7 +59,7 @@ export const cinesaEnvironments = {
     },
   },
   preprod: {
-    baseUrl: 'https://preprod-web.ocgtest.es/',
+    baseUrl: 'https://preprod-web.ocgtest.es',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
