@@ -13,7 +13,7 @@ The framework uses a centralized configuration system that allows for:
 
 ## Files Structure
 
-```
+```bash
 config/
 ├── environments.ts    # Environment configurations and feature flags
 └── urls.ts           # URL generation and navigation paths

@@ -10,8 +10,8 @@ Esta documentación proporciona una visión integral de la arquitectura del fram
 - [Flujo End-to-End](#-flujo-end-to-end)
 - [Gestión de Datos](#-gestión-de-datos)
 - [Observabilidad](#-observabilidad)
-- [Decisiones Arquitecturales](#-decisiones-arquitecturales)
-- [Riesgos y Trade-offs](#-riesgos-y-trade-offs)
+- [Decisiones Arquitecturales](#️-decisiones-arquitecturales)
+- [Riesgos y Trade-offs](#️-riesgos-y-trade-offs)
 
 ## 🎬 Contexto del Dominio
 
@@ -28,18 +28,21 @@ El framework opera en el **dominio de entretenimiento cinematográfico**, espec�
 ### Stakeholders Principales
 
 **Stakeholders Internos:**
+
 - **QA Engineers**: Responsables de la calidad y ejecución de tests
 - **Developers**: Implementan funcionalidades y mantienen el framework
 - **Product Managers**: Definen requirements y priorizan features
 - **DevOps Team**: Gestionan CI/CD e infraestructura
 
 **Stakeholders Externos:**
+
 - **Cinesa Platform**: Plataforma objetivo para automatización
 - **UCI Cinemas**: Segunda plataforma de cines soportada
 - **End Users**: Usuarios finales cuya experiencia validamos
 - **Business Teams**: Equipos de negocio que dependen de los resultados
 
 **Relaciones:**
+
 - El **Test Automation Framework** es el punto central que conecta stakeholders internos con externos
 - Los stakeholders internos contribuyen al framework y lo mantienen
 - El framework valida y monitorea las plataformas externas
@@ -103,33 +106,39 @@ El framework opera en el **dominio de entretenimiento cinematográfico**, espec�
 **Automation Framework** (Núcleo del Sistema):
 
 **1. Test Layer** (Capa de Pruebas):
-   - **Test Cases**: Casos de prueba específicos por funcionalidad
-   - **Test Data**: Datos estructurados para alimentar las pruebas
-   - **Test Assertions**: Validaciones customizadas por componente
+
+- **Test Cases**: Casos de prueba específicos por funcionalidad
+- **Test Data**: Datos estructurados para alimentar las pruebas
+- **Test Assertions**: Validaciones customizadas por componente
 
 **2. Page Object Layer** (Capa de Abstracción UI):
-   - **Page Object Managers**: Gestores centralizados de interacciones
-   - **Cinesa Pages**: Page Objects específicos para plataforma Cinesa
-   - **UCI Pages**: Page Objects específicos para plataforma UCI
+
+- **Page Object Managers**: Gestores centralizados de interacciones
+- **Cinesa Pages**: Page Objects específicos para plataforma Cinesa
+- **UCI Pages**: Page Objects específicos para plataforma UCI
 
 **3. Core Layer** (Capa Central):
-   - **WebActions**: API unificada para interacciones con browser
-   - **Assertions Engine**: Motor de validaciones reutilizable
-   - **Base Classes**: Clases base y abstracciones comunes
-   - **Type Definitions**: Definiciones de tipos globales
+
+- **WebActions**: API unificada para interacciones con browser
+- **Assertions Engine**: Motor de validaciones reutilizable
+- **Base Classes**: Clases base y abstracciones comunes
+- **Type Definitions**: Definiciones de tipos globales
 
 **4. Infrastructure Layer** (Capa de Infraestructura):
-   - **Configuration**: Gestión de configuraciones por entorno
-   - **Fixtures**: Sistema de inyección de dependencias
-   - **Environments**: Configuraciones específicas por ambiente
+
+- **Configuration**: Gestión de configuraciones por entorno
+- **Fixtures**: Sistema de inyección de dependencias
+- **Environments**: Configuraciones específicas por ambiente
 
 **Sistemas Externos:**
+
 - **Cinesa Website**: Plataforma web objetivo
 - **UCI Website**: Segunda plataforma soportada
 - **Allure Reports**: Sistema de reportes y analytics
 - **CI/CD Pipeline**: Integración con sistemas de deployment
 
 **Herramientas de Desarrollo:**
+
 - **Playwright**: Framework base de automatización
 - **TypeScript**: Lenguaje principal con type safety
 - **ESLint**: Herramienta de linting y calidad de código
@@ -224,31 +233,37 @@ interface CoreLayerComponents {
 ### Dependency Graph
 
 **Dependencias Externas (Foundation):**
+
 - **Playwright ^1.50.1**: Framework core de automatización
 - **TypeScript 5.8.2**: Lenguaje principal con type safety
 - **Allure 3.2.0**: Sistema de reportes y analytics
 - **ESLint 9.21.0**: Herramientas de linting y calidad
 
 **Core Framework (Núcleo):**
+
 - **WebActions**: Depende de Playwright para interacciones browser
 - **Base Classes**: Construido sobre WebActions para abstracciones
 - **Types**: Utiliza TypeScript para definiciones globales
 
 **Platform Implementation (Implementación por Plataforma):**
+
 - **Cinesa Pages**: Extiende Base Classes, usa Types
 - **UCI Pages**: Extiende Base Classes, usa Types
 - **Cinesa Fixtures**: Integra con Cinesa Pages
 - **UCI Fixtures**: Integra con UCI Pages
 
 **Test Implementation (Implementación de Tests):**
+
 - **Cinesa Tests**: Usa Cinesa Pages, Cinesa Fixtures, reporta a Allure
 - **UCI Tests**: Usa UCI Pages, UCI Fixtures, reporta a Allure
 
 **Calidad y Linting:**
+
 - **ESLint** valida código en todas las capas: Core, Platform, Tests
 
 **Flujo de Dependencias:**
-```
+
+```text
 Playwright → WebActions → Base Classes → Page Objects → Fixtures → Tests
 TypeScript → Types → Page Objects
 Allure ← Tests (reporting)
@@ -280,46 +295,53 @@ ESLint → All layers (validation)
 7. **Developer**: Recibe resultados finales con métricas
 
 **Notas del Ciclo:**
+**Notas del Ciclo:**
+
 - **Tiempo total**: Aproximadamente 45 segundos por test
-- **Paralelización**: Hasta 5 workers simultáneos
 - **Error handling**: Retry automático con backoff strategy
 - **Reporting**: Generación automática con screenshots y videos
 
 ### Flujo de Usuario Típico (E-commerce)
 
 **Journey Completo de Reserva de Película:**
+**Journey Completo de Reserva de Película:**
 
-**Fase 1: Navigation (Navegación)**
-- **Visit Homepage**: Usuario llega al sitio principal (⭐⭐⭐⭐⭐)
-- **Browse Movies**: Explora catálogo de películas disponibles (⭐⭐⭐⭐)
+#### Fase 1: Navigation (Navegación)
+
+- **Visit Homepage**: Usuario llega al sitio principal (⭐⭐⭐⭐⭐) (⭐⭐⭐⭐)
+- **Select Movie**: Elige película específica (⭐⭐⭐⭐⭐)
 - **Select Movie**: Elige película específica (⭐⭐⭐⭐⭐)
 
-**Fase 2: Seat Selection (Selección de Asientos)**
+#### Fase 2: Seat Selection (Selección de Asientos)
+
 - **Choose Session**: Selecciona horario y sala (⭐⭐⭐⭐)
-- **Select Seats**: Elige asientos específicos (⭐⭐⭐)
+- **Confirm Selection**: Confirma selección de asientos (⭐⭐⭐⭐)
 - **Confirm Selection**: Confirma selección de asientos (⭐⭐⭐⭐)
 
-**Fase 3: Payment (Pago)**
-- **Enter Details**: Ingresa datos de pago (⭐⭐)
-- **Process Payment**: Procesa pago con Payment Gateway (⭐⭐⭐)
+#### Fase 3: Payment (Pago)
+
+- **Enter Details**: Ingresa datos de pago (⭐⭐) Gateway (⭐⭐⭐)
+- **Receive Confirmation**: Recibe confirmación de reserva (⭐⭐⭐⭐⭐)
 - **Receive Confirmation**: Recibe confirmación de reserva (⭐⭐⭐⭐⭐)
 
-**Fase 4: Validation (Validación Automatizada)**
+#### Fase 4: Validation (Validación Automatizada)
+
 - **Verify Booking**: Framework verifica reserva (⭐⭐⭐⭐⭐)
-- **Check Email**: Valida email de confirmación (⭐⭐⭐⭐)
 - **Generate Report**: Genera reporte de validación (⭐⭐⭐⭐⭐)
 
 **Métricas de Experiencia:**
+**Métricas de Experiencia:**
+
 - **Puntos de fricción**: Selección de asientos y datos de pago
-- **Puntos fuertes**: Homepage, confirmación y reportes
 - **Tiempo total**: ~8-12 minutos para flujo completo
 - **Tasa de éxito**: 88.2% automatizada, mejorando hacia 95%
 
 ### Flujo de Datos en el Framework
 
 **Iniciación y Routing:**
+
 1. **Test Execution Start**: Comienza ejecución de test
-2. **Environment Check**: 
+2. **Environment Check**:
    - **Production**: Navegación directa (sin protecciones)
    - **Preprod**: Requiere manejo de Cloudflare
 
@@ -331,14 +353,16 @@ ESLint → All layers (validation)
 **Ejecución e Interacciones:**
 6. **UI Interactions**: Interacciones con elementos UI
 7. **Action Success Evaluation**:
-   - **Éxito**: Continúa a validaciones
-   - **Fallo**: Activa manejo de errores
+
+- **Éxito**: Continúa a validaciones
+- **Fallo**: Activa manejo de errores
 
 **Manejo de Errores:**
 8. **Error Handling**: Captura y procesa errores
 9. **Retry Logic**:
-   - **Retry Available**: Reintenta con backoff
-   - **No Retry**: Falla el test
+
+- **Retry Available**: Reintenta con backoff
+- **No Retry**: Falla el test
 
 **Validación y Resultados:**
 10. **Assertion Validation**: Evalúa todas las aserciones
@@ -352,6 +376,7 @@ ESLint → All layers (validation)
 14. **Test Execution End**: Finaliza ejecución
 
 **Puntos de Control Críticos:**
+
 - **Cloudflare bypass**: Esencial para preprod UCI
 - **Retry strategy**: Máximo 2 reintentos con exponential backoff
 - **Resource cleanup**: Previene memory leaks en ejecuciones largas
@@ -388,40 +413,46 @@ interface DataSources {
 ### Estado de Sesión (Session State)
 
 **Estados y Transiciones del Sistema:**
+**Estados y Transiciones del Sistema:**
 
-**1. NoSession (Estado Inicial)**
-- **Descripción**: No existe sesión activa en el sistema
-- **Trigger**: Aplicación recién iniciada o sesión expirada
+#### 1. NoSession (Estado Inicial)
+
+- **Descripción**: No existe sesión activa en el sistemaada
+- **Transición**: Manual login required → CreatingSession
 - **Transición**: Manual login required → CreatingSession
 
-**2. CreatingSession (Creando Sesión)**
+#### 2. CreatingSession (Creando Sesión)
+
 - **Descripción**: Proceso activo de login manual y bypass Cloudflare
-- **Archivo**: `auth.saveState.spec.ts` en ejecución
 - **Transición**: Login exitoso → ValidSession
 - **Nota**: Solo requerido para entorno preprod
+- **Nota**: Solo requerido para entorno preprod
 
-**3. ValidSession (Sesión Válida)**
-- **Descripción**: Estado de sesión guardado y válido
-- **Archivo**: `loggedInState.preprod.json` disponible
+#### 3. ValidSession (Sesión Válida)
+
+- **Descripción**: Estado de sesión guardado y válidoe
 - **Transiciones**:
   - Load saved state → TestExecution
   - Session timeout → ExpiredSession
 
-**4. TestExecution (Ejecutando Tests)**
+#### 4. TestExecution (Ejecutando Tests)
+
 - **Descripción**: Tests ejecutándose con sesión válida
 - **Transiciones**:
   - Session valid → ValidSession (loop)
   - Session timeout → ExpiredSession
   - Test completion → ValidSession
+  - Test completion → ValidSession
 
-**5. ExpiredSession (Sesión Expirada)**
+#### 5. ExpiredSession (Sesión Expirada)
+
 - **Descripción**: Sesión ya no válida, requiere regeneración
-- **Trigger**: Timeout o invalidación de tokens
 - **Transición**: Regenerate required → CreatingSession
 
 **Notas Importantes:**
+**Notas Importantes:**
+
 - **CreatingSession** maneja protección Cloudflare automáticamente
-- **Solo preprod** requiere este flujo completo
 - **Producción** usa navegación directa sin session state
 - **Archivos de sesión** no se incluyen en git (.gitignore)
 
@@ -477,39 +508,46 @@ interface ObservabilityStack {
 
 **Niveles de Logging:**
 
-**ERROR (🔴 Crítico)**
+#### ERROR (🔴 Crítico)
+
 - **Contenido**: Fallos de tests, errores críticos del sistema
 - **Destinos**: Console Output, Allure Reports
 - **Ejemplo**: "Test failed: Element not found after 30s"
 
-**WARN (🟡 Advertencia)**
+#### WARN (🟡 Advertencia)
+
 - **Contenido**: Deprecations, configuraciones subóptimas
 - **Destinos**: Console Output
 - **Ejemplo**: "Warning: Using deprecated selector strategy"
 
-**INFO (🔵 Información)**
+#### INFO (🔵 Información)
+
 - **Contenido**: Progreso de tests, eventos importantes
 - **Destinos**: Allure Reports
 - **Ejemplo**: "Test started: Movie selection flow"
 
-**DEBUG (⚪ Detallado)**
+#### DEBUG (⚪ Detallado)
+
 - **Contenido**: Acciones detalladas, estados internos
 - **Destinos**: Log Files (cuando DEBUG=true)
 - **Ejemplo**: "Clicking element: .movie-card[data-id='123']"
 
 **Destinos de Salida:**
 
-**Console Output**
+#### Console Output
+
 - Recibe: ERROR, WARN
 - Propósito: Feedback inmediato durante desarrollo
 - Formato: Timestamp + Level + Message
 
-**Allure Reports**
+#### Allure Reports
+
 - Recibe: ERROR, INFO
 - Propósito: Reportes detallados post-ejecución
 - Incluye: Screenshots, videos, trace files
 
-**Log Files**
+#### Log Files
+
 - Recibe: DEBUG (solo en modo debug)
 - Propósito: Troubleshooting profundo
 - Rotación: Automática cada 10MB
@@ -542,22 +580,26 @@ interface AlertingStrategy {
 
 **Distribución de Ejecución de Tests:**
 
-**Tests Exitosos: 88.2%**
+#### Tests Exitosos: 88.2%
+
 - Mayoría de tests pasan consistentemente
 - Indica estabilidad general del framework
 - Target: Mejorar a 95% en próximos 3 meses
 
-**Tests Fallidos: 8.3%**
+#### Tests Fallidos: 8.3%
+
 - Principalmente issues de timing y elementos dinámicos
 - Cloudflare challenges ocasionales en UCI
 - Cambios inesperados en UI de plataformas
 
-**Tests Omitidos: 3.5%**
+#### Tests Omitidos: 3.5%
+
 - Tests deshabilitados temporalmente
 - Funcionalidades bajo desarrollo
 - Environment-specific tests no aplicables
 
 **Métricas de Performance:**
+
 - **Tiempo promedio por test**: 45 segundos
 - **Suite completa Cinesa**: 12 minutos
 - **Paralelización**: 5 workers simultáneos
@@ -566,25 +608,30 @@ interface AlertingStrategy {
 **Timeline de Ejecución de Tests:**
 
 **Setup Phase (Primeros 3 minutos):**
+
 - **00:00-00:02**: Environment Setup - Configuración inicial
 - **00:02-00:03**: Browser Launch - Inicialización de navegadores
 
 **Cinesa Tests (Fase Principal - 15 minutos):**
+
 - **00:03-00:06**: Navigation Tests - Validación de navegación
 - **00:06-00:11**: Movie Tests - Tests de catálogo de películas
 - **00:11-00:18**: Booking Tests - Flujos de reserva completos
 
 **UCI Tests (Fase Secundaria - 5 minutos):**
+
 - **00:18-00:20**: Cloudflare Handling - Bypass de protecciones
 - **00:20-00:23**: Basic Navigation - Navegación básica UCI
 
 **Finalization (Últimos 3 minutos):**
+
 - **00:23-00:25**: Report Generation - Generación de reportes
 - **00:25-00:26**: Cleanup - Limpieza de recursos
 
-**Total Duration: ~26 minutos para suite completa**
+#### Total Duration: ~26 minutos para suite completa
 
 **Optimizaciones Aplicadas:**
+
 - Tests en paralelo donde es posible
 - Reutilización de browser instances
 - Lazy loading de Page Objects
