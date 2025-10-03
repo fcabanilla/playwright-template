@@ -4,15 +4,15 @@ This document outlines the system architecture, design decisions, and structural
 
 ## 📋 Table of Contents
 
-- [System Overview](#system-overview)
-- [Architectural Patterns](#architectural-patterns)
-- [Component Architecture](#component-architecture)
-- [Data Flow](#data-flow)
-- [Platform Integration](#platform-integration)
-- [Environment Configuration](#environment-configuration)
-- [Testing Strategy](#testing-strategy)
-- [Scalability and Maintenance](#scalability-and-maintenance)
-- [Technology Decisions](#technology-decisions)
+- [System Overview](#-system-overview)
+- [Architectural Patterns](#️-architectural-patterns)
+- [Component Architecture](#️-component-architecture)
+- [Data Flow](#-data-flow)
+- [Platform Integration](#-platform-integration)
+- [Environment Configuration](#️-environment-configuration)
+- [Testing Strategy](#-testing-strategy)
+- [Scalability and Maintenance](#-scalability-and-maintenance)
+- [Technology Decisions](#️-technology-decisions)
 
 ## 🎯 System Overview
 
