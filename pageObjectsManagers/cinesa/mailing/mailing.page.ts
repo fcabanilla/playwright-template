@@ -75,9 +75,13 @@ export class Mailing {
       }
       const messageUid = messages[messages.length - 1];
       for await (let msg of client.fetch(messageUid, { envelope: true })) {
+        // Null-safe access to envelope properties
+        const from = msg.envelope?.from?.[0]?.address || 'unknown';
+        const subject = msg.envelope?.subject || '';
+        
         result = {
-          from: msg.envelope.from[0].address,
-          subject: msg.envelope.subject,
+          from,
+          subject,
         };
       }
     } finally {
