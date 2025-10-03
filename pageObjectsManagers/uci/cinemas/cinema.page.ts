@@ -383,7 +383,8 @@ export class Cinema {
           return names.length > 0;
         }
       } catch (error) {
-        console.log(`Error with selector "${selector}":`, error.message);
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`Error with selector "${selector}":`, message);
         continue;
       }
     }
