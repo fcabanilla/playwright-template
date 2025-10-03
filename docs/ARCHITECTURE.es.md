@@ -60,30 +60,30 @@ El framework opera en el **dominio de entretenimiento cinematográfico**, espec�
 
 ### Performance
 
-| Métrica | Objetivo | Actual |
-|---------|----------|--------|
-| **Tiempo de ejecución suite completa** | < 15 minutos | ~12 minutos |
-| **Tiempo de ejecución test individual** | < 60 segundos | ~45 segundos |
-| **Paralelización** | 5 workers simultáneos | ✅ Implementado |
-| **Tiempo de setup framework** | < 2 minutos | ~90 segundos |
+| Métrica                                 | Objetivo              | Actual          |
+| --------------------------------------- | --------------------- | --------------- |
+| **Tiempo de ejecución suite completa**  | < 15 minutos          | ~12 minutos     |
+| **Tiempo de ejecución test individual** | < 60 segundos         | ~45 segundos    |
+| **Paralelización**                      | 5 workers simultáneos | ✅ Implementado |
+| **Tiempo de setup framework**           | < 2 minutos           | ~90 segundos    |
 
 ### Reliability
 
-| Aspecto | Objetivo | Implementación |
-|---------|----------|----------------|
-| **Tasa de éxito** | > 95% | 88.2% (mejorando) |
-| **Flaky tests** | < 5% | Monitoreo continuo |
-| **Recovery automático** | Retry en fallos temporales | 2 retries configurados |
-| **Manejo de Cloudflare** | 100% bypass en UCI | ✅ Implementado |
+| Aspecto                  | Objetivo                   | Implementación         |
+| ------------------------ | -------------------------- | ---------------------- |
+| **Tasa de éxito**        | > 95%                      | 88.2% (mejorando)      |
+| **Flaky tests**          | < 5%                       | Monitoreo continuo     |
+| **Recovery automático**  | Retry en fallos temporales | 2 retries configurados |
+| **Manejo de Cloudflare** | 100% bypass en UCI         | ✅ Implementado        |
 
 ### Scalability
 
-| Dimensión | Capacidad | Estado |
-|-----------|-----------|---------|
-| **Plataformas soportadas** | 2+ cadenas de cines | Cinesa ✅, UCI ✅ |
-| **Test cases simultáneos** | 100+ tests | 33 implementados |
-| **Entornos soportados** | 4 entornos por plataforma | ✅ Configurado |
-| **Browsers soportados** | Chromium, Firefox, WebKit | ✅ Configurado |
+| Dimensión                  | Capacidad                 | Estado            |
+| -------------------------- | ------------------------- | ----------------- |
+| **Plataformas soportadas** | 2+ cadenas de cines       | Cinesa ✅, UCI ✅ |
+| **Test cases simultáneos** | 100+ tests                | 33 implementados  |
+| **Entornos soportados**    | 4 entornos por plataforma | ✅ Configurado    |
+| **Browsers soportados**    | Chromium, Firefox, WebKit | ✅ Configurado    |
 
 ### Security
 
@@ -156,14 +156,14 @@ interface TestLayerComponents {
     examples: ['navbar.spec.ts', 'movies.spec.ts', 'seatPicker.spec.ts'];
     dependencies: ['Page Objects', 'Fixtures', 'Test Data'];
   };
-  
+
   testData: {
     location: 'tests/**/*.data.ts';
     responsibility: 'Provide structured test data and configuration';
     examples: ['navbar.data.ts', 'movies.data.ts'];
     format: 'TypeScript objects with type safety';
   };
-  
+
   assertions: {
     location: 'tests/**/*.assertions.ts';
     responsibility: 'Custom validation logic for specific components';
@@ -186,13 +186,13 @@ interface PageObjectLayerComponents {
       files: ['*.page.ts', '*.selectors.ts', '*.types.ts'];
     };
   };
-  
+
   selectors: {
     format: 'CSS Selectors and XPath expressions';
     strategy: 'Data attributes preferred, class fallback';
     maintenance: 'Centralized in *.selectors.ts files';
   };
-  
+
   interactions: {
     types: ['Navigation', 'User Actions', 'Data Retrieval', 'Validation'];
     errorHandling: 'Graceful degradation with retries';
@@ -212,16 +212,16 @@ interface CoreLayerComponents {
       'Overlay handling',
       'Cloudflare bypass',
       'Smart waiting strategies',
-      'Error recovery'
+      'Error recovery',
     ];
   };
-  
+
   baseClasses: {
     location: 'core/base/';
     responsibility: 'Common functionality and abstractions';
     provides: ['BasePage', 'BaseTest', 'BaseAssertion'];
   };
-  
+
   types: {
     location: 'core/types/';
     responsibility: 'Global type definitions and interfaces';
@@ -345,35 +345,21 @@ ESLint → All layers (validation)
    - **Production**: Navegación directa (sin protecciones)
    - **Preprod**: Requiere manejo de Cloudflare
 
-**Setup y Preparación:**
-3. **Page Object Initialization**: Inicialización de objetos de página
-4. **Session State Loading**: Carga estado guardado (solo preprod)
-5. **Test Data Loading**: Carga datos específicos del test
+**Setup y Preparación:** 3. **Page Object Initialization**: Inicialización de objetos de página 4. **Session State Loading**: Carga estado guardado (solo preprod) 5. **Test Data Loading**: Carga datos específicos del test
 
-**Ejecución e Interacciones:**
-6. **UI Interactions**: Interacciones con elementos UI
-7. **Action Success Evaluation**:
+**Ejecución e Interacciones:** 6. **UI Interactions**: Interacciones con elementos UI 7. **Action Success Evaluation**:
 
 - **Éxito**: Continúa a validaciones
 - **Fallo**: Activa manejo de errores
 
-**Manejo de Errores:**
-8. **Error Handling**: Captura y procesa errores
-9. **Retry Logic**:
+**Manejo de Errores:** 8. **Error Handling**: Captura y procesa errores 9. **Retry Logic**:
 
 - **Retry Available**: Reintenta con backoff
 - **No Retry**: Falla el test
 
-**Validación y Resultados:**
-10. **Assertion Validation**: Evalúa todas las aserciones
-11. **Result Determination**:
-    - **All Pass**: Test exitoso
-    - **Any Fail**: Test fallido
+**Validación y Resultados:** 10. **Assertion Validation**: Evalúa todas las aserciones 11. **Result Determination**: - **All Pass**: Test exitoso - **Any Fail**: Test fallido
 
-**Finalización:**
-12. **Allure Report Generation**: Genera reportes detallados
-13. **Cleanup Resources**: Libera recursos utilizados
-14. **Test Execution End**: Finaliza ejecución
+**Finalización:** 12. **Allure Report Generation**: Genera reportes detallados 13. **Cleanup Resources**: Libera recursos utilizados 14. **Test Execution End**: Finaliza ejecución
 
 **Puntos de Control Críticos:**
 
@@ -393,14 +379,14 @@ interface DataSources {
     format: 'TypeScript configuration objects';
     validation: 'Runtime type checking';
   };
-  
+
   testData: {
     location: 'tests/**/*.data.ts';
     content: 'Test-specific data, expected values, user scenarios';
     format: 'Structured TypeScript objects';
     maintenance: 'Version controlled with tests';
   };
-  
+
   selectors: {
     location: 'pageObjectsManagers/**/*.selectors.ts';
     content: 'CSS selectors, XPath expressions, element identifiers';
@@ -450,7 +436,6 @@ interface DataSources {
 - **Transición**: Regenerate required → CreatingSession
 
 **Notas Importantes:**
-**Notas Importantes:**
 
 - **CreatingSession** maneja protección Cloudflare automáticamente
 - **Producción** usa navegación directa sin session state
@@ -458,13 +443,13 @@ interface DataSources {
 
 ### Persistencia y Almacenamiento
 
-| Tipo de Dato | Almacenamiento | Duración | Propósito |
-|---------------|----------------|----------|-----------|
+| Tipo de Dato      | Almacenamiento         | Duración              | Propósito               |
+| ----------------- | ---------------------- | --------------------- | ----------------------- |
 | **Session State** | `loggedInState.*.json` | Por sesión de testing | Bypass de autenticación |
-| **Test Results** | `.allure/results/` | Hasta limpieza manual | Generación de reportes |
-| **Screenshots** | `test-results/` | 30 días | Debug y evidencia |
-| **Videos** | `test-results/` | 30 días | Análisis de fallos |
-| **Logs** | Console output | Por ejecución | Debugging |
+| **Test Results**  | `.allure/results/`     | Hasta limpieza manual | Generación de reportes  |
+| **Screenshots**   | `test-results/`        | 30 días               | Debug y evidencia       |
+| **Videos**        | `test-results/`        | 30 días               | Análisis de fallos      |
+| **Logs**          | Console output         | Por ejecución         | Debugging               |
 
 ## 📊 Observabilidad
 
@@ -478,27 +463,27 @@ interface ObservabilityStack {
       'Test execution time',
       'Success/failure rates',
       'Flaky test detection',
-      'Performance trends'
+      'Performance trends',
     ];
     aggregation: 'Per test suite, platform, and environment';
   };
-  
+
   systemMetrics: {
     collection: 'Playwright built-in';
     metrics: [
       'Browser resource usage',
       'Network request timing',
       'Page load performance',
-      'Memory consumption'
+      'Memory consumption',
     ];
   };
-  
+
   businessMetrics: {
     tracking: 'Custom test data collection';
     metrics: [
       'Feature coverage',
       'Critical path validation',
-      'User flow completion rates'
+      'User flow completion rates',
     ];
   };
 }
@@ -561,13 +546,13 @@ interface AlertingStrategy {
     action: 'Slack notification to QA team';
     escalation: 'Email to tech leads after 24h';
   };
-  
+
   performanceDegradation: {
     trigger: 'Test execution time > 120% of baseline';
     action: 'Performance investigation alert';
     monitoring: 'Trend analysis over 7 days';
   };
-  
+
   infrastructureIssues: {
     trigger: 'Browser launch failures > 5%';
     action: 'Infrastructure team notification';
@@ -699,12 +684,12 @@ interface AlertingStrategy {
 
 ### Riesgos Técnicos
 
-| Riesgo | Probabilidad | Impacto | Mitigación |
-|--------|--------------|---------|------------|
-| **Cambios en UI de plataformas** | Alta | Medio | Selectores robustos, monitoring continuo |
-| **Cloudflare protection evolution** | Media | Alto | Multiple bypass strategies, session management |
-| **Performance degradation** | Media | Medio | Performance monitoring, resource optimization |
-| **Browser compatibility issues** | Baja | Alto | Multi-browser testing, fallback strategies |
+| Riesgo                              | Probabilidad | Impacto | Mitigación                                     |
+| ----------------------------------- | ------------ | ------- | ---------------------------------------------- |
+| **Cambios en UI de plataformas**    | Alta         | Medio   | Selectores robustos, monitoring continuo       |
+| **Cloudflare protection evolution** | Media        | Alto    | Multiple bypass strategies, session management |
+| **Performance degradation**         | Media        | Medio   | Performance monitoring, resource optimization  |
+| **Browser compatibility issues**    | Baja         | Alto    | Multi-browser testing, fallback strategies     |
 
 ### Trade-offs Arquitecturales
 
