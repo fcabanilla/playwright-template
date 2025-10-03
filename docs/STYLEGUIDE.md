@@ -4,16 +4,16 @@ This guide defines code conventions, style, and best practices to maintain consi
 
 ## 📋 Table of Contents
 
-- [General Principles](#general-principles)
-- [Naming Conventions](#naming-conventions)
-- [Layer Structure](#layer-structure)
-- [TypeScript Guidelines](#typescript-guidelines)
-- [Page Objects Pattern](#page-objects-pattern)
-- [Test Organization](#test-organization)
-- [Documentation (JSDoc)](#documentation-jsdoc)
-- [Logging and Debugging](#logging-and-debugging)
-- [Testing Best Practices](#testing-best-practices)
-- [Repository Examples](#repository-examples)
+- [General Principles](#-general-principles)
+- [Naming Conventions](#%EF%B8%8F-naming-conventions)
+- [Layer Structure](#%EF%B8%8F-layer-structure)
+- [TypeScript Guidelines](#-typescript-guidelines)
+- [Page Objects Pattern](#-page-objects-pattern)
+- [Test Organization](#-test-organization)
+- [Documentation (JSDoc)](#-documentation-jsdoc)
+- [Logging and Debugging](#-logging-and-debugging)
+- [Testing Best Practices](#-testing-best-practices)
+- [Repository Examples](#-repository-examples)
 
 ## 🎯 General Principles
 

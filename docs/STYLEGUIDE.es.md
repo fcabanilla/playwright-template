@@ -5,8 +5,8 @@ Esta guía define las convenciones de código, estilo y mejores prácticas para 
 ## 📋 Tabla de Contenidos
 
 - [Principios Generales](#-principios-generales)
-- [Convenciones de Naming](#-convenciones-de-naming)
-- [Estructura por Capas](#-estructura-por-capas)
+- [Convenciones de Naming](#%EF%B8%8F-convenciones-de-naming)
+- [Estructura por Capas](#%EF%B8%8F-estructura-por-capas)
 - [TypeScript Guidelines](#-typescript-guidelines)
 - [Page Objects Pattern](#-page-objects-pattern)
 - [Test Organization](#-test-organization)
@@ -18,20 +18,25 @@ Esta guía define las convenciones de código, estilo y mejores prácticas para 
 ## 🎯 Principios Generales
 
 ### Claridad sobre Brevedad
+
 ```typescript
 // ✅ Bueno: Claro y descriptivo
-async function selectMovieAndProceedToSeatSelection(movieTitle: string): Promise<void>
+async function selectMovieAndProceedToSeatSelection(
+  movieTitle: string
+): Promise<void>;
 
 // ❌ Malo: Muy breve, poco claro
-async function selMov(title: string): Promise<void>
+async function selMov(title: string): Promise<void>;
 ```
 
 ### Consistencia en Patrones
+
 - **Mismo patrón** para componentes similares
 - **Misma estructura** de archivos y directorios
 - **Mismas convenciones** de naming a través del proyecto
 
 ### Mantenibilidad
+
 - **Separación clara** de responsabilidades
 - **Reutilización** de componentes comunes
 - **Documentación** clara y actualizada
@@ -40,7 +45,7 @@ async function selMov(title: string): Promise<void>
 
 ### Archivos y Directorios
 
-```
+```text
 # ✅ Estructura de archivos correcta
 pageObjectsManagers/
 ├── cinesa/
@@ -63,50 +68,52 @@ tests/
 
 ### Convenciones de Nombres
 
-| Tipo | Convención | Ejemplo | Descripción |
-|------|------------|---------|-------------|
-| **Clases** | PascalCase | `NavbarPage`, `MovieSelectors` | Componentes principales |
-| **Métodos** | camelCase | `selectMovie()`, `verifyNavigation()` | Acciones y verificaciones |
-| **Variables** | camelCase | `movieTitle`, `seatNumber` | Variables locales |
-| **Constantes** | UPPER_SNAKE_CASE | `DEFAULT_TIMEOUT`, `BASE_URL` | Valores constantes |
-| **Interfaces** | PascalCase + I | `IMovieData`, `INavbarSelectors` | Contratos de tipos |
-| **Enums** | PascalCase | `TestEnvironment`, `CinemaChain` | Enumeraciones |
-| **Archivos** | kebab-case | `navbar.page.ts`, `movie-selection.spec.ts` | Archivos del proyecto |
-| **Directorios** | kebab-case | `seat-picker/`, `purchase-summary/` | Carpetas del proyecto |
+| Tipo            | Convención       | Ejemplo                                     | Descripción               |
+| --------------- | ---------------- | ------------------------------------------- | ------------------------- |
+| **Clases**      | PascalCase       | `NavbarPage`, `MovieSelectors`              | Componentes principales   |
+| **Métodos**     | camelCase        | `selectMovie()`, `verifyNavigation()`       | Acciones y verificaciones |
+| **Variables**   | camelCase        | `movieTitle`, `seatNumber`                  | Variables locales         |
+| **Constantes**  | UPPER_SNAKE_CASE | `DEFAULT_TIMEOUT`, `BASE_URL`               | Valores constantes        |
+| **Interfaces**  | PascalCase + I   | `IMovieData`, `INavbarSelectors`            | Contratos de tipos        |
+| **Enums**       | PascalCase       | `TestEnvironment`, `CinemaChain`            | Enumeraciones             |
+| **Archivos**    | kebab-case       | `navbar.page.ts`, `movie-selection.spec.ts` | Archivos del proyecto     |
+| **Directorios** | kebab-case       | `seat-picker/`, `purchase-summary/`         | Carpetas del proyecto     |
 
 ### Naming Específico por Capa
 
 #### Page Objects
+
 ```typescript
 // ✅ Naming correcto para Page Objects
 export class NavbarPage {
   // Métodos de acción
-  async clickLogo(): Promise<void>
-  async navigateToMovies(): Promise<void>
-  async selectCinemaLocation(): Promise<void>
-  
+  async clickLogo(): Promise<void>;
+  async navigateToMovies(): Promise<void>;
+  async selectCinemaLocation(): Promise<void>;
+
   // Métodos de verificación
-  async verifyLogoIsVisible(): Promise<void>
-  async verifyNavigationItems(): Promise<void>
-  
+  async verifyLogoIsVisible(): Promise<void>;
+  async verifyNavigationItems(): Promise<void>;
+
   // Métodos de obtención de datos
-  async getNavigationItemsText(): Promise<string[]>
-  async getCurrentActiveSection(): Promise<string>
+  async getNavigationItemsText(): Promise<string[]>;
+  async getCurrentActiveSection(): Promise<string>;
 }
 ```
 
 #### Test Cases
+
 ```typescript
 // ✅ Naming descriptivo para tests
 test.describe('Cinesa Navbar Navigation', () => {
   test('should display logo and navigate to home when clicked', async () => {
     // Test implementation
   });
-  
+
   test('should highlight active navigation section', async () => {
     // Test implementation
   });
-  
+
   test('should open mobile menu on small screens', async () => {
     // Test implementation
   });
@@ -117,7 +124,7 @@ test.describe('Cinesa Navbar Navigation', () => {
 
 ### Arquitectura en Capas
 
-```
+```bash
 📁 Test Layer (tests/)
     ├── *.spec.ts              # Test cases
     ├── *.data.ts              # Test data
@@ -145,15 +152,16 @@ test.describe('Cinesa Navbar Navigation', () => {
 ### Responsabilidades por Capa
 
 #### Test Layer - `tests/`
+
 - **Responsabilidad**: Orquestación de tests y validación de comportamiento
 - **No debe**: Contener lógica de UI o selectores directos
 
 ```typescript
 // ✅ Correcto: Test enfocado en comportamiento
-test('should complete movie booking flow', async ({ 
-  moviePage, 
-  seatPage, 
-  paymentPage 
+test('should complete movie booking flow', async ({
+  moviePage,
+  seatPage,
+  paymentPage,
 }) => {
   await moviePage.selectMovie('Avengers: Endgame');
   await seatPage.selectSeats(2);
@@ -170,6 +178,7 @@ test('should complete booking', async ({ page }) => {
 ```
 
 #### Page Object Layer - `pageObjectsManagers/`
+
 - **Responsabilidad**: Abstracción de la UI y encapsulación de interacciones
 - **No debe**: Contener lógica de testing o aserciones
 
@@ -177,13 +186,13 @@ test('should complete booking', async ({ page }) => {
 // ✅ Correcto: Page Object bien encapsulado
 export class MoviePage {
   constructor(private page: Page) {}
-  
+
   private selectors = {
     movieCard: '[data-testid="movie-card"]',
     movieTitle: '.movie-title',
-    bookButton: '.book-now-button'
+    bookButton: '.book-now-button',
   };
-  
+
   async selectMovie(title: string): Promise<void> {
     const movieCard = this.page
       .locator(this.selectors.movieCard)
@@ -194,6 +203,7 @@ export class MoviePage {
 ```
 
 #### Core Layer - `core/`
+
 - **Responsabilidad**: Funcionalidades base reutilizables
 - **No debe**: Contener lógica específica de plataforma
 
@@ -211,6 +221,7 @@ export class WebActions {
 ## 📝 TypeScript Guidelines
 
 ### Tipos Estrictos
+
 ```typescript
 // ✅ Tipos explícitos y estrictos
 interface MovieSelectors {
@@ -223,16 +234,17 @@ interface MovieData {
   title: string;
   genre: string;
   duration: number;
-  rating?: number;  // Opcional con ?
+  rating?: number; // Opcional con ?
 }
 
 // ❌ Tipos débiles
 const selectors: any = {
-  movieCard: '[data-testid="movie"]'
+  movieCard: '[data-testid="movie"]',
 };
 ```
 
 ### Interfaces vs Types
+
 ```typescript
 // ✅ Interfaces para contratos extensibles
 interface BasePageSelectors {
@@ -252,6 +264,7 @@ type TestTag = '@smoke' | '@critical' | '@fast';
 ```
 
 ### Generics para Reutilización
+
 ```typescript
 // ✅ Page Object genérico
 abstract class BasePage<TSelectors> {
@@ -259,7 +272,7 @@ abstract class BasePage<TSelectors> {
     protected page: Page,
     protected selectors: TSelectors
   ) {}
-  
+
   abstract navigate(): Promise<void>;
 }
 
@@ -273,41 +286,42 @@ class MoviePage extends BasePage<MovieSelectors> {
 ## 🎭 Page Objects Pattern
 
 ### Estructura Estándar
+
 ```typescript
 // ✅ Estructura completa de Page Object
 export class NavbarPage {
   // 1. Dependencias inyectadas
   constructor(private page: Page) {}
-  
+
   // 2. Selectores privados y readonly
   private readonly selectors = {
     logo: '[data-testid="navbar-logo"]',
     menuItems: '.navbar-menu-item',
-    loginButton: '[data-testid="login-button"]'
+    loginButton: '[data-testid="login-button"]',
   } as const;
-  
+
   // 3. Métodos de navegación
   async navigate(): Promise<void> {
     await this.page.goto('/');
   }
-  
+
   // 4. Métodos de acción
   async clickLogo(): Promise<void> {
     await this.page.locator(this.selectors.logo).click();
   }
-  
+
   async clickMenuItem(itemText: string): Promise<void> {
     await this.page
       .locator(this.selectors.menuItems)
       .filter({ hasText: itemText })
       .click();
   }
-  
+
   // 5. Métodos de verificación
   async verifyLogoIsVisible(): Promise<void> {
     await expect(this.page.locator(this.selectors.logo)).toBeVisible();
   }
-  
+
   // 6. Métodos de obtención de datos
   async getMenuItemsText(): Promise<string[]> {
     return await this.page.locator(this.selectors.menuItems).allTextContents();
@@ -316,6 +330,7 @@ export class NavbarPage {
 ```
 
 ### Separación de Selectores
+
 ```typescript
 // ✅ Selectores en archivo separado para componentes complejos
 // navbar.selectors.ts
@@ -325,13 +340,13 @@ export const NavbarSelectors = {
   menuItems: {
     movies: '[data-nav="movies"]',
     cinemas: '[data-nav="cinemas"]',
-    promotions: '[data-nav="promotions"]'
+    promotions: '[data-nav="promotions"]',
   },
   userActions: {
     login: '[data-testid="login-button"]',
     signup: '[data-testid="signup-button"]',
-    profile: '[data-testid="user-profile"]'
-  }
+    profile: '[data-testid="user-profile"]',
+  },
 } as const;
 
 // navbar.page.ts
@@ -339,7 +354,7 @@ import { NavbarSelectors } from './navbar.selectors';
 
 export class NavbarPage {
   constructor(private page: Page) {}
-  
+
   async clickMoviesSection(): Promise<void> {
     await this.page.locator(NavbarSelectors.menuItems.movies).click();
   }
@@ -349,32 +364,39 @@ export class NavbarPage {
 ## 🧪 Test Organization
 
 ### Estructura de Test Suites
+
 ```typescript
 // ✅ Organización clara de test suites
 test.describe('Cinesa Navbar Component', () => {
   test.beforeEach(async ({ page, navbarPage }) => {
     await navbarPage.navigate();
   });
-  
+
   test.describe('Visual Elements', () => {
     test('should display logo correctly', async ({ navbarPage }) => {
       await navbarPage.verifyLogoIsVisible();
     });
-    
+
     test('should display all navigation items', async ({ navbarPage }) => {
       await navbarPage.verifyAllNavigationItemsVisible();
     });
   });
-  
+
   test.describe('Navigation Functionality', () => {
-    test('should navigate to movies section', async ({ navbarPage, moviePage }) => {
+    test('should navigate to movies section', async ({
+      navbarPage,
+      moviePage,
+    }) => {
       await navbarPage.clickMoviesSection();
       await moviePage.verifyPageLoaded();
     });
   });
-  
+
   test.describe('Responsive Behavior', () => {
-    test('should show mobile menu on small screens', async ({ page, navbarPage }) => {
+    test('should show mobile menu on small screens', async ({
+      page,
+      navbarPage,
+    }) => {
       await page.setViewportSize({ width: 480, height: 800 });
       await navbarPage.verifyMobileMenuVisible();
     });
@@ -383,6 +405,7 @@ test.describe('Cinesa Navbar Component', () => {
 ```
 
 ### Test Data Management
+
 ```typescript
 // ✅ Datos de test organizados y tipados
 // navbar.data.ts
@@ -390,19 +413,19 @@ export const NavbarTestData = {
   navigationItems: [
     { name: 'Películas', url: '/movies', testId: 'nav-movies' },
     { name: 'Cines', url: '/cinemas', testId: 'nav-cinemas' },
-    { name: 'Promociones', url: '/promotions', testId: 'nav-promotions' }
+    { name: 'Promociones', url: '/promotions', testId: 'nav-promotions' },
   ],
-  
+
   userActions: {
     login: { text: 'Iniciar Sesión', testId: 'login-button' },
-    signup: { text: 'Registrarse', testId: 'signup-button' }
+    signup: { text: 'Registrarse', testId: 'signup-button' },
   },
-  
+
   expectedUrls: {
     home: 'https://www.cinesa.es/',
     movies: 'https://www.cinesa.es/cartelera',
-    cinemas: 'https://www.cinesa.es/cines'
-  }
+    cinemas: 'https://www.cinesa.es/cines',
+  },
 } as const;
 
 // Uso en tests
@@ -418,35 +441,36 @@ test('should navigate to all main sections', async ({ navbarPage }) => {
 ## 📚 Documentación (JSDoc)
 
 ### Documentación de Page Objects
-```typescript
+
+````typescript
 /**
  * Manages interactions with the Cinesa navbar component.
  * Handles navigation, user actions, and responsive behavior.
- * 
+ *
  * @example
  * ```typescript
  * const navbar = new NavbarPage(page);
  * await navbar.navigate();
  * await navbar.clickMoviesSection();
  * ```
- * 
+ *
  * @since 1.0.0
  * @author Cinema Automation Team
  */
 export class NavbarPage {
   /**
    * Creates a new NavbarPage instance.
-   * 
+   *
    * @param page - Playwright Page object for browser interactions
    */
   constructor(private page: Page) {}
-  
+
   /**
    * Navigates to a specific section using the navbar.
-   * 
+   *
    * @param sectionName - Name of the section to navigate to
    * @throws {Error} When section is not found or navigation fails
-   * 
+   *
    * @example
    * ```typescript
    * await navbar.navigateToSection('Películas');
@@ -456,9 +480,10 @@ export class NavbarPage {
     // Implementation
   }
 }
-```
+````
 
 ### Documentación de Test Cases
+
 ```typescript
 /**
  * @suite Cinesa Navbar Navigation
@@ -474,7 +499,9 @@ test.describe('Cinesa Navbar Navigation', () => {
    * @severity critical
    * @story Navigate to home via logo
    */
-  test('should navigate to home when logo is clicked', async ({ navbarPage }) => {
+  test('should navigate to home when logo is clicked', async ({
+    navbarPage,
+  }) => {
     // Test implementation
   });
 });
@@ -483,27 +510,37 @@ test.describe('Cinesa Navbar Navigation', () => {
 ## 🔍 Logging y Debugging
 
 ### Logging Levels
+
 ```typescript
 // ✅ Logging estructurado con niveles
 export enum LogLevel {
   ERROR = 'ERROR',
-  WARN = 'WARN', 
+  WARN = 'WARN',
   INFO = 'INFO',
-  DEBUG = 'DEBUG'
+  DEBUG = 'DEBUG',
 }
 
 export class Logger {
   static info(message: string, context?: any): void {
-    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, context || '');
+    console.log(
+      `[INFO] ${new Date().toISOString()} - ${message}`,
+      context || ''
+    );
   }
-  
+
   static error(message: string, error?: Error): void {
-    console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error || '');
+    console.error(
+      `[ERROR] ${new Date().toISOString()} - ${message}`,
+      error || ''
+    );
   }
-  
+
   static debug(message: string, data?: any): void {
     if (process.env.DEBUG) {
-      console.log(`[DEBUG] ${new Date().toISOString()} - ${message}`, data || '');
+      console.log(
+        `[DEBUG] ${new Date().toISOString()} - ${message}`,
+        data || ''
+      );
     }
   }
 }
@@ -512,12 +549,13 @@ export class Logger {
 export class MoviePage {
   async selectMovie(title: string): Promise<void> {
     Logger.info(`Selecting movie: ${title}`);
-    
+
     try {
-      await this.page.locator(this.selectors.movieCard)
+      await this.page
+        .locator(this.selectors.movieCard)
         .filter({ hasText: title })
         .click();
-      
+
       Logger.info(`Successfully selected movie: ${title}`);
     } catch (error) {
       Logger.error(`Failed to select movie: ${title}`, error as Error);
@@ -528,24 +566,29 @@ export class MoviePage {
 ```
 
 ### Debug Helpers
+
 ```typescript
 // ✅ Helpers para debugging
 export class DebugHelpers {
   static async takeScreenshot(page: Page, name: string): Promise<void> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    await page.screenshot({ 
+    await page.screenshot({
       path: `debug-screenshots/${name}-${timestamp}.png`,
-      fullPage: true 
+      fullPage: true,
     });
   }
-  
+
   static async logPageInfo(page: Page): Promise<void> {
     const title = await page.title();
     const url = page.url();
     Logger.debug('Page Information', { title, url });
   }
-  
-  static async waitWithLog(page: Page, selector: string, timeout = 30000): Promise<void> {
+
+  static async waitWithLog(
+    page: Page,
+    selector: string,
+    timeout = 30000
+  ): Promise<void> {
     Logger.debug(`Waiting for element: ${selector}`);
     await page.locator(selector).waitFor({ timeout });
     Logger.debug(`Element found: ${selector}`);
@@ -556,6 +599,7 @@ export class DebugHelpers {
 ## 🧪 Testing Best Practices
 
 ### Pirámide de Testing
+
 ```typescript
 // ✅ Unit Tests - Tests rápidos y específicos
 test.describe('MoviePage Unit Tests', () => {
@@ -567,9 +611,9 @@ test.describe('MoviePage Unit Tests', () => {
 
 // ✅ Integration Tests - Interacciones entre componentes
 test.describe('Movie Selection Integration', () => {
-  test('should select movie and proceed to seat selection', async ({ 
-    moviePage, 
-    seatPage 
+  test('should select movie and proceed to seat selection', async ({
+    moviePage,
+    seatPage,
   }) => {
     await moviePage.selectMovie('Avengers');
     await seatPage.verifyPageLoaded();
@@ -578,11 +622,11 @@ test.describe('Movie Selection Integration', () => {
 
 // ✅ E2E Tests - Flujos completos de usuario
 test.describe('Complete Booking Flow', () => {
-  test('should complete full booking journey', async ({ 
-    moviePage, 
-    seatPage, 
+  test('should complete full booking journey', async ({
+    moviePage,
+    seatPage,
     paymentPage,
-    confirmationPage 
+    confirmationPage,
   }) => {
     await moviePage.selectMovie('Avengers');
     await seatPage.selectSeats(2);
@@ -593,6 +637,7 @@ test.describe('Complete Booking Flow', () => {
 ```
 
 ### Test Fixtures y Setup
+
 ```typescript
 // ✅ Fixtures bien organizados
 // cinesa.fixtures.ts
@@ -606,38 +651,39 @@ export const test = base.extend<{
     const navbarPage = new NavbarPage(page);
     await use(navbarPage);
   },
-  
+
   moviePage: async ({ page }, use) => {
     const moviePage = new MoviePage(page);
     await use(moviePage);
   },
-  
+
   testData: async ({}, use) => {
     const testData = new TestDataManager();
     await testData.initialize();
     await use(testData);
     await testData.cleanup();
-  }
+  },
 });
 ```
 
 ### Cobertura y Métricas
+
 ```typescript
 // ✅ Tests con métricas y etiquetas
-test('should load movie page within performance threshold', async ({ 
-  page, 
-  moviePage 
+test('should load movie page within performance threshold', async ({
+  page,
+  moviePage,
 }) => {
   const startTime = performance.now();
-  
+
   await moviePage.navigate();
   await moviePage.waitForMoviesLoaded();
-  
+
   const loadTime = performance.now() - startTime;
-  
+
   // Performance assertion
   expect(loadTime).toBeLessThan(3000); // 3 segundos
-  
+
   // Allure reporting
   await allure.attachment('Load Time', `${loadTime}ms`, 'text/plain');
 });
@@ -646,6 +692,7 @@ test('should load movie page within performance threshold', async ({
 ## 🎨 Ejemplos del Repositorio
 
 ### Ejemplo 1: Page Object Bien Estructurado
+
 ```typescript
 // Extraído de: pageObjectsManagers/cinesa/navbar/navbar.page.ts
 export class NavbarPage {
@@ -654,7 +701,7 @@ export class NavbarPage {
   private readonly selectors = {
     logo: '[data-testid="cinesa-logo"]',
     menuItems: '.navbar-menu .menu-item',
-    loginButton: '.user-actions .login-btn'
+    loginButton: '.user-actions .login-btn',
   } as const;
 
   async navigate(): Promise<void> {
@@ -676,6 +723,7 @@ export class NavbarPage {
 ```
 
 ### Ejemplo 2: Test Case Bien Documentado
+
 ```typescript
 // Extraído de: tests/cinesa/navbar/navbar.spec.ts
 import { test, expect } from '../../fixtures/cinesa/playwright.fixtures';
@@ -685,16 +733,16 @@ test.describe('Cinesa Navbar Component', () => {
     await navbarPage.navigate();
   });
 
-  test('should display logo and navigate to home when clicked', async ({ 
-    page, 
-    navbarPage 
+  test('should display logo and navigate to home when clicked', async ({
+    page,
+    navbarPage,
   }) => {
     // Verificar que el logo está visible
     await navbarPage.verifyLogoIsVisible();
-    
+
     // Hacer click en el logo
     await navbarPage.clickLogo();
-    
+
     // Verificar navegación a home
     await expect(page).toHaveURL('https://www.cinesa.es/');
   });
@@ -702,6 +750,7 @@ test.describe('Cinesa Navbar Component', () => {
 ```
 
 ### Ejemplo 3: WebActions Genéricas
+
 ```typescript
 // Extraído de: core/webactions/webActions.ts
 export class WebActions {
@@ -732,6 +781,7 @@ export class WebActions {
 ```
 
 ### Ejemplo 4: Configuración de Entornos
+
 ```typescript
 // Extraído de: config/environments.ts
 export const cinesaEnvironments = {
@@ -760,13 +810,14 @@ export const cinesaEnvironments = {
       promotionalModals: true,
       cookieBanners: true,
     },
-  }
+  },
 } as const satisfies Record<string, EnvironmentConfig>;
 ```
 
 ## ✅ Checklist de Revisión
 
 ### Para Page Objects
+
 - [ ] Métodos descriptivos y bien documentados
 - [ ] Selectores privados y constants
 - [ ] Separación clara entre acciones y verificaciones
@@ -774,6 +825,7 @@ export const cinesaEnvironments = {
 - [ ] TypeScript strict mode compliance
 
 ### Para Test Cases
+
 - [ ] Nombres descriptivos que explican el comportamiento
 - [ ] Uso correcto de fixtures
 - [ ] Datos de test externalizados
@@ -781,6 +833,7 @@ export const cinesaEnvironments = {
 - [ ] Tags apropiados para categorización
 
 ### Para Código General
+
 - [ ] Linting rules pasando sin warnings
 - [ ] JSDoc para métodos públicos
 - [ ] Tipos TypeScript explícitos
@@ -788,6 +841,7 @@ export const cinesaEnvironments = {
 - [ ] No código duplicado
 
 ### Para Arquitectura
+
 - [ ] Responsabilidades claras por capa
 - [ ] Bajo acoplamiento entre componentes
 - [ ] Alta cohesión dentro de módulos
