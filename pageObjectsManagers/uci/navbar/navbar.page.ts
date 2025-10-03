@@ -4,11 +4,6 @@ import {
   navbarSelectors,
   NavbarSelectors,
   navbarConstants,
-  alternativeNavbarSelectors,
-  alternativeLogoSelectors,
-  alternativeMoviesSelectors,
-  alternativeCinemaSelectors,
-  alternativePromoModalSelectors,
 } from './navbar.selectors';
 import { getUCIUrls } from '../../../config/urls';
 import { WebActions } from '../../../core/webactions/webActions';

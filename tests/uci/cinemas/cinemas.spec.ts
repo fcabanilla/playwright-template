@@ -41,7 +41,7 @@ test.describe(
         await navbar.navigateToCinemas();
 
         // Select first available cinema and verify detail page loads
-        const selectedCinema = await cinema.selectFirstCinema();
+        await cinema.selectFirstCinema();
         await cinemasAssertions.assertCinemaDetailPageLoaded();
 
         // Verify cinema has films available

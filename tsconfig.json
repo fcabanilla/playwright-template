@@ -17,12 +17,12 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
 
-    /* Phase 2: Code quality improvements (partially enabled) */
-    "noUnusedLocals": false, // TODO: Enable after cleanup
-    "noUnusedParameters": false, // TODO: Enable after cleanup
+    /* Phase 4: Code quality improvements (currently enabled) */
+    "noUnusedLocals": true, // ✅ Phase 4a: Enabled - Remove unused variables
+    "noUnusedParameters": false, // Disabled - Playwright fixtures often unused but required
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false, // TODO: Enable in Phase 4
+    "noUncheckedIndexedAccess": false, // TODO: Phase 4b - Safe array access (~99 errors)
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
 

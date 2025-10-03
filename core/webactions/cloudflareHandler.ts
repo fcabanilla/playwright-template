@@ -15,5 +15,6 @@ export async function bypassCloudflareAndRestoreSession(
 
 // Placeholder class for future advanced Cloudflare utilities
 export class CloudflareHandler {
+  // @ts-expect-error - page will be used when implementing setupAntiDetection() and navigateWithCloudflareHandling()
   constructor(private page: Page) {}
 }

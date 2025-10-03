@@ -1,6 +1,4 @@
-import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
-import { CookieBanner } from '../../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
-import { Footer } from '../../../pageObjectsManagers/cinesa/footer/footer.page';
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import {
   assertFooterElementsVisible,
   assertNavigateToBlog,

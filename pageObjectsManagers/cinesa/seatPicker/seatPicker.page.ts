@@ -108,7 +108,7 @@ export class SeatPicker {
           const pressed = await seatLocator.getAttribute('aria-pressed');
 
           const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
-          const seatIdentifier = `${row}-${seatNumber}`;
+          // const seatIdentifier = `${row}-${seatNumber}`; // TODO: Use for seat identification if needed
 
           const seatType = this.getSeatType(className, ariaLabel);
           const seatState = await this.getSeatState(seatLocator, className, pressed);
@@ -1001,8 +1001,8 @@ export class SeatPicker {
    * Selecciona un asiento regular y un asiento sofa, y devuelve un array de los tipos de asiento únicos en texto plano (por ejemplo, ['regular', 'dbox']).
    */
   async getRegularAndSofaSeatTypes(): Promise<string[]> {
-    const regular = await this.selectLastAvailableSeat();
-    const sofa = await this.selectLastAvailableSofaSeat();
+    await this.selectLastAvailableSeat();
+    await this.selectLastAvailableSofaSeat();
     const allSeats = await this.getAllSeats();
     const selectedSeats = allSeats.filter(s => s.seatState === 'selected');
     const seatTypes: string[] = [];

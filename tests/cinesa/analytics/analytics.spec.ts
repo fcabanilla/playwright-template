@@ -1,7 +1,3 @@
-import {
-  getCinesaConfig,
-  CinesaEnvironment,
-} from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { analyticsTestData } from './analytics.data';
 import {
@@ -104,7 +100,7 @@ test.describe('Google Analytics DataLayer Validation', () => {
     loginPage,
     analyticsPage,
   }) => {
-    const cinemaName = analyticsTestData.cinemaNames.grancasa;
+    // const cinemaName = analyticsTestData.cinemaNames.grancasa; // TODO: Use if cinema-specific logic needed
 
     await analyticsPage.initializeDataLayerCapture();
 
