@@ -1,0 +1,77 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+
+    /* Type Checking - Progressive Strict Mode (ADR-002) */
+    /* Phase 1: Essential type safety (currently enabled) */
+    "strict": false, // Temporarily disabled to enable progressive adoption
+    "noImplicitAny": false, // TODO: Enable in Phase 2
+    "strictNullChecks": false, // TODO: Enable in Phase 3
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": false, // TODO: Enable in Phase 3
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    /* Phase 2: Code quality improvements (partially enabled) */
+    "noUnusedLocals": false, // TODO: Enable after cleanup
+    "noUnusedParameters": false, // TODO: Enable after cleanup
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false, // TODO: Enable in Phase 4
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    /* Module Resolution */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Emit */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": false,
+    "noEmit": true,
+
+    /* Interop Constraints */
+    "skipLibCheck": true,
+    "allowJs": false,
+    "allowImportingTsExtensions": true,
+
+    /* Completeness */
+    "types": ["node", "@playwright/test"],
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@core/*": ["core/*"],
+      "@fixtures/*": ["fixtures/*"],
+      "@pageObjects/*": ["pageObjectsManagers/*"],
+      "@tests/*": ["tests/*"]
+    }
+  },
+  "include": [
+    "config/**/*",
+    "core/**/*",
+    "fixtures/**/*",
+    "pageObjectsManagers/**/*",
+    "tests/**/*",
+    "playwright.config.ts",
+    "allure.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test-results",
+    "playwright-report",
+    "allure-report",
+    ".allure"
+  ]
+}

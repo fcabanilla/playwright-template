@@ -4,8 +4,10 @@
   "description": "## Description",
   "type": "module",
   "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
     "test:cinesa:preprod": "TEST_ENV=preprod npx playwright test --project='Cinesa' --headed --workers=1",
-    "test:cinesa:preprod1": "TEST_ENV=preprod npx playwright test --project='Cinesa' --headed --workers=1 -g 'DEMO test'",
+    "test:cinesa:preprod:demo": "TEST_ENV=preprod npx playwright test --project='Cinesa' --headed --workers=1 -g 'DEMO test'",
     "test": "npx playwright test",
     "test:cinesa": "npx playwright test --project='Cinesa'",
     "test:navbar": "npx playwright test tests/cinesa/navbar/navbar.spec.ts",

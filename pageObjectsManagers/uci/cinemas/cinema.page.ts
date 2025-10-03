@@ -5,7 +5,7 @@ import {
   CinemaSelectors,
   cinemaConstants,
 } from './cinema.selectors';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 
 /**
  * UCI Cinemas Cinema Selection Page Object Model

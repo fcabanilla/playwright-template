@@ -1,14 +1,21 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
+// TODO: Create films.definitions.ts file with these interfaces
+// import {
+//   FilmsInterface,
+//   FilmSelectOptions,
+//   FilmFilterOptions,
+//   FilmCard,
+//   FilmData,
+//   FilmsPageType,
+// } from './films.definitions';
+import { getUCIUrls } from '../../../config/urls';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   filmsSelectors,
-  FilmsSelectors,
   filmsConstants,
-  alternativeFilmTitleSelectors,
-  alternativeFilmCardSelectors,
+  FilmsSelectors,
 } from './films.selectors';
-import { getUCIUrls } from '../../../config/urls';
-import { WebActions } from '../../../core/webActions/webActions';
 
 /**
  * UCI Cinemas Films/Movies Page Object Model
