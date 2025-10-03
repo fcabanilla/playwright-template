@@ -449,7 +449,8 @@ export class CinemaDetail {
         indicators.hasFilmItems = await this._checkAlternativeFilmSelectors();
       }
     } catch (error) {
-      console.log('❌ Film items check failed:', error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      console.log('❌ Film items check failed:', message);
     }
 
     // 4. Overall page readiness check

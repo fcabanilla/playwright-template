@@ -71,7 +71,9 @@ export class PromoModal {
             console.log('No promotional modal detected');
           }
         } catch (error) {
-          console.log('Error handling promotional modal:', error.message);
+          const message =
+            error instanceof Error ? error.message : String(error);
+          console.log('Error handling promotional modal:', message);
 
           // Emergency strategy: Press Escape
           try {
@@ -79,7 +81,11 @@ export class PromoModal {
             await this.page.waitForTimeout(2000);
             console.log('Modal closed with Escape key');
           } catch (escapeError) {
-            console.log('Could not close with Escape:', escapeError.message);
+            const escapeMessage =
+              escapeError instanceof Error
+                ? escapeError.message
+                : String(escapeError);
+            console.log('Could not close with Escape:', escapeMessage);
           }
         }
       }
