@@ -1,8 +1,6 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 
 test.describe('Bar', () => {
-
   test.beforeEach(async ({ page, navbar }) => {
     await navbar.navigateToHome();
   });
@@ -17,7 +15,7 @@ test.describe('Bar', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
@@ -42,7 +40,7 @@ test.describe('Bar', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
@@ -68,7 +66,7 @@ test.describe('Bar', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
@@ -93,7 +91,7 @@ test.describe('Bar', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();

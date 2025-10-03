@@ -1,4 +1,4 @@
-import { test, expect } from '../../../fixtures/uci/playwright.fixtures';
+import { test } from '../../../fixtures/uci/playwright.fixtures';
 
 /**
  * Integration tests for page loading validation

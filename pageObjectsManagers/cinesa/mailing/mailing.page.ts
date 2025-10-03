@@ -78,7 +78,7 @@ export class Mailing {
         // Null-safe access to envelope properties
         const from = msg.envelope?.from?.[0]?.address || 'unknown';
         const subject = msg.envelope?.subject || '';
-        
+
         result = {
           from,
           subject,

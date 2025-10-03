@@ -11,6 +11,7 @@ import { CinemaDetail } from '../../../pageObjectsManagers/uci/cinemas/cinemaDet
  */
 export class CinemasAssertions {
   constructor(
+    // @ts-expect-error - Page may be used for future assertions
     private page: Page,
     private cinema: Cinema,
     private cinemaDetail: CinemaDetail
