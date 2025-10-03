@@ -2,7 +2,6 @@ import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
 import { WebActions } from '../../../core/webactions/webActions';
-import { EnvironmentConfig } from '../../../config/environments';
 
 /**
  * Represents the Cinesa website navigation bar component.

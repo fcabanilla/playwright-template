@@ -1,5 +1,4 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { NavbarAssertions } from './navbar.assertions';
 import { getNavbarData } from './navbar.data';
 import { setupCloudflareContextAndPage } from '../../../core/webactions/setupCloudflareContextAndPage';

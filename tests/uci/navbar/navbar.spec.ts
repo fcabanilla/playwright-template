@@ -1,5 +1,5 @@
 import { test } from '../../../fixtures/uci/playwright.fixtures';
-import { baseUrl, internalNavItems, testUrls } from './navbar.data';
+import { baseUrl, testUrls } from './navbar.data';
 
 test.describe(
   'UCI Cinemas Navbar Tests',

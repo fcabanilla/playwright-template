@@ -1,12 +1,19 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
-import { assertMoviesRedirection, assertMovieSchemaMatches, assertMovieSchemaURLsAreValid } from './movies.assertions';
+import {
+  assertMoviesRedirection,
+  assertMovieSchemaMatches,
+  assertMovieSchemaURLsAreValid,
+} from './movies.assertions';
 import { MovieList } from '../../../pageObjectsManagers/cinesa/movies/movies.page';
 import { MoviePage } from '../../../pageObjectsManagers/cinesa/movie/movie.page';
 
 test.describe('Cinesa Movies Tests', () => {
-  test('Movies page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+  test('Movies page display and layout', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }, testInfo) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
@@ -14,7 +21,11 @@ test.describe('Cinesa Movies Tests', () => {
     await takeScreenshot(page, testInfo, 'Movies page display and layout');
   });
 
-  test('Cinesa Movies page redirection test', async ({ page, navbar, cookieBanner }) => {
+  test('Cinesa Movies page redirection test', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
@@ -22,24 +33,36 @@ test.describe('Cinesa Movies Tests', () => {
     assertMoviesRedirection(page);
   });
 
-  test('Navigate through Top Movies', async ({ page, navbar, cookieBanner }) => {
-  await navbar.navigateToHome();
+  test('Navigate through Top Movies', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.iterateAndClickMovies();
   });
 
-  test('Navigate through Random Movies from All Movies', async ({ page, navbar, cookieBanner }) => {
-  await navbar.navigateToHome();
+  test('Navigate through Random Movies from All Movies', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Navigate through Random Movies from Now Showing', async ({ page, navbar, cookieBanner }) => {
-  await navbar.navigateToHome();
+  test('Navigate through Random Movies from Now Showing', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
@@ -47,8 +70,12 @@ test.describe('Cinesa Movies Tests', () => {
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Navigate through Random Movies from Coming Soon', async ({ page, navbar, cookieBanner }) => {
-  await navbar.navigateToHome();
+  test('Navigate through Random Movies from Coming Soon', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
@@ -56,8 +83,12 @@ test.describe('Cinesa Movies Tests', () => {
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Navigate through Random Movies from Advance Sale', async ({ page, navbar, cookieBanner }) => {
-  await navbar.navigateToHome();
+  test('Navigate through Random Movies from Advance Sale', async ({
+    page,
+    navbar,
+    cookieBanner,
+  }) => {
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
@@ -70,9 +101,9 @@ test.describe('Cinesa Movies Tests', () => {
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner
+    cookieBanner,
   }) => {
-  await navbar.navigateToHome();
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
@@ -87,9 +118,9 @@ test.describe('Cinesa Movies Tests', () => {
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner
+    cookieBanner,
   }) => {
-  await navbar.navigateToHome();
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
@@ -104,9 +135,9 @@ test.describe('Cinesa Movies Tests', () => {
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner
+    cookieBanner,
   }) => {
-  await navbar.navigateToHome();
+    await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();

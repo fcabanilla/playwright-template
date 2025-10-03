@@ -1,4 +1,3 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 test.describe('Login', () => {
   test.beforeEach(async ({ page, navbar }) => {
@@ -10,5 +9,4 @@ test.describe('Login', () => {
     await loginPage.fillData();
     await loginPage.clickSubmit();
   });
-
 });

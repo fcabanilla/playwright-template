@@ -1,13 +1,12 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { 
-  assertWarningMessageDisplayed, 
-  assertConfirmButtonDisabled, 
-  assertWarningMessageNotDisplayed, 
-  assertConfirmButtonEnabled, 
-  assertFirstSeatsDeselected, 
+import {
+  assertWarningMessageDisplayed,
+  assertConfirmButtonDisabled,
+  assertWarningMessageNotDisplayed,
+  assertConfirmButtonEnabled,
+  assertFirstSeatsDeselected,
   assertLastSeatsSelected,
-  assertTicketTypeNamesMatchExpectedTexts 
+  assertTicketTypeNamesMatchExpectedTexts
 } from './seatPicker.assertions';
 import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';

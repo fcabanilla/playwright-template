@@ -1,5 +1,4 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { getCinesaConfig } from '../../../config/environments';
 import { takeScreenshotForModal } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/signup.selectors';
 import { defaultUser } from './signup.data';
