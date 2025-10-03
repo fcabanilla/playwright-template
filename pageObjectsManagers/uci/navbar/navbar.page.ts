@@ -142,7 +142,9 @@ export class Navbar {
    * ```
    *
    * @since 1.0.0
+   * @deprecated Temporarily disabled until navigateToWithCloudflareHandling is implemented in WebActions
    */
+  /*
   async navigateToHomeWithCloudflareHandling(): Promise<boolean> {
     return await allure.test.step(
       'Navigating to UCI Cinemas home with Cloudflare handling',
@@ -157,6 +159,7 @@ export class Navbar {
       }
     );
   }
+  */
 
   /**
    * Clicks on the UCI logo in the navbar (usually returns to the homepage).
