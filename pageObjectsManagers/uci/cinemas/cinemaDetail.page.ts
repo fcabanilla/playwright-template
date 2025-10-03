@@ -326,7 +326,9 @@ export class CinemaDetail {
 
         if (count > 0) {
           const names = await elements.allTextContents();
-          const validNames = names.filter((name: string) => name.trim().length > 0);
+          const validNames = names.filter(
+            (name: string) => name.trim().length > 0
+          );
           console.log(
             `🎬 Valid film names found: ${validNames.length}`,
             validNames
