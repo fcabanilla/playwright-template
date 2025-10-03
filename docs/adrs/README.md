@@ -20,11 +20,12 @@ All ADRs follow the template defined in [`_template.md`](./_template.md).
 
 ## ADR Index
 
-| ADR                                        | Title                                              | Status   | Date       | Author      |
-| ------------------------------------------ | -------------------------------------------------- | -------- | ---------- | ----------- |
-| [001](./0001-playwright-framework.md)      | Adoption of Playwright as Main Framework           | Accepted | 2024-08-15 | @fcabanilla |
-| [002](./0002-typescript-strict-mode.md)    | Implementation of TypeScript in Strict Mode        | Accepted | 2024-08-20 | @fcabanilla |
-| [003](./0003-multi-cinema-architecture.md) | Multi-Cinema Architecture with Separate Namespaces | Accepted | 2024-08-25 | @fcabanilla |
+| ADR                                                | Title                                               | Status   | Date       | Author      |
+| -------------------------------------------------- | --------------------------------------------------- | -------- | ---------- | ----------- |
+| [001](./0001-playwright-framework.md)              | Adoption of Playwright as Main Framework            | Accepted | 2024-08-15 | @fcabanilla |
+| [002](./0002-typescript-strict-mode.md)            | Implementation of TypeScript in Strict Mode         | Accepted | 2024-08-20 | @fcabanilla |
+| [003](./0003-multi-cinema-architecture.md)         | Multi-Cinema Architecture with Separate Namespaces  | Accepted | 2024-08-25 | @fcabanilla |
+| [004](./0004-unified-environment-configuration.md) | Unified Environment Configuration Across Namespaces | Accepted | 2025-10-03 | @fcabanilla |
 
 ## Decisions by Category
 
@@ -36,20 +37,21 @@ All ADRs follow the template defined in [`_template.md`](./_template.md).
 ### System Architecture
 
 - **ADR-003**: Multi-cinema structure with separate namespaces
+- **ADR-004**: Unified environment configuration across namespaces
 
 ## Planned Future Decisions
 
-### Q4 2024 - Q1 2025
+### Q4 2025 - Q1 2026
 
-- **ADR-004**: CI/CD strategy and deployment pipeline
-- **ADR-005**: API testing integration implementation
-- **ADR-006**: Visual regression testing approach
+- **ADR-005**: CI/CD strategy and deployment pipeline
+- **ADR-006**: API testing integration implementation
+- **ADR-007**: Visual regression testing approach
 
-### Q1 2025 - Q2 2025
+### Q1 2026 - Q2 2026
 
-- **ADR-007**: Mobile testing strategy and responsive validation
-- **ADR-008**: Performance testing integration
-- **ADR-009**: Test data management and synthetic data generation
+- **ADR-008**: Mobile testing strategy and responsive validation
+- **ADR-009**: Performance testing integration
+- **ADR-010**: Test data management and synthetic data generation
 
 ## Process for New ADRs
 
