@@ -7,13 +7,13 @@
     "moduleResolution": "bundler",
 
     /* Type Checking - Progressive Strict Mode (ADR-002) */
-    /* Phase 2: Explicit types (currently enabled) */
+    /* Phase 3: Null Safety (currently enabled) */
     "strict": false, // Temporarily disabled to enable progressive adoption
     "noImplicitAny": true, // ✅ Phase 2: Enabled - Require explicit types
-    "strictNullChecks": false, // TODO: Enable in Phase 3
+    "strictNullChecks": true, // ✅ Phase 3: Enabled - Catch null/undefined errors
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
-    "strictPropertyInitialization": false, // TODO: Enable in Phase 3
+    "strictPropertyInitialization": true, // ✅ Phase 3: Enabled - Initialize properties
     "noImplicitThis": true,
     "alwaysStrict": true,
 
