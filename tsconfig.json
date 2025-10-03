@@ -7,9 +7,9 @@
     "moduleResolution": "bundler",
 
     /* Type Checking - Progressive Strict Mode (ADR-002) */
-    /* Phase 1: Essential type safety (currently enabled) */
+    /* Phase 2: Explicit types (currently enabled) */
     "strict": false, // Temporarily disabled to enable progressive adoption
-    "noImplicitAny": false, // TODO: Enable in Phase 2
+    "noImplicitAny": true, // ✅ Phase 2: Enabled - Require explicit types
     "strictNullChecks": false, // TODO: Enable in Phase 3
     "strictFunctionTypes": true,
     "strictBindCallApply": true,

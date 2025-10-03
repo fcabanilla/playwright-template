@@ -68,7 +68,7 @@ export class AnalyticsPage {
         
         // Create proxy to intercept NEW dataLayer.push calls
         window.dataLayer = new Proxy(originalDataLayer, {
-          get(target, prop) {
+          get(target, prop: PropertyKey) {
             if (prop === 'push') {
               return function(...args: any[]) {
                 // Store new events in our custom array
@@ -77,7 +77,7 @@ export class AnalyticsPage {
                 return Array.prototype.push.apply(target, args);
               };
             }
-            return target[prop];
+            return target[prop as keyof typeof target];
           }
         });
 
