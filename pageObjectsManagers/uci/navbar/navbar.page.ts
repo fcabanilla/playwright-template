@@ -66,6 +66,12 @@ export class Navbar {
   private readonly urls: ReturnType<typeof getUCIUrls>;
 
   /**
+   * Base URL for the UCI website, injected from environment config.
+   * @private
+   */
+  private url: string;
+
+  /**
    * WebActions instance for all browser interactions.
    */
   readonly webActions: WebActions;
@@ -81,18 +87,22 @@ export class Navbar {
    * and prepares URL configuration for navigation operations.
    *
    * @param {Page} page - Playwright Page object for browser interactions
+   * @param {string} baseUrl - Optional base URL from environment configuration
    *
    * @example
    * ```typescript
    * const navbar = new Navbar(page);
+   * // or with custom baseUrl
+   * const navbar = new Navbar(page, 'https://staging.ucicinemas.it');
    * ```
    *
    * @since 1.0.0
    */
-  constructor(page: Page) {
+  constructor(page: Page, baseUrl?: string) {
     this.webActions = new WebActions(page);
     this.selectors = navbarSelectors;
     this.urls = getUCIUrls();
+    this.url = baseUrl || this.urls.base;
   }
 
   /**
@@ -112,7 +122,7 @@ export class Navbar {
    */
   async navigateToHome(): Promise<void> {
     await allure.test.step('Navigating to UCI Cinemas home', async () => {
-      await this.webActions.navigateTo(this.urls.base);
+      await this.webActions.navigateTo(this.url);
       await this._waitForNavigationComplete(navbarConstants.homePattern);
     });
   }
@@ -138,7 +148,7 @@ export class Navbar {
       'Navigating to UCI Cinemas home with Cloudflare handling',
       async () => {
         const success = await this.webActions.navigateToWithCloudflareHandling(
-          this.urls.base
+          this.url
         );
         if (success) {
           await this._waitForNavigationComplete(navbarConstants.homePattern);
