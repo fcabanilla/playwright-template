@@ -330,7 +330,7 @@ export class Cinema {
         const elements = this.webActions.getLocator(selector);
         const names = await elements.allTextContents();
         if (names.length > 0) {
-          return names.filter((name) => name.trim().length > 0);
+          return names.filter((name: string) => name.trim().length > 0);
         }
       } catch (error) {
         // Try next selector
