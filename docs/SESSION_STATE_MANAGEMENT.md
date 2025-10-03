@@ -7,6 +7,7 @@ This document explains how session state files work in the project, particularly
 ## What are Session State Files?
 
 Session state files (`.json`) contain:
+
 - **Cookies**: Authentication tokens, session IDs, Cloudflare bypass tokens
 - **Local Storage**: Application state, user preferences
 - **Session Storage**: Temporary data
@@ -30,28 +31,31 @@ playwright-template/
 
 The project automatically selects the correct state file based on the `TEST_ENV` environment variable:
 
-| Environment | `TEST_ENV` Value | State File |
-|-------------|------------------|------------|
-| Production | `production` (default) | `loggedInState.json` |
-| Preprod | `preprod` | `loggedInState.preprod.json` |
-| Staging | `staging` | `loggedInState.staging.json` |
-| Development | `development` | `loggedInState.dev.json` |
+| Environment | `TEST_ENV` Value       | State File                   |
+| ----------- | ---------------------- | ---------------------------- |
+| Production  | `production` (default) | `loggedInState.json`         |
+| Preprod     | `preprod`              | `loggedInState.preprod.json` |
+| Staging     | `staging`              | `loggedInState.staging.json` |
+| Development | `development`          | `loggedInState.dev.json`     |
 
 ## Generating Session State Files
 
 ### For Cinesa
 
 1. **Set the target environment**:
+
    ```bash
    export TEST_ENV=preprod  # or staging, development, production
    ```
 
 2. **Run the authentication script**:
+
    ```bash
    npm run test:cinesa:cloudflare -- tests/cinesa/cloudflare/auth.saveState.spec.ts
    ```
 
 3. **Manual steps**:
+
    - Browser will open to the configured environment URL
    - Log in manually if needed
    - Pass Cloudflare challenge (if present)
@@ -158,12 +162,12 @@ test('Test without authentication', async ({ page }) => {
 
 ### Important Cookies
 
-| Cookie Name | Purpose | Environment-Specific |
-|-------------|---------|---------------------|
-| `__cf_bm` | Cloudflare Bot Management | ✅ Yes |
-| `_cfuvid` | Cloudflare User ID | ✅ Yes |
-| `Queue-it-token` | Queue-it token | ✅ Yes |
-| `QueueITAccepted-*` | Queue-it acceptance | ✅ Yes |
+| Cookie Name         | Purpose                   | Environment-Specific |
+| ------------------- | ------------------------- | -------------------- |
+| `__cf_bm`           | Cloudflare Bot Management | ✅ Yes               |
+| `_cfuvid`           | Cloudflare User ID        | ✅ Yes               |
+| `Queue-it-token`    | Queue-it token            | ✅ Yes               |
+| `QueueITAccepted-*` | Queue-it acceptance       | ✅ Yes               |
 
 **⚠️ Note**: Cookies contain domain-specific information and **cannot be reused across different environments**.
 
@@ -181,6 +185,7 @@ npm run test:cinesa:cloudflare -- tests/cinesa/cloudflare/auth.saveState.spec.ts
 ### Problem: Cloudflare challenge appears even with state file
 
 **Possible causes**:
+
 1. **Cookies expired**: Regenerate the state file
 2. **IP address changed**: Cloudflare may require new challenge
 3. **Wrong environment**: Verify `TEST_ENV` matches the state file
@@ -192,6 +197,7 @@ npm run test:cinesa:cloudflare -- tests/cinesa/cloudflare/auth.saveState.spec.ts
 This is expected. The `localStorage` contains URLs from when the state was captured. Playwright will use the URLs from your test navigation, not from localStorage.
 
 **Example**:
+
 ```json
 // localStorage captured from production
 "origin": "https://www.cinesa.es"
@@ -274,12 +280,14 @@ stage('Run Tests') {
 ### Sensitive Data in State Files
 
 State files contain:
+
 - Authentication tokens
 - Session IDs
 - User-specific data
 - Cloudflare bypass tokens
 
 **Security measures**:
+
 1. ✅ All state files are in `.gitignore`
 2. ✅ State files are not shared between environments
 3. ✅ State files expire and need regeneration
