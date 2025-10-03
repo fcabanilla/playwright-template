@@ -20,7 +20,7 @@ Este proyecto resuelve la necesidad de **automatización de pruebas consistente*
 
 ## 📁 Estructura del Proyecto
 
-```
+```bash
 playwright-template/
 ├── 📁 config/                  # Configuraciones por entorno
 │   ├── environments.ts        # URLs y configuraciones por plataforma
@@ -137,26 +137,26 @@ npm run test:uci:dev             # Entorno desarrollo
 
 ## 🏗️ Arquitectura del Sistema
 
-**Arquitectura en Capas del Framework:**
+### Arquitectura en Capas del Framework
 
-**Test Layer (Capa de Pruebas)**
+#### Test Layer (Capa de Pruebas)
 
 - **Test Cases**: Casos de prueba específicos organizados por funcionalidad
 - **Test Fixtures**: Sistema de inyección de dependencias para setup automático
 
-**Page Object Layer (Capa de Abstracción UI)**
+#### Page Object Layer (Capa de Abstracción UI)
 
 - **Page Object Managers**: Gestores centralizados para interacciones con UI
 - **Cinesa Pages**: Page Objects específicos para la plataforma Cinesa
 - **UCI Pages**: Page Objects específicos para la plataforma UCI
 
-**Core Layer (Capa Central)**
+#### Core Layer (Capa Central)
 
 - **WebActions**: API unificada para todas las interacciones con browser
 - **Assertions**: Motor de validaciones reutilizable y extensible
 - **Base Classes**: Clases base que proporcionan funcionalidad común
 
-**Configuration Layer (Capa de Configuración)**
+#### Configuration Layer (Capa de Configuración)
 
 - **Environments**: Configuraciones específicas por entorno (prod, staging, dev)
 - **Playwright Config**: Configuración central del framework de testing
@@ -169,7 +169,7 @@ npm run test:uci:dev             # Entorno desarrollo
 
 **Flujo de Dependencias:**
 
-```
+```text
 Test Cases → Page Objects → WebActions → Browser
 Fixtures → Configuration → Environment Setup
 All Layers → Allure Reports (output)
@@ -406,27 +406,30 @@ npx playwright test --project=Cinesa --headed
    ```
 
 2. **Ejecutar tests:**
+
    ```bash
    npm run test:cinesa:preprod
    ```
 
-## Table of Contents
+## Tabla de Contenidos
 
-- [Playwright Template for Automated Testing](#playwright-template-for-automated-testing)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Project Structure](#project-structure)
-  - [Usage](#usage)
-    - [Running Tests](#running-tests)
-    - [Allure Reporting](#allure-reporting)
-    - [Custom Fixtures](#custom-fixtures)
-  - [Configuration](#configuration)
-  - [Best Practices](#best-practices)
-  - [CI/CD Integration](#cicd-integration)
-  - [Contributing](#contributing)
-  - [License](#license)
+- [🎯 Propósito del Proyecto](#-propósito-del-proyecto)
+- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
+- [⚡ Inicio Rápido](#-inicio-rápido)
+- [🏗️ Arquitectura del Sistema](#️-arquitectura-del-sistema)
+- [📋 Estado del Proyecto](#-estado-del-proyecto)
+- [🔗 Enlaces Importantes](#-enlaces-importantes)
+- [❓ FAQ](#-faq)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Project Structure](#project-structure)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Best Practices](#best-practices)
+- [CI/CD Integration](#cicd-integration)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -725,12 +728,14 @@ No necesitas generar archivos de sesión ni hacer login manual. Todo funciona di
    - Se abrirá el navegador, haz login y pasa Cloudflare manualmente.
    - El script guardará el estado en `loggedInState.preprod.json`.
 
-2. **Ejecuta los tests normalmente:**
+1. **Ejecuta los tests normalmente:**
+
    ```bash
    npm run test:cinesa:preprod
    # o
    npx playwright test --project=Cinesa --headed --workers=1
    ```
+
    - Ahora los tests usarán el estado guardado y saltarán login/Cloudflare.
 
 ---
@@ -1009,7 +1014,7 @@ npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
 
 - Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
 
-2. Corré los tests normalmente usando ese storageState:
+1. Corré los tests normalmente usando ese storageState:
 
 ```powershell
 # Preproducción (PowerShell en Windows):

@@ -6,7 +6,8 @@ Este módulo contiene las pruebas automatizadas para validar los eventos de Goog
 
 Siguiendo la convención del proyecto:
 
-```
+```bash
+
 tests/cinesa/analytics/
 ├── analytics.spec.ts           # Tests principales de validación de Google Analytics
 ├── analytics.assertions.ts     # Funciones de validación y assertions
@@ -15,7 +16,8 @@ tests/cinesa/analytics/
 └── README.md                  # Este archivo
 ```
 
-```
+```bash
+
 pageObjectsManagers/cinesa/analytics/
 ├── analytics.page.ts          # Page Object para funcionalidades de Google Analytics
 └── analytics.selectors.ts     # Selectores DOM para elementos de analytics
@@ -24,14 +26,17 @@ pageObjectsManagers/cinesa/analytics/
 ## Funcionalidad
 
 ### Objetivo Principal
+
 Validar que los eventos de Google Analytics (`add_to_cart`, `begin_checkout`) se disparan correctamente durante el flujo de compra de entradas en Cinesa.
 
 ### Eventos Monitoreados
+
 - **`add_to_cart`** - Al añadir entradas o productos F&B al carrito
 - **`begin_checkout`** - Al iniciar el proceso de checkout/pago
 - **`view_promotion`** - Al visualizar promociones
 
 ### Validaciones Realizadas
+
 - ✅ Captura exitosa de eventos del dataLayer
 - ✅ Estructura correcta de eventos (currency, value, items)
 - ✅ Presencia de propiedades requeridas
@@ -51,38 +56,22 @@ npx playwright test tests/cinesa/analytics/ --ui
 npx playwright test tests/cinesa/analytics/analytics.spec.ts
 ```
 
-## Funcionalidad
-
-### Eventos Monitoreados
-
-1. **add_to_cart** - Se dispara cuando:
-   - Se añade una entrada de cine al carrito
-   - Se añaden productos de food & beverage al carrito
-
-2. **begin_checkout** - Se dispara cuando:
-   - Se procede al resumen de compra y se muestra el total final
-
-### Validaciones Realizadas
-
-1. **Estructura de Eventos**: Verifica que los eventos tengan la estructura esperada
-2. **Precios**: Compara los precios mostrados en la UI con los registrados en analytics
-3. **Moneda**: Valida que se use EUR como moneda
-4. **Categorías**: Verifica que las categorías sean 'Movie' para entradas y 'F&B' para comida/bebida
-5. **Impuestos**: Analiza posibles discrepancias en el manejo de impuestos
-
 ### Uso
 
 #### Test Principal
+
 ```bash
 npx playwright test tests/cinesa/analytics/analytics.spec.ts
 ```
 
 #### Test de Debug
+
 ```bash
 npx playwright test tests/cinesa/analytics/analytics-debug.spec.ts
 ```
 
 #### Con UI (para ver el flujo)
+
 ```bash
 npx playwright test tests/cinesa/analytics/analytics.spec.ts --headed
 ```
@@ -90,6 +79,7 @@ npx playwright test tests/cinesa/analytics/analytics.spec.ts --headed
 ## Estructura del DataLayer
 
 ### add_to_cart Event
+
 ```json
 {
   "event": "add_to_cart",
@@ -116,6 +106,7 @@ npx playwright test tests/cinesa/analytics/analytics.spec.ts --headed
 ```
 
 ### begin_checkout Event
+
 ```json
 {
   "event": "begin_checkout",
