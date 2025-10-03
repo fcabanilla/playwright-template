@@ -23,13 +23,17 @@ export class WebActions {
 
   /**
    * Navigate to a URL with Cloudflare protection handling
+   * @deprecated CloudflareHandler methods not yet implemented
+   * TODO: Implement setupAntiDetection() and navigateWithCloudflareHandling() in CloudflareHandler
    */
   async navigateToWithCloudflareHandling(url: string): Promise<boolean> {
-    // Setup anti-detection measures first
-    await this.cloudflareHandler.setupAntiDetection();
+    // Temporary fallback: use regular navigation
+    await this.navigateTo(url);
+    return true;
 
-    // Navigate with Cloudflare handling
-    return await this.cloudflareHandler.navigateWithCloudflareHandling(url);
+    // TODO: Uncomment when CloudflareHandler is fully implemented
+    // await this.cloudflareHandler.setupAntiDetection();
+    // return await this.cloudflareHandler.navigateWithCloudflareHandling(url);
   }
 
   /**

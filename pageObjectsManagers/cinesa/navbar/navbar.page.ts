@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { navbarSelectors, NavbarSelectors } from './navbar.selectors';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 import { EnvironmentConfig } from '../../../config/environments';
 
 /**
@@ -14,7 +14,7 @@ export class Navbar {
    * Base URL for the Cinesa website, injected from environment config.
    * @private
    */
-    private url: string;
+  private url: string;
 
   /**
    * WebActions instance for all browser interactions.
@@ -47,7 +47,6 @@ export class Navbar {
       await this.webActions.navigateTo(this.url);
     });
   }
-
 
   /**
    * Clicks on the Cinesa logo in the navbar (usually returns to the homepage).

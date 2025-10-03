@@ -5,7 +5,7 @@ import {
   CinemaDetailSelectors,
   cinemaDetailConstants,
 } from './cinemaDetail.selectors';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 
 /**
  * Represents the UCI Cinema Detail page.

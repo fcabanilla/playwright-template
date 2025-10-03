@@ -11,7 +11,7 @@ import {
   alternativePromoModalSelectors,
 } from './navbar.selectors';
 import { getUCIUrls } from '../../../config/urls';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 
 /**
  * UCI Cinemas Navigation Bar Page Object Model
