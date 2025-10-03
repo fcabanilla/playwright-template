@@ -30,6 +30,7 @@ This document outlines the plan to progressively enable TypeScript strict mode i
 - [x] Document progressive approach
 
 **Enabled Checks**:
+
 ```json
 {
   "strictFunctionTypes": true,
@@ -54,12 +55,14 @@ This document outlines the plan to progressively enable TypeScript strict mode i
 **Goal**: Fix the remaining 10 type errors with current configuration.
 
 **Known Issues**:
+
 1. `webActions-fixed.ts`: Missing CloudflareHandler methods
 2. Analytics page: Browser API types issues
 3. Cinema pages: `string | undefined` assignments
 4. Unused imports
 
 **Tasks**:
+
 - [ ] Fix CloudflareHandler method signatures
 - [ ] Fix analytics page browser API usage
 - [ ] Add null checks for `textContent()` returns
@@ -78,6 +81,7 @@ This document outlines the plan to progressively enable TypeScript strict mode i
 **Goal**: Require explicit types, eliminate implicit `any` types.
 
 **Changes**:
+
 ```json
 {
   "noImplicitAny": true
@@ -87,6 +91,7 @@ This document outlines the plan to progressively enable TypeScript strict mode i
 **Expected Impact**: ~15-20 new errors
 
 **Common Patterns to Fix**:
+
 ```typescript
 // Before (implicit any)
 function handleEvent(event) { ... }
@@ -96,6 +101,7 @@ function handleEvent(event: Event) { ... }
 ```
 
 **Tasks**:
+
 - [ ] Add explicit types to function parameters
 - [ ] Add types to callback parameters
 - [ ] Type array iterations properly
@@ -111,6 +117,7 @@ function handleEvent(event: Event) { ... }
 **Goal**: Catch null/undefined errors at compile time.
 
 **Changes**:
+
 ```json
 {
   "strictNullChecks": true,
@@ -121,6 +128,7 @@ function handleEvent(event: Event) { ... }
 **Expected Impact**: ~20-25 new errors
 
 **Common Patterns to Fix**:
+
 ```typescript
 // Before
 let name: string;
@@ -148,6 +156,7 @@ class User {
 ```
 
 **Tasks**:
+
 - [ ] Add null checks before accessing properties
 - [ ] Initialize class properties
 - [ ] Use optional chaining (`?.`)
@@ -164,6 +173,7 @@ class User {
 **Goal**: Remove dead code and improve code quality.
 
 **Changes**:
+
 ```json
 {
   "noUnusedLocals": true,
@@ -175,6 +185,7 @@ class User {
 **Expected Impact**: ~10-15 new errors
 
 **Common Patterns to Fix**:
+
 ```typescript
 // Before (unused variable)
 const unused = getData();
@@ -193,6 +204,7 @@ if (first) {
 ```
 
 **Tasks**:
+
 - [ ] Remove unused imports
 - [ ] Remove unused variables
 - [ ] Prefix intentionally unused params with `_`
@@ -208,6 +220,7 @@ if (first) {
 **Goal**: Enable the full `strict` flag.
 
 **Changes**:
+
 ```json
 {
   "strict": true
@@ -217,6 +230,7 @@ if (first) {
 **Expected Impact**: 0 new errors (all previous phases completed)
 
 **Tasks**:
+
 - [ ] Enable `strict: true`
 - [ ] Remove individual strict flags (now covered by `strict`)
 - [ ] Final verification
@@ -263,14 +277,14 @@ Update this as you complete phases:
 
 Track progress:
 
-| Phase | Date | Errors | Notes |
-|-------|------|--------|-------|
-| Phase 0 | 2025-10-03 | 10 | Initial baseline with relaxed config |
-| Phase 1 | TBD | Target: 0 | Fix current errors |
-| Phase 2 | TBD | Expected: ~15 | Enable noImplicitAny |
-| Phase 3 | TBD | Expected: ~20 | Enable strictNullChecks |
-| Phase 4 | TBD | Expected: ~10 | Enable unused checks |
-| Phase 5 | TBD | **Target: 0** | Full strict mode |
+| Phase   | Date       | Errors        | Notes                                |
+| ------- | ---------- | ------------- | ------------------------------------ |
+| Phase 0 | 2025-10-03 | 10            | Initial baseline with relaxed config |
+| Phase 1 | TBD        | Target: 0     | Fix current errors                   |
+| Phase 2 | TBD        | Expected: ~15 | Enable noImplicitAny                 |
+| Phase 3 | TBD        | Expected: ~20 | Enable strictNullChecks              |
+| Phase 4 | TBD        | Expected: ~10 | Enable unused checks                 |
+| Phase 5 | TBD        | **Target: 0** | Full strict mode                     |
 
 ## Best Practices
 
@@ -286,12 +300,12 @@ Track progress:
 ```typescript
 // ❌ BAD (will fail in future phases)
 function processData(data) {
-  return data.map(item => item.value);
+  return data.map((item) => item.value);
 }
 
 // ✅ GOOD (ready for strict mode)
 function processData(data: DataItem[]): number[] {
-  return data.map(item => item.value);
+  return data.map((item) => item.value);
 }
 
 // ❌ BAD (null/undefined issues)

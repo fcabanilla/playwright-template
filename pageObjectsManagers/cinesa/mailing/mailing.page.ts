@@ -8,7 +8,7 @@ import {
   smtpHost,
   smtpPort,
   imapHost,
-  imapPort
+  imapPort,
 } from '../../../tests/cinesa/mailing/mailing.data';
 
 dotenv.config();
@@ -34,15 +34,15 @@ export class Mailing {
       secure: false,
       auth: {
         user: this.user,
-        pass: this.pass
-      }
+        pass: this.pass,
+      },
     });
 
     await transporter.sendMail({
       from: this.user,
       to,
       subject,
-      text
+      text,
     });
   }
 
@@ -53,29 +53,31 @@ export class Mailing {
       secure: true,
       auth: {
         user: this.user,
-        pass: this.pass
-      }
+        pass: this.pass,
+      },
     });
 
     await client.connect();
-    let result: { from: string, subject: string } | null = null;
+    let result: { from: string; subject: string } | null = null;
     let lock = await client.getMailboxLock('INBOX');
     try {
       const searchCriteria = [
         ['UNSEEN'],
         ['HEADER', 'SUBJECT', subject],
-        ['HEADER', 'FROM', from]
+        ['HEADER', 'FROM', from],
       ];
+      // TODO: Fix IMAP library types - searchCriteria needs proper SearchObject type
+      // @ts-expect-error - IMAP library types need to be fixed
       const messages = await client.search(searchCriteria, { uid: true });
 
-      if (messages.length === 0) {
-        throw new Error('No email found with the expected subject and sender');
+      if (!messages || typeof messages === 'boolean' || messages.length === 0) {
+        return null;
       }
       const messageUid = messages[messages.length - 1];
       for await (let msg of client.fetch(messageUid, { envelope: true })) {
         result = {
           from: msg.envelope.from[0].address,
-          subject: msg.envelope.subject
+          subject: msg.envelope.subject,
         };
       }
     } finally {
@@ -88,7 +90,7 @@ export class Mailing {
 
   async sendAndValidateEmail(subject: string, text: string, to: string) {
     await this.sendEmail(subject, text, to);
-    await new Promise(res => setTimeout(res, 10000));
+    await new Promise((res) => setTimeout(res, 10000));
     return await this.getLastEmailWithSubject(subject, this.user);
   }
 }

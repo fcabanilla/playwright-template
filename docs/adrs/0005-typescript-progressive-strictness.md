@@ -32,6 +32,7 @@ When attempting to introduce TypeScript strict mode directly (`"strict": true`),
 - Unchecked array access
 
 **Forcing immediate strict mode compliance would:**
+
 - Block all development until ~45 errors are fixed
 - Require massive refactoring effort (estimated 20-30 hours)
 - Risk introducing bugs during mass changes
@@ -59,6 +60,7 @@ We will gradually enable TypeScript strict mode through a structured 5-phase app
 #### Implementation Strategy
 
 **Phase 0: Foundation** (Completed - Oct 3, 2025)
+
 - Create `tsconfig.json` with ES2022 modules
 - Add `DOM` library for browser types
 - Enable essential type safety checks
@@ -66,29 +68,34 @@ We will gradually enable TypeScript strict mode through a structured 5-phase app
 - Establish baseline: **10 errors**
 
 **Phase 1: Fix Basic Errors** (Target: Week of Oct 7)
+
 - Fix remaining 10 errors with current config
 - Establish zero-error baseline
 - Estimated effort: 2-4 hours
 
 **Phase 2: Enable `noImplicitAny`** (Target: Week of Oct 14)
+
 - Require explicit types for parameters
 - Eliminate implicit `any` types
 - Expected: ~15-20 new errors
 - Estimated effort: 4-6 hours
 
 **Phase 3: Enable Strict Null Checks** (Target: Week of Oct 21)
+
 - Enable `strictNullChecks` and `strictPropertyInitialization`
 - Catch null/undefined errors at compile time
 - Expected: ~20-25 new errors
 - Estimated effort: 6-8 hours
 
 **Phase 4: Enable Code Quality Checks** (Target: Week of Oct 28)
+
 - Enable `noUnusedLocals`, `noUnusedParameters`, `noUncheckedIndexedAccess`
 - Remove dead code, add bounds checks
 - Expected: ~10-15 new errors
 - Estimated effort: 3-4 hours
 
 **Phase 5: Enable Full Strict Mode** (Target: Week of Nov 4)
+
 - Enable `"strict": true` flag
 - Remove individual flags (covered by `strict`)
 - Expected: 0 new errors (all previous phases complete)
@@ -107,35 +114,40 @@ We will gradually enable TypeScript strict mode through a structured 5-phase app
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     // Progressive Strictness - Phase 0
-    "strict": false,                          // ⚠️ Temporarily disabled
-    
+    "strict": false, // ⚠️ Temporarily disabled
+
     // Essential type safety (already enabled)
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    
+
     // Phase 2: Enable after Phase 1 complete
-    "noImplicitAny": false,                   // TODO: Enable in Phase 2
-    
+    "noImplicitAny": false, // TODO: Enable in Phase 2
+
     // Phase 3: Enable after Phase 2 complete
-    "strictNullChecks": false,                // TODO: Enable in Phase 3
-    "strictPropertyInitialization": false,    // TODO: Enable in Phase 3
-    
+    "strictNullChecks": false, // TODO: Enable in Phase 3
+    "strictPropertyInitialization": false, // TODO: Enable in Phase 3
+
     // Phase 4: Enable after Phase 3 complete
-    "noUnusedLocals": false,                  // TODO: Enable in Phase 4
-    "noUnusedParameters": false,              // TODO: Enable in Phase 4
-    "noUncheckedIndexedAccess": false,        // TODO: Enable in Phase 4
-    
+    "noUnusedLocals": false, // TODO: Enable in Phase 4
+    "noUnusedParameters": false, // TODO: Enable in Phase 4
+    "noUncheckedIndexedAccess": false, // TODO: Enable in Phase 4
+
     // Additional checks
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "playwright-report", "test-results", "allure-report"]
+  "exclude": [
+    "node_modules",
+    "playwright-report",
+    "test-results",
+    "allure-report"
+  ]
 }
 ```
 
@@ -160,14 +172,12 @@ Added to `package.json`:
   - Maximum type safety immediately
   - No phased planning needed
   - Clear target state
-  
 - **Cons**:
   - Blocks all development until ~45 errors fixed
   - Massive refactoring effort (20-30 hours)
   - High risk of introducing bugs
   - Team overwhelm and frustration
   - Merge conflicts with ongoing work
-  
 - **Reason for rejection**: Not practical for active project with ongoing development
 
 #### Option B: Never Enable Strict Mode
@@ -176,14 +186,12 @@ Added to `package.json`:
   - No changes needed
   - No development interruption
   - No learning curve
-  
 - **Cons**:
   - Misses entire value of TypeScript
   - Allows type errors to persist
   - Runtime bugs that could be caught at compile time
   - Lower code quality
   - No CI/CD validation
-  
 - **Reason for rejection**: Defeats purpose of using TypeScript
 
 #### Option C: Per-File Opt-In Strict Mode
@@ -191,14 +199,12 @@ Added to `package.json`:
 - **Pros**:
   - Each file can enable strict mode independently
   - Gradual migration per file
-  
 - **Cons**:
   - Inconsistent configuration across files
   - Hard to track progress
   - Complex to maintain
   - `// @ts-strict` comments in every file
   - No clear migration path to full strictness
-  
 - **Reason for rejection**: Creates fragmented codebase, hard to maintain
 
 #### Option D: Create Separate TypeScript Project for New Code
@@ -206,14 +212,12 @@ Added to `package.json`:
 - **Pros**:
   - New code starts strict from day one
   - No need to fix existing code
-  
 - **Cons**:
   - Two different TypeScript configurations
   - Complex build process
   - Code sharing difficulties
   - Confusing for team
   - Maintenance nightmare
-  
 - **Reason for rejection**: Over-engineering, creates artificial separation
 
 ## Consequences
@@ -254,6 +258,7 @@ Added to `package.json`:
 **Result**: Baseline established with 10 errors
 
 **Actions Taken**:
+
 - ✅ Created `tsconfig.json` with ES2022 configuration
 - ✅ Added `DOM` library for browser types (`window`, `document`, etc.)
 - ✅ Enabled essential type safety checks
@@ -262,6 +267,7 @@ Added to `package.json`:
 - ✅ Reduced errors from ~45 to 10
 
 **Enabled Checks**:
+
 ```json
 {
   "strictFunctionTypes": true,
@@ -281,12 +287,14 @@ Added to `package.json`:
 **Goal**: Achieve zero errors with current configuration
 
 **Known Issues to Fix**:
+
 1. `core/webactions/webActions-fixed.ts`: Missing CloudflareHandler methods
 2. `pageObjectsManagers/cinesa/analytics/analytics.page.ts`: Browser API types
 3. Various cinema page objects: `string | undefined` assignments
 4. Unused imports and variables
 
 **Tasks**:
+
 - [ ] Fix CloudflareHandler method signatures in webActions-fixed.ts
 - [ ] Fix analytics page browser API usage (window, document)
 - [ ] Add null checks for `textContent()` returns
@@ -295,6 +303,7 @@ Added to `package.json`:
 - [ ] Run full test suite to ensure no regressions
 
 **Success Criteria**:
+
 - `npm run typecheck` returns **0 errors**
 - All existing tests pass without modification
 - No new type errors introduced
@@ -306,13 +315,15 @@ Added to `package.json`:
 **Expected New Errors**: ~15-20
 
 **Change to Apply**:
+
 ```json
 {
-  "noImplicitAny": true  // Require explicit types
+  "noImplicitAny": true // Require explicit types
 }
 ```
 
 **Common Patterns to Fix**:
+
 ```typescript
 // ❌ Before (implicit any)
 function handleEvent(event) { ... }
@@ -322,6 +333,7 @@ function handleEvent(event: MouseEvent) { ... }
 ```
 
 **Tasks**:
+
 - [ ] Add explicit types to function parameters
 - [ ] Add types to callback parameters
 - [ ] Type array iterations properly
@@ -335,6 +347,7 @@ function handleEvent(event: MouseEvent) { ... }
 **Expected New Errors**: ~20-25
 
 **Changes to Apply**:
+
 ```json
 {
   "strictNullChecks": true,
@@ -343,6 +356,7 @@ function handleEvent(event: MouseEvent) { ... }
 ```
 
 **Common Patterns to Fix**:
+
 ```typescript
 // ❌ Before
 let name: string;
@@ -368,6 +382,7 @@ class User {
 ```
 
 **Tasks**:
+
 - [ ] Add null checks before accessing properties
 - [ ] Initialize all class properties
 - [ ] Use optional chaining (`?.`)
@@ -381,6 +396,7 @@ class User {
 **Expected New Errors**: ~10-15
 
 **Changes to Apply**:
+
 ```json
 {
   "noUnusedLocals": true,
@@ -390,6 +406,7 @@ class User {
 ```
 
 **Tasks**:
+
 - [ ] Remove unused imports
 - [ ] Remove unused variables
 - [ ] Prefix intentionally unused params with `_`
@@ -403,13 +420,15 @@ class User {
 **Expected New Errors**: 0
 
 **Final Configuration**:
+
 ```json
 {
-  "strict": true  // Enable full strict mode
+  "strict": true // Enable full strict mode
 }
 ```
 
 **Tasks**:
+
 - [ ] Enable `"strict": true`
 - [ ] Remove individual strict flags (covered by `strict`)
 - [ ] Final verification with full test suite
@@ -430,14 +449,14 @@ Add to GitHub Actions / Jenkins pipeline:
 
 ### Progress Tracking
 
-| Phase | Target Date | Status | Errors | Effort | Notes |
-|-------|-------------|--------|--------|--------|-------|
-| Phase 0 | Oct 3, 2025 | ✅ Complete | 10 → 10 | 2h | Baseline established |
-| Phase 1 | Oct 7, 2025 | 🔄 In Progress | 10 → 0 | 2-4h | Fix basic errors |
-| Phase 2 | Oct 14, 2025 | 📋 Planned | 0 → ~15 | 4-6h | Enable noImplicitAny |
-| Phase 3 | Oct 21, 2025 | 📋 Planned | ~15 → ~35 | 6-8h | Enable strict null checks |
-| Phase 4 | Oct 28, 2025 | 📋 Planned | ~35 → ~45 | 3-4h | Enable code quality |
-| Phase 5 | Nov 4, 2025 | 🎯 Goal | ~45 → 0 | 1-2h | Full strict mode |
+| Phase   | Target Date  | Status         | Errors    | Effort | Notes                     |
+| ------- | ------------ | -------------- | --------- | ------ | ------------------------- |
+| Phase 0 | Oct 3, 2025  | ✅ Complete    | 10 → 10   | 2h     | Baseline established      |
+| Phase 1 | Oct 7, 2025  | 🔄 In Progress | 10 → 0    | 2-4h   | Fix basic errors          |
+| Phase 2 | Oct 14, 2025 | 📋 Planned     | 0 → ~15   | 4-6h   | Enable noImplicitAny      |
+| Phase 3 | Oct 21, 2025 | 📋 Planned     | ~15 → ~35 | 6-8h   | Enable strict null checks |
+| Phase 4 | Oct 28, 2025 | 📋 Planned     | ~35 → ~45 | 3-4h   | Enable code quality       |
+| Phase 5 | Nov 4, 2025  | 🎯 Goal        | ~45 → 0   | 1-2h   | Full strict mode          |
 
 **Total Estimated Effort**: 18-24 hours over 5 weeks
 
@@ -517,6 +536,7 @@ Add to GitHub Actions / Jenkins pipeline:
 ### Best Practices During Transition
 
 **DO**:
+
 - ✅ Write new code with strict types even before strict mode enabled
 - ✅ Run `npm run typecheck` before committing
 - ✅ Fix type errors as you encounter them
@@ -524,6 +544,7 @@ Add to GitHub Actions / Jenkins pipeline:
 - ✅ Document complex types with interfaces
 
 **DON'T**:
+
 - ❌ Add new type errors during transition
 - ❌ Use `@ts-ignore` to bypass errors
 - ❌ Use `any` type unless absolutely necessary
@@ -535,7 +556,7 @@ Add to GitHub Actions / Jenkins pipeline:
 ```typescript
 // ❌ BAD: Will fail in future phases
 function processData(data) {
-  return data.map(item => item.value);
+  return data.map((item) => item.value);
 }
 
 // ✅ GOOD: Ready for strict mode
@@ -545,7 +566,7 @@ interface DataItem {
 }
 
 function processData(data: DataItem[]): number[] {
-  return data.map(item => item.value);
+  return data.map((item) => item.value);
 }
 
 // ❌ BAD: Null/undefined issues
@@ -563,6 +584,7 @@ if (config) {
 ### Architecture Impact
 
 **Before Progressive Strictness**:
+
 ```
 No tsconfig.json
   ↓
@@ -574,6 +596,7 @@ Harder to maintain
 ```
 
 **After Progressive Strictness**:
+
 ```
 tsconfig.json with progressive flags
   ↓
@@ -601,4 +624,3 @@ Easier to maintain, fewer runtime bugs
 ---
 
 **Implementation Status**: Phase 0 completed successfully. Progressive strictness strategy established with clear path to full strict mode over 5 weeks. Baseline of 10 errors achieved, ready to proceed with Phase 1.
-
