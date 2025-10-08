@@ -1,5 +1,5 @@
 import * as allure from 'allure-playwright';
-import { Page } from '@playwright/test';
+// import { Page } from '@playwright/test'; // Reserved for future use
 import { Cinema } from '../../../pageObjectsManagers/uci/cinemas/cinema.page';
 import { CinemaDetail } from '../../../pageObjectsManagers/uci/cinemas/cinemaDetail.page';
 
@@ -11,7 +11,8 @@ import { CinemaDetail } from '../../../pageObjectsManagers/uci/cinemas/cinemaDet
  */
 export class CinemasAssertions {
   constructor(
-    private page: Page,
+    // Reserved for future assertions if needed
+    // private _page: Page,
     private cinema: Cinema,
     private cinemaDetail: CinemaDetail
   ) {}

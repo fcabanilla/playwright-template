@@ -1,0 +1,77 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+
+    /* Type Checking - Progressive Strict Mode (ADR-002) */
+    /* Phase 5: Full Strict Mode ✅ COMPLETE */
+    "strict": true, // ✅ All strict checks enabled! Includes:
+    // - noImplicitAny: true
+    // - strictNullChecks: true
+    // - strictFunctionTypes: true
+    // - strictBindCallApply: true
+    // - strictPropertyInitialization: true
+    // - noImplicitThis: true
+    // - alwaysStrict: true
+
+    /* Additional Code Quality checks */
+    "noUnusedLocals": true, // ✅ Remove unused variables
+    "noUnusedParameters": false, // Pragmatic: Playwright fixtures often unused but required
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false, // TODO: Phase 4b - Safe array access (~99 errors)
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    /* Module Resolution */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Emit */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": false,
+    "noEmit": true,
+
+    /* Interop Constraints */
+    "skipLibCheck": true,
+    "allowJs": false,
+    "allowImportingTsExtensions": true,
+
+    /* Completeness */
+    "types": ["node", "@playwright/test"],
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@core/*": ["core/*"],
+      "@fixtures/*": ["fixtures/*"],
+      "@pageObjects/*": ["pageObjectsManagers/*"],
+      "@tests/*": ["tests/*"]
+    }
+  },
+  "include": [
+    "config/**/*",
+    "core/**/*",
+    "fixtures/**/*",
+    "pageObjectsManagers/**/*",
+    "tests/**/*",
+    "playwright.config.ts",
+    "allure.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test-results",
+    "playwright-report",
+    "allure-report",
+    ".allure"
+  ]
+}

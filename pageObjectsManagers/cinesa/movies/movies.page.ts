@@ -22,14 +22,20 @@ export class MovieList {
    * Waits for the top movies container to be visible.
    */
   async loadTopMovies(): Promise<void> {
-    await this.page.waitForSelector(MOVIES_SELECTORS.topMoviesContainer, { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector(MOVIES_SELECTORS.topMoviesContainer, {
+      state: 'visible',
+      timeout: 10000,
+    });
   }
 
   /**
    * Waits for the all movies container to be visible.
    */
   async loadAllMovies(): Promise<void> {
-    await this.page.waitForSelector(MOVIES_SELECTORS.allMoviesContainer, { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector(MOVIES_SELECTORS.allMoviesContainer, {
+      state: 'visible',
+      timeout: 10000,
+    });
   }
 
   /**
@@ -37,11 +43,15 @@ export class MovieList {
    */
   async getTopMovies(): Promise<Movie[]> {
     await this.loadTopMovies();
-    const movieLocators = await this.page.locator(MOVIES_SELECTORS.topMoviesContainer).all();
+    const movieLocators = await this.page
+      .locator(MOVIES_SELECTORS.topMoviesContainer)
+      .all();
     const movies: Movie[] = [];
 
     for (const movieLocator of movieLocators) {
-      const title = await movieLocator.locator(MOVIES_SELECTORS.movieTitle).innerText();
+      const title = await movieLocator
+        .locator(MOVIES_SELECTORS.movieTitle)
+        .innerText();
       movies.push({ title, locator: movieLocator });
     }
 
@@ -53,11 +63,15 @@ export class MovieList {
    */
   async getAllMovies(): Promise<Movie[]> {
     await this.loadAllMovies();
-    const movieLocators = await this.page.locator(MOVIES_SELECTORS.allMoviesContainer).all();
+    const movieLocators = await this.page
+      .locator(MOVIES_SELECTORS.allMoviesContainer)
+      .all();
     const movies: Movie[] = [];
 
     for (const movieLocator of movieLocators) {
-      const title = await movieLocator.locator(MOVIES_SELECTORS.movieTitle).innerText();
+      const title = await movieLocator
+        .locator(MOVIES_SELECTORS.movieTitle)
+        .innerText();
       movies.push({ title, locator: movieLocator });
     }
 
@@ -86,9 +100,16 @@ export class MovieList {
       await this.page.waitForTimeout(500);
       await nextButton.click();
       await this.page.waitForTimeout(1000);
-      await this.page.waitForSelector(MOVIES_SELECTORS.topMoviesContainer, { state: 'visible', timeout: 10000 });
+      await this.page.waitForSelector(MOVIES_SELECTORS.topMoviesContainer, {
+        state: 'visible',
+        timeout: 10000,
+      });
     } catch (error) {
-      console.warn('Carousel next button not available or not clickable:', error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(
+        'Carousel next button not available or not clickable:',
+        message
+      );
     }
   }
 
@@ -106,8 +127,12 @@ export class MovieList {
     const movies = await this.getTopMovies();
     let processedCount = 0;
     const maxMoviesToProcess = Math.min(3, movies.length);
-    
-    for (let i = 0; i < movies.length && processedCount < maxMoviesToProcess; i++) {
+
+    for (
+      let i = 0;
+      i < movies.length && processedCount < maxMoviesToProcess;
+      i++
+    ) {
       const movie = movies[i];
       try {
         await this.clickMovie(movie);
@@ -117,19 +142,26 @@ export class MovieList {
         await this.loadTopMovies();
         processedCount++;
       } catch (error) {
-        console.warn(`Failed to process movie ${i}: ${error.message}`);
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`Failed to process movie ${i}: ${message}`);
         try {
           await this.page.goBack();
           await this.page.waitForLoadState('networkidle');
           await this.loadTopMovies();
         } catch (backError) {
-          console.warn('Failed to go back:', backError.message);
-        }        
+          const backMessage =
+            backError instanceof Error ? backError.message : String(backError);
+          console.warn('Failed to go back:', backMessage);
+        }
         try {
           await this.clickCarouselNext();
           await this.page.waitForTimeout(1000);
         } catch (carouselError) {
-          console.warn('Failed to navigate carousel:', carouselError.message);
+          const carouselMessage =
+            carouselError instanceof Error
+              ? carouselError.message
+              : String(carouselError);
+          console.warn('Failed to navigate carousel:', carouselMessage);
         }
       }
     }
@@ -150,20 +182,25 @@ export class MovieList {
     const randomMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 3); // Reduced to 3 for stability
     for (const movie of randomMovies) {
       try {
-        const title = await movie.locator.locator(MOVIES_SELECTORS.movieTitle).innerText();
+        const title = await movie.locator
+          .locator(MOVIES_SELECTORS.movieTitle)
+          .innerText();
         await this.clickMovie(movie);
         await this.validateMovieTitle(title);
         await this.page.goBack();
         await this.page.waitForLoadState('networkidle');
         await this.loadAllMovies();
       } catch (error) {
-        console.warn(`Failed to process movie: ${error.message}`);
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`Failed to process movie: ${message}`);
         try {
           await this.page.goBack();
           await this.page.waitForLoadState('networkidle');
           await this.loadAllMovies();
         } catch (backError) {
-          console.warn('Failed to go back:', backError.message);
+          const backMessage =
+            backError instanceof Error ? backError.message : String(backError);
+          console.warn('Failed to go back:', backMessage);
         }
       }
     }
@@ -177,7 +214,9 @@ export class MovieList {
     await moviePage.waitForPageLoad();
     const actualTitle = await moviePage.getMovieTitle();
     if (actualTitle.toLowerCase() !== expectedTitle.toLowerCase()) {
-      throw new Error(`Expected title "${expectedTitle}" but found "${actualTitle}"`);
+      throw new Error(
+        `Expected title "${expectedTitle}" but found "${actualTitle}"`
+      );
     }
   }
 
@@ -186,7 +225,9 @@ export class MovieList {
    * 0 = All, 1 = Now Showing, 2 = Coming Soon, 3 = Advance Sale
    */
   async clickMoviesTabByIndex(index: number): Promise<void> {
-    const tabButton = this.page.locator('.v-tabs__tab-list .v-tab__button').nth(index);
+    const tabButton = this.page
+      .locator('.v-tabs__tab-list .v-tab__button')
+      .nth(index);
     await tabButton.waitFor({ state: 'visible', timeout: 15000 }); // Increased timeout for high concurrency
     await tabButton.click();
     await this.page.waitForTimeout(800);

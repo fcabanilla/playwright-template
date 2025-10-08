@@ -1,14 +1,12 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
+import { getUCIUrls } from '../../../config/urls';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   filmsSelectors,
-  FilmsSelectors,
   filmsConstants,
-  alternativeFilmTitleSelectors,
-  alternativeFilmCardSelectors,
+  FilmsSelectors,
 } from './films.selectors';
-import { getUCIUrls } from '../../../config/urls';
-import { WebActions } from '../../../core/webActions/webActions';
 
 /**
  * UCI Cinemas Films/Movies Page Object Model

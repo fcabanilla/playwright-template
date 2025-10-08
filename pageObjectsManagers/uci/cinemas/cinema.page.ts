@@ -5,7 +5,7 @@ import {
   CinemaSelectors,
   cinemaConstants,
 } from './cinema.selectors';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 
 /**
  * UCI Cinemas Cinema Selection Page Object Model
@@ -330,7 +330,7 @@ export class Cinema {
         const elements = this.webActions.getLocator(selector);
         const names = await elements.allTextContents();
         if (names.length > 0) {
-          return names.filter((name) => name.trim().length > 0);
+          return names.filter((name: string) => name.trim().length > 0);
         }
       } catch (error) {
         // Try next selector
@@ -383,7 +383,8 @@ export class Cinema {
           return names.length > 0;
         }
       } catch (error) {
-        console.log(`Error with selector "${selector}":`, error.message);
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`Error with selector "${selector}":`, message);
         continue;
       }
     }

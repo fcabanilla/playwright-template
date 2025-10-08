@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Page } from '@playwright/test';
+import type { Browser } from '@playwright/test';
 
 /**
  * Inicializa un contexto y página sorteando Cloudflare y restaurando sesión según el ambiente.

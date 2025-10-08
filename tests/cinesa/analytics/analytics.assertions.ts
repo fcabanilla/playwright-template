@@ -1,4 +1,4 @@
-import { Page, expect, TestInfo } from '@playwright/test';
+import { expect, TestInfo } from '@playwright/test';
 
 /**
  * Validates that dataLayer events were captured successfully

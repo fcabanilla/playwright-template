@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { Navbar } from '../../pageObjectsManagers/uci/navbar/navbar.page';
+import { getUCIConfig, UCIEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/uci/cookies/cookieBanner.page';
 import { PromoModal } from '../../pageObjectsManagers/uci/promoModal/promoModal.page';
 import { Cinema } from '../../pageObjectsManagers/uci/cinemas/cinema.page';
@@ -23,7 +24,9 @@ type CustomFixtures = {
 
 export const test = base.extend<CustomFixtures>({
   navbar: async ({ page }, use) => {
-    const navbar = new Navbar(page);
+    const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
+    const config = getUCIConfig(env);
+    const navbar = new Navbar(page, config.baseUrl);
     await use(navbar);
   },
   cookieBanner: async ({ page }, use) => {
@@ -54,8 +57,8 @@ export const test = base.extend<CustomFixtures>({
     const navbarAssertions = new NavbarAssertions(page);
     await use(navbarAssertions);
   },
-  cinemasAssertions: async ({ page, cinema, cinemaDetail }, use) => {
-    const cinemasAssertions = new CinemasAssertions(page, cinema, cinemaDetail);
+  cinemasAssertions: async ({ cinema, cinemaDetail }, use) => {
+    const cinemasAssertions = new CinemasAssertions(cinema, cinemaDetail);
     await use(cinemasAssertions);
   },
 });

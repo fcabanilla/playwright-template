@@ -5,7 +5,7 @@ import {
   CinemaDetailSelectors,
   cinemaDetailConstants,
 } from './cinemaDetail.selectors';
-import { WebActions } from '../../../core/webActions/webActions';
+import { WebActions } from '../../../core/webactions/webActions';
 
 /**
  * Represents the UCI Cinema Detail page.
@@ -326,7 +326,9 @@ export class CinemaDetail {
 
         if (count > 0) {
           const names = await elements.allTextContents();
-          const validNames = names.filter((name) => name.trim().length > 0);
+          const validNames = names.filter(
+            (name: string) => name.trim().length > 0
+          );
           console.log(
             `🎬 Valid film names found: ${validNames.length}`,
             validNames
@@ -447,7 +449,8 @@ export class CinemaDetail {
         indicators.hasFilmItems = await this._checkAlternativeFilmSelectors();
       }
     } catch (error) {
-      console.log('❌ Film items check failed:', error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      console.log('❌ Film items check failed:', message);
     }
 
     // 4. Overall page readiness check

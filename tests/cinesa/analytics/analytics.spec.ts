@@ -1,7 +1,6 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { analyticsTestData } from './analytics.data';
-import { 
+import {
   assertEventsWereCaptured,
   assertCriticalEventsExist,
   assertBeginCheckoutEventStructure,
@@ -9,7 +8,7 @@ import {
   assertEcommerceItemsStructure,
   attachEventsToReport,
   logAnalyticsSummary,
-  logGrancasaAnalyticsSummary
+  logGrancasaAnalyticsSummary,
 } from './analytics.assertions';
 
 // Extend window type to include dataLayer and our custom properties
@@ -21,7 +20,6 @@ declare global {
 }
 
 test.describe('Google Analytics DataLayer Validation', () => {
-  
   test.beforeEach(async ({ page, navbar }) => {
     await navbar.navigateToHome();
   });
@@ -36,11 +34,11 @@ test.describe('Google Analytics DataLayer Validation', () => {
     barPage,
     purchaseSummary,
     loginPage,
-    analyticsPage
+    analyticsPage,
   }) => {
     const cinemaName = analyticsTestData.cinemaNames.oasiz;
     const menuType = 'Classic';
-    
+
     await analyticsPage.initializeDataLayerCapture();
 
     await cookieBanner.acceptCookies();
@@ -57,25 +55,37 @@ test.describe('Google Analytics DataLayer Validation', () => {
     // Validate analytics
     const allEvents = await analyticsPage.captureDataLayerEvents();
     await assertEventsWereCaptured(allEvents);
-    
-    const { addToCartEvents, beginCheckoutEvents } = await assertCriticalEventsExist(allEvents);
-    const latestBeginCheckout = beginCheckoutEvents[beginCheckoutEvents.length - 1];
-    
+
+    const { addToCartEvents, beginCheckoutEvents } =
+      await assertCriticalEventsExist(allEvents);
+    const latestBeginCheckout =
+      beginCheckoutEvents[beginCheckoutEvents.length - 1];
+
     await assertBeginCheckoutEventStructure(latestBeginCheckout);
-    
+
     const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
     await assertAnalyticsTotalIsReasonable(analyticsTotal);
-    
+
     if (latestBeginCheckout.ecommerce?.items) {
       await assertEcommerceItemsStructure(latestBeginCheckout.ecommerce.items);
     }
 
-    const itemsTotal = latestBeginCheckout.ecommerce?.items?.reduce((sum, item) => {
-      return sum + (item.price * (item.quantity || 1));
-    }, 0) || 0;
+    const itemsTotal =
+      latestBeginCheckout.ecommerce?.items?.reduce((sum: number, item: any) => {
+        return sum + item.price * (item.quantity || 1);
+      }, 0) || 0;
 
     await attachEventsToReport(test.info(), allEvents, latestBeginCheckout);
-    await logAnalyticsSummary(cinemaName, menuType, allEvents, addToCartEvents, beginCheckoutEvents, analyticsTotal, itemsTotal, latestBeginCheckout);
+    await logAnalyticsSummary(
+      cinemaName,
+      menuType,
+      allEvents,
+      addToCartEvents,
+      beginCheckoutEvents,
+      analyticsTotal,
+      itemsTotal,
+      latestBeginCheckout
+    );
   });
 
   test('Validate analytics events capture - Grancasa with Classic menu', async ({
@@ -88,10 +98,8 @@ test.describe('Google Analytics DataLayer Validation', () => {
     barPage,
     purchaseSummary,
     loginPage,
-    analyticsPage
+    analyticsPage,
   }) => {
-    const cinemaName = analyticsTestData.cinemaNames.grancasa;
-    
     await analyticsPage.initializeDataLayerCapture();
 
     await cookieBanner.acceptCookies();
@@ -108,12 +116,19 @@ test.describe('Google Analytics DataLayer Validation', () => {
     // Validate analytics
     const allEvents = await analyticsPage.captureDataLayerEvents();
     await assertEventsWereCaptured(allEvents);
-    
-    const { addToCartEvents, beginCheckoutEvents } = await assertCriticalEventsExist(allEvents);
-    const latestBeginCheckout = beginCheckoutEvents[beginCheckoutEvents.length - 1];
+
+    const { addToCartEvents, beginCheckoutEvents } =
+      await assertCriticalEventsExist(allEvents);
+    const latestBeginCheckout =
+      beginCheckoutEvents[beginCheckoutEvents.length - 1];
     const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
-    
+
     await assertAnalyticsTotalIsReasonable(analyticsTotal);
-    await logGrancasaAnalyticsSummary(allEvents, addToCartEvents, beginCheckoutEvents, analyticsTotal);
+    await logGrancasaAnalyticsSummary(
+      allEvents,
+      addToCartEvents,
+      beginCheckoutEvents,
+      analyticsTotal
+    );
   });
 });

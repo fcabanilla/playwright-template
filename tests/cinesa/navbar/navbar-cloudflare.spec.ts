@@ -1,14 +1,13 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { NavbarAssertions } from './navbar.assertions';
-import { baseUrl } from './navbar.data';
+import { getNavbarData } from './navbar.data';
 import { setupCloudflareContextAndPage } from '../../../core/webactions/setupCloudflareContextAndPage';
+import type { BrowserContext, Page } from '@playwright/test';
 
 test.describe('Cinesa Navbar Tests - Cloudflare Safe', () => {
-
-  let context;
-  let page;
-  let navbarAssertions;
+  let context: BrowserContext;
+  let page: Page;
+  let navbarAssertions: NavbarAssertions;
 
   test.beforeEach(async ({ browser }) => {
     ({ context, page } = await setupCloudflareContextAndPage(browser));
@@ -23,6 +22,7 @@ test.describe('Cinesa Navbar Tests - Cloudflare Safe', () => {
   test('@fast @navbar @cinesa should click logo and stay on home safely', async ({
     navbar,
   }) => {
+    const { baseUrl } = getNavbarData();
     await navbar.clickLogo();
     await navbarAssertions.expectHomeUrl(baseUrl);
   });
