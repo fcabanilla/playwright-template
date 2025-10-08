@@ -100,8 +100,6 @@ test.describe('Google Analytics DataLayer Validation', () => {
     loginPage,
     analyticsPage,
   }) => {
-    // const cinemaName = analyticsTestData.cinemaNames.grancasa; // TODO: Use if cinema-specific logic needed
-
     await analyticsPage.initializeDataLayerCapture();
 
     await cookieBanner.acceptCookies();

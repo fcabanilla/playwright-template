@@ -4,7 +4,7 @@ import {
   CinesaEnvironment,
 } from '../../../config/environments';
 
-// Interfaz para representar un elemento de navegación y su URL esperada
+// Interface to represent a navigation element and its expected URL
 export interface NavItem {
   selectorKey: keyof NavbarSelectors;
   expectedUrl: string;
@@ -17,10 +17,10 @@ const cleanBaseUrl = config.baseUrl.endsWith('/')
   ? config.baseUrl.slice(0, -1)
   : config.baseUrl;
 
-// URL base del sitio (dinámica según el entorno)
+// Base URL of the site (dynamic based on environment)
 export const baseUrl = cleanBaseUrl;
 
-// Elementos de navegación interna (URLs dinámicas según el entorno)
+// Internal navigation elements (dynamic URLs based on environment)
 export const internalNavItems: NavItem[] = [
   { selectorKey: 'cines', expectedUrl: `${cleanBaseUrl}/cines/` },
   { selectorKey: 'peliculas', expectedUrl: `${cleanBaseUrl}/peliculas/` },
@@ -29,7 +29,7 @@ export const internalNavItems: NavItem[] = [
   { selectorKey: 'programas', expectedUrl: `${cleanBaseUrl}/programas/` },
 ];
 
-// Elemento de navegación externa
+// External navigation element
 export const externalNavItem: NavItem = {
   selectorKey: 'bonos',
   expectedUrl: 'https://www.cinesabusiness.es/promociones.html',

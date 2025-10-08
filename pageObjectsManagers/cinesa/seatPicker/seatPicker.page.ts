@@ -108,7 +108,6 @@ export class SeatPicker {
           const pressed = await seatLocator.getAttribute('aria-pressed');
 
           const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
-          // const seatIdentifier = `${row}-${seatNumber}`; // TODO: Use for seat identification if needed
 
           const seatType = this.getSeatType(className, ariaLabel);
           const seatState = await this.getSeatState(seatLocator, className, pressed);

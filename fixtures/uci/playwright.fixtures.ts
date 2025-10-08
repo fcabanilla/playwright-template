@@ -57,8 +57,8 @@ export const test = base.extend<CustomFixtures>({
     const navbarAssertions = new NavbarAssertions(page);
     await use(navbarAssertions);
   },
-  cinemasAssertions: async ({ page, cinema, cinemaDetail }, use) => {
-    const cinemasAssertions = new CinemasAssertions(page, cinema, cinemaDetail);
+  cinemasAssertions: async ({ cinema, cinemaDetail }, use) => {
+    const cinemasAssertions = new CinemasAssertions(cinema, cinemaDetail);
     await use(cinemasAssertions);
   },
 });
