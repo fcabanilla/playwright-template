@@ -74,13 +74,12 @@ export class SeatPicker {
       }
 
       // Wait for all seats to have their aria-pressed attribute set
-      await this.page.waitForFunction(
-        (selector) => {
-          const seats = Array.from(document.querySelectorAll(selector));
-          return seats.every((seat) => seat.getAttribute('aria-pressed') !== null);
-        },
-        SEAT_PICKER_SELECTORS.seatGeneric
-      );
+      await this.page.waitForFunction((selector) => {
+        const seats = Array.from(document.querySelectorAll(selector));
+        return seats.every(
+          (seat) => seat.getAttribute('aria-pressed') !== null
+        );
+      }, SEAT_PICKER_SELECTORS.seatGeneric);
     });
   }
 
@@ -110,7 +109,11 @@ export class SeatPicker {
           const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
 
           const seatType = this.getSeatType(className, ariaLabel);
-          const seatState = await this.getSeatState(seatLocator, className, pressed);
+          const seatState = await this.getSeatState(
+            seatLocator,
+            className,
+            pressed
+          );
 
           seats.push({
             row,
@@ -132,69 +135,88 @@ export class SeatPicker {
    * Each sublist represents a row, and each element in the sublist is a seat.
    */
   async getAllSofaSeats(): Promise<Seat[][]> {
-    return await allure.test.step('Retrieving all sofa seats from the sofa section as a matrix', async () => {
-      await this.waitForSeatPicker();
+    return await allure.test.step(
+      'Retrieving all sofa seats from the sofa section as a matrix',
+      async () => {
+        await this.waitForSeatPicker();
 
-      // Locate the sofa section
-      const sofaSectionLocator = this.page.locator(SEAT_PICKER_SELECTORS.sofaSection);
-      await sofaSectionLocator.waitFor({ state: 'visible', timeout: 10000 });
+        // Locate the sofa section
+        const sofaSectionLocator = this.page.locator(
+          SEAT_PICKER_SELECTORS.sofaSection
+        );
+        await sofaSectionLocator.waitFor({ state: 'visible', timeout: 10000 });
 
-      const seatLocators = sofaSectionLocator.locator(SEAT_PICKER_SELECTORS.seatGeneric);
-      const count = await seatLocators.count();
-      console.log(`Found ${count} seats in the sofa section`);
+        const seatLocators = sofaSectionLocator.locator(
+          SEAT_PICKER_SELECTORS.seatGeneric
+        );
+        const count = await seatLocators.count();
+        console.log(`Found ${count} seats in the sofa section`);
 
-      if (count === 0) {
-        throw new Error('No seats found in the sofa section after waiting for them to load');
-      }
-
-      const sofaSeats: Seat[] = [];
-
-      for (let i = 0; i < count; i++) {
-        const seatLocator = seatLocators.nth(i);
-        await seatLocator.waitFor({ state: 'visible', timeout: 5000 });
-
-        const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
-        const className = (await seatLocator.getAttribute('class')) || '';
-
-        // Filter for sofa seats based on specific class or aria-label patterns
-        if (className.includes('v-seat-picker-seat--normal') && ariaLabel.toLowerCase().includes('normal seat')) {
-          const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
-          const seatType = this.getSeatType(className, ariaLabel);
-          const seatState = await this.getSeatState(seatLocator, className, null);
-
-          sofaSeats.push({
-            row,
-            seatNumber,
-            seatType,
-            seatState,
-            ariaLabel,
-            locator: seatLocator,
-          });
+        if (count === 0) {
+          throw new Error(
+            'No seats found in the sofa section after waiting for them to load'
+          );
         }
-      }
 
-      // Group seats into a matrix by row
-      const seatsMatrix: Seat[][] = [];
-      let currentRow: number | null = null;
-      let currentRowSeats: Seat[] = [];
+        const sofaSeats: Seat[] = [];
 
-      for (const seat of sofaSeats.sort((a, b) => a.row - b.row || a.seatNumber - b.seatNumber)) {
-        if (currentRow === null || seat.row !== currentRow) {
-          if (currentRowSeats.length > 0) {
-            seatsMatrix.push(currentRowSeats);
+        for (let i = 0; i < count; i++) {
+          const seatLocator = seatLocators.nth(i);
+          await seatLocator.waitFor({ state: 'visible', timeout: 5000 });
+
+          const ariaLabel =
+            (await seatLocator.getAttribute('aria-label')) || '';
+          const className = (await seatLocator.getAttribute('class')) || '';
+
+          // Filter for sofa seats based on specific class or aria-label patterns
+          if (
+            className.includes('v-seat-picker-seat--normal') &&
+            ariaLabel.toLowerCase().includes('normal seat')
+          ) {
+            const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
+            const seatType = this.getSeatType(className, ariaLabel);
+            const seatState = await this.getSeatState(
+              seatLocator,
+              className,
+              null
+            );
+
+            sofaSeats.push({
+              row,
+              seatNumber,
+              seatType,
+              seatState,
+              ariaLabel,
+              locator: seatLocator,
+            });
           }
-          currentRow = seat.row;
-          currentRowSeats = [];
         }
-        currentRowSeats.push(seat);
-      }
 
-      if (currentRowSeats.length > 0) {
-        seatsMatrix.push(currentRowSeats);
-      }
+        // Group seats into a matrix by row
+        const seatsMatrix: Seat[][] = [];
+        let currentRow: number | null = null;
+        let currentRowSeats: Seat[] = [];
 
-      return seatsMatrix;
-    });
+        for (const seat of sofaSeats.sort(
+          (a, b) => a.row - b.row || a.seatNumber - b.seatNumber
+        )) {
+          if (currentRow === null || seat.row !== currentRow) {
+            if (currentRowSeats.length > 0) {
+              seatsMatrix.push(currentRowSeats);
+            }
+            currentRow = seat.row;
+            currentRowSeats = [];
+          }
+          currentRowSeats.push(seat);
+        }
+
+        if (currentRowSeats.length > 0) {
+          seatsMatrix.push(currentRowSeats);
+        }
+
+        return seatsMatrix;
+      }
+    );
   }
 
   /**
@@ -251,7 +273,7 @@ export class SeatPicker {
           await this.handleShowtimeAttributeModal();
           await seat.locator.click();
         }
-        
+
         const elementHandle = await seat.locator.elementHandle();
         await this.page.waitForFunction(
           (element) => element?.getAttribute('aria-pressed') === 'true',
@@ -280,8 +302,10 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting a random available seat',
       async () => {
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
 
         const availableSeats = await this.getAvailableSeats();
@@ -301,45 +325,55 @@ export class SeatPicker {
    * Returns the chosen seat.
    */
   async selectLastAvailableSeat(): Promise<Seat> {
-    return await allure.test.step('Selecting last available seat from back', async () => {
-      await this.page.waitForResponse((response) =>
-        response.url().includes('/seat-availability') && response.status() === 200
-      );
-      await this.waitForSeatsToBeReady();
-      const availableSeats = await this.getAvailableSeats();
-      if (availableSeats.length === 0) {
-        throw new Error('No available seats found');
+    return await allure.test.step(
+      'Selecting last available seat from back',
+      async () => {
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const availableSeats = await this.getAvailableSeats();
+        if (availableSeats.length === 0) {
+          throw new Error('No available seats found');
+        }
+        const sortedSeats = availableSeats.sort((a, b) => {
+          if (a.row !== b.row) return b.row - a.row;
+          return b.seatNumber - a.seatNumber;
+        });
+        const chosenSeat = sortedSeats[0];
+        await this.selectSeat(chosenSeat);
+        return chosenSeat;
       }
-      const sortedSeats = availableSeats.sort((a, b) => {
-        if (a.row !== b.row) return b.row - a.row;
-        return b.seatNumber - a.seatNumber;
-      });
-      const chosenSeat = sortedSeats[0];
-      await this.selectSeat(chosenSeat);
-      return chosenSeat;
-    });
+    );
   }
 
   /**
    * Selecciona el último sofá disponible (de atrás hacia adelante) y devuelve el objeto Seat completo.
    */
   async selectLastAvailableSofaSeat(): Promise<Seat> {
-    return await allure.test.step('Selecting last available sofa seat from back', async () => {
-      await this.waitForSeatsToBeReady();
-      const sofaMatrix = await this.getAllSofaSeats();
-      const allSofas = sofaMatrix.flat();
-      const availableSofas = allSofas.filter(seat => seat.seatState === 'available');
-      if (availableSofas.length === 0) {
-        throw new Error('No available sofa seats found');
+    return await allure.test.step(
+      'Selecting last available sofa seat from back',
+      async () => {
+        await this.waitForSeatsToBeReady();
+        const sofaMatrix = await this.getAllSofaSeats();
+        const allSofas = sofaMatrix.flat();
+        const availableSofas = allSofas.filter(
+          (seat) => seat.seatState === 'available'
+        );
+        if (availableSofas.length === 0) {
+          throw new Error('No available sofa seats found');
+        }
+        const sortedSofas = availableSofas.sort((a, b) => {
+          if (a.row !== b.row) return b.row - a.row;
+          return b.seatNumber - a.seatNumber;
+        });
+        const chosenSofa = sortedSofas[0];
+        await this.selectSeat(chosenSofa);
+        return chosenSofa;
       }
-      const sortedSofas = availableSofas.sort((a, b) => {
-        if (a.row !== b.row) return b.row - a.row;
-        return b.seatNumber - a.seatNumber;
-      });
-      const chosenSofa = sortedSofas[0];
-      await this.selectSeat(chosenSofa);
-      return chosenSofa;
-    });
+    );
   }
 
   /**
@@ -356,8 +390,10 @@ export class SeatPicker {
           throw new Error(`Cannot select more than ${maxSeatSelection} seats`);
         }
 
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
         await this.waitForSeatsToBeReady();
         const availableSeats = await this.getAvailableSeats();
@@ -418,20 +454,27 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats with an empty space between them',
       async () => {
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
         await this.waitForSeatsToBeReady();
         const availableSeats = await this.getAvailableSeats();
 
-        const seatsByRow = availableSeats.reduce((acc, seat) => {
-          acc[seat.row] = acc[seat.row] || [];
-          acc[seat.row].push(seat);
-          return acc;
-        }, {} as Record<number, Seat[]>);
+        const seatsByRow = availableSeats.reduce(
+          (acc, seat) => {
+            acc[seat.row] = acc[seat.row] || [];
+            acc[seat.row].push(seat);
+            return acc;
+          },
+          {} as Record<number, Seat[]>
+        );
 
         for (const row in seatsByRow) {
-          const rowSeats = seatsByRow[row].sort((a, b) => a.seatNumber - b.seatNumber);
+          const rowSeats = seatsByRow[row].sort(
+            (a, b) => a.seatNumber - b.seatNumber
+          );
 
           for (let i = 0; i < rowSeats.length - 2; i++) {
             const firstSeat = rowSeats[i];
@@ -449,7 +492,9 @@ export class SeatPicker {
           }
         }
 
-        throw new Error('No suitable seats found with an empty space between them');
+        throw new Error(
+          'No suitable seats found with an empty space between them'
+        );
       }
     );
   }
@@ -463,24 +508,31 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats separating group in the same row',
       async () => {
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
         await this.waitForSeatsToBeReady();
         const availableSeats = await this.getAvailableSeats();
 
-        const seatsByRow = availableSeats.reduce((acc, seat) => {
-          acc[seat.row] = acc[seat.row] || [];
-          acc[seat.row].push(seat);
-          return acc;
-        }, {} as Record<number, Seat[]>);
+        const seatsByRow = availableSeats.reduce(
+          (acc, seat) => {
+            acc[seat.row] = acc[seat.row] || [];
+            acc[seat.row].push(seat);
+            return acc;
+          },
+          {} as Record<number, Seat[]>
+        );
 
         const sortedRows = Object.keys(seatsByRow)
           .map(Number)
           .sort((a, b) => b - a);
 
         for (const row of sortedRows) {
-          const rowSeats = seatsByRow[row].sort((a, b) => a.seatNumber - b.seatNumber);
+          const rowSeats = seatsByRow[row].sort(
+            (a, b) => a.seatNumber - b.seatNumber
+          );
 
           for (let i = 0; i < rowSeats.length - 4; i++) {
             const firstSeat = rowSeats[i];
@@ -520,8 +572,10 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats separating group in different rows',
       async () => {
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
         await this.waitForSeatsToBeReady();
         const seatsMatrix = await this.getAvailableSeatsMatrix();
@@ -533,7 +587,10 @@ export class SeatPicker {
           for (let i = 0; i < sortedRow.length - 1; i++) {
             const firstSeat = sortedRow[i];
             const secondSeat = sortedRow[i + 1];
-            if (firstSeat.seatState === 'available' && secondSeat.seatState === 'available') {
+            if (
+              firstSeat.seatState === 'available' &&
+              secondSeat.seatState === 'available'
+            ) {
               selectedSeats.push(firstSeat, secondSeat);
               rowIndex--;
               break;
@@ -543,7 +600,9 @@ export class SeatPicker {
             for (; rowIndex >= 0; rowIndex--) {
               const nextRow = seatsMatrix[rowIndex];
               if (nextRow.length > 0) {
-                const sortedNextRow = nextRow.sort((a, b) => a.seatNumber - b.seatNumber);
+                const sortedNextRow = nextRow.sort(
+                  (a, b) => a.seatNumber - b.seatNumber
+                );
                 selectedSeats.push(sortedNextRow[0]);
                 break;
               }
@@ -574,8 +633,10 @@ export class SeatPicker {
         const extraSeatsToTest = 3; // Number of extra seats to test
         const seatCount = maxSeatSelection + extraSeatsToTest; // Total seats to select
 
-        await this.page.waitForResponse((response) =>
-          response.url().includes('/seat-availability') && response.status() === 200
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
         );
         await this.waitForSeatsToBeReady();
         const seatsMatrix = await this.getAvailableSeatsMatrix();
@@ -595,13 +656,15 @@ export class SeatPicker {
           if (totalSelected >= seatCount) break;
         }
         if (selectedSeats.length !== seatCount) {
-          throw new Error(`Expected to select ${seatCount} seats, but only selected ${selectedSeats.length}`);
+          throw new Error(
+            `Expected to select ${seatCount} seats, but only selected ${selectedSeats.length}`
+          );
         }
         await this.page.waitForTimeout(500);
         for (let i = 0; i < selectedSeats.length; i++) {
           selectedSeats[i].seatState = await this.getSeatState(
             selectedSeats[i].locator,
-            await selectedSeats[i].locator.getAttribute('class') || '',
+            (await selectedSeats[i].locator.getAttribute('class')) || '',
             await selectedSeats[i].locator.getAttribute('aria-pressed')
           );
         }
@@ -616,12 +679,17 @@ export class SeatPicker {
    */
   async selectCompanionSeat(): Promise<void> {
     return await allure.test.step('Selecting a companion seat', async () => {
-      await this.page.waitForResponse((response) =>
-        response.url().includes('/seat-availability') && response.status() === 200
+      await this.page.waitForResponse(
+        (response) =>
+          response.url().includes('/seat-availability') &&
+          response.status() === 200
       );
       await this.waitForSeatsToBeReady();
       const allSeats = await this.getAllSeats();
-      const companionSeat = allSeats.find((seat) => seat.seatType === 'companion' && seat.seatState === 'available');
+      const companionSeat = allSeats.find(
+        (seat) =>
+          seat.seatType === 'companion' && seat.seatState === 'available'
+      );
       if (!companionSeat) {
         throw new Error('No available companion seat found');
       }
@@ -653,47 +721,63 @@ export class SeatPicker {
    * Finds the first available companion seat and its contiguous wheelchair seat, then selects both.
    */
   async selectCompanionAndWheelchairSeats(): Promise<void> {
-    return await allure.test.step('Selecting a companion seat and a contiguous wheelchair seat', async () => {
-      await this.page.waitForResponse((response) =>
-        response.url().includes('/seat-availability') && response.status() === 200
-      );
-      await this.waitForSeatsToBeReady();
-      const allSeats = await this.getAllSeats();
-      const companionSeat = allSeats.find((seat) => seat.seatType === 'companion' && seat.seatState === 'available');
-      if (!companionSeat) {
-        throw new Error('No available companion seat found');
+    return await allure.test.step(
+      'Selecting a companion seat and a contiguous wheelchair seat',
+      async () => {
+        await this.page.waitForResponse(
+          (response) =>
+            response.url().includes('/seat-availability') &&
+            response.status() === 200
+        );
+        await this.waitForSeatsToBeReady();
+        const allSeats = await this.getAllSeats();
+        const companionSeat = allSeats.find(
+          (seat) =>
+            seat.seatType === 'companion' && seat.seatState === 'available'
+        );
+        if (!companionSeat) {
+          throw new Error('No available companion seat found');
+        }
+        const wheelchairSeat = allSeats.find(
+          (seat) =>
+            seat.seatType === 'wheelchair' &&
+            seat.seatState === 'available' &&
+            seat.row === companionSeat.row &&
+            (seat.seatNumber === companionSeat.seatNumber - 1 ||
+              seat.seatNumber === companionSeat.seatNumber + 1)
+        );
+        if (!wheelchairSeat) {
+          throw new Error(
+            'No contiguous wheelchair seat found for the companion seat'
+          );
+        }
+        await this.selectSeat(companionSeat);
+        await this.selectWheelchairSeat(wheelchairSeat);
       }
-      const wheelchairSeat = allSeats.find(
-        (seat) =>
-          seat.seatType === 'wheelchair' &&
-          seat.seatState === 'available' &&
-          seat.row === companionSeat.row &&
-          (seat.seatNumber === companionSeat.seatNumber - 1 || seat.seatNumber === companionSeat.seatNumber + 1)
-      );
-      if (!wheelchairSeat) {
-        throw new Error('No contiguous wheelchair seat found for the companion seat');
-      }
-      await this.selectSeat(companionSeat);
-      await this.selectWheelchairSeat(wheelchairSeat);
-    });
+    );
   }
 
   /**
    * Selects a sofa seat within a specific section and returns the selected Seat object.
    */
   async selectSofaSeat(): Promise<Seat> {
-    return await allure.test.step('Selecting a sofa seat within a specific section', async () => {
-      const sofaSeatsMatrix = await this.getAllSofaSeats();
-      for (const row of sofaSeatsMatrix) {
-        for (const seat of row) {
-          if (seat.seatState === 'available') {
-            await this.selectSeat(seat);
-            return seat;
+    return await allure.test.step(
+      'Selecting a sofa seat within a specific section',
+      async () => {
+        const sofaSeatsMatrix = await this.getAllSofaSeats();
+        for (const row of sofaSeatsMatrix) {
+          for (const seat of row) {
+            if (seat.seatState === 'available') {
+              await this.selectSeat(seat);
+              return seat;
+            }
           }
         }
+        throw new Error(
+          'No available sofa seat found in the specified section'
+        );
       }
-      throw new Error('No available sofa seat found in the specified section');
-    });
+    );
   }
 
   /**
@@ -701,27 +785,30 @@ export class SeatPicker {
    * Throws an error if no such seats are found.
    */
   async selectMiddleOfThreeContiguousSeats(): Promise<void> {
-    await allure.test.step('Selecting the middle seat of three contiguous available seats', async () => {
-      const availableSeatsMatrix = await this.getAvailableSeatsMatrix();
-      for (const row of availableSeatsMatrix) {
-        for (let i = 0; i < row.length - 2; i++) {
-          const firstSeat = row[i];
-          const secondSeat = row[i + 1];
-          const thirdSeat = row[i + 2];
+    await allure.test.step(
+      'Selecting the middle seat of three contiguous available seats',
+      async () => {
+        const availableSeatsMatrix = await this.getAvailableSeatsMatrix();
+        for (const row of availableSeatsMatrix) {
+          for (let i = 0; i < row.length - 2; i++) {
+            const firstSeat = row[i];
+            const secondSeat = row[i + 1];
+            const thirdSeat = row[i + 2];
 
-          if (
-            firstSeat.seatState === 'available' &&
-            secondSeat.seatState === 'available' &&
-            thirdSeat.seatState === 'available'
-          ) {
-            await this.selectSeat(secondSeat);
-            return;
+            if (
+              firstSeat.seatState === 'available' &&
+              secondSeat.seatState === 'available' &&
+              thirdSeat.seatState === 'available'
+            ) {
+              await this.selectSeat(secondSeat);
+              return;
+            }
           }
         }
-      }
 
-      throw new Error('No three contiguous available seats found in any row');
-    });
+        throw new Error('No three contiguous available seats found in any row');
+      }
+    );
   }
 
   /**
@@ -730,7 +817,9 @@ export class SeatPicker {
   async acceptWheelchairMessage(): Promise<void> {
     return await allure.test.step('Handling the wheelchair modal', async () => {
       const modal = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModal);
-      const continueButton = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModalAcceptButton);
+      const continueButton = this.page.locator(
+        SEAT_PICKER_SELECTORS.wheelchairModalAcceptButton
+      );
       await modal.waitFor({ state: 'visible', timeout: 10000 });
       await continueButton.waitFor({ state: 'visible', timeout: 5000 });
       await continueButton.click();
@@ -756,36 +845,46 @@ export class SeatPicker {
    * Handles the showtime attribute modal by dismissing it if it appears.
    */
   async handleShowtimeAttributeModal(): Promise<void> {
-    await allure.test.step('Handling showtime attribute modal if present', async () => {
-      try {
-        const modal = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModal);
-        
-        // Check if modal is visible with a short timeout
-        await modal.waitFor({ state: 'visible', timeout: 1000 });
-        
-        // Try to find and click the accept button first (most common case)
-        const acceptButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton).first();
-        
-        if (await acceptButton.isVisible()) {
-          await acceptButton.click();
-          console.log('Clicked accept button on showtime attribute modal');
-        } else {
-          // Try close button as fallback
-          const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton);
-          if (await closeButton.isVisible()) {
-            await closeButton.click();
-            console.log('Clicked close button on showtime attribute modal');
+    await allure.test.step(
+      'Handling showtime attribute modal if present',
+      async () => {
+        try {
+          const modal = this.page.locator(
+            SEAT_PICKER_SELECTORS.showtimeAttributeModal
+          );
+
+          // Check if modal is visible with a short timeout
+          await modal.waitFor({ state: 'visible', timeout: 1000 });
+
+          // Try to find and click the accept button first (most common case)
+          const acceptButton = this.page
+            .locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton)
+            .first();
+
+          if (await acceptButton.isVisible()) {
+            await acceptButton.click();
+            console.log('Clicked accept button on showtime attribute modal');
+          } else {
+            // Try close button as fallback
+            const closeButton = this.page.locator(
+              SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton
+            );
+            if (await closeButton.isVisible()) {
+              await closeButton.click();
+              console.log('Clicked close button on showtime attribute modal');
+            }
           }
+
+          // Wait for modal to disappear
+          await modal.waitFor({ state: 'hidden', timeout: 5000 });
+        } catch (error) {
+          // Modal not present or already closed, continue
+          console.log(
+            'Showtime attribute modal not present or already handled'
+          );
         }
-        
-        // Wait for modal to disappear
-        await modal.waitFor({ state: 'hidden', timeout: 5000 });
-        
-      } catch (error) {
-        // Modal not present or already closed, continue
-        console.log('Showtime attribute modal not present or already handled');
       }
-    });
+    );
   }
 
   /**
@@ -815,24 +914,34 @@ export class SeatPicker {
    * Validates that the red warning message is displayed.
    */
   async validateWarningMessage(): Promise<void> {
-    await allure.test.step('Validating red warning message is displayed', async () => {
-      const warningMessage = this.page.locator(SEAT_PICKER_SELECTORS.warningMessage);
-      if (!(await warningMessage.isVisible())) {
-        throw new Error('Red warning message is not displayed');
+    await allure.test.step(
+      'Validating red warning message is displayed',
+      async () => {
+        const warningMessage = this.page.locator(
+          SEAT_PICKER_SELECTORS.warningMessage
+        );
+        if (!(await warningMessage.isVisible())) {
+          throw new Error('Red warning message is not displayed');
+        }
       }
-    });
+    );
   }
 
   /**
    * Validates that the "Continuar" button is disabled.
    */
   async validateConfirmButtonDisabled(): Promise<void> {
-    await allure.test.step('Validating "Continuar" button is disabled', async () => {
-      const confirmButton = this.page.locator(SEAT_PICKER_SELECTORS.disabledConfirmButton);
-      if (!(await confirmButton.isVisible())) {
-        throw new Error('"Continuar" button is not disabled');
+    await allure.test.step(
+      'Validating "Continuar" button is disabled',
+      async () => {
+        const confirmButton = this.page.locator(
+          SEAT_PICKER_SELECTORS.disabledConfirmButton
+        );
+        if (!(await confirmButton.isVisible())) {
+          throw new Error('"Continuar" button is not disabled');
+        }
       }
-    });
+    );
   }
 
   // ────────────────────────── Helpers ──────────────────────────
@@ -878,7 +987,11 @@ export class SeatPicker {
   /**
    * Determines the seat state from class names, aria-label, or the aria-pressed attribute.
    */
-  private async getSeatState(seatLocator: Locator, className: string, pressed: string | null): Promise<SeatState> {
+  private async getSeatState(
+    seatLocator: Locator,
+    className: string,
+    pressed: string | null
+  ): Promise<SeatState> {
     const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
     const useLocator = seatLocator.locator('use');
 
@@ -888,15 +1001,17 @@ export class SeatPicker {
     }
 
     // Check for specific icons or href attributes in <use> elements
-    if (await useLocator.count() > 0) {
+    if ((await useLocator.count()) > 0) {
       const href = await useLocator.first().getAttribute('href');
       if (href?.includes('selected')) return 'selected';
       if (href?.includes('available')) return 'available';
-      if (href?.includes('unavailable') || href?.includes('house')) return 'unavailable';
+      if (href?.includes('unavailable') || href?.includes('house'))
+        return 'unavailable';
     }
 
     // Check for specific class names indicating state
-    if (className.includes('--unavailable') || className.includes('--house')) return 'unavailable';
+    if (className.includes('--unavailable') || className.includes('--house'))
+      return 'unavailable';
     if (className.includes('--selected')) return 'selected';
     if (className.includes('--available')) return 'available';
 
@@ -926,7 +1041,9 @@ export class SeatPicker {
    */
   async selectRandomAvailableWheelchairSeat(): Promise<void> {
     const availableSeats = await this.getAvailableSeats();
-    const wheelchairSeats = availableSeats.filter(seat => seat.seatType === 'wheelchair');
+    const wheelchairSeats = availableSeats.filter(
+      (seat) => seat.seatType === 'wheelchair'
+    );
     if (wheelchairSeats.length === 0) {
       throw new Error('No available wheelchair seats found');
     }
@@ -942,7 +1059,9 @@ export class SeatPicker {
   async selectSofaSeatsWithEmptySpaceBetween(): Promise<void> {
     const sofaMatrix = await this.getAllSofaSeats();
     for (const row of sofaMatrix) {
-      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      const availableSofas = row.filter(
+        (seat) => seat.seatState === 'available'
+      );
       if (availableSofas.length >= 3) {
         await this.selectSeat(availableSofas[0]);
         await this.selectSeat(availableSofas[2]);
@@ -958,7 +1077,9 @@ export class SeatPicker {
   async selectSofaSeatsSeparatingGroupInSameRow(): Promise<void> {
     const sofaMatrix = await this.getAllSofaSeats();
     for (const row of sofaMatrix) {
-      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      const availableSofas = row.filter(
+        (seat) => seat.seatState === 'available'
+      );
       if (availableSofas.length >= 3) {
         await this.selectSeat(availableSofas[0]);
         await this.selectSeat(availableSofas[availableSofas.length - 1]);
@@ -975,14 +1096,18 @@ export class SeatPicker {
     const sofaMatrix = await this.getAllSofaSeats();
     const selected: Seat[] = [];
     for (const row of sofaMatrix) {
-      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      const availableSofas = row.filter(
+        (seat) => seat.seatState === 'available'
+      );
       if (availableSofas.length > 0 && selected.length < 2) {
         selected.push(availableSofas[0]);
       }
       if (selected.length === 2) break;
     }
     for (const row of sofaMatrix) {
-      const availableSofas = row.filter(seat => seat.seatState === 'available');
+      const availableSofas = row.filter(
+        (seat) => seat.seatState === 'available'
+      );
       if (availableSofas.length > 0 && !selected.includes(availableSofas[0])) {
         selected.push(availableSofas[0]);
         break;
@@ -1003,16 +1128,23 @@ export class SeatPicker {
     await this.selectLastAvailableSeat();
     await this.selectLastAvailableSofaSeat();
     const allSeats = await this.getAllSeats();
-    const selectedSeats = allSeats.filter(s => s.seatState === 'selected');
+    const selectedSeats = allSeats.filter((s) => s.seatState === 'selected');
     const seatTypes: string[] = [];
     for (const seat of selectedSeats) {
       const aria = seat.ariaLabel.toLowerCase();
-      const className = (await seat.locator.getAttribute('class'))?.toLowerCase() || '';
-      let isDBox = aria.includes('d-box') || aria.includes('dbox') || className.includes('d-box') || className.includes('dbox');
+      const className =
+        (await seat.locator.getAttribute('class'))?.toLowerCase() || '';
+      let isDBox =
+        aria.includes('d-box') ||
+        aria.includes('dbox') ||
+        className.includes('d-box') ||
+        className.includes('dbox');
       if (!isDBox) {
         const useLocator = seat.locator.locator('use');
-        if (await useLocator.count() > 0) {
-          const href = (await useLocator.first().getAttribute('href'))?.toLowerCase() || '';
+        if ((await useLocator.count()) > 0) {
+          const href =
+            (await useLocator.first().getAttribute('href'))?.toLowerCase() ||
+            '';
           if (href.includes('d-box') || href.includes('dbox')) {
             isDBox = true;
           }

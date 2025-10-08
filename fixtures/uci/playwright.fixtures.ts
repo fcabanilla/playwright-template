@@ -24,7 +24,7 @@ type CustomFixtures = {
 
 export const test = base.extend<CustomFixtures>({
   navbar: async ({ page }, use) => {
-    const env = process.env.TEST_ENV as UCIEnvironment || 'production';
+    const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
     const config = getUCIConfig(env);
     const navbar = new Navbar(page, config.baseUrl);
     await use(navbar);
