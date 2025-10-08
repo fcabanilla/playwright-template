@@ -4,15 +4,15 @@ This document outlines the system architecture, design decisions, and structural
 
 ## 📋 Table of Contents
 
-- [System Overview](#system-overview)
-- [Architectural Patterns](#architectural-patterns)
-- [Component Architecture](#component-architecture)
-- [Data Flow](#data-flow)
-- [Platform Integration](#platform-integration)
-- [Environment Configuration](#environment-configuration)
-- [Testing Strategy](#testing-strategy)
-- [Scalability and Maintenance](#scalability-and-maintenance)
-- [Technology Decisions](#technology-decisions)
+- [🎯 System Overview](#-system-overview)
+- [🏛️ Architectural Patterns](#️-architectural-patterns)
+- [🏗️ Component Architecture](#️-component-architecture)
+- [📊 Data Flow](#-data-flow)
+- [🔌 Platform Integration](#-platform-integration)
+- [⚙️ Environment Configuration](#️-environment-configuration)
+- [🧪 Testing Strategy](#-testing-strategy)
+- [📈 Scalability and Maintenance](#-scalability-and-maintenance)
+- [🛠️ Technology Decisions](#️-technology-decisions)
 
 ## 🎯 System Overview
 
@@ -130,6 +130,207 @@ class PlatformFactory {
 const config = PlatformFactory.createConfig('cinesa');
 const moviePage = new MoviePage(page, config);
 ```
+
+### Architectural Boundaries and Access Control
+
+**CRITICAL RULE**: The framework enforces strict separation between layers to maintain code quality, testability, and maintainability.
+
+#### Access Control Rules
+
+##### Rule 1: Playwright API Access Restriction
+
+**✅ ALLOWED to access Playwright API (`page` object) directly:**
+
+- `WebActions` class (core/webactions/)
+- Assertion classes (\*.assertions.ts)
+- Test files (\*.spec.ts) - only for test-specific operations
+
+**❌ FORBIDDEN to access Playwright API directly:**
+
+- Page Object classes (\*.page.ts)
+- Selector files (\*.selectors.ts)
+- Data files (\*.data.ts)
+- Helper utilities (\*.helpers.ts)
+
+**Rationale**: Centralizing Playwright API access in WebActions enables:
+
+- Single point of change when Playwright API evolves
+- Consistent error handling and retry logic
+- Easy mocking for unit tests
+- Platform-specific adaptations without cascading changes
+
+**Example:**
+
+```typescript
+// ✅ CORRECT: Page Object delegates to WebActions
+export class MoviesPage {
+  constructor(
+    private readonly webActions: WebActions // ✅ Uses abstraction
+    // NO private page: Page - ❌ Direct access forbidden
+  ) {}
+
+  async selectMovie(title: string): Promise<void> {
+    // ✅ All interactions through WebActions
+    await this.webActions.click(this.selectors.movieCard(title));
+    await this.webActions.waitForVisible(this.selectors.movieDetail);
+  }
+}
+```
+
+```typescript
+// ❌ WRONG: Page Object accessing Playwright API directly
+export class MoviesPage {
+  constructor(private readonly page: Page) {} // ❌ Forbidden
+
+  async selectMovie(title: string): Promise<void> {
+    // ❌ Direct Playwright API usage - FORBIDDEN
+    await this.page.click(`[data-title="${title}"]`);
+    await this.page.waitForSelector('.movie-detail');
+  }
+}
+```
+
+##### Rule 2: Selector Separation
+
+**ALL selectors MUST be defined in dedicated `.selectors.ts` files.**
+
+**✅ CORRECT Pattern:**
+
+```typescript
+// navbar.selectors.ts
+export const navbarSelectors = {
+  logo: '[data-testid="navbar-logo"]',
+  menuButton: '[data-testid="navbar-menu"]',
+  searchInput: 'input[name="search"]',
+} as const;
+
+// navbar.page.ts
+import { navbarSelectors } from './navbar.selectors';
+
+export class NavbarPage {
+  private readonly selectors = navbarSelectors;
+
+  async clickLogo(): Promise<void> {
+    await this.webActions.click(this.selectors.logo);
+  }
+}
+```
+
+**❌ FORBIDDEN Pattern:**
+
+```typescript
+// navbar.page.ts - WRONG!
+export class NavbarPage {
+  async clickLogo(): Promise<void> {
+    // ❌ Inline selector - FORBIDDEN
+    await this.webActions.click('[data-testid="navbar-logo"]');
+  }
+}
+```
+
+**Rationale**:
+
+- Selector changes don't require modifying page object logic
+- Selectors reusable across multiple methods
+- Easy to update when UI changes
+- Clear separation of concerns (what vs where)
+
+##### Rule 3: Page Object Responsibilities
+
+**Page Objects MUST:**
+
+- Define business-level page interactions
+- Use selectors from `.selectors.ts` files
+- Delegate all browser interactions to WebActions
+- Return business-level data (strings, numbers, objects)
+- Handle page-specific logic and workflows
+
+**Page Objects MUST NOT:**
+
+- Access Playwright API (`page`, `locator`, `elementHandle`) directly
+- Contain inline selectors as magic strings
+- Implement browser interaction logic (clicks, waits, fills)
+- Return Playwright types (Locator, ElementHandle)
+- Contain test assertions (belongs in .assertions.ts)
+
+**Example:**
+
+```typescript
+// ✅ CORRECT: High-level business methods
+export class TicketPickerPage {
+  constructor(
+    private readonly webActions: WebActions,
+    private readonly selectors: TicketPickerSelectors
+  ) {}
+
+  async selectAdultTickets(quantity: number): Promise<void> {
+    // ✅ Business logic with WebActions delegation
+    for (let i = 0; i < quantity; i++) {
+      await this.webActions.click(this.selectors.adultPlusButton);
+    }
+  }
+
+  async getTicketTotal(): Promise<string> {
+    // ✅ Returns business data, not Locator
+    return await this.webActions.getText(this.selectors.totalPrice);
+  }
+}
+```
+
+##### Rule 4: WebActions as Gateway
+
+**WebActions class responsibilities:**
+
+- Encapsulate ALL Playwright API interactions
+- Provide high-level interaction methods (click, fill, getText, etc.)
+- Handle waits, retries, and error handling
+- Abstract browser-specific behaviors
+- Log actions for debugging and reporting
+
+**Example:**
+
+```typescript
+// core/webactions/webActions.ts
+export class WebActions {
+  constructor(public readonly page: Page) {} // ✅ Only here
+
+  async click(selector: string, options?: ClickOptions): Promise<void> {
+    await this.page.click(selector, options); // ✅ Encapsulated
+  }
+
+  async getText(selector: string): Promise<string> {
+    return (await this.page.textContent(selector)) || '';
+  }
+
+  async waitForVisible(selector: string): Promise<void> {
+    await this.page.waitForSelector(selector, { state: 'visible' });
+  }
+}
+```
+
+#### Enforcement Mechanisms
+
+**Automated Checks:**
+
+- ESLint rules restrict imports in page objects
+- TypeScript compiler enforces type boundaries
+- Pre-commit hooks detect architectural violations
+- CI/CD pipeline fails on rule violations
+
+**Manual Reviews:**
+
+- Code review checklist includes architectural compliance
+- Architecture review sessions for major changes
+- Team training on architectural rules
+- Pair programming for complex implementations
+
+#### References
+
+For detailed implementation guidelines and examples, see:
+
+- [ADR-0009: Page Object Architecture and Access Control Rules](./adrs/0009-page-object-architecture-rules.md)
+- [WebActions Implementation](../core/webactions/webActions.ts)
+- [Example Page Objects](../pageObjectsManagers/)
 
 ## 🏗️ Component Architecture
 
