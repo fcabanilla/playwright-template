@@ -2,6 +2,11 @@ node_modules/
 .allure/
 dist/
 
+# Environment variables (contienen credenciales sensibles)
+.env
+.env.local
+.env.*.local
+
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
 notLoggedInState.json
