@@ -16,6 +16,9 @@ import { UnlimitedProgramsPage } from '../../pageObjectsManagers/cinesa/programs
 import { SignupPage } from '../../pageObjectsManagers/cinesa/signup/signup.page';
 import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
 import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analytics.page';
+import { PromoModalPage } from '../../pageObjectsManagers/cinesa/promoModal/promoModal.page';
+import { AuthenticatedNavbarPage } from '../../pageObjectsManagers/cinesa/navbar/authenticatedNavbar.page';
+import { MyAccountOverviewPage } from '../../pageObjectsManagers/cinesa/myAccount/myAccountOverview.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -34,6 +37,9 @@ type CustomFixtures = {
   unlimitedProgramsPage: UnlimitedProgramsPage;
   signupPage: SignupPage;
   mailing: Mailing;
+  promoModal: PromoModalPage;
+  authenticatedNavbar: AuthenticatedNavbarPage;
+  myAccountOverview: MyAccountOverviewPage;
   whoarewe: Footer;
   workwithus: Footer;
   cinesabusiness: Footer;
@@ -59,12 +65,12 @@ type CustomFixtures = {
 };
 
 export const test = base.extend<CustomFixtures>({
-    navbar: async ({ page }, use) => {
-      const env = process.env.TEST_ENV as CinesaEnvironment || 'production';
-      const config = getCinesaConfig(env);
-      const navbar = new Navbar(page, config.baseUrl);
-      await use(navbar);
-    },
+  navbar: async ({ page }, use) => {
+    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+    const config = getCinesaConfig(env);
+    const navbar = new Navbar(page, config.baseUrl);
+    await use(navbar);
+  },
   cookieBanner: async ({ page }, use) => {
     const cookieBanner = new CookieBanner(page);
     await use(cookieBanner);
@@ -124,6 +130,18 @@ export const test = base.extend<CustomFixtures>({
   mailing: async ({ page }, use) => {
     const mailing = new Mailing(page);
     await use(mailing);
+  },
+  promoModal: async ({ page }, use) => {
+    const promoModal = new PromoModalPage(page);
+    await use(promoModal);
+  },
+  authenticatedNavbar: async ({ page }, use) => {
+    const authenticatedNavbar = new AuthenticatedNavbarPage(page);
+    await use(authenticatedNavbar);
+  },
+  myAccountOverview: async ({ page }, use) => {
+    const myAccountOverview = new MyAccountOverviewPage(page);
+    await use(myAccountOverview);
   },
   whoarewe: async ({ footer }, use) => {
     await use(footer);

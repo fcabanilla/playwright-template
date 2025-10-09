@@ -80,9 +80,12 @@ export default defineConfig({
           actionTimeout: 60000,
           navigationTimeout: 60000,
           // Usa el estado guardado para saltar login/cloudflare
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : 'loggedInState.json',
+          storageState:
+            process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json',
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
@@ -114,10 +117,13 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare en preprod
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : undefined,
+          // Usa el estado guardado para saltar login/cloudflare en preprod/lab
+          storageState:
+            process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : undefined,
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
