@@ -48,35 +48,12 @@ test.describe('My Account - Login Flow @quick', () => {
   });
 
   test('should navigate to My Account overview page @smoke', async ({
-    page,
     navbar,
     loginPage,
     authenticatedNavbar,
     myAccountOverview,
     promoModal,
   }) => {
-    // Capture console messages and errors
-    page.on('console', (msg) => {
-      const type = msg.type();
-      const text = msg.text();
-      if (type === 'error' || type === 'warning') {
-        console.log(`🔴 Browser ${type}: ${text}`);
-      }
-    });
-
-    // Capture network request failures
-    page.on('requestfailed', (request) => {
-      console.log(`❌ Network failed: ${request.url()}`);
-      console.log(`   Failure: ${request.failure()?.errorText}`);
-    });
-
-    // Capture response errors
-    page.on('response', (response) => {
-      if (response.status() >= 400) {
-        console.log(`⚠️  HTTP ${response.status()}: ${response.url()}`);
-      }
-    });
-
     // Step 1: Navigate to home
     await navbar.navigateToHome();
 
@@ -87,31 +64,18 @@ test.describe('My Account - Login Flow @quick', () => {
     await navbar.clickSignin();
 
     // Step 4: Fill and submit login form with test account credentials
-    console.log(`📧 Using account: ${testAccount.email}`);
     await loginPage.fillData(testAccount.email, testAccount.password);
-    console.log('✅ Form filled, clicking submit...');
 
+    // Step 5: Submit login form
     await loginPage.clickSubmit();
-    console.log('✅ Submit clicked, waiting for response...');
 
-    // Wait for login to process
-    await page.waitForTimeout(5000);
+    // Step 6: Wait for authentication to complete
+    await authenticatedNavbar.isUserAuthenticated();
 
-    // Step 5: Wait for authenticated state
-    const isAuthenticated = await authenticatedNavbar.isUserAuthenticated();
+    // Step 7: Navigate to My Account overview
+    await authenticatedNavbar.navigateToMyAccount();
 
-    // Step 6: Navigate to My Account overview
-    if (isAuthenticated) {
-      console.log('✅ User is authenticated!');
-
-      await authenticatedNavbar.navigateToMyAccount();
-
-      // Wait a bit for navigation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      console.log('Successfully navigated to My Account!');
-    } else {
-      console.log('❌ User is NOT authenticated');
-    }
+    // Step 8: Verify My Account page loaded
+    await myAccountOverview.waitForPageLoad();
   });
 });
