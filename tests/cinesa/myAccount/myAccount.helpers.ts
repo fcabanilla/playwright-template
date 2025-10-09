@@ -9,21 +9,24 @@
 
 import { Page } from '@playwright/test';
 import { LoginPage } from '../../../pageObjectsManagers/cinesa/login/login.page';
-import { AuthenticatedNavbarPage } from '../../../pageObjectsManagers/cinesa/navbar/authenticatedNavbar.page';
+import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAccount/myAccountOverview.page';
 
 /**
  * Common login and navigate to My Account flow
+ * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
  * @param page - Playwright Page object
  * @param loginPage - LoginPage fixture
- * @param authenticatedNavbar - AuthenticatedNavbarPage fixture
+ * @param navbar - Navbar fixture (unified, handles both states)
+ * @param email - Email for login
+ * @param password - Password for login
  * @returns Promise that resolves when navigation is complete
  *
  * @example
  * ```typescript
- * test('my test', async ({ page, loginPage, authenticatedNavbar }) => {
- *   await loginAndNavigateToMyAccount(page, loginPage, authenticatedNavbar);
+ * test('my test', async ({ page, loginPage, navbar }) => {
+ *   await loginAndNavigateToMyAccount(page, loginPage, navbar, 'user@test.com', 'pass123');
  *   // Now user is logged in and on My Account page
  * });
  * ```
@@ -31,13 +34,15 @@ import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAcc
 export async function loginAndNavigateToMyAccount(
   page: Page,
   loginPage: LoginPage,
-  authenticatedNavbar: AuthenticatedNavbarPage
+  navbar: Navbar,
+  email: string,
+  password: string
 ): Promise<void> {
-  // Open login modal
-  await page.click('button:has-text("Inicia sesión")');
+  // Open login modal (using unified navbar)
+  await navbar.clickSignin();
 
-  // Fill credentials (currently hardcoded in LoginPage)
-  await loginPage.fillData();
+  // Fill credentials
+  await loginPage.fillData(email, password);
 
   // Submit login
   await loginPage.clickSubmit();
@@ -45,26 +50,25 @@ export async function loginAndNavigateToMyAccount(
   // Wait for authentication
   await page.waitForLoadState('networkidle');
 
-  // Navigate to My Account
-  await authenticatedNavbar.navigateToMyAccount();
+  // Navigate to My Account (unified navbar detects auth state)
+  await navbar.navigateToMyAccount();
 }
 
 /**
  * Verifies user is authenticated
+ * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
- * @param authenticatedNavbar - AuthenticatedNavbarPage fixture
+ * @param navbar - Navbar fixture (unified)
  * @returns Promise resolving to true if authenticated
  *
  * @example
  * ```typescript
- * const isAuth = await verifyAuthenticated(authenticatedNavbar);
+ * const isAuth = await verifyAuthenticated(navbar);
  * expect(isAuth).toBe(true);
  * ```
  */
-export async function verifyAuthenticated(
-  authenticatedNavbar: AuthenticatedNavbarPage
-): Promise<boolean> {
-  return await authenticatedNavbar.isUserAuthenticated();
+export async function verifyAuthenticated(navbar: Navbar): Promise<boolean> {
+  return await navbar.isAuthenticated();
 }
 
 /**
@@ -87,18 +91,21 @@ export async function verifyOnMyAccountPage(
 
 /**
  * Performs complete login flow and verifies success
+ * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
  * @param page - Playwright Page object
  * @param loginPage - LoginPage fixture
- * @param authenticatedNavbar - AuthenticatedNavbarPage fixture
+ * @param navbar - Navbar fixture (unified)
  * @param myAccountOverview - MyAccountOverviewPage fixture
+ * @param email - Email for login
+ * @param password - Password for login
  * @returns Promise that resolves when login is verified
  * @throws Error if login fails
  *
  * @example
  * ```typescript
- * test('my test', async ({ page, loginPage, authenticatedNavbar, myAccountOverview }) => {
- *   await performCompleteLoginFlow(page, loginPage, authenticatedNavbar, myAccountOverview);
+ * test('my test', async ({ page, loginPage, navbar, myAccountOverview }) => {
+ *   await performCompleteLoginFlow(page, loginPage, navbar, myAccountOverview, 'user@test.com', 'pass123');
  *   // Now user is verified as logged in and on My Account page
  * });
  * ```
@@ -106,13 +113,15 @@ export async function verifyOnMyAccountPage(
 export async function performCompleteLoginFlow(
   page: Page,
   loginPage: LoginPage,
-  authenticatedNavbar: AuthenticatedNavbarPage,
-  myAccountOverview: MyAccountOverviewPage
+  navbar: Navbar,
+  myAccountOverview: MyAccountOverviewPage,
+  email: string,
+  password: string
 ): Promise<void> {
-  await loginAndNavigateToMyAccount(page, loginPage, authenticatedNavbar);
+  await loginAndNavigateToMyAccount(page, loginPage, navbar, email, password);
 
   // Verify authentication
-  const isAuthenticated = await verifyAuthenticated(authenticatedNavbar);
+  const isAuthenticated = await verifyAuthenticated(navbar);
   if (!isAuthenticated) {
     throw new Error('Login failed: User is not authenticated');
   }
@@ -129,26 +138,25 @@ export async function performCompleteLoginFlow(
 
 /**
  * Logs out user and verifies logout
+ * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
- * @param authenticatedNavbar - AuthenticatedNavbarPage fixture
+ * @param navbar - Navbar fixture (unified)
  * @returns Promise that resolves when logout is complete
  *
  * @example
  * ```typescript
- * test('logout test', async ({ authenticatedNavbar }) => {
+ * test('logout test', async ({ navbar }) => {
  *   // ... after login
- *   await performLogout(authenticatedNavbar);
+ *   await performLogout(navbar);
  *   // User is now logged out
  * });
  * ```
  */
-export async function performLogout(
-  authenticatedNavbar: AuthenticatedNavbarPage
-): Promise<void> {
-  await authenticatedNavbar.logout();
+export async function performLogout(navbar: Navbar): Promise<void> {
+  await navbar.logout();
 
   // Verify logout (login button should be visible)
-  const isLoggedOut = await authenticatedNavbar.isLoginButtonVisible();
+  const isLoggedOut = await navbar.isLoginButtonVisible();
   if (!isLoggedOut) {
     throw new Error('Logout failed: Login button not visible');
   }

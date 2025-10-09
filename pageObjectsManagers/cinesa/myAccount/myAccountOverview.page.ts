@@ -37,10 +37,15 @@ export class MyAccountOverviewPage {
 
   /**
    * Waits for the My Account overview page to finish loading
+   * This should be called after navigating to My Account
    *
    * @returns Promise that resolves when page is fully loaded
    */
   async waitForPageLoad(): Promise<void> {
+    // Wait for page load state
+    await this.webActions.page.waitForLoadState('load');
+
+    // Wait for the main container to be visible
     await this.webActions.waitForVisible(
       MyAccountOverviewSelectors.page.container,
       10000
@@ -327,5 +332,175 @@ export class MyAccountOverviewPage {
       );
     }
     return null;
+  }
+
+  // ============================================================
+  // ASSERTION METHODS - For Test Verification
+  // ============================================================
+
+  /**
+   * Verifies the page layout is correct
+   * Covers: COMS-6033 - Overview display and layout
+   *
+   * @returns Promise resolving to true if layout is valid
+   */
+  async verifyPageLayout(): Promise<boolean> {
+    // Verify the main container is visible
+    // This is the same check as waitForPageLoad(), so if we got here, layout is valid
+    const isContainerVisible = await this.webActions.isVisible(
+      MyAccountOverviewSelectors.page.container
+    );
+
+    // Also verify we have at least one section box (the cards)
+    const sectionBoxCount = await this.webActions.getElementCount(
+      MyAccountOverviewSelectors.navigation.sectionBoxItems
+    );
+
+    return isContainerVisible && sectionBoxCount > 0;
+  }
+
+  /**
+   * Verifies user name is displayed on the overview page
+   * Covers: COMS-11711 - Member's area display and layout
+   *
+   * @returns Promise resolving to true if user name is visible
+   */
+  async verifyUserNameDisplayed(): Promise<boolean> {
+    return await this.webActions.isVisible(
+      MyAccountOverviewSelectors.dashboard.userName
+    );
+  }
+
+  /**
+   * Gets the displayed user name
+   *
+   * @returns Promise resolving to user name string or null
+   */
+  async getUserName(): Promise<string | null> {
+    try {
+      return await this.webActions.getText(
+        MyAccountOverviewSelectors.dashboard.userName
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Verifies points balance is visible on dashboard
+   * Covers: Part of COMS-6033 - Overview display
+   *
+   * @returns Promise resolving to true if points visible
+   */
+  async verifyPointsBalanceVisible(): Promise<boolean> {
+    return await this.webActions.isVisible(
+      MyAccountOverviewSelectors.dashboard.pointsValue
+    );
+  }
+
+  /**
+   * Verifies watched films count is displayed
+   * Covers: OCG-2454 - Dashboard watched films total matches loyalty balance
+   *
+   * @returns Promise resolving to watched films count or null
+   */
+  async getWatchedFilmsCount(): Promise<number | null> {
+    try {
+      const watchedFilmsText = await this.webActions.getText(
+        MyAccountOverviewSelectors.dashboard.watchedFilmsValue
+      );
+      // Extract numeric value (e.g., "15 películas" -> 15)
+      const numericValue = watchedFilmsText.replace(/[^\d]/g, '');
+      return parseInt(numericValue, 10);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Verifies watched films widget is visible
+   *
+   * @returns Promise resolving to true if widget is visible
+   */
+  async verifyWatchedFilmsVisible(): Promise<boolean> {
+    return await this.webActions.isVisible(
+      MyAccountOverviewSelectors.dashboard.watchedFilmsWidget
+    );
+  }
+
+  /**
+   * Verifies recent bookings summary is displayed
+   * Covers: Part of COMS-6033 - Overview display
+   *
+   * @returns Promise resolving to true if bookings summary visible
+   */
+  async verifyRecentBookingsSummary(): Promise<boolean> {
+    return await this.webActions.isVisible(
+      MyAccountOverviewSelectors.dashboard.recentBookings
+    );
+  }
+
+  /**
+   * Verifies all navigation cards are present
+   * Covers: COMS-11711 - Member's area display and layout
+   *
+   * Based on actual HTML structure, the page shows:
+   * - Mis entradas (Bookings)
+   * - Ofertas y recompensas (Offers)
+   * - Mis logros (Achievements)
+   * - Ayuda (Help/FAQs)
+   *
+   * @returns Promise resolving to object with visibility status of each section
+   */
+  async verifyAllNavigationCards(): Promise<{
+    bookings: boolean;
+    offers: boolean;
+    achievements: boolean;
+    help: boolean;
+  }> {
+    return {
+      bookings: await this.webActions.isVisible(
+        MyAccountOverviewSelectors.navigation.bookingsCard
+      ),
+      offers: await this.webActions.isVisible(
+        MyAccountOverviewSelectors.navigation.offersCard
+      ),
+      achievements: await this.webActions.isVisible(
+        MyAccountOverviewSelectors.navigation.achievementsCard
+      ),
+      help: await this.webActions.isVisible(
+        MyAccountOverviewSelectors.navigation.helpCard
+      ),
+    };
+  }
+
+  /**
+   * Comprehensive verification of the overview page
+   * Combines multiple checks for complete validation
+   * Covers: COMS-6033, COMS-11711, OCG-2454 (partial)
+   *
+   * @returns Promise resolving to detailed verification results
+   */
+  async verifyOverviewPageComplete(): Promise<{
+    layoutValid: boolean;
+    userNameVisible: boolean;
+    pointsVisible: boolean;
+    watchedFilmsVisible: boolean;
+    recentBookingsVisible: boolean;
+    navigationCards: {
+      bookings: boolean;
+      offers: boolean;
+      achievements: boolean;
+      help: boolean;
+    };
+  }> {
+    return {
+      layoutValid: await this.verifyPageLayout(),
+      userNameVisible: await this.verifyUserNameDisplayed(),
+      pointsVisible: await this.verifyPointsBalanceVisible(),
+      watchedFilmsVisible: await this.verifyWatchedFilmsVisible(),
+      recentBookingsVisible: await this.verifyRecentBookingsSummary(),
+      navigationCards: await this.verifyAllNavigationCards(),
+    };
   }
 }

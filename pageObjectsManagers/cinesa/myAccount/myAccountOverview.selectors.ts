@@ -13,64 +13,76 @@
 export const MyAccountOverviewSelectors = {
   // Page identifiers
   page: {
-    container:
-      '.account-overview, .my-account-container, [data-page="account-overview"]',
-    title: 'h1:has-text("Mi área de cliente"), h1:has-text("Mi cuenta")',
-    welcomeMessage: '.welcome-message, .user-greeting',
+    container: '.account-container__content, .account-overview',
+    title: '.section-box-list__item-title',
+    welcomeMessage: '.v-member-context',
+    sectionBoxList: '.section-box-list',
   },
 
   // Navigation cards/tiles to different sections
   navigation: {
     // Section 1: Overview/Dashboard
-    overviewCard:
-      'a[href="/mycinesa/mi-area-de-cliente/"], [data-section="overview"]',
+    overviewCard: '.account-overview',
 
     // Section 2: Bookings (Mis Entradas)
-    bookingsCard:
-      'a[href="/mycinesa/mis-entradas/"], [data-section="bookings"]',
-    bookingsIcon: '.bookings-icon, .v-icon--ticket',
+    bookingsCard: 'a[href="/mycinesa/mis-entradas/"]',
+    bookingsIcon: '.section-box-list__item-title:has-text("Mis entradas")',
 
-    // Section 3: Preferences (Preferencias)
-    preferencesCard:
-      'a[href="/mycinesa/preferencias/"], [data-section="preferences"]',
-    preferencesIcon: '.preferences-icon, .v-icon--settings',
+    // Section 3: Offers & Rewards (Ofertas y Recompensas)
+    offersCard: 'a[href="/mycinesa/ofertas-y-recompensas/"]',
+    offersIcon:
+      '.section-box-list__item-title:has-text("Ofertas y recompensas")',
 
-    // Section 4: Membership (Suscripciones)
-    membershipCard:
-      'a[href="/mycinesa/mis-suscripciones/"], [data-section="membership"]',
-    membershipIcon: '.membership-icon, .v-icon--card',
+    // Section 4: Achievements (Mis Logros)
+    achievementsCard: 'a[href="/mycinesa/mis-logros/"]',
+    achievementsIcon: '.section-box-list__item-title:has-text("Mis logros")',
 
-    // Section 5: Offers & Rewards (Ofertas y Recompensas)
-    offersCard:
-      'a[href="/mycinesa/ofertas-y-recompensas/"], [data-section="offers"]',
-    offersIcon: '.offers-icon, .v-icon--gift',
+    // Section 5: Help/FAQs (Ayuda)
+    helpCard: 'a[href="/que-es-mycinesa/"]',
+    helpIcon: '.section-box-list__item-title:has-text("Ayuda")',
 
-    // Section 6: Card Wallet (Mis Tarjetas)
-    cardWalletCard: 'a[href="/mycinesa/mis-tarjetas/"], [data-section="cards"]',
-    cardWalletIcon: '.card-wallet-icon, .v-icon--wallet',
+    // Generic section box items
+    sectionBoxItems: '.section-box-list__item',
+    sectionBoxTitle: '.section-box-list__item-title',
+    sectionBoxSummary: '.section-box-list__item-summary',
+    sectionBoxLink: '.section-box-list__item-link a',
 
-    // Section 7: Profile (Mi Perfil)
-    profileCard: 'a[href="/mycinesa/mi-perfil/"], [data-section="profile"]',
-    profileIcon: '.profile-icon, .v-icon--user',
+    // Legacy selectors (for backward compatibility - not present in current HTML)
+    preferencesCard: 'a[href="/mycinesa/preferencias/"]',
+    membershipCard: 'a[href="/mycinesa/mis-suscripciones/"]',
+    cardWalletCard: 'a[href="/mycinesa/mis-tarjetas/"]',
+    profileCard: 'a[href="/mycinesa/mi-perfil/"]',
   },
 
-  // User dashboard widgets (if present)
+  // User dashboard widgets (based on actual HTML structure)
   dashboard: {
-    // Loyalty points widget
+    // Member context (user info area)
+    memberContext: '.v-member-context',
+
+    // Section summaries
+    entriesSummary:
+      '.section-box-list__item:has-text("Mis entradas") .section-box-list__item-summary',
+    offersSummary:
+      '.section-box-list__item:has-text("Ofertas y recompensas") .section-box-list__item-summary',
+    achievementsSummary:
+      '.section-box-list__item:has-text("Mis logros") .section-box-list__item-summary',
+
+    // Legacy selectors (may not be present in current view)
     pointsWidget: '.points-widget, .loyalty-balance',
     pointsValue: '.points-value, .balance-amount',
     pointsLabel: '.points-label',
-
-    // Recent bookings widget
+    watchedFilmsWidget: '.watched-films-widget, .films-counter',
+    watchedFilmsValue: '.watched-films-value, .films-count',
+    watchedFilmsLabel: '.watched-films-label',
+    userName: '.user-name, .member-name, .account-name',
+    userEmail: '.user-email, .account-email',
     recentBookings: '.recent-bookings-widget',
     bookingItem: '.booking-item',
-
-    // Membership status widget
+    bookingsSummary: '.bookings-summary, .recent-bookings-summary',
+    upcomingBookingsCount: '.upcoming-bookings-count',
     membershipStatus: '.membership-status-widget',
     membershipTier: '.membership-tier',
     membershipExpiry: '.membership-expiry',
-
-    // Active offers widget
     activeOffers: '.active-offers-widget',
     offerItem: '.offer-item',
   },

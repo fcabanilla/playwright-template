@@ -9,45 +9,37 @@
  */
 
 export const AuthenticatedNavbarSelectors = {
-  // Main account button/icon in navbar
-  accountButton: {
-    // The icon clicked in Codegen: page.getByRole('banner').filter({ hasText: 'CinesPelí' }).locator('use').first()
-    // More specific selector needed - will use class or data attribute
-    container: '[role="banner"]',
-    iconButton:
-      'button[aria-label*="cuenta"], button[aria-label*="account"], .header-account-button',
-    // Alternative: by icon class
-    icon: '.v-icon--user, .v-icon--account',
-  },
+  // Direct "Mi cuenta" link in navbar (appears after login)
+  myAccountNavLink:
+    '#my-account-nav-link a[href="/mycinesa/"], a[href="/mycinesa/"]',
 
-  // Dropdown menu that appears after clicking account button
-  accountMenu: {
-    container: '.account-dropdown, .v-dropdown-menu, .user-menu',
-    menuList: '.v-dropdown-menu__list, .user-menu__list',
-
-    // Menu items
-    myAccountLink:
-      'a[href="/mycinesa/mi-area-de-cliente/"], a:has-text("Mi área de cliente")',
-    myBookingsLink: 'a[href="/mycinesa/mis-entradas/"]',
-    myProfileLink: 'a[href="/mycinesa/mi-perfil/"]',
-    myPreferencesLink: 'a[href="/mycinesa/preferencias/"]',
-    myMembershipLink: 'a[href="/mycinesa/mis-suscripciones/"]',
-    logoutButton:
-      'button:has-text("Cerrar sesión"), a:has-text("Cerrar sesión")',
+  // Member context (user photo and name)
+  memberContext: {
+    container: '.v-member-context',
+    memberPhoto: '.member-photo',
+    memberName: '.member-name',
+    memberPhotoPlaceholder: '.v-icon--member-photo-placeholder',
   },
 
   // User info displayed in navbar
   userInfo: {
-    userName: '.user-name, .member-name',
+    userName: '.member-name',
     memberTier: '.member-tier, .membership-badge',
     pointsBalance: '.points-balance, .member-points',
   },
 
+  // Logout button
+  logoutButton: 'a.header-sign-out, a:has-text("Cerrar sesión")',
+
   // Login button (for verification that user is NOT authenticated)
-  loginButton: 'button:has-text("Inicia sesión")',
+  loginButton: 'a.header-sign-in, a:has-text("Inicia sesión")',
 
   // Signup button
-  signupButton: 'button:has-text("Regístrate"), a:has-text("Regístrate")',
+  signupButton: 'a.header-sign-up, a:has-text("Regístrate")',
+
+  // Header sign container (shows different content when authenticated)
+  headerSign: '.header-sign',
+  headerMember: '.header-member',
 } as const;
 
 /**
