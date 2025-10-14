@@ -43,6 +43,8 @@ export class LoginPage {
 
   /**
    * Hace click en el botón de submit del login.
+   * Note: This does NOT wait for authentication to complete.
+   * Use submitAndWaitForAuth() if you need to wait for the login process.
    */
   async clickSubmit(): Promise<void> {
     await this.webActions.clickWithOverlayHandling(
@@ -51,10 +53,31 @@ export class LoginPage {
   }
 
   /**
+   * Submit login form and wait for authentication to complete.
+   * Waits for page to reload and network activity to settle.
+   *
+   * This method ensures the login process is fully complete before returning,
+   * eliminating the need for hardcoded timeouts.
+   *
+   * @returns Promise that resolves when login process is complete
+   *
+   * @example
+   * await loginPage.fillData(email, password);
+   * await loginPage.submitAndWaitForAuth();
+   * // User is now authenticated
+   */
+  async submitAndWaitForAuth(): Promise<void> {
+    await this.clickSubmit();
+    // waitForLoad() internally calls waitForLoadState('networkidle')
+    // This ensures all navigation and initial network requests complete
+    await this.webActions.waitForLoad();
+  }
+
+  /**
    * Wait for login process to complete
+   * @deprecated Use submitAndWaitForAuth() instead for better semantics
    */
   async waitForLoginComplete(): Promise<void> {
     await this.webActions.waitForLoad();
-    await this.webActions.wait(2000);
   }
 }

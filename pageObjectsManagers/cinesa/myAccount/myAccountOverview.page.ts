@@ -42,8 +42,8 @@ export class MyAccountOverviewPage {
    * @returns Promise that resolves when page is fully loaded
    */
   async waitForPageLoad(): Promise<void> {
-    // Wait for page load state
-    await this.webActions.page.waitForLoadState('load');
+    // Wait for page load state using WebActions (no direct page access)
+    await this.webActions.waitForLoad();
 
     // Wait for the main container to be visible
     await this.webActions.waitForVisible(

@@ -175,6 +175,12 @@ export class MyAccountOverviewAssertions {
    * Assert that all navigation cards are present
    * Covers: COMS-11711 - Member's area display and layout
    *
+   * Based on actual HTML structure:
+   * - Mis entradas (Bookings)
+   * - Ofertas y recompensas (Offers)
+   * - Mis logros (Achievements)
+   * - Ayuda (Help/FAQs)
+   *
    * @param overview - MyAccountOverviewPage instance
    */
   static async assertAllNavigationCardsVisible(
@@ -183,11 +189,9 @@ export class MyAccountOverviewAssertions {
     const cards = await overview.verifyAllNavigationCards();
 
     expect(cards.bookings).toBeTruthy();
-    expect(cards.preferences).toBeTruthy();
-    expect(cards.membership).toBeTruthy();
     expect(cards.offers).toBeTruthy();
-    expect(cards.cardWallet).toBeTruthy();
-    expect(cards.profile).toBeTruthy();
+    expect(cards.achievements).toBeTruthy();
+    expect(cards.help).toBeTruthy();
   }
 
   /**
@@ -198,14 +202,7 @@ export class MyAccountOverviewAssertions {
    */
   static async assertNavigationCardsVisible(
     overview: MyAccountOverviewPage,
-    requiredCards: Array<
-      | 'bookings'
-      | 'preferences'
-      | 'membership'
-      | 'offers'
-      | 'cardWallet'
-      | 'profile'
-    >
+    requiredCards: Array<'bookings' | 'offers' | 'achievements' | 'help'>
   ): Promise<void> {
     const cards = await overview.verifyAllNavigationCards();
 
@@ -257,32 +254,21 @@ export class MyAccountOverviewAssertions {
       'Recent bookings summary should be visible'
     ).toBeTruthy();
 
-    // Navigation cards
+    // Navigation cards (based on actual HTML structure)
     const { navigationCards } = verification;
     expect(
       navigationCards.bookings,
       'Bookings card should be visible'
     ).toBeTruthy();
     expect(
-      navigationCards.preferences,
-      'Preferences card should be visible'
-    ).toBeTruthy();
-    expect(
-      navigationCards.membership,
-      'Membership card should be visible'
-    ).toBeTruthy();
-    expect(
       navigationCards.offers,
       'Offers card should be visible'
     ).toBeTruthy();
     expect(
-      navigationCards.cardWallet,
-      'Card Wallet card should be visible'
+      navigationCards.achievements,
+      'Achievements card should be visible'
     ).toBeTruthy();
-    expect(
-      navigationCards.profile,
-      'Profile card should be visible'
-    ).toBeTruthy();
+    expect(navigationCards.help, 'Help card should be visible').toBeTruthy();
   }
 
   /**
