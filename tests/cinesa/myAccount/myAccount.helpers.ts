@@ -17,6 +17,40 @@ import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAcc
 import { PromoModalPage } from '../../../pageObjectsManagers/cinesa/promoModal/promoModal.page';
 
 /**
+ * Configuration object for login and My Account navigation helpers
+ */
+export interface LoginAndNavigateOptions {
+  /** Navbar fixture */
+  navbar: Navbar;
+  /** LoginPage fixture */
+  loginPage: LoginPage;
+  /** MyAccountOverviewPage fixture */
+  myAccountOverview: MyAccountOverviewPage;
+  /** PromoModalPage fixture */
+  promoModal: PromoModalPage;
+  /** User email address */
+  email: string;
+  /** User password */
+  password: string;
+}
+
+/**
+ * Configuration object for quick login helper
+ */
+export interface QuickLoginOptions {
+  /** Navbar fixture */
+  navbar: Navbar;
+  /** LoginPage fixture */
+  loginPage: LoginPage;
+  /** PromoModalPage fixture */
+  promoModal: PromoModalPage;
+  /** User email address */
+  email: string;
+  /** User password */
+  password: string;
+}
+
+/**
  * High-level helper: Complete login flow and navigate to My Account
  *
  * This helper encapsulates the entire authentication flow:
@@ -27,12 +61,7 @@ import { PromoModalPage } from '../../../pageObjectsManagers/cinesa/promoModal/p
  * 5. Wait for authentication
  * 6. Navigate to My Account overview
  *
- * @param navbar - Navbar fixture
- * @param loginPage - LoginPage fixture
- * @param myAccountOverview - MyAccountOverviewPage fixture
- * @param promoModal - PromoModalPage fixture
- * @param email - User email address
- * @param password - User password
+ * @param options - Configuration object with fixtures and credentials
  * @returns Promise that resolves when user is on My Account page
  *
  * @example
@@ -40,26 +69,24 @@ import { PromoModalPage } from '../../../pageObjectsManagers/cinesa/promoModal/p
  * import { testAccounts } from './myAccount.data';
  *
  * test('my test', async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
- *   await loginAndNavigateToMyAccount(
+ *   await loginAndNavigateToMyAccount({
  *     navbar,
  *     loginPage,
  *     myAccountOverview,
  *     promoModal,
- *     testAccounts.noMembership.email,
- *     testAccounts.noMembership.password
- *   );
+ *     email: testAccounts.noMembership.email,
+ *     password: testAccounts.noMembership.password,
+ *   });
  *   // Now user is authenticated and on My Account overview page
  * });
  * ```
  */
 export async function loginAndNavigateToMyAccount(
-  navbar: Navbar,
-  loginPage: LoginPage,
-  myAccountOverview: MyAccountOverviewPage,
-  promoModal: PromoModalPage,
-  email: string,
-  password: string
+  options: LoginAndNavigateOptions
 ): Promise<void> {
+  const { navbar, loginPage, myAccountOverview, promoModal, email, password } =
+    options;
+
   // Setup: Navigate to home and dismiss modals
   await navbar.navigateToHome();
   await promoModal.dismissIfVisible();
@@ -79,11 +106,7 @@ export async function loginAndNavigateToMyAccount(
  *
  * Useful when you need to authenticate but navigate elsewhere.
  *
- * @param navbar - Navbar fixture
- * @param loginPage - LoginPage fixture
- * @param promoModal - PromoModalPage fixture
- * @param email - User email address
- * @param password - User password
+ * @param options - Configuration object with fixtures and credentials
  * @returns Promise that resolves when user is authenticated
  *
  * @example
@@ -91,25 +114,21 @@ export async function loginAndNavigateToMyAccount(
  * import { testAccounts } from './myAccount.data';
  *
  * test('my test', async ({ navbar, loginPage, promoModal }) => {
- *   await quickLogin(
+ *   await quickLogin({
  *     navbar,
  *     loginPage,
  *     promoModal,
- *     testAccounts.loyaltyMember.email,
- *     testAccounts.loyaltyMember.password
- *   );
+ *     email: testAccounts.loyaltyMember.email,
+ *     password: testAccounts.loyaltyMember.password,
+ *   });
  *   // Now user is authenticated, navigate wherever you need
  *   await navbar.navigateToMovies();
  * });
  * ```
  */
-export async function quickLogin(
-  navbar: Navbar,
-  loginPage: LoginPage,
-  promoModal: PromoModalPage,
-  email: string,
-  password: string
-): Promise<void> {
+export async function quickLogin(options: QuickLoginOptions): Promise<void> {
+  const { navbar, loginPage, promoModal, email, password } = options;
+
   // Setup: Navigate to home and dismiss modals
   await navbar.navigateToHome();
   await promoModal.dismissIfVisible();

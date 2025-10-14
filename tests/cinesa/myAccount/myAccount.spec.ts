@@ -45,15 +45,15 @@ test.describe(
       'should login and verify My Account overview page',
       { tag: '@smoke' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Assertions: Use assertion helpers with Allure steps
         await assertPageLayout(myAccountOverview);
@@ -68,15 +68,15 @@ test.describe(
       'should verify quick navigation to My Account',
       { tag: '@smoke' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Quick assertion: Verify page layout only
         await assertPageLayout(myAccountOverview);

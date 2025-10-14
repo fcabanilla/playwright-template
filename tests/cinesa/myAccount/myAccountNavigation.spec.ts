@@ -41,15 +41,15 @@ test.describe(
       'should login and navigate to My Account overview',
       { tag: '@smoke' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Assertions: Verify page loaded correctly
         await assertPageLayout(myAccountOverview);
@@ -60,15 +60,15 @@ test.describe(
       'should display all navigation cards on My Account overview',
       { tag: '@smoke' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Assertions: Verify all navigation cards visible
         await assertAllNavigationCardsVisible(myAccountOverview);
@@ -79,15 +79,15 @@ test.describe(
       'should navigate to bookings section',
       { tag: '@navigation' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Navigate to bookings section
         await myAccountOverview.navigateToBookings();
@@ -101,15 +101,15 @@ test.describe(
       'should navigate to profile section',
       { tag: '@navigation' },
       async ({ navbar, loginPage, myAccountOverview, promoModal }) => {
-        // Use helper for complete login flow
-        await loginAndNavigateToMyAccount(
+        // Use helper for complete login flow (with options object)
+        await loginAndNavigateToMyAccount({
           navbar,
           loginPage,
           myAccountOverview,
           promoModal,
-          testAccounts.noMembership.email,
-          testAccounts.noMembership.password
-        );
+          email: testAccounts.noMembership.email,
+          password: testAccounts.noMembership.password,
+        });
 
         // Navigate to profile section
         await myAccountOverview.navigateToProfile();
