@@ -17,9 +17,8 @@ export default defineConfig({
     actionTimeout: 60000,
     navigationTimeout: 60000,
 
-    // Configuraciones agresivas para evadir Cloudflare
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    // User-Agent whitelisteado para Cloudflare (Cinesa ES/PT, stage, preprod, prod)
+    userAgent: 'QA-AutomationSuite/1.0 (+https://cinesa.es) / 7f4c3d1b9a6e4a08',
     viewport: { width: 1920, height: 1080 },
     locale: 'es-ES',
     permissions: ['clipboard-read', 'clipboard-write'],
@@ -79,13 +78,16 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare
+          // StorageState: solo cuando se especifique explícitamente
+          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
           storageState:
-            process.env.TEST_ENV === 'preprod'
-              ? 'loggedInState.preprod.json'
-              : process.env.TEST_ENV === 'lab'
-                ? 'loggedInState.lab.json'
-                : 'loggedInState.json',
+            process.env.USE_STORAGE_STATE === 'true'
+              ? process.env.TEST_ENV === 'preprod'
+                ? 'loggedInState.preprod.json'
+                : process.env.TEST_ENV === 'lab'
+                  ? 'loggedInState.lab.json'
+                  : 'loggedInState.json'
+              : undefined,
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
@@ -117,13 +119,16 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare en preprod/lab
+          // StorageState: solo cuando se especifique explícitamente
+          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
           storageState:
-            process.env.TEST_ENV === 'preprod'
-              ? 'loggedInState.preprod.json'
-              : process.env.TEST_ENV === 'lab'
-                ? 'loggedInState.lab.json'
-                : undefined,
+            process.env.USE_STORAGE_STATE === 'true'
+              ? process.env.TEST_ENV === 'preprod'
+                ? 'loggedInState.preprod.json'
+                : process.env.TEST_ENV === 'lab'
+                  ? 'loggedInState.lab.json'
+                  : 'loggedInState.json'
+              : undefined,
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [

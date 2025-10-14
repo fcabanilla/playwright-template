@@ -69,10 +69,11 @@ test.describe('My Account - Fixture Usage Examples', () => {
   }) => {
     // ✅ Helper encapsulates the entire login flow
     await performCompleteLoginFlow(
-      page,
       loginPage,
       authenticatedNavbar,
-      myAccountOverview
+      myAccountOverview,
+      testAccounts.standard.email,
+      testAccounts.standard.password
     );
 
     // Now we're authenticated and on My Account page

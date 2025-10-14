@@ -19,6 +19,8 @@ import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analyt
 import { PromoModalPage } from '../../pageObjectsManagers/cinesa/promoModal/promoModal.page';
 import { AuthenticatedNavbarPage } from '../../pageObjectsManagers/cinesa/navbar/authenticatedNavbar.page';
 import { MyAccountOverviewPage } from '../../pageObjectsManagers/cinesa/myAccount/myAccountOverview.page';
+import { CloudflarePage } from '../../pageObjectsManagers/cinesa/cloudflare/cloudflare.page';
+import { WebActions } from '../../core/webactions/webActions';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -40,6 +42,7 @@ type CustomFixtures = {
   promoModal: PromoModalPage;
   authenticatedNavbar: AuthenticatedNavbarPage;
   myAccountOverview: MyAccountOverviewPage;
+  cloudflare: CloudflarePage;
   whoarewe: Footer;
   workwithus: Footer;
   cinesabusiness: Footer;
@@ -208,6 +211,11 @@ export const test = base.extend<CustomFixtures>({
   },
   appleAppDownload: async ({ footer }, use) => {
     await use(footer);
+  },
+  cloudflare: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const cloudflare = new CloudflarePage(webActions);
+    await use(cloudflare);
   },
 });
 

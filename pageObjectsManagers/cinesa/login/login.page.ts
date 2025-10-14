@@ -49,4 +49,12 @@ export class LoginPage {
       LOGIN_SELECTORS.submitButton
     );
   }
+
+  /**
+   * Wait for login process to complete
+   */
+  async waitForLoginComplete(): Promise<void> {
+    await this.webActions.waitForLoad();
+    await this.webActions.wait(2000);
+  }
 }

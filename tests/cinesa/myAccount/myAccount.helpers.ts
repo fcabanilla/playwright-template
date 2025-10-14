@@ -7,7 +7,6 @@
  * @module MyAccountHelpers
  */
 
-import { Page } from '@playwright/test';
 import { LoginPage } from '../../../pageObjectsManagers/cinesa/login/login.page';
 import { Navbar } from '../../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAccount/myAccountOverview.page';
@@ -16,7 +15,6 @@ import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAcc
  * Common login and navigate to My Account flow
  * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
- * @param page - Playwright Page object
  * @param loginPage - LoginPage fixture
  * @param navbar - Navbar fixture (unified, handles both states)
  * @param email - Email for login
@@ -25,14 +23,13 @@ import { MyAccountOverviewPage } from '../../../pageObjectsManagers/cinesa/myAcc
  *
  * @example
  * ```typescript
- * test('my test', async ({ page, loginPage, navbar }) => {
- *   await loginAndNavigateToMyAccount(page, loginPage, navbar, 'user@test.com', 'pass123');
+ * test('my test', async ({ loginPage, navbar }) => {
+ *   await loginAndNavigateToMyAccount(loginPage, navbar, 'user@test.com', 'pass123');
  *   // Now user is logged in and on My Account page
  * });
  * ```
  */
 export async function loginAndNavigateToMyAccount(
-  page: Page,
   loginPage: LoginPage,
   navbar: Navbar,
   email: string,
@@ -47,8 +44,8 @@ export async function loginAndNavigateToMyAccount(
   // Submit login
   await loginPage.clickSubmit();
 
-  // Wait for authentication
-  await page.waitForLoadState('networkidle');
+  // Wait for authentication using Page Object
+  await loginPage.waitForLoginComplete();
 
   // Navigate to My Account (unified navbar detects auth state)
   await navbar.navigateToMyAccount();
@@ -93,7 +90,6 @@ export async function verifyOnMyAccountPage(
  * Performs complete login flow and verifies success
  * Uses unified Navbar that handles both authenticated and unauthenticated states
  *
- * @param page - Playwright Page object
  * @param loginPage - LoginPage fixture
  * @param navbar - Navbar fixture (unified)
  * @param myAccountOverview - MyAccountOverviewPage fixture
@@ -104,21 +100,20 @@ export async function verifyOnMyAccountPage(
  *
  * @example
  * ```typescript
- * test('my test', async ({ page, loginPage, navbar, myAccountOverview }) => {
- *   await performCompleteLoginFlow(page, loginPage, navbar, myAccountOverview, 'user@test.com', 'pass123');
+ * test('my test', async ({ loginPage, navbar, myAccountOverview }) => {
+ *   await performCompleteLoginFlow(loginPage, navbar, myAccountOverview, 'user@test.com', 'pass123');
  *   // Now user is verified as logged in and on My Account page
  * });
  * ```
  */
 export async function performCompleteLoginFlow(
-  page: Page,
   loginPage: LoginPage,
   navbar: Navbar,
   myAccountOverview: MyAccountOverviewPage,
   email: string,
   password: string
 ): Promise<void> {
-  await loginAndNavigateToMyAccount(page, loginPage, navbar, email, password);
+  await loginAndNavigateToMyAccount(loginPage, navbar, email, password);
 
   // Verify authentication
   const isAuthenticated = await verifyAuthenticated(navbar);
