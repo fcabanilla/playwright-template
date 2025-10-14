@@ -30,7 +30,7 @@ export class CloudflarePage {
     await this.webActions.navigateTo(targetUrl);
     await this.webActions.waitForLoad();
 
-    const currentUrl = this.webActions.page.url();
+    const currentUrl = this.webActions.getCurrentUrl();
     const isCloudflare = currentUrl.includes(
       cloudflareIdentifiers.accessDomain
     );
@@ -52,10 +52,10 @@ export class CloudflarePage {
 
   /**
    * Get browser fingerprint information
-   * Uses WebActions page access for evaluation
+   * Uses WebActions evaluateScript for browser context evaluation
    */
   private async getBrowserFingerprint(): Promise<BrowserFingerprint> {
-    return await this.webActions.page.evaluate(() => {
+    return await this.webActions.evaluateScript(() => {
       return {
         userAgent: navigator.userAgent,
         platform: navigator.platform,

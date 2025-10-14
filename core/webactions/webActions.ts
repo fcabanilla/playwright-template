@@ -193,6 +193,48 @@ export class WebActions {
   }
 
   /**
+   * Get the current page URL
+   *
+   * @returns {string} The current page URL
+   *
+   * @example
+   * ```typescript
+   * const currentUrl = webActions.getCurrentUrl();
+   * console.log(`Current page: ${currentUrl}`);
+   * ```
+   *
+   * @since 1.1.0
+   */
+  getCurrentUrl(): string {
+    return this.page.url();
+  }
+
+  /**
+   * Execute JavaScript code in the browser context
+   *
+   * @template T - The return type of the evaluation
+   * @param {Function | string} script - JavaScript function or code to execute
+   * @returns {Promise<T>} The result of the script execution
+   *
+   * @example
+   * ```typescript
+   * // Get browser fingerprint
+   * const fingerprint = await webActions.evaluateScript(() => {
+   *   return {
+   *     userAgent: navigator.userAgent,
+   *     platform: navigator.platform,
+   *     languages: Array.from(navigator.languages),
+   *   };
+   * });
+   * ```
+   *
+   * @since 1.1.0
+   */
+  async evaluateScript<T>(script: () => T | Promise<T>): Promise<T> {
+    return await this.page.evaluate(script);
+  }
+
+  /**
    * Get the count of elements matching a selector
    */
   async getElementCount(selector: string): Promise<number> {
