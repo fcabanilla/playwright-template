@@ -129,7 +129,7 @@ export class CloudflareAssertions {
     await allure.test.step('🧪 Assertion Results', async () => {
       // Verify page accessibility first
       await this.expectPageAccessible();
-      
+
       // Informational assertions that always pass but log results
       expect.soft(analysis.currentUrl).toBeTruthy();
       expect.soft(analysis.fingerprint.userAgent).toBeTruthy();

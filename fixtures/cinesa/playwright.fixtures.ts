@@ -79,7 +79,8 @@ export const test = base.extend<CustomFixtures>({
     await use(cookieBanner);
   },
   seatPicker: async ({ page }, use) => {
-    const seatPicker = new SeatPicker(page);
+    const webActions = new WebActions(page);
+    const seatPicker = new SeatPicker(webActions);
     await use(seatPicker);
   },
   footer: async ({ page }, use) => {

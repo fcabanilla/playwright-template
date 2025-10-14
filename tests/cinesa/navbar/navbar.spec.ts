@@ -1,6 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { NavbarAssertions } from './navbar.assertions';
-import { getNavbarData } from './navbar.data';
+import { baseUrl, internalNavItems, externalNavItem } from './navbar.data';
 
 test.describe('Cinesa Navbar Tests', () => {
   let navbarAssertions: NavbarAssertions;
@@ -16,7 +16,11 @@ test.describe('Cinesa Navbar Tests', () => {
   });
 
   test('should click logo and stay on home', async ({ navbar }) => {
-    const { baseUrl } = getNavbarData();
+    // baseUrl is imported from navbar.data
+
+    // Use imported baseUrl
+
+    // const { baseUrl } = getNavbarData();
     await navbar.clickLogo();
     await navbarAssertions.expectHomeUrl(baseUrl);
   });
@@ -24,16 +28,19 @@ test.describe('Cinesa Navbar Tests', () => {
   test('should click each navbar element and navigate accordingly DEMO test', async ({
     navbar,
   }) => {
-    const { internalNavItems, externalNavItem } = getNavbarData();
     for (const item of internalNavItems) {
+      // Ensure selectorKey is typed before indexing selectors
+      const key = item.selectorKey as keyof typeof navbar.selectors;
       await navbarAssertions.expectNavClick(
-        navbar.selectors[item.selectorKey],
+        navbar.selectors[key],
         item.expectedUrl
       );
       await navbar.navigateToHome();
     }
+    const externalKey =
+      externalNavItem.selectorKey as keyof typeof navbar.selectors;
     await navbarAssertions.expectExternalNavClick(
-      navbar.selectors[externalNavItem.selectorKey],
+      navbar.selectors[externalKey],
       externalNavItem.expectedUrl
     );
   });

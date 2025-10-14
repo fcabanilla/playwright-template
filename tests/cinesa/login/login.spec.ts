@@ -6,7 +6,11 @@ test.describe('Login', () => {
 
   test('Login with valid credentials', async ({ loginPage, navbar }) => {
     await navbar.navigateToSignIn();
-    await loginPage.fillData();
+    // Use test credentials from config or provide inline test credentials for the spec
+    // Prefer using centralised test accounts; fallback to a placeholder here
+    const testEmail = 'test.user@example.com';
+    const testPassword = 'Password123!';
+    await loginPage.fillData(testEmail, testPassword);
     await loginPage.clickSubmit();
   });
 });

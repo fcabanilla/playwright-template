@@ -80,7 +80,6 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  
 
   /**
    * Performs a standard click action on an element identified by CSS selector.
@@ -253,6 +252,34 @@ export class WebActions {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('networkidle');
+  }
+
+  /**
+   * Wait for a page function to return truthy.
+   * @param fn
+   * @param arg
+   * @param timeout
+   */
+  async waitForFunction(
+    fn: Function | string,
+    arg?: any,
+    timeout?: number
+  ): Promise<void> {
+    await this.page.waitForFunction(fn as any, arg, {
+      timeout: timeout || 30000,
+    });
+  }
+
+  /**
+   * Wait for a network response matching a predicate.
+   */
+  async waitForResponse(
+    predicate: (response: any) => boolean,
+    timeout?: number
+  ): Promise<void> {
+    await this.page.waitForResponse(predicate as any, {
+      timeout: timeout || 30000,
+    });
   }
 
   /**
