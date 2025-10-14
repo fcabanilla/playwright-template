@@ -265,13 +265,10 @@ export class Navbar {
       );
 
       // Wait for navigation to My Account overview page
-      await this.webActions.page.waitForURL(
-        `**${new URL(expectedUrl).pathname}`,
-        {
-          timeout: 10000,
-          waitUntil: 'domcontentloaded',
-        }
-      );
+      await this.webActions.waitForUrl(`**${new URL(expectedUrl).pathname}`, {
+        timeout: 10000,
+        waitUntil: 'domcontentloaded',
+      });
     });
   }
 

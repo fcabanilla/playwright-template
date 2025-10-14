@@ -255,6 +255,30 @@ export class WebActions {
   }
 
   /**
+   * Wait for the page URL to match an expected value or pattern.
+   * Delegates to Playwright's page.waitForURL but keeps the call inside WebActions
+   * to respect ADR-0009 (PageObjects must not access page directly).
+   *
+   * @param expectedUrl - string or RegExp to match the URL
+   * @param options - optional wait options (timeout, waitUntil)
+   */
+  async waitForUrl(
+    expectedUrl: string | RegExp,
+    options?: {
+      timeout?: number;
+      waitUntil?: 'load' | 'domcontentloaded' | 'networkidle';
+    }
+  ): Promise<void> {
+    await this.page.waitForURL(
+      expectedUrl as any,
+      {
+        timeout: options?.timeout ?? 30000,
+        waitUntil: options?.waitUntil ?? 'domcontentloaded',
+      } as any
+    );
+  }
+
+  /**
    * Wait for a page function to return truthy.
    * @param fn
    * @param arg
