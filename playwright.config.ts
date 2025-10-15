@@ -72,40 +72,36 @@ export default defineConfig({
       name: 'UCI Cinemas',
       testDir: './tests/uci',
       use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // StorageState: solo cuando se especifique explícitamente
-          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
-          storageState:
-            process.env.USE_STORAGE_STATE === 'true'
-              ? process.env.TEST_ENV === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : process.env.TEST_ENV === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : 'loggedInState.json'
-              : undefined,
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
+        headless: true,
+        screenshot: 'only-on-failure',
+        video: 'on',
+        actionTimeout: 60000,
+        navigationTimeout: 60000,
+        // Usa el estado guardado para saltar login/cloudflare cuando se solicite
+        storageState:
+          process.env.USE_STORAGE_STATE === 'true'
+            ? process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json'
+            : undefined,
+        launchOptions: {
+          args: [
+            '--disable-blink-features=AutomationControlled',
+            '--disable-features=VizDisplayCompositor',
+            '--disable-extensions',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--disable-gpu',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+          ],
         },
       },
     },
@@ -113,40 +109,36 @@ export default defineConfig({
       name: 'Cinesa',
       testDir: './tests/cinesa',
       use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // StorageState: solo cuando se especifique explícitamente
-          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
-          storageState:
-            process.env.USE_STORAGE_STATE === 'true'
-              ? process.env.TEST_ENV === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : process.env.TEST_ENV === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : 'loggedInState.json'
-              : undefined,
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
+        headless: true,
+        screenshot: 'only-on-failure',
+        video: 'on',
+        actionTimeout: 60000,
+        navigationTimeout: 60000,
+        // Usa el estado guardado para saltar login/cloudflare cuando se solicite
+        storageState:
+          process.env.USE_STORAGE_STATE === 'true'
+            ? process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json'
+            : undefined,
+        launchOptions: {
+          args: [
+            '--disable-blink-features=AutomationControlled',
+            '--disable-features=VizDisplayCompositor',
+            '--disable-extensions',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--disable-gpu',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+          ],
         },
       },
     },

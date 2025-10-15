@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { getCinesaConfig, CinesaEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
+import { PromotionalModal } from '../../pageObjectsManagers/cinesa/promotionalModal/promotionalModal.page';
 import { SeatPicker } from '../../pageObjectsManagers/cinesa/seatPicker/seatPicker.page';
 import { Footer } from '../../pageObjectsManagers/cinesa/footer/footer.page';
 import { BlogLanding } from '../../pageObjectsManagers/cinesa/blog/blogLanding.page';
@@ -25,6 +26,7 @@ import { WebActions } from '../../core/webactions/webActions';
 type CustomFixtures = {
   navbar: Navbar;
   cookieBanner: CookieBanner;
+  promotionalModal: PromotionalModal;
   seatPicker: SeatPicker;
   footer: Footer;
   blogLanding: BlogLanding;
@@ -77,6 +79,10 @@ export const test = base.extend<CustomFixtures>({
   cookieBanner: async ({ page }, use) => {
     const cookieBanner = new CookieBanner(page);
     await use(cookieBanner);
+  },
+  promotionalModal: async ({ page }, use) => {
+    const promotionalModal = new PromotionalModal(page);
+    await use(promotionalModal);
   },
   seatPicker: async ({ page }, use) => {
     const webActions = new WebActions(page);
