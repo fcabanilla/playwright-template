@@ -80,7 +80,6 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  
 
   /**
    * Performs a standard click action on an element identified by CSS selector.
@@ -193,6 +192,48 @@ export class WebActions {
   }
 
   /**
+   * Get the current page URL
+   *
+   * @returns {string} The current page URL
+   *
+   * @example
+   * ```typescript
+   * const currentUrl = webActions.getCurrentUrl();
+   * console.log(`Current page: ${currentUrl}`);
+   * ```
+   *
+   * @since 1.1.0
+   */
+  getCurrentUrl(): string {
+    return this.page.url();
+  }
+
+  /**
+   * Execute JavaScript code in the browser context
+   *
+   * @template T - The return type of the evaluation
+   * @param {Function | string} script - JavaScript function or code to execute
+   * @returns {Promise<T>} The result of the script execution
+   *
+   * @example
+   * ```typescript
+   * // Get browser fingerprint
+   * const fingerprint = await webActions.evaluateScript(() => {
+   *   return {
+   *     userAgent: navigator.userAgent,
+   *     platform: navigator.platform,
+   *     languages: Array.from(navigator.languages),
+   *   };
+   * });
+   * ```
+   *
+   * @since 1.1.0
+   */
+  async evaluateScript<T>(script: () => T | Promise<T>): Promise<T> {
+    return await this.page.evaluate(script);
+  }
+
+  /**
    * Get the count of elements matching a selector
    */
   async getElementCount(selector: string): Promise<number> {
@@ -211,6 +252,58 @@ export class WebActions {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('networkidle');
+  }
+
+  /**
+   * Wait for the page URL to match an expected value or pattern.
+   * Delegates to Playwright's page.waitForURL but keeps the call inside WebActions
+   * to respect ADR-0009 (PageObjects must not access page directly).
+   *
+   * @param expectedUrl - string or RegExp to match the URL
+   * @param options - optional wait options (timeout, waitUntil)
+   */
+  async waitForUrl(
+    expectedUrl: string | RegExp,
+    options?: {
+      timeout?: number;
+      waitUntil?: 'load' | 'domcontentloaded' | 'networkidle';
+    }
+  ): Promise<void> {
+    await this.page.waitForURL(
+      expectedUrl as any,
+      {
+        timeout: options?.timeout ?? 30000,
+        waitUntil: options?.waitUntil ?? 'domcontentloaded',
+      } as any
+    );
+  }
+
+  /**
+   * Wait for a page function to return truthy.
+   * @param fn
+   * @param arg
+   * @param timeout
+   */
+  async waitForFunction(
+    fn: Function | string,
+    arg?: any,
+    timeout?: number
+  ): Promise<void> {
+    await this.page.waitForFunction(fn as any, arg, {
+      timeout: timeout || 30000,
+    });
+  }
+
+  /**
+   * Wait for a network response matching a predicate.
+   */
+  async waitForResponse(
+    predicate: (response: any) => boolean,
+    timeout?: number
+  ): Promise<void> {
+    await this.page.waitForResponse(predicate as any, {
+      timeout: timeout || 30000,
+    });
   }
 
   /**

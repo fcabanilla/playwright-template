@@ -1,4 +1,5 @@
-import { Page, Locator } from '@playwright/test';
+import { Locator } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import * as allure from 'allure-playwright';
 import { SEAT_PICKER_SELECTORS } from './seatPicker.selectors';
 
@@ -39,10 +40,17 @@ const maxSeatSelection = 9;
  * Contains methods to interact with the seat picker page.
  */
 export class SeatPicker {
-  readonly page: Page;
+  private readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
+  // compatibility: tests/assertions that read seatPicker.page expect a Page-like object
+  get page() {
+    // return the underlying page via locator helper — keep usage minimal
+    // tests should be migrated to use WebActions where possible
+    return (this.webActions as any).page as any;
+  }
+
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
@@ -62,7 +70,9 @@ export class SeatPicker {
    */
   private async waitForSeatsToBeReady(): Promise<void> {
     await allure.test.step('Waiting for seats to be ready', async () => {
-      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const seatLocators = this.webActions.getLocator(
+        SEAT_PICKER_SELECTORS.seatGeneric
+      );
 
       // Wait for at least one seat to be visible
       await seatLocators.first().waitFor({ state: 'visible', timeout: 10000 });
@@ -74,7 +84,7 @@ export class SeatPicker {
       }
 
       // Wait for all seats to have their aria-pressed attribute set
-      await this.page.waitForFunction((selector) => {
+      await this.webActions.waitForFunction((selector: string) => {
         const seats = Array.from(document.querySelectorAll(selector));
         return seats.every(
           (seat) => seat.getAttribute('aria-pressed') !== null
@@ -275,8 +285,8 @@ export class SeatPicker {
         }
 
         const elementHandle = await seat.locator.elementHandle();
-        await this.page.waitForFunction(
-          (element) => element?.getAttribute('aria-pressed') === 'true',
+        await this.webActions.waitForFunction(
+          (element: any) => element?.getAttribute('aria-pressed') === 'true',
           elementHandle
         );
       }
@@ -302,8 +312,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting a random available seat',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -328,8 +338,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting last available seat from back',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -390,8 +400,8 @@ export class SeatPicker {
           throw new Error(`Cannot select more than ${maxSeatSelection} seats`);
         }
 
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -411,7 +421,7 @@ export class SeatPicker {
         const chosenSeats = sortedSeats.slice(0, seatCount);
         for (const seat of chosenSeats) {
           await this.selectSeat(seat);
-          await this.page.waitForTimeout(300);
+          await this.webActions.wait(300);
         }
 
         return chosenSeats;
@@ -454,8 +464,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats with an empty space between them',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -508,8 +518,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats separating group in the same row',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -544,13 +554,13 @@ export class SeatPicker {
               thirdSeat.seatNumber === firstSeat.seatNumber + 4
             ) {
               await this.selectSeat(firstSeat);
-              await this.page.waitForTimeout(300);
+              await this.webActions.wait(300);
 
               await this.selectSeat(secondSeat);
-              await this.page.waitForTimeout(300);
+              await this.webActions.wait(300);
 
               await this.selectSeat(thirdSeat);
-              await this.page.waitForTimeout(300);
+              await this.webActions.wait(300);
 
               return [firstSeat, secondSeat, thirdSeat];
             }
@@ -572,8 +582,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting seats separating group in different rows',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -615,7 +625,7 @@ export class SeatPicker {
         }
         for (const seat of selectedSeats) {
           await this.selectSeat(seat);
-          await this.page.waitForTimeout(300);
+          await this.webActions.wait(300);
         }
         return selectedSeats;
       }
@@ -633,8 +643,8 @@ export class SeatPicker {
         const extraSeatsToTest = 3; // Number of extra seats to test
         const seatCount = maxSeatSelection + extraSeatsToTest; // Total seats to select
 
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -660,7 +670,7 @@ export class SeatPicker {
             `Expected to select ${seatCount} seats, but only selected ${selectedSeats.length}`
           );
         }
-        await this.page.waitForTimeout(500);
+        await this.webActions.wait(500);
         for (let i = 0; i < selectedSeats.length; i++) {
           selectedSeats[i].seatState = await this.getSeatState(
             selectedSeats[i].locator,
@@ -679,8 +689,8 @@ export class SeatPicker {
    */
   async selectCompanionSeat(): Promise<void> {
     return await allure.test.step('Selecting a companion seat', async () => {
-      await this.page.waitForResponse(
-        (response) =>
+      await this.webActions.waitForResponse(
+        (response: any) =>
           response.url().includes('/seat-availability') &&
           response.status() === 200
       );
@@ -708,8 +718,8 @@ export class SeatPicker {
         await wheelchairSeat.locator.click();
         const elementHandle = await wheelchairSeat.locator.elementHandle();
         await this.acceptWheelchairMessage();
-        await this.page.waitForFunction(
-          (element) => element?.getAttribute('aria-pressed') === 'true',
+        await this.webActions.waitForFunction(
+          (element: any) => element?.getAttribute('aria-pressed') === 'true',
           elementHandle
         );
       }
@@ -724,8 +734,8 @@ export class SeatPicker {
     return await allure.test.step(
       'Selecting a companion seat and a contiguous wheelchair seat',
       async () => {
-        await this.page.waitForResponse(
-          (response) =>
+        await this.webActions.waitForResponse(
+          (response: any) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
         );
@@ -816,8 +826,10 @@ export class SeatPicker {
    */
   async acceptWheelchairMessage(): Promise<void> {
     return await allure.test.step('Handling the wheelchair modal', async () => {
-      const modal = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModal);
-      const continueButton = this.page.locator(
+      const modal = this.webActions.getLocator(
+        SEAT_PICKER_SELECTORS.wheelchairModal
+      );
+      const continueButton = this.webActions.getLocator(
         SEAT_PICKER_SELECTORS.wheelchairModalAcceptButton
       );
       await modal.waitFor({ state: 'visible', timeout: 10000 });
@@ -833,7 +845,7 @@ export class SeatPicker {
   async acceptDBoxMessage(): Promise<void> {
     await allure.test.step('Accepting the D-BOX warning modal', async () => {
       const modalSelector = SEAT_PICKER_SELECTORS.dboxModal;
-      const modal = this.page.locator(modalSelector);
+      const modal = this.webActions.getLocator(modalSelector);
       await modal.waitFor({ state: 'visible', timeout: 5000 });
 
       const acceptButton = modal.locator('button').first();
@@ -849,7 +861,7 @@ export class SeatPicker {
       'Handling showtime attribute modal if present',
       async () => {
         try {
-          const modal = this.page.locator(
+          const modal = this.webActions.getLocator(
             SEAT_PICKER_SELECTORS.showtimeAttributeModal
           );
 
@@ -857,8 +869,10 @@ export class SeatPicker {
           await modal.waitFor({ state: 'visible', timeout: 1000 });
 
           // Try to find and click the accept button first (most common case)
-          const acceptButton = this.page
-            .locator(SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton)
+          const acceptButton = this.webActions
+            .getLocator(
+              SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton
+            )
             .first();
 
           if (await acceptButton.isVisible()) {
@@ -866,7 +880,7 @@ export class SeatPicker {
             console.log('Clicked accept button on showtime attribute modal');
           } else {
             // Try close button as fallback
-            const closeButton = this.page.locator(
+            const closeButton = this.webActions.getLocator(
               SEAT_PICKER_SELECTORS.showtimeAttributeModalCloseButton
             );
             if (await closeButton.isVisible()) {
@@ -892,7 +906,9 @@ export class SeatPicker {
    */
   async confirmSeats(): Promise<void> {
     await allure.test.step('Confirming selected seats', async () => {
-      await this.page.locator(SEAT_PICKER_SELECTORS.confirmSeatsButton).click();
+      await this.webActions
+        .getLocator(SEAT_PICKER_SELECTORS.confirmSeatsButton)
+        .click();
     });
   }
 
@@ -917,7 +933,7 @@ export class SeatPicker {
     await allure.test.step(
       'Validating red warning message is displayed',
       async () => {
-        const warningMessage = this.page.locator(
+        const warningMessage = this.webActions.getLocator(
           SEAT_PICKER_SELECTORS.warningMessage
         );
         if (!(await warningMessage.isVisible())) {
@@ -934,7 +950,7 @@ export class SeatPicker {
     await allure.test.step(
       'Validating "Continuar" button is disabled',
       async () => {
-        const confirmButton = this.page.locator(
+        const confirmButton = this.webActions.getLocator(
           SEAT_PICKER_SELECTORS.disabledConfirmButton
         );
         if (!(await confirmButton.isVisible())) {

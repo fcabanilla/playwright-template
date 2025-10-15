@@ -1,6 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { NavbarAssertions } from './navbar.assertions';
-import { getNavbarData } from './navbar.data';
+import { baseUrl } from './navbar.data';
 import { setupCloudflareContextAndPage } from '../../../core/webactions/setupCloudflareContextAndPage';
 import type { BrowserContext, Page } from '@playwright/test';
 
@@ -22,7 +22,7 @@ test.describe('Cinesa Navbar Tests - Cloudflare Safe', () => {
   test('@fast @navbar @cinesa should click logo and stay on home safely', async ({
     navbar,
   }) => {
-    const { baseUrl } = getNavbarData();
+    // baseUrl is imported from navbar.data
     await navbar.clickLogo();
     await navbarAssertions.expectHomeUrl(baseUrl);
   });

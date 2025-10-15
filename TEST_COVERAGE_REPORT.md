@@ -1,7 +1,7 @@
 # 📊 Test Coverage Report - Manual vs Automated
 
-> **Last Updated**: October 8, 2025  
-> **Scope**: Comparison of 233 manual tests vs 127 automated tests  
+> **Last Updated**: January 13, 2025  
+> **Scope**: Comparison of 233 manual tests vs 129 automated tests  
 > **Approach**: Semantic test-by-test analysis to identify real coverage
 
 ---
@@ -11,11 +11,11 @@
 | Metric                       | Value    |
 | ---------------------------- | -------- |
 | **Total Manual Tests**       | 233      |
-| **Total Automated Tests**    | 127      |
-| **Tests Covered (Explicit)** | 70 (30%) |
-| **Tests Covered (Implicit)** | 65 (28%) |
-| **Tests NOT Covered**        | 98 (42%) |
-| **Semantic Coverage**        | **58%**  |
+| **Total Automated Tests**    | 129      |
+| **Tests Covered (Explicit)** | 72 (31%) |
+| **Tests Covered (Implicit)** | 67 (29%) |
+| **Tests NOT Covered**        | 94 (40%) |
+| **Semantic Coverage**        | **60%**  |
 
 ### 🔍 Key Discovery: Implicit Coverage Pattern
 
@@ -52,8 +52,8 @@ This means that **components without explicit tests have implicit coverage** of 
 | **Booking Journey** | 15           | 0                    | 0                    | 0       | 15          | 0%         | 🔴 ZERO         |
 | **Unlimited**       | 40           | 0                    | 0                    | 0       | 40          | 0%         | 🔴 ZERO         |
 | **Loyalty**         | 30           | 0                    | 0                    | 0       | 30          | 0%         | 🔴 ZERO         |
-| **My Account**      | 25           | 0                    | 0                    | 0       | 25          | 0%         | 🔴 ZERO         |
-| **TOTAL**           | **233**      | **127**              | **46**               | **135** | **98**      | **58%**    | 🟡              |
+| **My Account**      | 25           | 2                    | 0                    | 4       | 21          | 16%        | 🟡 Initial      |
+| **TOTAL**           | **233**      | **129**              | **46**               | **139** | **94**      | **60%**    | 🟡              |
 
 ---
 
@@ -278,15 +278,33 @@ This means that **components without explicit tests have implicit coverage** of 
 
 ---
 
-### 7️⃣ My Account - 0% Coverage 🔴
+### 7️⃣ My Account - 16% Coverage 🟡
 
-**Manual Tests**: 25 | **Automated**: 0 | **Coverage**: 0/25 (0%)
+**Manual Tests**: 25 | **Automated**: 2 explicit | **Coverage**: 4/25 (16%)
+
+#### ✅ My Account - Tests Automatizados que Cubren Tests Manuales
+
+| Automated Test                                 | Covers Manual Test(s)                                                                   | Type     |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------- | -------- |
+| `should login and verify My Account overview`  | COMS-6033: Overview display and layout                                                  | Explicit |
+| `should login and verify My Account overview`  | COMS-11711: Member's area display and layout (navigation cards)                         | Explicit |
+| `should login and verify My Account overview`  | OCG-2454: Dashboard watched films total matches loyalty balance (partial - non-loyalty) | Implicit |
+| `should verify quick navigation to My Account` | COMS-6033: Quick smoke test - page loads correctly                                      | Implicit |
+
+**Test File**: `tests/cinesa/myAccount/myAccount.quick.spec.ts`
+
+**Coverage Details**:
+
+- ✅ **COMS-6033**: Overview page loads with correct layout
+- ✅ **COMS-11711**: Navigation cards displayed (Mis entradas, Ofertas y recompensas, Mis logros)
+- ⚠️ **OCG-2454**: Points/watched films widget verification (only for non-loyalty users, shows info message)
+- ✅ **Quick navigation**: Member context icon click → My Account page
 
 #### ❌ Tests Manuales SIN Cobertura (Resumen por Categoría)
 
 | Category                | Test Count | Priority  | Examples                                         |
 | ----------------------- | ---------- | --------- | ------------------------------------------------ |
-| **Dashboard**           | 5          | 🟡 MEDIUM | View bookings, view points, view offers          |
+| **Dashboard**           | 1          | 🟡 MEDIUM | View detailed points balance                     |
 | **Preferences**         | 6          | 🟡 MEDIUM | Email preferences, cinema preferences, language  |
 | **Bookings Management** | 8          | 🔴 HIGH   | View history, cancel booking, download tickets   |
 | **Membership**          | 4          | 🟡 MEDIUM | View card, renew membership, cancel subscription |
@@ -294,11 +312,12 @@ This means that **components without explicit tests have implicit coverage** of 
 
 #### 📊 My Account - Coverage Summary
 
-- **Automated**: 0/25 manual tests (0%)
-- **Not Covered**: 25/25 manual tests (100%)
-- **Critical Impact**: 🔴 **ACCOUNT MANAGEMENT RISK** - User self-service untested
+- **Automated**: 4/25 manual tests (16%)
+- **Not Covered**: 21/25 manual tests (84%)
+- **Critical Impact**: � **INITIAL COVERAGE** - Basic navigation and overview tested
 - **Business Priority**: 🟡 **MEDIUM** - Support ticket reduction, user autonomy
-- **Estimated Effort**: 25 tests × 1 day = **25-30 days** (1 month)
+- **Next Priority**: 🔴 **COMS-7087** (Bookings Management), **COMS-6044** (Preferences)
+- **Estimated Effort**: 21 tests × 1 day = **21-25 days** (3-4 weeks)
 
 ---
 

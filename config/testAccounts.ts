@@ -144,7 +144,8 @@ const invalidLockedAccount: TestAccount = {
  */
 const invalidNonExistent: TestAccount = {
   id: 'cinesa-invalid-non-existent',
-  email: process.env.TEST_NON_EXISTENT_EMAIL || 'nonexistent.user@cinesa-test.com',
+  email:
+    process.env.TEST_NON_EXISTENT_EMAIL || 'nonexistent.user@cinesa-test.com',
   password: process.env.TEST_NON_EXISTENT_PASSWORD || 'TestPassword123!',
   validity: 'invalid',
   membershipTier: 'none',

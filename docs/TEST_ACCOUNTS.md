@@ -14,7 +14,7 @@ This document explains how to manage a### Step 2: Configure Environment Variable
    # Edit .env file
    TEST_NO_MEMBERSHIP_EMAIL=your.real.email@cinesa-test.com
    TEST_NO_MEMBERSHIP_PASSWORD=YourRealPassword123!
-   
+
    TEST_LOYALTY_EMAIL=your.loyalty@cinesa-test.com
    TEST_LOYALTY_PASSWORD=YourRealPassword123!
    # ... etc
@@ -22,10 +22,11 @@ This document explains how to manage a### Step 2: Configure Environment Variable
 
 3. **Verify `.env` is in `.gitignore`**:
 
-   ```bash
+   ````bash
    # Should show .env in .gitignore
    cat .gitignore | grep .env
    ```counts for data-driven testing in the Playwright automation framework.
+   ````
 
 ## 📋 Overview
 

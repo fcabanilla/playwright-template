@@ -40,6 +40,13 @@ export interface NavigationUrls {
     signUp: string;
     forgotPassword: string;
   };
+  /** My Account related URLs */
+  myAccount: {
+    overview: string;
+    profile?: string;
+    orders?: string;
+    cards?: string;
+  };
   /** App download links */
   apps: {
     android: string;
@@ -84,6 +91,12 @@ export function getCinesaUrls(): NavigationUrls {
       signUp: `${baseUrl}/registro`,
       forgotPassword: `${baseUrl}/recuperar-password`,
     },
+    myAccount: {
+      overview: `${baseUrl}/mycinesa/mi-area-de-cliente/`,
+      profile: `${baseUrl}/mycinesa/mi-perfil/`,
+      orders: `${baseUrl}/mycinesa/mis-pedidos/`,
+      cards: `${baseUrl}/mycinesa/mis-tarjetas/`,
+    },
     apps: {
       android:
         'https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa',
@@ -126,6 +139,12 @@ export function getUCIUrls(): NavigationUrls {
       signIn: `${baseUrl}/accedi`,
       signUp: `${baseUrl}/registrati`,
       forgotPassword: `${baseUrl}/recupera-password`,
+    },
+    myAccount: {
+      overview: `${baseUrl}/myuci/area-cliente/`,
+      profile: `${baseUrl}/myuci/profilo/`,
+      orders: `${baseUrl}/myuci/ordini/`,
+      cards: `${baseUrl}/myuci/carte/`,
     },
     apps: {
       android: 'https://play.google.com/store/apps/details?id=com.uci.cinemas',
