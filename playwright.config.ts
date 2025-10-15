@@ -85,11 +85,12 @@ export default defineConfig({
           // presentes (están gitignored y se generan localmente).
           storageState: (() => {
             const env = process.env.TEST_ENV;
-            const candidate = env === 'preprod'
-              ? 'loggedInState.preprod.json'
-              : env === 'lab'
-                ? 'loggedInState.lab.json'
-                : 'loggedInState.json';
+            const candidate =
+              env === 'preprod'
+                ? 'loggedInState.preprod.json'
+                : env === 'lab'
+                  ? 'loggedInState.lab.json'
+                  : 'loggedInState.json';
             return fs.existsSync(candidate) ? candidate : undefined;
           })(),
           // Configuraciones específicas para evadir detección
@@ -126,12 +127,15 @@ export default defineConfig({
           // Usa el estado guardado para saltar login/cloudflare en preprod
           storageState: (() => {
             const env = process.env.TEST_ENV;
-            const candidate = env === 'preprod'
-              ? 'loggedInState.preprod.json'
-              : env === 'lab'
-                ? 'loggedInState.lab.json'
-                : undefined;
-            return candidate && fs.existsSync(candidate) ? candidate : undefined;
+            const candidate =
+              env === 'preprod'
+                ? 'loggedInState.preprod.json'
+                : env === 'lab'
+                  ? 'loggedInState.lab.json'
+                  : undefined;
+            return candidate && fs.existsSync(candidate)
+              ? candidate
+              : undefined;
           })(),
           // Configuraciones específicas para evadir detección
           launchOptions: {
