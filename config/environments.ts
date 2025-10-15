@@ -71,6 +71,19 @@ export const cinesaEnvironments = {
       cookieBanners: true,
     },
   },
+  lab: {
+    baseUrl: 'https://lab-web.ocgtest.es',
+    timeouts: {
+      pageLoad: 30000,
+      element: 10000,
+      modal: 15000,
+    },
+    features: {
+      analytics: false,
+      promotionalModals: true,
+      cookieBanners: true,
+    },
+  },
   development: {
     baseUrl: 'https://dev.cinesa.es',
     timeouts: {
