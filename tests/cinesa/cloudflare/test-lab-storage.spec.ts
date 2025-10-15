@@ -4,20 +4,18 @@
 import { test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import {
+  getCinesaConfig,
+  CinesaEnvironment,
+} from '../../../config/environments';
 
 test('Verify LAB storage state works', async ({ page }) => {
-  const env = (process.env.TEST_ENV || 'production').toLowerCase();
+  const env = ((process.env.TEST_ENV as CinesaEnvironment) ||
+    'production') as CinesaEnvironment;
   console.log('🌍 Environment:', env);
 
-  const urls: Record<string, string> = {
-    production: 'https://www.cinesa.es/',
-    preprod: 'https://preprod-web.ocgtest.es/',
-    lab: 'https://lab-web.ocgtest.es/',
-    staging: 'https://staging.cinesa.es/',
-    development: 'https://dev.cinesa.es/'
-  };
-
-  const targetUrl = urls[env] || urls.production;
+  const config = getCinesaConfig(env);
+  const targetUrl = config.baseUrl;
   console.log('📍 Navigating to', targetUrl);
 
   await page.goto(targetUrl);
