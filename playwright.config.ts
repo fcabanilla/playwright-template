@@ -78,16 +78,13 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // StorageState: solo cuando se especifique explícitamente
-          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
+          // Usa el estado guardado para saltar login/cloudflare
           storageState:
-            process.env.USE_STORAGE_STATE === 'true'
-              ? process.env.TEST_ENV === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : process.env.TEST_ENV === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : 'loggedInState.json'
-              : undefined,
+            process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json',
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
@@ -119,16 +116,13 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // StorageState: solo cuando se especifique explícitamente
-          // Por defecto undefined = tests independientes (User-Agent resuelve Cloudflare)
+          // Usa el estado guardado para saltar login/cloudflare en preprod
           storageState:
-            process.env.USE_STORAGE_STATE === 'true'
-              ? process.env.TEST_ENV === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : process.env.TEST_ENV === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : 'loggedInState.json'
-              : undefined,
+            process.env.TEST_ENV === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : process.env.TEST_ENV === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json',
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [

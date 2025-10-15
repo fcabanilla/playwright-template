@@ -310,22 +310,54 @@ npm run test:coverage          # Coverage analysis
 - **[ADRs](./docs/adrs/)** - Architectural Decision Records
 - **[Contributing](./CONTRIBUTING.md)** - Contribution workflow and guidelines
 
-## 🔒 Authentication & Security
+## 🔒 Running Tests by Environment
 
-### Test User Management
-
-- **Dedicated test accounts** for each environment
-- **Session state management** for authenticated flows
-- **Secure credential storage** (environment variables)
-
-### Cloudflare Handling
-
-Special handling for Cloudflare-protected environments:
+### Production (No Cloudflare - Direct)
 
 ```bash
-# Generate authenticated session state
-npm run auth:generate          # Interactive authentication
-npm run test:authenticated     # Use saved session state
+npx playwright test --project="Cinesa" --workers=1
+```
+
+**PowerShell:**
+```powershell
+npx playwright test --project="Cinesa" --workers=1
+```
+
+### Preprod, Lab, Staging (With Cloudflare)
+
+**Step 1: Generate session (one-time):**
+
+```bash
+# Lab
+TEST_ENV=lab npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+
+# Preprod
+TEST_ENV=preprod npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+
+# Staging
+TEST_ENV=staging npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+```
+
+**PowerShell:**
+```powershell
+$env:TEST_ENV="lab"; npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+```
+
+*Login manually, pass Cloudflare, browser closes automatically and saves session.*
+
+**Step 2: Run tests:**
+
+```bash
+# Lab
+TEST_ENV=lab npx playwright test --project="Cinesa" --workers=1
+
+# Preprod
+TEST_ENV=preprod npx playwright test --project="Cinesa" --workers=1
+```
+
+**PowerShell:**
+```powershell
+$env:TEST_ENV="lab"; npx playwright test --project="Cinesa" --workers=1
 ```
 
 ## 🎯 Roadmap

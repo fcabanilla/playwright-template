@@ -5,10 +5,11 @@ import { baseUrl, internalNavItems, externalNavItem } from './navbar.data';
 test.describe('Cinesa Navbar Tests', () => {
   let navbarAssertions: NavbarAssertions;
 
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
     navbarAssertions = new NavbarAssertions(page);
     await navbar.navigateToHome();
     await cookieBanner.acceptCookies();
+    await promotionalModal.closeModalIfVisible();
   });
 
   test('should display all navbar elements', async () => {

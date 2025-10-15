@@ -34,3 +34,12 @@ export const externalNavItem: NavItem = {
   selectorKey: 'bonos',
   expectedUrl: 'https://www.cinesabusiness.es/promociones.html',
 };
+
+// Function to get navbar data (returns dynamic values based on current environment)
+export function getNavbarData() {
+  return {
+    baseUrl,
+    internalNavItems,
+    externalNavItem,
+  };
+}
