@@ -4,6 +4,7 @@ import { test, expect } from '@playwright/test';
 const urls: Record<string, string> = {
   production: 'https://www.cinesa.es/',
   preprod: 'https://preprod-web.ocgtest.es/',
+  lab: 'https://lab-web.ocgtest.es/',
   staging: 'https://staging.cinesa.es/',
   development: 'https://dev.cinesa.es/'
 };
@@ -26,6 +27,7 @@ test('login manual y guarda estado (auto-close)', async ({ browser }) => {
     console.log('¡Página principal detectada! Guardando estado y cerrando navegador...');
     let stateFile = 'loggedInState.json';
     if (env === 'preprod') stateFile = 'loggedInState.preprod.json';
+    else if (env === 'lab') stateFile = 'loggedInState.lab.json';
     else if (env === 'staging') stateFile = 'loggedInState.staging.json';
     else if (env === 'development') stateFile = 'loggedInState.dev.json';
     await page.context().storageState({ path: stateFile });
