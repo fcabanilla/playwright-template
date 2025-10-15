@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
+import * as fs from 'node:fs';
 
 export default defineConfig({
   name: 'UCI Cinemas',
@@ -79,12 +80,18 @@ export default defineConfig({
           video: 'on',
           actionTimeout: 60000,
           navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : process.env.TEST_ENV === 'lab'
-              ? 'loggedInState.lab.json'
-              : 'loggedInState.json',
+          // Usa el estado guardado para saltar login/cloudflare sólo si existe.
+          // Evita errores ENOENT en CI cuando los archivos de sesión no están
+          // presentes (están gitignored y se generan localmente).
+          storageState: (() => {
+            const env = process.env.TEST_ENV;
+            const candidate = env === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : env === 'lab'
+                ? 'loggedInState.lab.json'
+                : 'loggedInState.json';
+            return fs.existsSync(candidate) ? candidate : undefined;
+          })(),
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [
@@ -117,11 +124,15 @@ export default defineConfig({
           actionTimeout: 60000,
           navigationTimeout: 60000,
           // Usa el estado guardado para saltar login/cloudflare en preprod
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : process.env.TEST_ENV === 'lab'
-              ? 'loggedInState.lab.json'
-              : undefined,
+          storageState: (() => {
+            const env = process.env.TEST_ENV;
+            const candidate = env === 'preprod'
+              ? 'loggedInState.preprod.json'
+              : env === 'lab'
+                ? 'loggedInState.lab.json'
+                : undefined;
+            return candidate && fs.existsSync(candidate) ? candidate : undefined;
+          })(),
           // Configuraciones específicas para evadir detección
           launchOptions: {
             args: [

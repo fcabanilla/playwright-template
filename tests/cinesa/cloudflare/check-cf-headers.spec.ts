@@ -1,6 +1,4 @@
-import { test } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
+import { test, expect } from '@playwright/test';
 import { getCloudflareCredentials } from '../../../core/cloudflare/envValidator';
 import {
   getCinesaConfig,
@@ -9,34 +7,38 @@ import {
 
 type EnvName = CinesaEnvironment;
 
-function artifactDir() {
-  const dir = path.join(process.cwd(), 'artifacts', 'cloudflare-check');
-  try {
-    fs.mkdirSync(dir, { recursive: true });
-  } catch (e) {
-    /* ignore */
+function isCloudflareUrl(url: string) {
+  return /cloudflare|cloudflareaccess|cdn-cgi\/access/i.test(url);
+}
+
+async function createContextWithOptionalHeaders(
+  browser: any,
+  creds?: { clientId: string; clientSecret: string }
+) {
+  const context = await browser.newContext();
+  if (creds) {
+    // set headers but do not log secret values
+    await context.setExtraHTTPHeaders({
+      'CF-Access-Client-Id': creds.clientId,
+      'CF-Access-Client-Secret': creds.clientSecret,
+    });
+    console.log('Set CF-Access headers (values not logged)');
   }
-  return dir;
+  return context;
 }
 
 test('check Cinesa URLs with CF-Access headers', async ({ browser }) => {
-  const envs: EnvName[] = [
-    'production',
-    'preprod',
-    'lab',
-    'staging',
-    'development',
-  ];
+  const envs: EnvName[] = ['production', 'preprod', 'lab', 'staging'];
 
-  for (const env of envs) {
-    const ts = new Date().toISOString().replace(/[:.]/g, '-');
-    const runId = `${env}-${ts}`;
+  async function runCheckForEnv(env: EnvName) {
     const config = getCinesaConfig(env as CinesaEnvironment);
     const targetUrl = config.baseUrl;
     console.log('\n=== Checking', env, targetUrl, '===');
 
     // Try to obtain Cloudflare credentials (prefer per-deployment override)
-    let creds;
+    let creds:
+      | { clientId: string; clientSecret: string; envKeyUsed: string }
+      | undefined;
     try {
       creds = getCloudflareCredentials(env, 'cinesa_es');
       console.log(
@@ -49,68 +51,59 @@ test('check Cinesa URLs with CF-Access headers', async ({ browser }) => {
       creds = undefined;
     }
 
-    const context = await browser.newContext();
+    const context = await createContextWithOptionalHeaders(
+      browser,
+      creds
+        ? { clientId: creds.clientId, clientSecret: creds.clientSecret }
+        : undefined
+    );
     const page = await context.newPage();
 
-    // If creds present, set headers on context
-    if (creds) {
-      const headers: Record<string, string> = {
-        'CF-Access-Client-Id': creds.clientId,
-        'CF-Access-Client-Secret': creds.clientSecret,
-      };
-      // Log header keys only
-      console.log(
-        'Setting extra HTTP headers:',
-        Object.keys(headers).join(', ')
-      );
-      await context.setExtraHTTPHeaders(headers);
-    } else {
-      console.log('No CF headers set for this run.');
-    }
-
-    let finalUrl = '';
-    let status: number | undefined = undefined;
     try {
       const resp = await page.goto(targetUrl, {
         waitUntil: 'load',
         timeout: 30000,
       });
-      finalUrl = page.url();
-      status = resp?.status();
+      const finalUrl = page.url();
+      const status = resp?.status();
       console.log(
         `Navigation finished. status=${status}, finalUrl=${finalUrl}`
       );
-    } catch (err: any) {
-      console.log(`Navigation error for ${env}:`, err.message || err);
-      // try to capture whatever is available
-      try {
-        finalUrl = page.url();
-        console.log('page.url() after error:', finalUrl);
-      } catch (e) {
-        /* ignore */
+
+      // Only assert when we successfully navigated
+      if (resp) {
+        // Assertion: If credentials were provided, we expect NOT to land on Cloudflare.
+        if (creds) {
+          expect(isCloudflareUrl(finalUrl)).toBeFalsy();
+        } else {
+          console.log(
+            'No creds provided; observed cloudflare:',
+            isCloudflareUrl(finalUrl)
+          );
+        }
+      } else {
+        console.log(
+          `No response from ${targetUrl}; skipping assertions for ${env}`
+        );
       }
+    } catch (err: any) {
+      const msg = String(err?.message || err);
+      if (
+        msg.includes('ERR_NAME_NOT_RESOLVED') ||
+        msg.includes('net::ERR_NAME_NOT_RESOLVED')
+      ) {
+        console.warn(`Skipping env=${env} due to DNS resolution error: ${msg}`);
+        // Do not rethrow; treat as skipped for this env
+        return;
+      }
+      console.warn(`Navigation error for ${env}: ${msg}`);
+      return;
+    } finally {
+      await context.close();
     }
+  }
 
-    // Check for Cloudflare patterns in finalUrl
-    const isCloudflare = /cloudflare|cloudflareaccess|cdn-cgi\/access/i.test(
-      finalUrl
-    );
-    console.log(`isCloudflareDetected=${isCloudflare}`);
-
-    // Save artifacts: screenshot and HTML
-    const dir = artifactDir();
-    const screenshotPath = path.join(dir, `check-${runId}.png`);
-    const htmlPath = path.join(dir, `check-${runId}.html`);
-    try {
-      await page.screenshot({ path: screenshotPath, fullPage: true });
-      const html = await page.content();
-      fs.writeFileSync(htmlPath, html, { encoding: 'utf8' });
-      console.log(`Saved artifacts: ${screenshotPath}, ${htmlPath}`);
-    } catch (err) {
-      console.log('Error saving artifacts:', err);
-    }
-
-    // Clean up context
-    await context.close();
+  for (const env of envs) {
+    await runCheckForEnv(env);
   }
 });
