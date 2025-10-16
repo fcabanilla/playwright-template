@@ -241,7 +241,6 @@ export class SeatPicker {
           SEAT_PICKER_SELECTORS.seatGeneric
         );
         const count = await seatLocators.count();
-        console.log(`Found ${count} seats`);
         const seats: Seat[] = [];
 
         for (let i = 0; i < count; i++) {
@@ -295,7 +294,6 @@ export class SeatPicker {
           SEAT_PICKER_SELECTORS.seatGeneric
         );
         const count = await seatLocators.count();
-        console.log(`Found ${count} seats in the sofa section`);
 
         if (count === 0) {
           throw new Error(
@@ -1008,7 +1006,6 @@ export class SeatPicker {
 
           if (await acceptButton.isVisible()) {
             await acceptButton.click();
-            console.log('Clicked accept button on showtime attribute modal');
           } else {
             // Try close button as fallback
             const closeButton = this.page.locator(
@@ -1016,7 +1013,6 @@ export class SeatPicker {
             );
             if (await closeButton.isVisible()) {
               await closeButton.click();
-              console.log('Clicked close button on showtime attribute modal');
             }
           }
 
@@ -1024,9 +1020,6 @@ export class SeatPicker {
           await modal.waitFor({ state: 'hidden', timeout: 5000 });
         } catch (error) {
           // Modal not present or already closed, continue
-          console.log(
-            'Showtime attribute modal not present or already handled'
-          );
         }
       }
     );

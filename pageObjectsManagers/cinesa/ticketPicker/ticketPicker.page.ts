@@ -1,86 +1,10 @@
 import { WebActions } from '../../../core/webactions/webActions';
 import { TICKET_PICKER_SELECTORS } from './ticketPicker.selectors';
-import { assertTicketCount } from '../../../tests/cinesa/ticketPicker/ticketPicker.assertions';
 
 export class TicketPicker {
   private readonly selectors = TICKET_PICKER_SELECTORS;
 
   constructor(private readonly webActions: WebActions) {}
-
-  /**
-   * Closes any modal that might be intercepting clicks
-   */
-  private async closeInterceptingModal(): Promise<void> {
-    try {
-      // Wait a bit for modals to appear
-      await this.webActions.wait(500);
-      
-      // Specifically handle the glasses modal that's blocking everything
-      const glassesModal = 'aside.v-modal.glasses-modal[role="dialog"]';
-      const isGlassesModalVisible = await this.webActions.isVisible(glassesModal);
-      
-      if (isGlassesModalVisible) {
-        // Force click the first button in the glasses modal
-        const modal = this.webActions.page.locator(glassesModal);
-        
-        // Try all possible buttons in the modal
-        const buttonSelectors = [
-          'button:has-text("Seleccionar")',
-          'button:has-text("Select")', 
-          'button',  // Any button in the modal
-          '.v-button'
-        ];
-        
-        for (const buttonSelector of buttonSelectors) {
-          try {
-            const button = modal.locator(buttonSelector).first();
-            const isButtonVisible = await button.isVisible({ timeout: 1000 });
-            
-            if (isButtonVisible) {
-              await button.click({ force: true, timeout: 5000 });
-              await this.webActions.wait(2000); // Wait longer for modal to close and page to update
-              
-              // Verify the glasses modal is gone
-              const stillVisible = await this.webActions.isVisible(glassesModal);
-              if (!stillVisible) {
-                return; // Modal successfully closed
-              }
-            }
-          } catch (error) {
-            // Continue to next button
-          }
-        }
-      }
-      
-      // Handle any other modals
-      const genericModalSelectors = [
-        'aside.v-modal[role="dialog"]',
-        '.v-modal',
-        '[role="dialog"]'
-      ];
-      
-      for (const modalSelector of genericModalSelectors) {
-        const isModalVisible = await this.webActions.isVisible(modalSelector);
-        
-        if (isModalVisible) {
-          const modal = this.webActions.page.locator(modalSelector);
-          
-          // Try to click any button in the modal
-          const anyButton = modal.locator('button').first();
-          const hasButton = await anyButton.isVisible({ timeout: 1000 });
-          
-          if (hasButton) {
-            await anyButton.click({ force: true });
-            await this.webActions.wait(1000);
-            return;
-          }
-        }
-      }
-      
-    } catch (error) {
-      // No modal found or error handling modal
-    }
-  }
 
   /**
    * Adds a ticket by clicking the increment button.
@@ -121,14 +45,6 @@ export class TicketPicker {
         }
       }
     }
-  }
-
-  /**
-   * Gets the current ticket count from the input field.
-   */
-  private async getTicketCount(): Promise<number> {
-    const value = await this.webActions.page.locator(this.selectors.quantityInput).first().inputValue();
-    return parseInt(value, 10);
   }
 
   /**

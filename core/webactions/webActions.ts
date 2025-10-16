@@ -153,9 +153,6 @@ export class WebActions {
       try {
         const overlay = this.page.locator(overlaySelector).first();
         if (await overlay.isVisible({ timeout: 1000 })) {
-          console.log(
-            `Detected overlay: ${overlaySelector}, attempting to close...`
-          );
           // Try clicking the overlay to close it
           await overlay.click({ timeout: 2000 });
           await this.page.waitForTimeout(1000);
