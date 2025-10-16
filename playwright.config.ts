@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
 import * as fs from 'node:fs';
+import getCloudflareHeaders from './core/cloudflare/cloudflareHeaders';
 
 export default defineConfig({
   name: 'UCI Cinemas',
@@ -68,7 +69,8 @@ export default defineConfig({
   fullyParallel: true,
   workers: 5, // Optimized for stability and performance balance
 
-  // Proyectos separados para UCI y Cinesa
+  // Proyectos separados para UCI, Cinesa y un proyecto específico para
+  // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
   projects: [
     {
       name: 'UCI Cinemas',
@@ -156,6 +158,15 @@ export default defineConfig({
             ],
           },
         },
+      },
+    },
+    {
+      name: 'cloudflare-only',
+      testDir: './tests/cinesa/cloudflare',
+      use: {
+        headless: true,
+        // inject Cloudflare headers computed by helper
+        extraHTTPHeaders: getCloudflareHeaders(process.env.TEST_ENV),
       },
     },
   ],
