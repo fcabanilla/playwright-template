@@ -13,7 +13,7 @@ export interface EnvVarMatch {
 export function getCloudflareHeaders(
   env?: string
 ): Record<string, string> | undefined {
-  const e = env || (process.env.TEST_ENV as string) || 'lab';
+  const e = (env || (process.env.TEST_ENV as string) || 'lab').toUpperCase();
 
   const findVar = (baseName: string): EnvVarMatch | undefined => {
     // 1) per-deployment pattern: any env var that starts with `${baseName}_${e}_`

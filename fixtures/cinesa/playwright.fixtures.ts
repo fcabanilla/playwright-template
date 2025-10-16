@@ -1,4 +1,5 @@
 import { test as base } from '@playwright/test';
+import { getCloudflareHeaders } from '../../core/cloudflare/cloudflareHeaders';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { getCinesaConfig, CinesaEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
@@ -61,12 +62,33 @@ type CustomFixtures = {
 };
 
 export const test = base.extend<CustomFixtures>({
-    navbar: async ({ page }, use) => {
-      const env = process.env.TEST_ENV as CinesaEnvironment || 'production';
-      const config = getCinesaConfig(env);
-      const navbar = new Navbar(page, config.baseUrl);
-      await use(navbar);
-    },
+  // Override context fixture to auto-inject Cloudflare headers when credentials exist
+  context: async ({ browser }, use) => {
+    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+    const headers = getCloudflareHeaders(env);
+
+    const context = await browser.newContext();
+
+    // Auto-inject Cloudflare headers if credentials are available for this environment
+    if (headers) {
+      await context.setExtraHTTPHeaders(headers);
+      console.log(`✅ [Cloudflare] Headers auto-injected for env=${env}`);
+    } else {
+      console.log(
+        `ℹ️  [Cloudflare] No credentials found for env=${env}, skipping header injection`
+      );
+    }
+
+    await use(context);
+    await context.close();
+  },
+
+  navbar: async ({ page }, use) => {
+    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+    const config = getCinesaConfig(env);
+    const navbar = new Navbar(page, config.baseUrl);
+    await use(navbar);
+  },
   cookieBanner: async ({ page }, use) => {
     const cookieBanner = new CookieBanner(page);
     await use(cookieBanner);

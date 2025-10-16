@@ -1,7 +1,11 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
-import * as fs from 'node:fs';
-import getCloudflareHeaders from './core/cloudflare/cloudflareHeaders';
+import {
+  getUCICinemasProject,
+  getCinesaProject,
+  getCloudflareOnlyProject,
+  getCinesaCloudflareProject,
+} from './config/projects';
 
 export default defineConfig({
   name: 'UCI Cinemas',
@@ -72,103 +76,10 @@ export default defineConfig({
   // Proyectos separados para UCI, Cinesa y un proyecto específico para
   // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
   projects: [
-    {
-      name: 'UCI Cinemas',
-      testDir: './tests/uci',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare sólo si existe.
-          // Evita errores ENOENT en CI cuando los archivos de sesión no están
-          // presentes (están gitignored y se generan localmente).
-          storageState: (() => {
-            const env = process.env.TEST_ENV;
-            const candidate =
-              env === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : env === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : 'loggedInState.json';
-            return fs.existsSync(candidate) ? candidate : undefined;
-          })(),
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
-    },
-    {
-      name: 'Cinesa',
-      testDir: './tests/cinesa',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare en preprod
-          storageState: (() => {
-            const env = process.env.TEST_ENV;
-            const candidate =
-              env === 'preprod'
-                ? 'loggedInState.preprod.json'
-                : env === 'lab'
-                  ? 'loggedInState.lab.json'
-                  : undefined;
-            return candidate && fs.existsSync(candidate)
-              ? candidate
-              : undefined;
-          })(),
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
-    },
-    {
-      name: 'cloudflare-only',
-      testDir: './tests/cinesa/cloudflare',
-      use: {
-        headless: true,
-        // inject Cloudflare headers computed by helper
-        extraHTTPHeaders: getCloudflareHeaders(process.env.TEST_ENV),
-      },
-    },
+    getUCICinemasProject(),
+    getCinesaProject(),
+    getCloudflareOnlyProject(),
+    getCinesaCloudflareProject(),
   ],
 
   // Reporter configurado para diferenciar proyectos
