@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { CorsHandler } from './corsHandler';
 
 type Page = any;
 type Locator = any;
@@ -26,6 +27,7 @@ type Locator = any;
  */
 export class WebActions {
   readonly page: Page;
+  private corsHandler: CorsHandler;
 
   /**
    * Creates a new WebActions instance with the provided page context.
@@ -41,6 +43,20 @@ export class WebActions {
    */
   constructor(page: Page) {
     this.page = page;
+    this.corsHandler = new CorsHandler(page);
+    // Initialize CORS handling automatically
+    this.initializeCorsHandling();
+  }
+
+  /**
+   * Initialize CORS handling automatically for all WebActions instances
+   */
+  private async initializeCorsHandling(): Promise<void> {
+    try {
+      await this.corsHandler.initialize();
+    } catch (error) {
+      // CORS handler initialization is optional
+    }
   }
 
   /**
@@ -173,6 +189,13 @@ export class WebActions {
    */
   async getText(selector: string): Promise<string> {
     return (await this.page.locator(selector).textContent()) || '';
+  }
+
+  /**
+   * Get the value of an input field
+   */
+  async getInputValue(selector: string): Promise<string> {
+    return await this.page.locator(selector).inputValue();
   }
 
   /**

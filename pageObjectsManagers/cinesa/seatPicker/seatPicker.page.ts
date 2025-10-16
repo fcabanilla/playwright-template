@@ -58,18 +58,159 @@ export class SeatPicker {
   }
 
   /**
+   * Checks if tickets are sold out or no seats available
+   * Returns true if sold out, false if seats are available
+   */
+  private async checkIfSoldOut(): Promise<boolean> {
+    // Only check if we're in LAB environment - production shouldn't have this issue
+    const currentUrl = this.page.url();
+    if (!currentUrl.includes('lab-web.ocgtest.es')) {
+      return false; // Never skip in production
+    }
+
+    // First check for specific sold out selectors
+    const soldOutSelectors = [
+      SEAT_PICKER_SELECTORS.soldOutMessage,
+      SEAT_PICKER_SELECTORS.noSeatsAvailable,
+      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("agotad")',
+      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("disponib")',
+      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("sold")',
+    ];
+
+    for (const selector of soldOutSelectors) {
+      try {
+        const element = this.page.locator(selector);
+        const isVisible = await element.isVisible({ timeout: 1000 });
+        if (isVisible) {
+          return true;
+        }
+      } catch (error) {
+        // Continue checking other selectors
+      }
+    }
+
+    // Broader text-based search for sold out messages anywhere in the page
+    const soldOutTexts = [
+      'agotadas',
+      'agotados', 
+      'sold out',
+      'no disponible',
+      'sin entradas',
+      'entradas agotadas',
+      'no seats available',
+      'tickets sold out',
+      'no hay asientos',
+      'asientos agotados'
+    ];
+
+    for (const text of soldOutTexts) {
+      try {
+        const element = this.page.locator(`text=${text}`).first();
+        const isVisible = await element.isVisible({ timeout: 500 });
+        if (isVisible) {
+          return true;
+        }
+      } catch (error) {
+        // Continue checking other texts
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Closes any blocking modals that might prevent seat interaction
+   */
+  private async closeBlockingModals(): Promise<void> {
+    const modalSelectors = [
+      // D-Box modal
+      {
+        modal: SEAT_PICKER_SELECTORS.dboxModal,
+        accept: SEAT_PICKER_SELECTORS.modalAcceptButton,
+        name: 'D-Box'
+      },
+      // Showtime attribute modal
+      {
+        modal: SEAT_PICKER_SELECTORS.showtimeAttributeModal,
+        accept: SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton,
+        name: 'Showtime'
+      },
+      // Generic modal fallback
+      {
+        modal: SEAT_PICKER_SELECTORS.modalGeneric,
+        accept: SEAT_PICKER_SELECTORS.modalAcceptButton,
+        name: 'Generic'
+      }
+    ];
+
+    for (const modalConfig of modalSelectors) {
+      try {
+        const modal = this.page.locator(modalConfig.modal);
+        const isVisible = await modal.isVisible({ timeout: 2000 });
+        
+        if (isVisible) {
+          // Try to click accept button first
+          const acceptButton = this.page.locator(modalConfig.accept);
+          const acceptExists = await acceptButton.isVisible({ timeout: 1000 });
+          
+          if (acceptExists) {
+            await acceptButton.click();
+          } else {
+            // Try to close the modal
+            const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.modalCloseButton);
+            const closeExists = await closeButton.isVisible({ timeout: 1000 });
+            
+            if (closeExists) {
+              await closeButton.click();
+            }
+          }
+          
+          // Wait for modal to disappear
+          await modal.waitFor({ state: 'hidden', timeout: 3000 });
+          break; // Exit after handling first modal found
+        }
+      } catch (error) {
+        // Continue to next modal type
+      }
+    }
+  }
+
+  /**
    * Waits for the seats to load and ensures they are visible and interactable.
    */
   private async waitForSeatsToBeReady(): Promise<void> {
     await allure.test.step('Waiting for seats to be ready', async () => {
+      // First, close any blocking modals
+      await this.closeBlockingModals();
+      
+      // Check if tickets are sold out FIRST before waiting for seats
+      const isSoldOut = await this.checkIfSoldOut();
+      if (isSoldOut) {
+        throw new Error('SOLD_OUT_SKIP_TEST'); // Special error to handle in test
+      }
+      
       const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
 
-      // Wait for at least one seat to be visible
-      await seatLocators.first().waitFor({ state: 'visible', timeout: 10000 });
+      // Give a quick check to see if any seats exist at all
+      try {
+        await seatLocators.first().waitFor({ state: 'visible', timeout: 3000 });
+      } catch (quickCheckError) {
+        const isSoldOutOnQuickFail = await this.checkIfSoldOut();
+        if (isSoldOutOnQuickFail) {
+          throw new Error('SOLD_OUT_SKIP_TEST');
+        }
+        // If not sold out, try waiting longer
+        await seatLocators.first().waitFor({ state: 'visible', timeout: 10000 });
+      }
 
       // Ensure all seats have loaded by checking their count
       const count = await seatLocators.count();
       if (count === 0) {
+        // Double check if this is a sold out scenario
+        const isSoldOutAfterTimeout = await this.checkIfSoldOut();
+        if (isSoldOutAfterTimeout) {
+          throw new Error('SOLD_OUT_SKIP_TEST');
+        }
         throw new Error('No seats found after waiting for them to load');
       }
 

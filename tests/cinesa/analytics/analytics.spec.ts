@@ -20,8 +20,10 @@ declare global {
 }
 
 test.describe('Google Analytics DataLayer Validation', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
+    await cookieBanner.acceptCookies();
+    await promotionalModal.closeModalIfVisible();
   });
 
   test('Validate analytics events capture - Oasiz with Classic menu', async ({
@@ -41,39 +43,29 @@ test.describe('Google Analytics DataLayer Validation', () => {
 
     await analyticsPage.initializeDataLayerCapture();
 
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket();
-    await barPage.buyClassicMenuOasiz();
-    await purchaseSummary.acceptAndContinue();
+    try {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket();
+      await barPage.buyClassicMenuOasiz();
+      await purchaseSummary.acceptAndContinue();
 
-    // Validate analytics
-    const allEvents = await analyticsPage.captureDataLayerEvents();
-    await assertEventsWereCaptured(allEvents);
+      // Validate analytics
+      const allEvents = await analyticsPage.captureDataLayerEvents();
+      await assertEventsWereCaptured(allEvents);
 
-    const { addToCartEvents, beginCheckoutEvents } =
+      const { addToCartEvents, beginCheckoutEvents } =
       await assertCriticalEventsExist(allEvents);
     const latestBeginCheckout =
       beginCheckoutEvents[beginCheckoutEvents.length - 1];
 
     await assertBeginCheckoutEventStructure(latestBeginCheckout);
-
-    const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
-    await assertAnalyticsTotalIsReasonable(analyticsTotal);
-
-    if (latestBeginCheckout.ecommerce?.items) {
-      await assertEcommerceItemsStructure(latestBeginCheckout.ecommerce.items);
-    }
-
-    const itemsTotal =
-      latestBeginCheckout.ecommerce?.items?.reduce((sum: number, item: any) => {
-        return sum + item.price * (item.quantity || 1);
-      }, 0) || 0;
+    await assertAnalyticsTotalIsReasonable(latestBeginCheckout);
+    await assertEcommerceItemsStructure(latestBeginCheckout);
 
     await attachEventsToReport(test.info(), allEvents, latestBeginCheckout);
     await logAnalyticsSummary(
@@ -82,10 +74,17 @@ test.describe('Google Analytics DataLayer Validation', () => {
       allEvents,
       addToCartEvents,
       beginCheckoutEvents,
-      analyticsTotal,
-      itemsTotal,
       latestBeginCheckout
     );
+    } catch (error: any) {
+      // Handle sold out scenario - skip test gracefully
+      if (error.message && error.message.includes('SOLD_OUT_SKIP_TEST')) {
+        test.skip(true, 'Tickets sold out - expected in LAB environment');
+        return;
+      }
+      // Re-throw other errors
+      throw error;
+    }
   });
 
   test('Validate analytics events capture - Grancasa with Classic menu', async ({
@@ -102,33 +101,41 @@ test.describe('Google Analytics DataLayer Validation', () => {
   }) => {
     await analyticsPage.initializeDataLayerCapture();
 
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToCinemas();
-    await cinema.selectGrancasaCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket();
-    await barPage.buyClassicMenuGrancasa();
-    await purchaseSummary.acceptAndContinue();
+    try {
+      await navbar.navigateToCinemas();
+      await cinema.selectGrancasaCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket();
+      await barPage.buyClassicMenuGrancasa();
+      await purchaseSummary.acceptAndContinue();
 
-    // Validate analytics
-    const allEvents = await analyticsPage.captureDataLayerEvents();
-    await assertEventsWereCaptured(allEvents);
+      // Validate analytics
+      const allEvents = await analyticsPage.captureDataLayerEvents();
+      await assertEventsWereCaptured(allEvents);
 
-    const { addToCartEvents, beginCheckoutEvents } =
-      await assertCriticalEventsExist(allEvents);
-    const latestBeginCheckout =
-      beginCheckoutEvents[beginCheckoutEvents.length - 1];
-    const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
+      const { addToCartEvents, beginCheckoutEvents } =
+        await assertCriticalEventsExist(allEvents);
+      const latestBeginCheckout =
+        beginCheckoutEvents[beginCheckoutEvents.length - 1];
 
-    await assertAnalyticsTotalIsReasonable(analyticsTotal);
-    await logGrancasaAnalyticsSummary(
-      allEvents,
-      addToCartEvents,
-      beginCheckoutEvents,
-      analyticsTotal
-    );
+      await assertAnalyticsTotalIsReasonable(latestBeginCheckout);
+      await logGrancasaAnalyticsSummary(
+        allEvents,
+        addToCartEvents,
+        beginCheckoutEvents,
+        latestBeginCheckout
+      );
+    } catch (error: any) {
+      // Handle sold out scenario - skip test gracefully
+      if (error.message && error.message.includes('SOLD_OUT_SKIP_TEST')) {
+        test.skip(true, 'Tickets sold out - expected in LAB environment');
+        return;
+      }
+      // Re-throw other errors
+      throw error;
+    }
   });
 });

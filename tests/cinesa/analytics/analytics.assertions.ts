@@ -43,22 +43,26 @@ export async function assertBeginCheckoutEventStructure(latestBeginCheckout: any
 
 /**
  * Validates analytics total values are reasonable
- * @param analyticsTotal The total value from analytics
+ * @param beginCheckoutEvent The begin_checkout event to validate
  */
-export async function assertAnalyticsTotalIsReasonable(analyticsTotal: number): Promise<void> {
+export async function assertAnalyticsTotalIsReasonable(beginCheckoutEvent: any): Promise<void> {
+  const analyticsTotal = beginCheckoutEvent.ecommerce?.value || 0;
   expect(analyticsTotal).toBeGreaterThan(0);
   expect(analyticsTotal).toBeLessThan(100); // Reasonable upper bound
 }
 
 /**
  * Validates the structure of ecommerce items
- * @param items Array of ecommerce items
+ * @param beginCheckoutEvent The begin_checkout event containing items
  */
-export async function assertEcommerceItemsStructure(items: any[]): Promise<void> {
-  for (const item of items) {
-    expect(item).toHaveProperty('item_name');
-    expect(item).toHaveProperty('price');
-    expect(item.price).toBeGreaterThan(0);
+export async function assertEcommerceItemsStructure(beginCheckoutEvent: any): Promise<void> {
+  if (beginCheckoutEvent.ecommerce?.items) {
+    const items = beginCheckoutEvent.ecommerce.items;
+    for (const item of items) {
+      expect(item).toHaveProperty('item_name');
+      expect(item).toHaveProperty('price');
+      expect(item.price).toBeGreaterThan(0);
+    }
   }
 }
 
@@ -87,8 +91,6 @@ export async function attachEventsToReport(testInfo: TestInfo, allEvents: any[],
  * @param allEvents Array of all captured events
  * @param addToCartEvents Array of add_to_cart events
  * @param beginCheckoutEvents Array of begin_checkout events
- * @param analyticsTotal Total value from analytics
- * @param itemsTotal Calculated total from items
  * @param latestBeginCheckout Latest begin_checkout event
  */
 export async function logAnalyticsSummary(
@@ -97,19 +99,13 @@ export async function logAnalyticsSummary(
   allEvents: any[],
   addToCartEvents: any[],
   beginCheckoutEvents: any[],
-  analyticsTotal: number,
-  itemsTotal: number,
   latestBeginCheckout: any
 ): Promise<void> {
-  console.log('=== ANALYTICS VALIDATION SUMMARY ===');
-  console.log(`🎬 Cinema: ${cinemaName}`);
-  console.log(`🍿 Menu: ${menuType}`);
-  console.log(`📊 Total events captured: ${allEvents.length}`);
-  console.log(`🛒 Add to cart events: ${addToCartEvents.length}`);
-  console.log(`💳 Begin checkout events: ${beginCheckoutEvents.length}`);
-  console.log(`💰 Analytics total: €${analyticsTotal}`);
-  console.log(`📝 Items total: €${itemsTotal}`);
-  console.log(`📋 Items count: ${latestBeginCheckout.ecommerce?.items?.length || 0}`);
+  const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
+  const itemsTotal = latestBeginCheckout.ecommerce?.items?.reduce((sum: number, item: any) => {
+    return sum + item.price * (item.quantity || 1);
+  }, 0) || 0;
+
   
   // List all items
   if (latestBeginCheckout.ecommerce?.items) {
@@ -129,8 +125,10 @@ export async function logGrancasaAnalyticsSummary(
   allEvents: any[],
   addToCartEvents: any[],
   beginCheckoutEvents: any[],
-  analyticsTotal: number
+  latestBeginCheckout: any
 ): Promise<void> {
+  const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
+  
   console.log('=== GRANCASA ANALYTICS VALIDATION SUMMARY ===');
   console.log(`✅ Total events captured: ${allEvents.length}`);
   console.log(`✅ Add to cart events: ${addToCartEvents.length}`);

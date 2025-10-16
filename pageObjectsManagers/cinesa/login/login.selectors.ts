@@ -2,7 +2,7 @@
  * Selectors for the Login page.
  */
 export const LOGIN_SELECTORS = {
-  continueAsGuestButton: 'button.v-button--color-secondary.btn--transparent--bordered--medium',
+  continueAsGuestButton: 'button:has-text("Continuar como invitado"), button:has-text("Continue as guest"), button:has-text("Continúa como invitado"), button.v-button--color-secondary.btn--transparent--bordered--medium',
   emailInput: '#v-member-sign-in-form-field__email-input',
   passwordInput: '#v-member-sign-in-form-field__password-input',
   submitButton: 'button[type="submit"].v-form__submit-button',

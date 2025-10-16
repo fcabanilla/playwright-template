@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import { LOGIN_SELECTORS } from './login.selectors';
 
 /**
@@ -6,17 +6,16 @@ import { LOGIN_SELECTORS } from './login.selectors';
  * Contains methods to interact with the login page.
  */
 export class LoginPage {
-  readonly page: Page;
+  private readonly selectors = LOGIN_SELECTORS;
 
-  constructor(page: Page) {
-    this.page = page;
-  }
+  constructor(private readonly webActions: WebActions) {}
 
   /**
    * Clicks the "Continuar como invitado" button.
    */
   async clickContinueAsGuest(): Promise<void> {
-    await this.page.locator(LOGIN_SELECTORS.continueAsGuestButton).click();
+    await this.webActions.waitForVisible(this.selectors.continueAsGuestButton, 10000);
+    await this.webActions.click(this.selectors.continueAsGuestButton);
   }
 
   /**
@@ -25,14 +24,14 @@ export class LoginPage {
   async fillData() {
     const email = `${'matiasslpknt08'}@${'gmail.com'}`;
     const password = 'EstoEsUnaPrueba.1';
-    await this.page.fill(LOGIN_SELECTORS.emailInput, email);
-    await this.page.fill(LOGIN_SELECTORS.passwordInput, password);
+    await this.webActions.fill(this.selectors.emailInput, email);
+    await this.webActions.fill(this.selectors.passwordInput, password);
   }
 
   /**
    * Hace click en el botón de submit del login.
    */
   async clickSubmit() {
-    await this.page.click(LOGIN_SELECTORS.submitButton);
+    await this.webActions.click(this.selectors.submitButton);
   }
 }

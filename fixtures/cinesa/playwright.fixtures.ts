@@ -1,4 +1,5 @@
 import { test as base } from '@playwright/test';
+import { WebActions } from '../../core/webactions/webActions';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { getCinesaConfig, CinesaEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
@@ -96,11 +97,13 @@ export const test = base.extend<CustomFixtures>({
     await use(cinemaDetail);
   },
   loginPage: async ({ page }, use) => {
-    const loginPage = new LoginPage(page);
+    const webActions = new WebActions(page);
+    const loginPage = new LoginPage(webActions);
     await use(loginPage);
   },
   ticketPicker: async ({ page }, use) => {
-    const ticketPicker = new TicketPicker(page);
+    const webActions = new WebActions(page);
+    const ticketPicker = new TicketPicker(webActions);
     await use(ticketPicker);
   },
   barPage: async ({ page }, use) => {

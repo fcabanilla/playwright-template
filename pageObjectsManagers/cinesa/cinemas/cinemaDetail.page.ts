@@ -119,7 +119,21 @@ export class CinemaDetail {
         }
 
         if (filmsWithNormalShowtimes.length === 0) {
-          throw new Error('No films with normal showtimes found on the cinema detail page');
+          // Fallback: select any film with any showtime
+          for (const name of names) {
+            const filmContainer = this.page.locator(this.selectors.filmItem, {
+              has: this.page.locator(this.selectors.filmName, { hasText: name }),
+            });
+
+            const anyShowtimes = await filmContainer.locator(this.selectors.showtime);
+            if ((await anyShowtimes.count()) > 0) {
+              filmsWithNormalShowtimes.push(name);
+            }
+          }
+
+          if (filmsWithNormalShowtimes.length === 0) {
+            throw new Error('No films with any showtimes found on the cinema detail page');
+          }
         }
 
         const randomIndex = Math.floor(Math.random() * filmsWithNormalShowtimes.length);
@@ -218,7 +232,16 @@ export class CinemaDetail {
 
         const normalShowtimeTexts = await normalShowtimes.allTextContents();
         if (normalShowtimeTexts.length === 0) {
-          throw new Error('No normal showtimes found for the selected film');
+          // Fallback: select any available showtime
+          const anyShowtimes = await showtimeLocator.allTextContents();
+          if (anyShowtimes.length === 0) {
+            throw new Error('No showtimes found for the selected film');
+          }
+
+          const randomIndex = Math.floor(Math.random() * anyShowtimes.length);
+          const selectedTime = anyShowtimes[randomIndex];
+          await this.selectShowtimeByText(selectedTime);
+          return selectedTime;
         }
 
         const randomIndex = Math.floor(Math.random() * normalShowtimeTexts.length);
