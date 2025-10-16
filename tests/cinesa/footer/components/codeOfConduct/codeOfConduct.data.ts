@@ -1,1 +1,6 @@
-export const expectedUrl = 'https://www.cinesa.es/quienes-somos/codigo-de-conducta-y-etica-empresariales/';
+import { getCinesaConfig, CinesaEnvironment } from '../../../../../config/environments';
+
+const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+const config = getCinesaConfig(env);
+
+export const expectedUrl = `${config.baseUrl}/quienes-somos/codigo-de-conducta-y-etica-empresariales/`;
