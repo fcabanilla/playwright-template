@@ -11,7 +11,7 @@ export interface NavbarSelectors {
 }
 
 export const navbarSelectors: NavbarSelectors = {
-  logo: ".logo a",
+  logo: "header .logo a:first-child",
   cines: 'nav.header-nav a[href="/cines/"]',
   peliculas: 'nav.header-nav a[href="/peliculas/"]',
   promociones: 'nav.header-nav a[href="/promociones/"]',

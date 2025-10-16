@@ -1,7 +1,7 @@
 /**
  * Test simple para verificar que el storageState de LAB funciona
  */
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test('Verify LAB storage state works', async ({ page }) => {
   console.log('🌍 Environment:', process.env.TEST_ENV);
