@@ -1,4 +1,8 @@
 import { FooterSelectors } from '../../../pageObjectsManagers/cinesa/footer/footer.selectors';
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
+
+const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+const config = getCinesaConfig(env);
 
 // Interfaz para representar un elemento de navegación y su URL esperada
 export interface FooterNavItem {
@@ -6,8 +10,8 @@ export interface FooterNavItem {
   expectedUrl: string;
 }
 
-// URL base del sitio
-export const baseUrl = 'https://www.cinesa.es';
+// URL base del sitio (dinámica según entorno)
+export const baseUrl = config.baseUrl;
 
 // Elementos de navegación interna
 export const internalFooterItems: FooterNavItem[] = [

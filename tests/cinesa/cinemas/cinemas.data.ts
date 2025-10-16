@@ -4,4 +4,9 @@ export const cinemasData = {
   grancasa: 'grancasa'
 };
 
-export const CINEMAS_URL = 'https://www.cinesa.es/cines/';
+import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
+
+const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+const config = getCinesaConfig(env);
+
+export const CINEMAS_URL = `${config.baseUrl}/cines/`;
