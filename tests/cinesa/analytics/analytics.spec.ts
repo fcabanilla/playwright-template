@@ -54,18 +54,28 @@ test.describe('Google Analytics DataLayer Validation', () => {
       await barPage.buyClassicMenuOasiz();
       await purchaseSummary.acceptAndContinue();
 
-      // Validate analytics
+      // Validate analytics - LÓGICA CENTRAL ORIGINAL
       const allEvents = await analyticsPage.captureDataLayerEvents();
       await assertEventsWereCaptured(allEvents);
 
       const { addToCartEvents, beginCheckoutEvents } =
-      await assertCriticalEventsExist(allEvents);
-    const latestBeginCheckout =
-      beginCheckoutEvents[beginCheckoutEvents.length - 1];
+        await assertCriticalEventsExist(allEvents);
+      const latestBeginCheckout =
+        beginCheckoutEvents[beginCheckoutEvents.length - 1];
 
-    await assertBeginCheckoutEventStructure(latestBeginCheckout);
-    await assertAnalyticsTotalIsReasonable(latestBeginCheckout);
-    await assertEcommerceItemsStructure(latestBeginCheckout);
+      await assertBeginCheckoutEventStructure(latestBeginCheckout);
+
+      const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
+      await assertAnalyticsTotalIsReasonable(analyticsTotal);
+
+      if (latestBeginCheckout.ecommerce?.items) {
+        await assertEcommerceItemsStructure(latestBeginCheckout.ecommerce.items);
+      }
+
+      const itemsTotal =
+        latestBeginCheckout.ecommerce?.items?.reduce((sum: number, item: any) => {
+          return sum + item.price * (item.quantity || 1);
+        }, 0) || 0;
 
     await attachEventsToReport(test.info(), allEvents, latestBeginCheckout);
     await logAnalyticsSummary(

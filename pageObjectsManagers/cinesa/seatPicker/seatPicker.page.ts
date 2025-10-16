@@ -68,50 +68,56 @@ export class SeatPicker {
       return false; // Never skip in production
     }
 
-    // First check for specific sold out selectors
-    const soldOutSelectors = [
-      SEAT_PICKER_SELECTORS.soldOutMessage,
-      SEAT_PICKER_SELECTORS.noSeatsAvailable,
-      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("agotad")',
-      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("disponib")',
-      SEAT_PICKER_SELECTORS.errorMessage + ':has-text("sold")',
-    ];
-
-    for (const selector of soldOutSelectors) {
-      try {
-        const element = this.page.locator(selector);
-        const isVisible = await element.isVisible({ timeout: 1000 });
-        if (isVisible) {
-          return true;
-        }
-      } catch (error) {
-        // Continue checking other selectors
+    // Check if seat map exists and has seats - if seats are visible, NOT sold out
+    try {
+      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const seatCount = await seatLocators.count();
+      if (seatCount > 0) {
+        // If we can see seats, definitely not sold out
+        return false;
       }
+    } catch (error) {
+      // Continue to check for sold out messages
     }
 
-    // Broader text-based search for sold out messages anywhere in the page
-    const soldOutTexts = [
-      'agotadas',
-      'agotados', 
-      'sold out',
-      'no disponible',
-      'sin entradas',
-      'entradas agotadas',
-      'no seats available',
-      'tickets sold out',
-      'no hay asientos',
-      'asientos agotados'
+    // Only check for VERY specific sold out indicators
+    const specificSoldOutSelectors = [
+      '.sold-out-message',
+      '.no-seats-available',
+      '.session-sold-out',
+      '.entradas-agotadas',
+      '.tickets-sold-out'
     ];
 
-    for (const text of soldOutTexts) {
+    for (const selector of specificSoldOutSelectors) {
       try {
-        const element = this.page.locator(`text=${text}`).first();
+        const element = this.page.locator(selector);
         const isVisible = await element.isVisible({ timeout: 500 });
         if (isVisible) {
           return true;
         }
       } catch (error) {
-        // Continue checking other texts
+        // Continue checking
+      }
+    }
+
+    // Check for sold out messages ONLY in main content areas, not entire page
+    const contentSelectors = ['.main-content', '.seat-picker-content', '.booking-content', 'main'];
+    
+    for (const contentSelector of contentSelectors) {
+      try {
+        const contentArea = this.page.locator(contentSelector);
+        const exists = await contentArea.isVisible({ timeout: 500 });
+        
+        if (exists) {
+          const soldOutInContent = contentArea.locator('text=/sold out|agotad|no disponible/i').first();
+          const isSoldOutVisible = await soldOutInContent.isVisible({ timeout: 500 });
+          if (isSoldOutVisible) {
+            return true;
+          }
+        }
+      } catch (error) {
+        // Continue checking other content areas
       }
     }
 
@@ -183,35 +189,33 @@ export class SeatPicker {
       // First, close any blocking modals
       await this.closeBlockingModals();
       
-      // Check if tickets are sold out FIRST before waiting for seats
-      const isSoldOut = await this.checkIfSoldOut();
-      if (isSoldOut) {
-        throw new Error('SOLD_OUT_SKIP_TEST'); // Special error to handle in test
-      }
-      
       const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
 
-      // Give a quick check to see if any seats exist at all
+      // Try to wait for seats normally first
       try {
-        await seatLocators.first().waitFor({ state: 'visible', timeout: 3000 });
-      } catch (quickCheckError) {
-        const isSoldOutOnQuickFail = await this.checkIfSoldOut();
-        if (isSoldOutOnQuickFail) {
-          throw new Error('SOLD_OUT_SKIP_TEST');
+        await seatLocators.first().waitFor({ state: 'visible', timeout: 20000 });
+        
+        // Ensure all seats have loaded by checking their count
+        const count = await seatLocators.count();
+        if (count === 0) {
+          throw new Error('No seats found after waiting for them to load');
         }
-        // If not sold out, try waiting longer
-        await seatLocators.first().waitFor({ state: 'visible', timeout: 10000 });
-      }
-
-      // Ensure all seats have loaded by checking their count
-      const count = await seatLocators.count();
-      if (count === 0) {
-        // Double check if this is a sold out scenario
-        const isSoldOutAfterTimeout = await this.checkIfSoldOut();
-        if (isSoldOutAfterTimeout) {
-          throw new Error('SOLD_OUT_SKIP_TEST');
+        
+        // If we reach here, seats loaded successfully
+        return;
+        
+      } catch (seatLoadError) {
+        // Only if seat loading fails, then check if it's because of sold-out
+        const currentUrl = this.page.url();
+        if (currentUrl.includes('lab-web.ocgtest.es')) {
+          const isSoldOut = await this.checkIfSoldOut();
+          if (isSoldOut) {
+            throw new Error('SOLD_OUT_SKIP_TEST');
+          }
         }
-        throw new Error('No seats found after waiting for them to load');
+        
+        // If not sold out, re-throw the original error
+        throw seatLoadError;
       }
 
       // Wait for all seats to have their aria-pressed attribute set
