@@ -17,8 +17,7 @@ export const navbarSelectors: NavbarSelectors = {
   promociones: 'nav.header-nav a[href="/promociones/"]',
   experiencias: 'nav.header-nav a[href="/experiencias/"]',
   programas: 'nav.header-nav a[href="/programas/"]',
-  bonos:
-    'nav.header-nav a[target="_blank"][href="https://www.cinesabusiness.es/promociones.html"]',
+  bonos: 'nav.header-nav a[href*="promociones"], nav.header-nav a[href*="bonos"], nav.header-nav a:has-text("Bonos")',
   signup: '.header-sign-up',
   signin: '.header-sign-in',
 };
