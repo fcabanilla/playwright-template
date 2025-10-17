@@ -1,7 +1,7 @@
 /**
  * Test simple para verificar que el storageState de LAB funciona
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../../fixtures/cinesa/playwright.fixtures';
 import {
   getCinesaConfig,
   CinesaEnvironment,
