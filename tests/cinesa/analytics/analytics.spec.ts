@@ -72,11 +72,6 @@ test.describe('Google Analytics DataLayer Validation', () => {
         await assertEcommerceItemsStructure(latestBeginCheckout.ecommerce.items);
       }
 
-      const itemsTotal =
-        latestBeginCheckout.ecommerce?.items?.reduce((sum: number, item: any) => {
-          return sum + item.price * (item.quantity || 1);
-        }, 0) || 0;
-
     await attachEventsToReport(test.info(), allEvents, latestBeginCheckout);
     await logAnalyticsSummary(
       cinemaName,
