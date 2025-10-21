@@ -10,3 +10,7 @@ dist/
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
 notLoggedInState.json
+artifacts/cloudflare-check/
+
+# Temporary files
+tests/cinesa/.DS_Store
