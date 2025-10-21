@@ -1,5 +1,11 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
+import {
+  getUCICinemasProject,
+  getCinesaProject,
+  getCloudflareOnlyProject,
+  getCinesaCloudflareProject,
+} from './config/projects';
 
 export default defineConfig({
   name: 'UCI Cinemas',
@@ -67,78 +73,13 @@ export default defineConfig({
   fullyParallel: true,
   workers: 5, // Optimized for stability and performance balance
 
-  // Proyectos separados para UCI y Cinesa
+  // Proyectos separados para UCI, Cinesa y un proyecto específico para
+  // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
   projects: [
-    {
-      name: 'UCI Cinemas',
-      testDir: './tests/uci',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : 'loggedInState.json',
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
-    },
-    {
-      name: 'Cinesa',
-      testDir: './tests/cinesa',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare en preprod
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : undefined,
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
-    },
+    getUCICinemasProject(),
+    getCinesaProject(),
+    getCloudflareOnlyProject(),
+    getCinesaCloudflareProject(),
   ],
 
   // Reporter configurado para diferenciar proyectos

@@ -1,4 +1,5 @@
 import type { Browser } from '@playwright/test';
+import * as fs from 'node:fs';
 
 /**
  * Inicializa un contexto y página sorteando Cloudflare y restaurando sesión según el ambiente.
@@ -12,7 +13,14 @@ export async function setupCloudflareContextAndPage(browser: Browser) {
   else if (env === 'staging') stateFile = 'loggedInState.staging.json';
   else if (env === 'development') stateFile = 'loggedInState.dev.json';
 
-  const context = await browser.newContext({ storageState: stateFile });
+  // Only use storageState if the file exists. Many environments do not commit
+  // session files (`loggedInState*.json`) and Playwright will throw ENOENT
+  // otherwise. Guarding prevents failing the whole run when state is absent.
+  const contextOptions: any = {};
+  if (fs.existsSync(stateFile)) {
+    contextOptions.storageState = stateFile;
+  }
+  const context = await browser.newContext(contextOptions);
   const page = await context.newPage();
   await page.goto('https://preprod-web.ocgtest.es/');
 

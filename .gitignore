@@ -9,4 +9,18 @@ dist/
 
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
-notLoggedInState.json
+sessionState*.json
+
+
+# Test result files
+artifacts/
+test-results/
+reports/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.svg
+*.webp
+

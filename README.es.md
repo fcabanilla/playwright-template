@@ -714,24 +714,42 @@ No necesitas generar archivos de sesión ni hacer login manual. Todo funciona di
 
 ---
 
-### 🟠 Preproducción (con Cloudflare, requiere login manual)
+### 🟠 Preproducción, LAB, Staging (con Cloudflare)
 
-1. **Genera el archivo de sesión:**
+**Paso 1: Generar sesión (una sola vez):**
 
-   ```bash
-   npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
-   ```
+```bash
+# Lab
+TEST_ENV=lab npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
 
-   - Se abrirá el navegador, haz login y pasa Cloudflare manualmente.
-   - El script guardará el estado en `loggedInState.preprod.json`.
+# Preprod
+TEST_ENV=preprod npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
 
-2. **Ejecuta los tests normalmente:**
-   ```bash
-   npm run test:cinesa:preprod
-   # o
-   npx playwright test --project=Cinesa --headed --workers=1
-   ```
-   - Ahora los tests usarán el estado guardado y saltarán login/Cloudflare.
+# Staging
+TEST_ENV=staging npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+```
+
+**PowerShell:**
+```powershell
+$env:TEST_ENV="lab"; npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+```
+
+*Hace login manualmente, pasa Cloudflare, el navegador se cierra automáticamente y guarda la sesión.*
+
+**Paso 2: Ejecutar tests:**
+
+```bash
+# Lab
+TEST_ENV=lab npx playwright test --project="Cinesa" --workers=1
+
+# Preprod
+TEST_ENV=preprod npx playwright test --project="Cinesa" --workers=1
+```
+
+**PowerShell:**
+```powershell
+$env:TEST_ENV="lab"; npx playwright test --project="Cinesa" --workers=1
+```
 
 ---
 
@@ -996,32 +1014,3 @@ La combinación de ambos enfoques resultaría en el framework de testing definit
 ---
 
 Este README actualizado proporciona una guía completa para la instalación, configuración y ejecución de tests, integrando prácticas modernas y aprovechando las capacidades avanzadas de Playwright.
-
-## Cloudflare Bypass & Session State Setup (Preproducción)
-
-> **Importante:** Solo aplica para preproducción (producción no requiere este paso).
-
-1. Ejecutá:
-
-```bash
-npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed
-```
-
-- Login manual y pasá Cloudflare. El estado se guarda en `loggedInState.preprod.json`.
-
-2. Corré los tests normalmente usando ese storageState:
-
-```powershell
-# Preproducción (PowerShell en Windows):
-$env:TEST_ENV="preprod"; npx playwright test --project='Cinesa' --headed --workers=5
-```
-
-```bash
-# Producción (todos los sistemas):
-npx playwright test --project='Cinesa' --headed --workers=5
-```
-
-**Notas:**
-
-- No subas archivos de sesión reales al repo (`.gitignore`).
-- Solo para preproducción con Cloudflare.
