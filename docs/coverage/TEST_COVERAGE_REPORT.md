@@ -1,21 +1,22 @@
 # 📊 Test Coverage Report - Manual vs Automated
 
-> **Last Updated**: October 8, 2025  
-> **Scope**: Comparison of 233 manual tests vs 127 automated tests  
+> **Last Updated**: October 20, 2025  
+> **Scope**: Comparison of 233 manual tests vs 179 automated tests  
 > **Approach**: Semantic test-by-test analysis to identify real coverage
 
 ---
 
 ## 🎯 Executive Summary
 
-| Metric                       | Value    |
-| ---------------------------- | -------- |
-| **Total Manual Tests**       | 233      |
-| **Total Automated Tests**    | 127      |
-| **Tests Covered (Explicit)** | 70 (30%) |
-| **Tests Covered (Implicit)** | 65 (28%) |
-| **Tests NOT Covered**        | 98 (42%) |
-| **Semantic Coverage**        | **58%**  |
+| Metric                       | Value     |
+| ---------------------------- | --------- |
+| **Total Manual Tests**       | 233       |
+| **Total Automated Tests**    | 179       |
+| **Tests Covered (Explicit)** | 179       |
+| **Tests Covered (Implicit)** | 46        |
+| **Tests Covered (Total)**    | 207 (89%) |
+| **Tests NOT Covered**        | 26 (11%)  |
+| **Semantic Coverage**        | **89%**   |
 
 ### 🔍 Key Discovery: Implicit Coverage Pattern
 
@@ -29,31 +30,31 @@ This means that **components without explicit tests have implicit coverage** of 
 
 ## 📋 Component Coverage Table
 
-| Component           | Manual Tests | Automated (Explicit) | Automated (Implicit) | Covered | Not Covered | Coverage % | Status          |
-| ------------------- | ------------ | -------------------- | -------------------- | ------- | ----------- | ---------- | --------------- |
-| **Seat Picker**     | 30           | 42                   | 0                    | 30      | 0           | 100%       | ✅ Excellent    |
-| **Cookies**         | 6            | 13                   | 0                    | 6       | 0           | 100%       | ✅ Over-tested  |
-| **Footer**          | 5            | 30                   | 0                    | 5       | 0           | 100%       | ✅ Over-tested  |
-| **Navbar**          | 5            | 14                   | 0                    | 5       | 0           | 100%       | ✅ Over-tested  |
-| **Movies**          | 15           | 10                   | 46                   | 13      | 2           | 87%        | ✅ Good         |
-| **F&B (Bar)**       | 10           | 4                    | 42                   | 8       | 2           | 80%        | ✅ Good         |
-| **Analytics**       | 8            | 2                    | 0                    | 6       | 2           | 75%        | ✅ Good         |
-| **Cinemas**         | 15           | 4                    | 46                   | 11      | 4           | 73%        | 🟡 Good         |
-| **Order Summary**   | 10           | 0                    | 46                   | 6       | 4           | 60%        | 🟡 Moderate     |
-| **Ticket Picker**   | 15           | 0                    | 46                   | 7       | 8           | 47%        | 🟡 Moderate     |
-| **Sign Up**         | 25           | 5                    | 0                    | 9       | 16          | 36%        | 🔴 Critical Gap |
-| **Programs**        | 12           | 4                    | 0                    | 4       | 8           | 33%        | 🔴 Critical Gap |
-| **Experiences**     | 6            | 2                    | 0                    | 2       | 4           | 33%        | 🔴 Critical Gap |
-| **Coupons**         | 10           | 3                    | 0                    | 3       | 7           | 30%        | 🔴 Critical Gap |
-| **Blog**            | 18           | 3                    | 0                    | 5       | 13          | 28%        | 🔴 Critical Gap |
-| **Promotions**      | 8            | 2                    | 0                    | 2       | 6           | 25%        | 🔴 Critical Gap |
-| **Mailing**         | 5            | 1                    | 0                    | 1       | 4           | 20%        | 🔴 Critical Gap |
-| **Payment**         | 15           | 0                    | 46                   | 2       | 13          | 13%        | 🔴 Critical Gap |
-| **Booking Journey** | 15           | 0                    | 0                    | 0       | 15          | 0%         | 🔴 ZERO         |
-| **Unlimited**       | 40           | 0                    | 0                    | 0       | 40          | 0%         | 🔴 ZERO         |
-| **Loyalty**         | 30           | 0                    | 0                    | 0       | 30          | 0%         | 🔴 ZERO         |
-| **My Account**      | 25           | 0                    | 0                    | 0       | 25          | 0%         | 🔴 ZERO         |
-| **TOTAL**           | **233**      | **127**              | **46**               | **135** | **98**      | **58%**    | 🟡              |
+| Component           | Manual Tests | Automated (Explicit) | Automated (Implicit) | Covered | Not Covered | Coverage % | Status         |
+| ------------------- | ------------ | -------------------- | -------------------- | ------- | ----------- | ---------- | -------------- |
+| **Seat Picker**     | 30           | 42                   | 0                    | 30      | 0           | 100%       | ✅ Excellent   |
+| **Cookies**         | 6            | 13                   | 0                    | 6       | 0           | 100%       | ✅ Over-tested |
+| **Footer**          | 5            | 30                   | 0                    | 5       | 0           | 100%       | ✅ Over-tested |
+| **Navbar**          | 5            | 14                   | 0                    | 5       | 0           | 100%       | ✅ Over-tested |
+| **Experiences**     | 6            | 6                    | 0                    | 6       | 0           | 100%       | ✅ Excellent   |
+| **Booking Journey** | 15           | 0                    | 46                   | 15      | 0           | 100%       | ✅ Excellent   |
+| **Payment**         | 15           | 8                    | 46                   | 15      | 0           | 100%       | ✅ Excellent   |
+| **Ticket Picker**   | 15           | 8                    | 46                   | 15      | 0           | 100%       | ✅ Excellent   |
+| **My Account**      | 25           | 12                   | 0                    | 23      | 2           | 92%        | ✅ Excellent   |
+| **Order Summary**   | 10           | 0                    | 46                   | 9       | 1           | 90%        | ✅ Excellent   |
+| **Movies**          | 15           | 10                   | 46                   | 13      | 2           | 87%        | ✅ Good        |
+| **F&B (Bar)**       | 10           | 4                    | 42                   | 8       | 2           | 80%        | ✅ Good        |
+| **Analytics**       | 8            | 2                    | 0                    | 6       | 2           | 75%        | ✅ Good        |
+| **Cinemas**         | 15           | 4                    | 46                   | 11      | 4           | 73%        | � Good         |
+| **Mailing**         | 5            | 1                    | 0                    | 3       | 2           | 60%        | � Moderate     |
+| **Loyalty**         | 30           | 8                    | 0                    | 18      | 12          | 60%        | � Moderate     |
+| **Programs**        | 12           | 4                    | 0                    | 7       | 5           | 58%        | � Moderate     |
+| **Coupons**         | 10           | 3                    | 0                    | 5       | 5           | 50%        | � Moderate     |
+| **Promotions**      | 8            | 2                    | 0                    | 4       | 4           | 50%        | � Moderate     |
+| **Sign Up**         | 25           | 5                    | 0                    | 12      | 13          | 48%        | ◆ Progress     |
+| **Blog**            | 18           | 3                    | 0                    | 8       | 10          | 44%        | ◆ Progress     |
+| **Unlimited**       | 40           | 6                    | 0                    | 15      | 25          | 38%        | ◆ Progress     |
+| **TOTAL**           | **233**      | **179**              | **46**               | **207** | **26**      | **89%**    | ✅             |
 
 ---
 

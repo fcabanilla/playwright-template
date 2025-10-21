@@ -46,7 +46,7 @@ export const cinesaEnvironments = {
     },
   },
   staging: {
-    baseUrl: 'https://staging.cinesa.es',
+    baseUrl: 'https://stage-web.ocgtest.es',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
