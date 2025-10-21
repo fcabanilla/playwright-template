@@ -14,6 +14,7 @@ sessionState*.json
 
 # Test result files
 artifacts/
+artifacts/cloudflare-check/
 test-results/
 reports/
 *.png
@@ -23,4 +24,7 @@ reports/
 *.mp4
 *.svg
 *.webp
+
+# Temporary files
+tests/cinesa/.DS_Store
 
