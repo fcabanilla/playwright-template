@@ -12,7 +12,7 @@ import {
 dotenv.config();
 
 export default defineConfig({
-  name: 'UCI Cinemas',
+  name: 'Multi-Cinema Test Suite',
   // Timeout global para cada test (60 segundos)
   timeout: 60000,
 
