@@ -82,21 +82,30 @@ npm run test:uci                 # All UCI tests
 npm run test:navbar              # Navigation
 npm run test:movies              # Movies
 npm run test:cinemas             # Cinemas
+npm run test:seatpicker          # Seat selection
 npm run test:login               # Authentication
 npm run test:booking             # Booking flow
 
-# Tests by tags
-npm run test:smoke               # Critical smoke tests
-npm run test:regression          # Complete regression
-npm run test:fast                # Quick execution tests
+# Filter tests by tags
+npx playwright test --grep "@smoke"              # Critical smoke tests
+npx playwright test --grep "@fast"               # Quick tests
+npx playwright test --grep-invert "@grancasa"    # Exclude Grancasa cinema
+npx playwright test --grep "@cinesa.*@navbar"    # Multiple tags
+
+# Environment-specific execution
+TEST_ENV=preprod npm run test:cinesa             # Preprod environment
+TEST_ENV=lab npm run test:uci                    # Lab environment
+TEST_ENV=production npm run test:cinesa          # Production (default)
 ```
 
 #### Reports and Analysis
 
 ```bash
-# Generate and view reports
-npm run test:report              # Open Allure report
-npm run test:html                # Generate HTML report
+# Generate and view Allure reports
+npm run report:generate          # Generate HTML report from results
+npm run report:open              # Open report in browser
+npm run report                   # Generate + open in one command
+npm run report:clean             # Clean old artifacts (before new execution)
 
 # Development and debugging
 npm run test:debug               # Debug mode
@@ -127,7 +136,25 @@ npm run test:trace               # With trace recording
 - **ESLint Integration**: Code quality enforcement
 - **Conventional Commits**: Standardized commit messages
 - **CI/CD Integration**: Azure DevOps pipeline support
-- **Allure Reporting**: Rich visual test reports
+- **Allure Awesome Reporting**: Rich visual test reports with v3 support
+
+### Pure Async Waiting Philosophy
+
+This framework follows a **strict no-timeout policy** for maximum reliability:
+
+- ❌ **NO fixed delays**: No `wait(500)`, `waitForTimeout(1000)`, etc.
+- ❌ **NO explicit timeouts**: No `waitFor({ timeout: 5000 })` parameters
+- ❌ **NO manual waits**: No `waitFor({ state: 'visible' })` when unnecessary
+- ✅ **YES to Playwright auto-waiting**: Built-in smart waiting for actionability
+- ✅ **YES to assertion auto-waiting**: `expect().toBeVisible()` handles timing
+- ✅ **YES to action auto-waiting**: `click()`, `fill()` wait automatically
+
+**Benefits:**
+
+- 🚀 Tests run as fast as possible (no artificial delays)
+- 🎯 More reliable (no race conditions from fixed timeouts)
+- 🔧 Easier maintenance (Playwright handles complexity)
+- 📊 Better debugging (failures are real issues, not timing problems)
 
 ## 🔧 Technology Stack
 

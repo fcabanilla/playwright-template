@@ -85,6 +85,11 @@ export class CookieBanner {
             console.log(
               '✅ No cookie banner detected (cookies already accepted or not required)'
             );
+            // ⚠️ CRITICAL: Even if banner doesn't appear, overlay might still exist
+            // Check and clean up any remaining OneTrust overlays
+            console.log('🔍 Checking for lingering OneTrust overlays...');
+            await this.waitForOneTrustCleanup();
+            console.log('✅ Cookie overlay cleanup completed');
             return;
           }
 

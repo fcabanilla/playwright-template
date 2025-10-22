@@ -13,19 +13,19 @@ dotenv.config();
 
 export default defineConfig({
   name: 'Multi-Cinema Test Suite',
-  // Timeout global para cada test (60 segundos)
-  timeout: 60000,
+  // Timeout global para cada test (90 segundos - para flujos E2E completos)
+  timeout: 90000,
 
   // Directorio de salida para videos, screenshots y traces
   outputDir: '.allure/playwright-artifacts',
 
   // Configuración base que se aplicará a todos los proyectos
   use: {
-    headless: false, // Ejecuta el navegador con interfaz gráfica para parecer más humano
+    headless: true, // Default headless (puedes override con --headed en comando)
     screenshot: 'only-on-failure',
-    video: 'on',
-    actionTimeout: 60000,
-    navigationTimeout: 60000,
+    video: 'retain-on-failure', // Solo guarda videos de tests fallidos (ahorra espacio)
+    actionTimeout: 30000, // Reducido a 30s (suficiente con auto-waiting)
+    navigationTimeout: 30000, // Reducido a 30s
 
     // Configuraciones agresivas para evadir Cloudflare
     userAgent:
@@ -75,7 +75,7 @@ export default defineConfig({
   },
 
   fullyParallel: true,
-  workers: 5, // Optimized for stability and performance balance
+  workers: process.env.CI ? 2 : 3, // CI: 2 workers, Local: 3 workers (balance estabilidad/velocidad)
 
   // Proyectos separados para UCI, Cinesa y un proyecto específico para
   // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
@@ -88,55 +88,62 @@ export default defineConfig({
 
   // Reporter configurado para diferenciar proyectos
   reporter: [
-    ['line'],
+    ['list'], // Console reporter más limpio que 'line'
     [
       'allure-playwright',
       {
         resultsDir: '.allure/results',
-        detail: true,
-        suiteTitle: false,
+        detail: true, // Genera steps automáticos para llamadas Playwright, hooks y assertions
+        suiteTitle: true, // Agrupa tests por archivo en el reporte (default: true)
+        links: {
+          // Plantillas para enlaces a JIRA, GitHub Issues, etc.
+          issue: {
+            urlTemplate: 'https://se-ocg.atlassian.net/browse/%s',
+            nameTemplate: 'Issue #%s',
+          },
+          tms: {
+            urlTemplate: 'https://se-ocg.atlassian.net/browse/%s',
+            nameTemplate: 'Test Case %s',
+          },
+        },
         categories: [
           {
             name: '🔒 Cloudflare Protection Issues',
             messageRegex: '.*(cloudflare|protection|challenge|captcha).*',
             traceRegex: '.*(cloudflare|TimeoutError|Navigation timeout).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+            matchedStatuses: ['failed', 'broken'], // lowercase en v3
           },
           {
             name: '🎭 Modal & Overlay Issues',
             messageRegex: '.*(modal|overlay|popup|banner|promotional).*',
             traceRegex: '.*(click intercepted|element not found|not visible).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+            matchedStatuses: ['failed', 'broken'],
           },
           {
             name: '🧭 Navigation & URL Issues',
             messageRegex: '.*(navigation|url|redirect|timeout).*',
             traceRegex: '.*(goto|navigate|waitForURL|expect.*toHaveURL).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+            matchedStatuses: ['failed', 'broken'],
           },
           {
             name: '🎬 Film Content Issues',
             messageRegex: '.*(film|movie|title|card).*',
             traceRegex: '.*(getFilmTitles|selectFilm|film.*not found).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+            matchedStatuses: ['failed', 'broken'],
           },
           {
             name: '🏢 Cinema Selection Issues',
             messageRegex: '.*(cinema|location|venue).*',
             traceRegex: '.*(getCinemaNames|selectCinema|cinema.*not found).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+            matchedStatuses: ['failed', 'broken'],
           },
         ],
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
-          Environment: 'Test',
-          Browser: 'Chromium (Headless)',
-          Note: 'UCI Phase 1 Automation - Clean Test Names',
-          os_platform: os.platform(),
-          os_release: os.release(),
-          os_version: os.version(),
-          node_version: process.version,
-          arch: os.arch(),
+          Environment: process.env.TEST_ENV || 'production',
+          Browser: 'Chromium',
+          'Node Version': process.version,
+          OS: `${os.platform()} ${os.release()}`,
         },
       },
     ],
