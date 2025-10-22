@@ -6,7 +6,7 @@ import { assertCinemasRedirection, assertCinemaSchemaMatches } from './cinemas.a
 test.describe('Cinesa Cinemas Tests', () => {
   test('Cinemas page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Cinemas page display and layout');
@@ -14,7 +14,7 @@ test.describe('Cinesa Cinemas Tests', () => {
 
   test('Cinesa Cinemas page redirection test', async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await page.waitForLoadState('networkidle');
     assertCinemasRedirection(page);
@@ -28,7 +28,7 @@ test.describe('Cinesa Cinemas Tests', () => {
     cookieBanner
   }) => {
   await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     const selectedCinemaName = await cinema.selectOasizCinema();
     const cinemaSchema = await cinemaDetail.extractCinemaSchema();
@@ -44,7 +44,7 @@ test.describe('Cinesa Cinemas Tests', () => {
   }) => {
   const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
   await page.goto(config.baseUrl);
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     const selectedCinemaName = await cinema.selectGrancasaCinema();
     const cinemaSchema = await cinemaDetail.extractCinemaSchema();

@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Privacy Policy Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
     await footer.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Privacy Policy page display and layout', async ({ page, footer }, testInfo) => {

@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Purchase Conditions Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, footer }) => {
     await footer.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Purchase Conditions page display and layout', async ({ page, footer }, testInfo) => {

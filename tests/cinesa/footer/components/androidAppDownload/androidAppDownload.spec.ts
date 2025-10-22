@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Android App Download Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
     await footer.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Android App Download display and layout', async ({ page, footer }, testInfo) => {

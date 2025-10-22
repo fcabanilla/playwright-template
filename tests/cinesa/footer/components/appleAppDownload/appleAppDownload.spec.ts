@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Apple App Download Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
     await footer.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Apple App Download display and layout', async ({ page, footer }, testInfo) => {

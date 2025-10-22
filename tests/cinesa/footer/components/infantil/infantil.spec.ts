@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Infantil y Colegios Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, infantil }) => {
     await infantil.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Infantil y Colegios page display and layout', async ({ page, infantil }, testInfo) => {

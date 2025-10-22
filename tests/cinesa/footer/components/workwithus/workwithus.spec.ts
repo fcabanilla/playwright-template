@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Work With Us Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, workwithus }) => {
     await workwithus.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Work With Us page display and layout', async ({ page, footer }, testInfo) => {

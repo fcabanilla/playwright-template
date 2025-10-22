@@ -4,8 +4,9 @@ import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/sig
 import { defaultUser } from './signup.data';
 
 test.describe('Signup', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Signup display and layout', async ({ page, navbar }, testInfo) => {

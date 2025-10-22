@@ -12,8 +12,9 @@ import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 
 test.describe('Seat Picker', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Simulate a Full Purchase - Oasiz', async ({
@@ -28,7 +29,6 @@ test.describe('Seat Picker', () => {
     purchaseSummary,
     paymentPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -53,7 +53,6 @@ test.describe('Seat Picker', () => {
     purchaseSummary,
     paymentPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -78,7 +77,6 @@ test.describe('Seat Picker', () => {
     purchaseSummary,
     paymentPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -104,7 +102,6 @@ test.describe('Seat Picker', () => {
     purchaseSummary,
     paymentPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -126,7 +123,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -143,7 +139,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -160,7 +155,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -177,7 +171,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -194,7 +187,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -212,7 +204,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -230,7 +221,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -245,7 +235,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -260,7 +249,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -279,7 +267,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -298,7 +285,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -315,7 +301,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -332,7 +317,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -350,7 +334,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -368,7 +351,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -387,7 +369,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -406,7 +387,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -424,7 +404,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -442,7 +421,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5638', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -460,7 +438,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5638', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -478,7 +455,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -496,7 +472,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -514,7 +489,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -532,7 +506,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -550,7 +523,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -569,7 +541,6 @@ test.describe('Seat Picker', () => {
     seatPicker
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -590,7 +561,6 @@ test.describe('Seat Picker', () => {
     loginPage
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -612,7 +582,6 @@ test.describe('Seat Picker', () => {
     loginPage
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -633,7 +602,6 @@ test.describe('Seat Picker', () => {
     ticketPicker,
     loginPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -652,7 +620,6 @@ test.describe('Seat Picker', () => {
     ticketPicker,
     loginPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -671,7 +638,6 @@ test.describe('Seat Picker', () => {
     ticketPicker,
     loginPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -690,7 +656,6 @@ test.describe('Seat Picker', () => {
     ticketPicker,
     loginPage
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();

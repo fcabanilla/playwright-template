@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Whistleblowing Policy Tests', () => {
   test.beforeEach(async ({ cookieBanner, whistleblowing }) => {
     await whistleblowing.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Whistleblowing Policy display and layout', async ({ page, footer }, testInfo) => {

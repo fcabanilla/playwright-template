@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Eventos Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, events }) => {
     await events.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Eventos page display and layout', async ({ page, events }, testInfo) => {

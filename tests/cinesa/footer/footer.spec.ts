@@ -10,7 +10,7 @@ test.describe('Cinesa Footer Tests', () => {
 
     const acceptButton = page.locator('#onetrust-accept-btn-handler');
     if (await acceptButton.isVisible()) {
-      await cookieBanner.acceptCookies();
+      await cookieBanner.acceptAllCookies();
     }
   });
 

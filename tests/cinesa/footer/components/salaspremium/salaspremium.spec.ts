@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Salas Premium Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, salaspremium }) => {
     await salaspremium.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Salas Premium page display and layout', async ({ page, salaspremium }, testInfo) => {

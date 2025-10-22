@@ -8,7 +8,7 @@ test.describe('Cinesa Navbar Tests', () => {
   test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
     navbarAssertions = new NavbarAssertions(page);
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

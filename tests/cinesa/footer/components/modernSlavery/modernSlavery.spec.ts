@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Modern Slavery Declaration Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
     await footer.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Modern Slavery Declaration display and layout', async ({ page, footer }, testInfo) => {

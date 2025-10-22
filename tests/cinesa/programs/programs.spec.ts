@@ -14,7 +14,7 @@ test.describe('Programs Page', () => {
   const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
   await page.goto(config.baseUrl + 'unlimited/informacion/');
     });
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
     await takeScreenshot(page, test.info());
   });
@@ -23,7 +23,7 @@ test.describe('Programs Page', () => {
     await test.step('Navigate to Home page', async () => {
       await navbar.navigateToHome();
     });
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToPrograms();
 
     const programsPage = new ProgramsPage(page);
@@ -36,7 +36,7 @@ test.describe('Programs Page', () => {
 
   test('Programs page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToPrograms();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Programs page display and layout');
@@ -44,7 +44,7 @@ test.describe('Programs Page', () => {
 
   test('Cinesa Programs page redirection test', async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToPrograms();
     await page.waitForLoadState('networkidle');
     assertProgramsRedirection(page);

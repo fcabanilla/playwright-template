@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Cinesa Business Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, cinesabusiness }) => {
     await cinesabusiness.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Cinesa Business page display and layout', async ({ page, footer }, testInfo) => {

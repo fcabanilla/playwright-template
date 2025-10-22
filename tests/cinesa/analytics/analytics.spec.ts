@@ -22,7 +22,7 @@ declare global {
 test.describe('Google Analytics DataLayer Validation', () => {
   test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

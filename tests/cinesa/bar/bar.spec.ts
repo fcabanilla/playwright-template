@@ -1,8 +1,9 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 
 test.describe('Bar', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Buy ticket with Classic menu - Oasiz', async ({
@@ -17,7 +18,6 @@ test.describe('Bar', () => {
     purchaseSummary,
     paymentPage,
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -42,7 +42,6 @@ test.describe('Bar', () => {
     purchaseSummary,
     paymentPage,
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -68,7 +67,6 @@ test.describe('Bar', () => {
     purchaseSummary,
     paymentPage,
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -93,7 +91,6 @@ test.describe('Bar', () => {
     purchaseSummary,
     paymentPage,
   }) => {
-    await cookieBanner.acceptCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();

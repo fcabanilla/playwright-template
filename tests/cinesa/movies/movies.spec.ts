@@ -15,7 +15,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }, testInfo) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     await page.waitForLoadState('networkidle', { timeout: 60000 });
     await takeScreenshot(page, testInfo, 'Movies page display and layout');
@@ -27,7 +27,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     await page.waitForLoadState('networkidle', { timeout: 60000 });
     assertMoviesRedirection(page);
@@ -39,7 +39,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.iterateAndClickMovies();
@@ -51,7 +51,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.navigateThroughRandomMovies();
@@ -63,7 +63,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.clickMoviesTabByIndex(1);
@@ -76,7 +76,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.clickMoviesTabByIndex(2);
@@ -89,7 +89,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
     const movieList = new MovieList(page);
     await movieList.clickMoviesTabByIndex(3);
@@ -104,7 +104,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
@@ -121,7 +121,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
@@ -138,7 +138,7 @@ test.describe('Cinesa Movies Tests', () => {
     cookieBanner,
   }) => {
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectRandomFilmForDetails();

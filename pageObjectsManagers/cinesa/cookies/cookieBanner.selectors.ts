@@ -1,9 +1,21 @@
 export interface CookieBannerSelectors {
   acceptButton: string;
-  // ...otros selectores si fuera necesario...
+  rejectButton: string;
+  settingsButton: string;
+  banner: string;
+  overlay: string;
+  settingsModal: string;
+  closeButton: string;
+  consentSdk: string;
 }
 
 export const cookieBannerSelectors: CookieBannerSelectors = {
   acceptButton: '#onetrust-accept-btn-handler',
-  // ...otros selectores a completar manualmente...
+  rejectButton: '#onetrust-reject-all-handler',
+  settingsButton: '#onetrust-pc-btn-handler',
+  banner: '#onetrust-banner-sdk',
+  overlay: '.onetrust-pc-dark-filter',
+  settingsModal: '#onetrust-pc-sdk',
+  closeButton: '.onetrust-close-btn-handler',
+  consentSdk: '#onetrust-consent-sdk',
 };

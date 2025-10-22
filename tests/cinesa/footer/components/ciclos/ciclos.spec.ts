@@ -6,7 +6,7 @@ import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generi
 test.describe('Ciclos Tests', () => {
   test.beforeEach(async ({ page, cookieBanner, ciclos }) => {
     await ciclos.navigateToHome();
-    await cookieBanner.acceptCookies();
+    await cookieBanner.acceptAllCookies();
   });
 
   test('Ciclos page display and layout', async ({ page, ciclos }, testInfo) => {
