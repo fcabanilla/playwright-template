@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import * as allure from 'allure-playwright';
 import { ANALYTICS_SELECTORS } from './analytics.selectors';
 
@@ -43,10 +43,10 @@ export interface PriceSummary {
 }
 
 export class AnalyticsPage {
-  readonly page: Page;
+  private readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
@@ -54,7 +54,7 @@ export class AnalyticsPage {
    */
   async initializeDataLayerCapture(): Promise<void> {
     await allure.test.step('Initializing dataLayer capture', async () => {
-      await this.page.addInitScript(() => {
+      await this.webActions.addInitScript(() => {
         // Create array to store ALL events (existing + new)
         window.dataLayerEvents = [];
 
@@ -105,7 +105,7 @@ export class AnalyticsPage {
    */
   async captureDataLayerEvents(): Promise<DataLayerEvent[]> {
     return await allure.test.step('Capturing dataLayer events', async () => {
-      const events = await this.page.evaluate(() => {
+      const events = await this.webActions.evaluate<DataLayerEvent[]>(() => {
         // Get both the original dataLayer content AND our captured events
         const originalEvents = window.dataLayer || [];
         const capturedEvents = window.dataLayerEvents || [];
@@ -131,7 +131,7 @@ export class AnalyticsPage {
    */
   async extractUIPrices(): Promise<PriceSummary> {
     return await allure.test.step('Extracting UI prices', async () => {
-      return await this.page.evaluate((selectors) => {
+      return await this.webActions.evaluate<PriceSummary>((selectors: any) => {
         const summary: PriceSummary = {
           ticketPrice: 0,
           foodBeveragePrice: 0,
@@ -225,19 +225,19 @@ export class AnalyticsPage {
               element.parentElement?.textContent?.toLowerCase() || '';
             const contextText = (elementText + ' ' + parentText).toLowerCase();
             if (
-              selectors.contextKeywords.ticket.some((keyword) =>
+              selectors.contextKeywords.ticket.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
               summary.ticketPrice += price;
             } else if (
-              selectors.contextKeywords.foodBeverage.some((keyword) =>
+              selectors.contextKeywords.foodBeverage.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
               summary.foodBeveragePrice += price;
             } else if (
-              selectors.contextKeywords.total.some((keyword) =>
+              selectors.contextKeywords.total.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
@@ -245,7 +245,7 @@ export class AnalyticsPage {
                 summary.totalPrice = price;
               }
             } else if (
-              selectors.contextKeywords.tax.some((keyword) =>
+              selectors.contextKeywords.tax.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {

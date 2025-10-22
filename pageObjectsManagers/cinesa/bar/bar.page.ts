@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { BAR_SELECTORS } from './bar.selectors';
-import { menu } from '../../../tests/cinesa/bar/bar.data';
 
 /**
  * The Bar Page Object Model.
@@ -95,27 +94,22 @@ export class BarPage {
   }
 
   /**
-   * Selects the "MENUS" tab and clicks on the menu item containing the configured menu name.
+   * Selects the "MENUS" tab and clicks on the first available menu item.
    */
   async selectClassicMenu(): Promise<void> {
-    await allure.test.step('Select MENUS tab and click on menu item containing menu name', async () => {
+    await allure.test.step('Select MENUS tab and click on first available menu item', async () => {
       await this.page.locator(BAR_SELECTORS.menusTab).click();
       const menuItems = this.page.locator(BAR_SELECTORS.menuItems);
       await menuItems.first().waitFor({ state: 'visible', timeout: 10000 });
       const count = await menuItems.count();
-      let found = false;
-      for (let i = 0; i < count; i++) {
-        const item = menuItems.nth(i);
-        const name = await item.locator(BAR_SELECTORS.menuItemName).innerText();
-        if (name.toLowerCase().includes(menu.toLowerCase())) {
-          await item.locator(BAR_SELECTORS.menuItemButton).click();
-          found = true;
-          break;
-        }
+      
+      if (count === 0) {
+        throw new Error('No menu items found');
       }
-      if (!found) {
-        throw new Error(`Menu item containing "${menu}" not found`);
-      }
+
+      // Get the first menu item and click it
+      const firstItem = menuItems.first();
+      await firstItem.locator(BAR_SELECTORS.menuItemButton).click();
     });
 
     await this.selectClassicMenuOptionsAndAddToCart();

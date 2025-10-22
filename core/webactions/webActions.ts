@@ -274,4 +274,44 @@ export class WebActions {
   async wait(milliseconds: number): Promise<void> {
     await this.page.waitForTimeout(milliseconds);
   }
+
+  /**
+   * Add script to be evaluated before page loads.
+   * Used for advanced analytics and browser instrumentation.
+   *
+   * @param {Function} script - Function to be executed in browser context before page load
+   *
+   * @example
+   * ```typescript
+   * await webActions.addInitScript(() => {
+   *   window.dataLayer = window.dataLayer || [];
+   * });
+   * ```
+   *
+   * @since 1.1.0
+   */
+  async addInitScript(script: Function): Promise<void> {
+    await this.page.addInitScript(script);
+  }
+
+  /**
+   * Execute JavaScript code in the browser context and return the result.
+   * Used for advanced DOM manipulation and data extraction.
+   *
+   * @param {Function} script - Function to be executed in browser context
+   * @param {any} arg - Optional argument to pass to the script
+   * @returns {Promise<T>} Result returned by the script
+   *
+   * @example
+   * ```typescript
+   * const events = await webActions.evaluate(() => {
+   *   return window.dataLayer || [];
+   * });
+   * ```
+   *
+   * @since 1.1.0
+   */
+  async evaluate<T>(script: Function, arg?: any): Promise<T> {
+    return await this.page.evaluate(script, arg);
+  }
 }

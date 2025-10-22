@@ -143,7 +143,8 @@ export const test = base.extend<CustomFixtures>({
     await use(paymentPage);
   },
   analyticsPage: async ({ page }, use) => {
-    const analyticsPage = new AnalyticsPage(page);
+    const webActions = new WebActions(page);
+    const analyticsPage = new AnalyticsPage(webActions);
     await use(analyticsPage);
   },
   unlimitedProgramsPage: async ({ page }, use) => {
