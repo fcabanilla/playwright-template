@@ -32,120 +32,128 @@ export class CookieBanner {
    * - Cookie banner (may or may not appear)
    * - Cookie settings modal
    * - Dark overlay that blocks interactions
-   * 
+   *
    * The banner may not appear if:
    * - Cookies were already accepted in a previous session
    * - Storage state is being reused
    * - User preferences are cached
    */
   async acceptAllCookies(): Promise<void> {
-    await allure.test.step('Accepting all cookies and dismissing overlays', async () => {
-      try {
-        console.log('🍪 Checking for cookie banner...');
+    await allure.test.step(
+      'Accepting all cookies and dismissing overlays',
+      async () => {
+        try {
+          console.log('🍪 Checking for cookie banner...');
 
-        // Wait for the banner to appear with a short timeout (3s)
-        // Short timeout to avoid slowing down tests when banner doesn't appear
-        const bannerAppeared = await this.page
-          .locator(this.selectors.banner)
-          .waitFor({ state: 'visible', timeout: 3000 })
-          .then(() => true)
-          .catch(() => false);
+          // Wait for the banner to appear with a short timeout (3s)
+          // Short timeout to avoid slowing down tests when banner doesn't appear
+          const bannerAppeared = await this.page
+            .locator(this.selectors.banner)
+            .waitFor({ state: 'visible', timeout: 3000 })
+            .then(() => true)
+            .catch(() => false);
 
-        if (!bannerAppeared) {
-          console.log('✅ No cookie banner detected (cookies already accepted or not required)');
-          return;
-        }
-
-        console.log('🍪 Cookie banner detected! Clicking accept button...');
-
-        // Wait for accept button to be ready
-        await this.page
-          .locator(this.selectors.acceptButton)
-          .waitFor({ state: 'visible', timeout: 5000 });
-
-        // Use JavaScript to click the button directly (bypasses overlay blocking)
-        const clicked = await this.page.evaluate(() => {
-          const acceptButton = document.querySelector(
-            '#onetrust-accept-btn-handler'
-          ) as HTMLButtonElement;
-          if (acceptButton) {
-            acceptButton.click();
-            return true;
+          if (!bannerAppeared) {
+            console.log(
+              '✅ No cookie banner detected (cookies already accepted or not required)'
+            );
+            return;
           }
-          return false;
-        });
 
-        if (clicked) {
-          console.log('✅ Clicked accept button via JS');
-        } else {
-          console.log('⚠️ Accept button not found, trying Playwright click...');
+          console.log('🍪 Cookie banner detected! Clicking accept button...');
+
+          // Wait for accept button to be ready
           await this.page
             .locator(this.selectors.acceptButton)
-            .click({ force: true, timeout: 5000 });
-        }
+            .waitFor({ state: 'visible', timeout: 5000 });
 
-        // Wait for banner to disappear
-        await this.page
-          .locator(this.selectors.banner)
-          .waitFor({ state: 'hidden', timeout: 5000 })
-          .catch(() => console.log('⚠️ Banner still visible, forcing removal...'));
+          // Use JavaScript to click the button directly (bypasses overlay blocking)
+          const clicked = await this.page.evaluate(() => {
+            const acceptButton = document.querySelector(
+              '#onetrust-accept-btn-handler'
+            ) as HTMLButtonElement;
+            if (acceptButton) {
+              acceptButton.click();
+              return true;
+            }
+            return false;
+          });
 
-        // Give it time to process the acceptance
-        await this.page.waitForTimeout(1000);
+          if (clicked) {
+            console.log('✅ Clicked accept button via JS');
+          } else {
+            console.log(
+              '⚠️ Accept button not found, trying Playwright click...'
+            );
+            await this.page
+              .locator(this.selectors.acceptButton)
+              .click({ force: true, timeout: 5000 });
+          }
 
-        // Force remove any remaining OneTrust elements
-        await this.page.evaluate(() => {
-          const elementsToRemove = [
-            '#onetrust-banner-sdk',
-            '#onetrust-pc-sdk',
-            '#onetrust-consent-sdk',
-            '.onetrust-pc-dark-filter',
-          ];
+          // Wait for banner to disappear
+          await this.page
+            .locator(this.selectors.banner)
+            .waitFor({ state: 'hidden', timeout: 5000 })
+            .catch(() =>
+              console.log('⚠️ Banner still visible, forcing removal...')
+            );
 
-          let removedCount = 0;
-          elementsToRemove.forEach((selector) => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach((el) => {
-              el.remove();
-              removedCount++;
+          // Give it time to process the acceptance
+          await this.page.waitForTimeout(1000);
+
+          // Force remove any remaining OneTrust elements
+          await this.page.evaluate(() => {
+            const elementsToRemove = [
+              '#onetrust-banner-sdk',
+              '#onetrust-pc-sdk',
+              '#onetrust-consent-sdk',
+              '.onetrust-pc-dark-filter',
+            ];
+
+            let removedCount = 0;
+            elementsToRemove.forEach((selector) => {
+              const elements = document.querySelectorAll(selector);
+              elements.forEach((el) => {
+                el.remove();
+                removedCount++;
+              });
+            });
+
+            if (removedCount > 0) {
+              console.log(
+                `✅ Forcefully removed ${removedCount} OneTrust elements`
+              );
+            }
+          });
+
+          // Final wait to ensure everything is settled
+          await this.page.waitForTimeout(500);
+
+          console.log('✅ Cookie handling completed successfully');
+        } catch (error) {
+          console.log('⚠️ Error handling cookies:', (error as Error).message);
+
+          // Emergency cleanup - force remove everything
+          console.log('🔧 Running emergency cleanup...');
+          await this.page.evaluate(() => {
+            const elementsToRemove = [
+              '#onetrust-banner-sdk',
+              '#onetrust-pc-sdk',
+              '#onetrust-consent-sdk',
+              '.onetrust-pc-dark-filter',
+            ];
+
+            elementsToRemove.forEach((selector) => {
+              const elements = document.querySelectorAll(selector);
+              elements.forEach((el) => el.remove());
             });
           });
 
-          if (removedCount > 0) {
-            console.log(`✅ Forcefully removed ${removedCount} OneTrust elements`);
-          }
-        });
-
-        // Final wait to ensure everything is settled
-        await this.page.waitForTimeout(500);
-
-        console.log('✅ Cookie handling completed successfully');
-      } catch (error) {
-        console.log(
-          '⚠️ Error handling cookies:',
-          (error as Error).message
-        );
-
-        // Emergency cleanup - force remove everything
-        console.log('🔧 Running emergency cleanup...');
-        await this.page.evaluate(() => {
-          const elementsToRemove = [
-            '#onetrust-banner-sdk',
-            '#onetrust-pc-sdk',
-            '#onetrust-consent-sdk',
-            '.onetrust-pc-dark-filter',
-          ];
-
-          elementsToRemove.forEach((selector) => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach((el) => el.remove());
-          });
-        });
-
-        await this.page.waitForTimeout(500);
-        console.log('✅ Emergency cleanup completed');
+          await this.page.waitForTimeout(500);
+          console.log('✅ Emergency cleanup completed');
+        }
       }
-    });
+    );
   }
 
   /**

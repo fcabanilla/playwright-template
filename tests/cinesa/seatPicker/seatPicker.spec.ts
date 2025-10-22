@@ -6,7 +6,7 @@ import {
   assertConfirmButtonEnabled,
   assertFirstSeatsDeselected,
   assertLastSeatsSelected,
-  assertTicketTypeNamesMatchExpectedTexts
+  assertTicketTypeNamesMatchExpectedTexts,
 } from './seatPicker.assertions';
 import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
@@ -27,7 +27,7 @@ test.describe('Seat Picker', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
@@ -51,7 +51,7 @@ test.describe('Seat Picker', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
@@ -75,7 +75,7 @@ test.describe('Seat Picker', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
@@ -100,7 +100,7 @@ test.describe('Seat Picker', () => {
     loginPage,
     barPage,
     purchaseSummary,
-    paymentPage
+    paymentPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
@@ -120,7 +120,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -136,7 +136,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -152,7 +152,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -168,7 +168,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -184,7 +184,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -201,7 +201,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
     await navbar.navigateToCinemas();
@@ -218,7 +218,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -232,7 +232,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -246,7 +246,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -264,7 +264,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -282,7 +282,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -298,7 +298,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -314,7 +314,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -331,7 +331,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -348,7 +348,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -366,7 +366,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -384,7 +384,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -401,7 +401,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -418,7 +418,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5638', async () => {});
     await navbar.navigateToCinemas();
@@ -435,7 +435,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5638', async () => {});
     await navbar.navigateToCinemas();
@@ -452,7 +452,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -469,7 +469,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -486,7 +486,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -503,7 +503,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -520,7 +520,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -538,7 +538,7 @@ test.describe('Seat Picker', () => {
     cinema,
     cinemaDetail,
     cookieBanner,
-    seatPicker
+    seatPicker,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
@@ -558,7 +558,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
     await navbar.navigateToCinemas();
@@ -569,7 +569,10 @@ test.describe('Seat Picker', () => {
     await seatPicker.confirmSeats();
     await loginPage.clickContinueAsGuest();
     const ticketTypeNames = await ticketPicker.getTicketTypeNames();
-    assertTicketTypeNamesMatchExpectedTexts(ticketTypeNames, ticketTypeMappings);
+    assertTicketTypeNamesMatchExpectedTexts(
+      ticketTypeNames,
+      ticketTypeMappings
+    );
   });
 
   test('should display regular and sofa ticket type - Grancasa', async ({
@@ -579,7 +582,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
     await navbar.navigateToCinemas();
@@ -590,7 +593,10 @@ test.describe('Seat Picker', () => {
     await seatPicker.confirmSeats();
     await loginPage.clickContinueAsGuest();
     const ticketTypeNames = await ticketPicker.getTicketTypeNames();
-    assertTicketTypeNamesMatchExpectedTexts(ticketTypeNames, ticketTypeMappings);
+    assertTicketTypeNamesMatchExpectedTexts(
+      ticketTypeNames,
+      ticketTypeMappings
+    );
   });
 
   test('Simulate a Full Purchase with promotional code - Oasiz', async ({
@@ -600,7 +606,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
@@ -618,7 +624,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
@@ -636,7 +642,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
@@ -654,7 +660,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
     ticketPicker,
-    loginPage
+    loginPage,
   }) => {
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
@@ -669,5 +675,3 @@ test.describe('Seat Picker', () => {
   //Modifies the above to allow the leaving of a single seat gap so long as it’s only one side and your selection abuts an existing order.
   //implementacion cuando podamos configurar la sala como querramos. imposible encontrar escenario armado
 });
-
-
