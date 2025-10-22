@@ -27,5 +27,3 @@ reports/
 
 # Temporary files
 tests/cinesa/.DS_Store
-
-.env
