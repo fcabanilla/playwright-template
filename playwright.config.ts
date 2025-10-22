@@ -1,11 +1,15 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
+import * as dotenv from 'dotenv';
 import {
   getUCICinemasProject,
   getCinesaProject,
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
+
+// Load environment variables from .env file
+dotenv.config();
 
 export default defineConfig({
   name: 'UCI Cinemas',
