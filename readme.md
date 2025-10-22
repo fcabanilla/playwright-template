@@ -346,6 +346,7 @@ npx playwright test --project="Cinesa" --workers=1
 ```
 
 **PowerShell:**
+
 ```powershell
 npx playwright test --project="Cinesa" --workers=1
 ```
@@ -366,11 +367,12 @@ TEST_ENV=staging npx playwright test tests/cinesa/cloudflare/auth.saveState.spec
 ```
 
 **PowerShell:**
+
 ```powershell
 $env:TEST_ENV="lab"; npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
 ```
 
-*Login manually, pass Cloudflare, browser closes automatically and saves session.*
+_Login manually, pass Cloudflare, browser closes automatically and saves session._
 
 **Step 2: Run tests:**
 
@@ -383,6 +385,7 @@ TEST_ENV=preprod npx playwright test --project="Cinesa" --workers=1
 ```
 
 **PowerShell:**
+
 ```powershell
 $env:TEST_ENV="lab"; npx playwright test --project="Cinesa" --workers=1
 ```
