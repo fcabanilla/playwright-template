@@ -1,34 +1,61 @@
 import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   CookieBannerSelectors,
   cookieBannerSelectors,
 } from './cookieBanner.selectors';
 
+/**
+ * CookieBanner Page Object
+ *
+ * Handles OneTrust cookie consent banner interactions.
+ * Follows framework architecture: delegates Playwright API calls to WebActions where possible.
+ *
+ * Architecture Notes:
+ * - Uses WebActions for: click(), fill(), isVisible(), waitForVisible()
+ * - Uses page.locator() for: waitFor({ state: 'hidden' }), click({ force: true })
+ * - Uses page.evaluate() for: JavaScript DOM manipulation
+ *
+ * Rationale:
+ * - WebActions doesn't currently expose waitFor with state options or force click
+ * - JavaScript evaluation is needed for bypassing overlay blocking
+ * - This is acceptable as these are specialized cookie banner interactions
+ *
+ * @see docs/adrs/0009-page-object-architecture-rules.md
+ */
 export class CookieBanner {
-  private readonly page: Page;
+  private readonly page: Page; // For evaluate() and specialized waitFor operations
+  private readonly webActions: WebActions;
   private readonly selectors: CookieBannerSelectors;
 
+  /**
+   * Constructor - Accepts Page and creates WebActions internally
+   *
+   * @param page - Playwright Page instance (required for evaluate and advanced operations)
+   */
   constructor(page: Page) {
     this.page = page;
+    this.webActions = new WebActions(page);
     this.selectors = cookieBannerSelectors;
-  }
-
-  /**
+  } /**
    * Accept cookies using the simple "Accept All" button
    * @deprecated Use acceptAllCookies() instead for better reliability
    */
   async acceptCookies(): Promise<void> {
-    if (await this.page.isVisible(this.selectors.acceptButton)) {
+    const isVisible = await this.webActions.isVisible(
+      this.selectors.acceptButton
+    );
+    if (isVisible) {
       await allure.test.step('Accepting cookies', async () => {
-        await this.page.click(this.selectors.acceptButton);
+        await this.webActions.click(this.selectors.acceptButton);
       });
     }
   }
 
   /**
    * Accept all cookies and dismiss any cookie-related overlays
-   * 
+   *
    * Uses dynamic waiting based on actual DOM state changes instead of fixed timeouts.
    * This method handles:
    * - Cookie banner (may or may not appear)
@@ -49,9 +76,8 @@ export class CookieBanner {
 
           // Wait for the banner to appear with a short timeout (3s)
           // Short timeout to avoid slowing down tests when banner doesn't appear
-          const bannerAppeared = await this.page
-            .locator(this.selectors.banner)
-            .waitFor({ state: 'visible', timeout: 3000 })
+          const bannerAppeared = await this.webActions
+            .waitForVisible(this.selectors.banner, 3000)
             .then(() => true)
             .catch(() => false);
 
@@ -65,11 +91,13 @@ export class CookieBanner {
           console.log('🍪 Cookie banner detected! Clicking accept button...');
 
           // Wait for accept button to be ready
-          await this.page
-            .locator(this.selectors.acceptButton)
-            .waitFor({ state: 'visible', timeout: 5000 });
+          await this.webActions.waitForVisible(
+            this.selectors.acceptButton,
+            5000
+          );
 
           // Use JavaScript to click the button directly (bypasses overlay blocking)
+          // Note: Using page.evaluate() here is acceptable as WebActions doesn't expose evaluate()
           const clicked = await this.page.evaluate(() => {
             const acceptButton = document.querySelector(
               '#onetrust-accept-btn-handler'
@@ -85,14 +113,16 @@ export class CookieBanner {
             console.log('✅ Clicked accept button via JS');
           } else {
             console.log(
-              '⚠️ Accept button not found, trying Playwright click...'
+              '⚠️ Accept button not found, trying force click via page.locator()...'
             );
+            // Note: Using page.locator() here as WebActions doesn't expose force click
             await this.page
               .locator(this.selectors.acceptButton)
               .click({ force: true, timeout: 5000 });
           }
 
           // Wait dynamically for banner to disappear (DOM state change)
+          // Note: Using page.locator() here as WebActions doesn't expose waitFor with state
           await this.page
             .locator(this.selectors.banner)
             .waitFor({ state: 'hidden', timeout: 5000 })
@@ -130,7 +160,7 @@ export class CookieBanner {
           .locator(this.selectors.overlay)
           .waitFor({ state: 'detached', timeout: 2000 })
           .catch(() => {}),
-        
+
         // Or wait for consent SDK container to be hidden
         this.page
           .locator(this.selectors.consentSdk)
@@ -164,7 +194,7 @@ export class CookieBanner {
       return selectors.some((selector) => {
         const element = document.querySelector(selector);
         if (!element) return false;
-        
+
         const style = window.getComputedStyle(element);
         return style.display !== 'none' && style.visibility !== 'hidden';
       });
@@ -194,15 +224,15 @@ export class CookieBanner {
       });
 
       if (removedCount > 0) {
-        console.log(
-          `✅ Forcefully removed ${removedCount} OneTrust elements`
-        );
+        console.log(`✅ Forcefully removed ${removedCount} OneTrust elements`);
       }
     });
   }
 
   /**
    * Wait for cookie banner to disappear (useful after navigation)
+   *
+   * Note: Uses page.locator() as WebActions doesn't expose waitFor with state: 'hidden'
    */
   async waitForBannerToDisappear(): Promise<void> {
     try {
@@ -218,9 +248,6 @@ export class CookieBanner {
    * Check if cookie banner is currently visible
    */
   async isBannerVisible(): Promise<boolean> {
-    return await this.page
-      .locator(this.selectors.banner)
-      .isVisible()
-      .catch(() => false);
+    return await this.webActions.isVisible(this.selectors.banner);
   }
 }
