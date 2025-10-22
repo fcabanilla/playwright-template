@@ -4,7 +4,6 @@ export interface FooterSelectors {
   trabajaConNosotrosLink: string;
   cinesaBusinessLink: string;
   atencionAlClienteLink: string;
-  apoyoInstitucionalLink: string;
   transparenciaLink: string;
   eventosLink: string;
   cinesaLuxeLink: string;
@@ -36,7 +35,6 @@ export const footerSelectors: FooterSelectors = {
   trabajaConNosotrosLink: 'a[href="https://cinesa-uci.jobtrain.co.uk/cinesajobs/Home/Job"]',
   cinesaBusinessLink: 'a[href="http://www.cinesabusiness.es/"]',
   atencionAlClienteLink: 'a[href="http://ayuda.cinesa.es/"]',
-  apoyoInstitucionalLink: 'a[href="/quienes-somos/apoyo-institucional/"]',
   transparenciaLink: 'a[href="/quienes-somos/transparencia/"]',
   eventosLink: 'a[href="/eventos/"]',
   cinesaLuxeLink: 'a[href="/experiencias/luxe/"]',

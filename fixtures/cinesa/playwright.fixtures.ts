@@ -42,7 +42,6 @@ type CustomFixtures = {
   workwithus: Footer;
   cinesabusiness: Footer;
   customerservice: Footer;
-  institutionalsupport: Footer;
   transparency: Footer;
   events: Footer;
   cinesaluxe: Footer;
@@ -103,7 +102,10 @@ export const test = base.extend<CustomFixtures>({
     await use(seatPicker);
   },
   footer: async ({ page }, use) => {
-    const footer = new Footer(page);
+    const webActions = new WebActions(page);
+    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
+    const config = getCinesaConfig(env);
+    const footer = new Footer(webActions, config.baseUrl);
     await use(footer);
   },
   blogLanding: async ({ page }, use) => {
@@ -166,9 +168,6 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   customerservice: async ({ footer }, use) => {
-    await use(footer);
-  },
-  institutionalsupport: async ({ footer }, use) => {
     await use(footer);
   },
   transparency: async ({ footer }, use) => {

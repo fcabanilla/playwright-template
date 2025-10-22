@@ -1,193 +1,189 @@
-import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { FooterSelectors, footerSelectors } from './footer.selectors';
 
 export class Footer {
-  private readonly page: Page;
+  private readonly webActions: WebActions;
   public selectors: FooterSelectors;
-  private readonly url: string = 'https://www.cinesa.es/';
-  constructor(page: Page) {
-    this.page = page;
+  private readonly url: string;
+  
+  constructor(webActions: WebActions, baseUrl?: string) {
+    this.webActions = webActions;
     this.selectors = footerSelectors;
+    this.url = baseUrl || 'https://www.cinesa.es/';
   }
 
   async navigateToHome(): Promise<void> {
     await allure.test.step('Navigating to Cinesa home', async () => {
-      await this.page.goto(this.url);
+      await this.webActions.navigateTo(this.url);
     });
   }
 
   async clickGoToTop(): Promise<void> {
     await allure.test.step('Clicking Go to Top button', async () => {
-      await this.page.click(this.selectors.goToTopButton);
+      await this.webActions.click(this.selectors.goToTopButton);
     });
   }
 
   async clickQuienesSomos(): Promise<void> {
     await allure.test.step('Clicking Quiénes Somos link', async () => {
-      await this.page.click(this.selectors.quienesSomosLink);
+      await this.webActions.click(this.selectors.quienesSomosLink);
     });
   }
 
   async clickTrabajaConNosotros(): Promise<void> {
     await allure.test.step('Clicking Trabaja con Nosotros link', async () => {
-      await this.page.click(this.selectors.trabajaConNosotrosLink);
+      await this.webActions.click(this.selectors.trabajaConNosotrosLink);
     });
   }
 
   async clickCinesaBusiness(): Promise<void> {
     await allure.test.step('Clicking Cinesa Business link', async () => {
-      await this.page.click(this.selectors.cinesaBusinessLink);
+      await this.webActions.click(this.selectors.cinesaBusinessLink);
     });
   }
 
   async clickAtencionAlCliente(): Promise<void> {
     await allure.test.step('Clicking Atención al Cliente link', async () => {
-      await this.page.click(this.selectors.atencionAlClienteLink);
-    });
-  }
-
-  async clickApoyoInstitucional(): Promise<void> {
-    await allure.test.step('Clicking Apoyo Institucional link', async () => {
-      await this.page.click(this.selectors.apoyoInstitucionalLink);
+      await this.webActions.click(this.selectors.atencionAlClienteLink);
     });
   }
 
   async clickTransparencia(): Promise<void> {
     await allure.test.step('Clicking Transparencia link', async () => {
-      await this.page.click(this.selectors.transparenciaLink);
+      await this.webActions.click(this.selectors.transparenciaLink);
     });
   }
 
   async clickEventos(): Promise<void> {
     await allure.test.step('Clicking Eventos link', async () => {
-      await this.page.click(this.selectors.eventosLink);
+      await this.webActions.click(this.selectors.eventosLink);
     });
   }
 
   async clickCinesaLuxe(): Promise<void> {
     await allure.test.step('Clicking Cinesa LUXE link', async () => {
-      await this.page.click(this.selectors.cinesaLuxeLink);
+      await this.webActions.click(this.selectors.cinesaLuxeLink);
     });
   }
 
   async clickSalasPremium(): Promise<void> {
     await allure.test.step('Clicking Salas Premium link', async () => {
-      await this.page.click(this.selectors.salasPremiumLink);
+      await this.webActions.click(this.selectors.salasPremiumLink);
     });
   }
 
   async clickInfantilYColegios(): Promise<void> {
     await allure.test.step('Clicking Infantil y Colegios link', async () => {
-      await this.page.click(this.selectors.infantilYColegiosLink);
+      await this.webActions.click(this.selectors.infantilYColegiosLink);
     });
   }
 
   async clickCiclos(): Promise<void> {
     await allure.test.step('Clicking Ciclos link', async () => {
-      await this.page.click(this.selectors.ciclosLink);
+      await this.webActions.click(this.selectors.ciclosLink);
     });
   }
 
   async clickBlogDeCinesa(): Promise<void> {
     await allure.test.step('Clicking Blog de Cinesa link', async () => {
-      await this.page.click(this.selectors.blogDeCinesaLink);
+      await this.webActions.click(this.selectors.blogDeCinesaLink);
     });
   }
 
   async clickAvisoLegal(): Promise<void> {
     await allure.test.step('Clicking Aviso Legal link', async () => {
-      await this.page.click(this.selectors.avisoLegalLink);
+      await this.webActions.click(this.selectors.avisoLegalLink);
     });
   }
 
   async clickCondicionesCompra(): Promise<void> {
     await allure.test.step('Clicking Condiciones de Compra link', async () => {
-      await this.page.click(this.selectors.condicionesCompraLink);
+      await this.webActions.click(this.selectors.condicionesCompraLink);
     });
   }
 
   async clickCondicionesUnlimited(): Promise<void> {
     await allure.test.step('Clicking Condiciones del Programa Unlimited Card link', async () => {
-      await this.page.click(this.selectors.condicionesUnlimitedLink);
+      await this.webActions.click(this.selectors.condicionesUnlimitedLink);
     });
   }
 
   async clickPoliticaPrivacidad(): Promise<void> {
     await allure.test.step('Clicking Política de Privacidad link', async () => {
-      await this.page.click(this.selectors.politicaPrivacidadLink);
+      await this.webActions.click(this.selectors.politicaPrivacidadLink);
     });
   }
 
   async clickPoliticaCookies(): Promise<void> {
     await allure.test.step('Clicking Política de Cookies link', async () => {
-      await this.page.click(this.selectors.politicaCookiesLink);
+      await this.webActions.click(this.selectors.politicaCookiesLink);
     });
   }
 
   async clickEsclavitudModerna(): Promise<void> {
     await allure.test.step('Clicking Declaración de Esclavitud Moderna link', async () => {
-      await this.page.click(this.selectors.esclavitudModernaLink);
+      await this.webActions.click(this.selectors.esclavitudModernaLink);
     });
   }
 
   async clickCodigoConducta(): Promise<void> {
     await allure.test.step('Clicking Código de Conducta link', async () => {
-      await this.page.click(this.selectors.codigoConductaLink);
+      await this.webActions.click(this.selectors.codigoConductaLink);
     });
   }
 
   async clickPoliticaDenuncia(): Promise<void> {
     await allure.test.step('Clicking Política de Denuncia link', async () => {
-      await this.page.click(this.selectors.politicaDenunciaLink);
+      await this.webActions.click(this.selectors.politicaDenunciaLink);
     });
   }
 
   async clickAndroidApp(): Promise<void> {
     await allure.test.step('Clicking Android App link', async () => {
-      await this.page.click(this.selectors.androidAppLink);
+      await this.webActions.click(this.selectors.androidAppLink);
     });
   }
 
   async clickAppleApp(): Promise<void> {
     await allure.test.step('Clicking Apple App link', async () => {
-      await this.page.click(this.selectors.appleAppLink);
+      await this.webActions.click(this.selectors.appleAppLink);
     });
   }
 
   async clickFacebook(): Promise<void> {
     await allure.test.step('Clicking Facebook link', async () => {
-      await this.page.click(this.selectors.facebookLink);
+      await this.webActions.click(this.selectors.facebookLink);
     });
   }
 
   async clickTwitter(): Promise<void> {
     await allure.test.step('Clicking Twitter link', async () => {
-      await this.page.click(this.selectors.twitterLink);
+      await this.webActions.click(this.selectors.twitterLink);
     });
   }
 
   async clickInstagram(): Promise<void> {
     await allure.test.step('Clicking Instagram link', async () => {
-      await this.page.click(this.selectors.instagramLink);
+      await this.webActions.click(this.selectors.instagramLink);
     });
   }
 
   async clickLinkedin(): Promise<void> {
     await allure.test.step('Clicking Linkedin link', async () => {
-      await this.page.click(this.selectors.linkedinLink);
+      await this.webActions.click(this.selectors.linkedinLink);
     });
   }
 
   async clickTiktok(): Promise<void> {
     await allure.test.step('Clicking Tiktok link', async () => {
-      await this.page.click(this.selectors.tiktokLink);
+      await this.webActions.click(this.selectors.tiktokLink);
     });
   }
 
   async clickYoutube(): Promise<void> {
     await allure.test.step('Clicking Youtube link', async () => {
-      await this.page.click(this.selectors.youtubeLink);
+      await this.webActions.click(this.selectors.youtubeLink);
     });
   }
 }

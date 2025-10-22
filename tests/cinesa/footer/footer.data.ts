@@ -32,10 +32,6 @@ export const internalFooterItems: FooterNavItem[] = [
     expectedUrl: 'https://ayuda.cinesa.es/hc/es',
   },
   {
-    selectorKey: 'apoyoInstitucionalLink',
-    expectedUrl: `${baseUrl}/quienes-somos/apoyo-institucional/`,
-  },
-  {
     selectorKey: 'transparenciaLink',
     expectedUrl: `${baseUrl}/quienes-somos/transparencia/`,
   },
