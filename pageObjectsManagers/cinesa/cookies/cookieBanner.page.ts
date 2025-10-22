@@ -28,7 +28,9 @@ export class CookieBanner {
 
   /**
    * Accept all cookies and dismiss any cookie-related overlays
-   * This method is more robust and handles:
+   * 
+   * Uses dynamic waiting based on actual DOM state changes instead of fixed timeouts.
+   * This method handles:
    * - Cookie banner (may or may not appear)
    * - Cookie settings modal
    * - Dark overlay that blocks interactions
@@ -90,7 +92,7 @@ export class CookieBanner {
               .click({ force: true, timeout: 5000 });
           }
 
-          // Wait for banner to disappear
+          // Wait dynamically for banner to disappear (DOM state change)
           await this.page
             .locator(this.selectors.banner)
             .waitFor({ state: 'hidden', timeout: 5000 })
@@ -98,36 +100,9 @@ export class CookieBanner {
               console.log('⚠️ Banner still visible, forcing removal...')
             );
 
-          // Give it time to process the acceptance
-          await this.page.waitForTimeout(1000);
-
-          // Force remove any remaining OneTrust elements
-          await this.page.evaluate(() => {
-            const elementsToRemove = [
-              '#onetrust-banner-sdk',
-              '#onetrust-pc-sdk',
-              '#onetrust-consent-sdk',
-              '.onetrust-pc-dark-filter',
-            ];
-
-            let removedCount = 0;
-            elementsToRemove.forEach((selector) => {
-              const elements = document.querySelectorAll(selector);
-              elements.forEach((el) => {
-                el.remove();
-                removedCount++;
-              });
-            });
-
-            if (removedCount > 0) {
-              console.log(
-                `✅ Forcefully removed ${removedCount} OneTrust elements`
-              );
-            }
-          });
-
-          // Final wait to ensure everything is settled
-          await this.page.waitForTimeout(500);
+          // Wait for any remaining OneTrust elements to be removed from DOM
+          // This is a dynamic wait for the SDK to clean up after acceptance
+          await this.waitForOneTrustCleanup();
 
           console.log('✅ Cookie handling completed successfully');
         } catch (error) {
@@ -135,25 +110,95 @@ export class CookieBanner {
 
           // Emergency cleanup - force remove everything
           console.log('🔧 Running emergency cleanup...');
-          await this.page.evaluate(() => {
-            const elementsToRemove = [
-              '#onetrust-banner-sdk',
-              '#onetrust-pc-sdk',
-              '#onetrust-consent-sdk',
-              '.onetrust-pc-dark-filter',
-            ];
-
-            elementsToRemove.forEach((selector) => {
-              const elements = document.querySelectorAll(selector);
-              elements.forEach((el) => el.remove());
-            });
-          });
-
-          await this.page.waitForTimeout(500);
+          await this.forceRemoveOneTrustElements();
           console.log('✅ Emergency cleanup completed');
         }
       }
     );
+  }
+
+  /**
+   * Wait dynamically for OneTrust SDK to clean up after cookie acceptance
+   * Uses MutationObserver to detect when elements are removed from DOM
+   */
+  private async waitForOneTrustCleanup(): Promise<void> {
+    try {
+      // Use Playwright's built-in wait for selector to be detached/hidden
+      await Promise.race([
+        // Wait for overlay to be detached from DOM
+        this.page
+          .locator(this.selectors.overlay)
+          .waitFor({ state: 'detached', timeout: 2000 })
+          .catch(() => {}),
+        
+        // Or wait for consent SDK container to be hidden
+        this.page
+          .locator(this.selectors.consentSdk)
+          .waitFor({ state: 'hidden', timeout: 2000 })
+          .catch(() => {}),
+      ]);
+
+      // If elements still exist, force remove them
+      const stillVisible = await this.hasVisibleOneTrustElements();
+      if (stillVisible) {
+        console.log('⚠️ OneTrust elements still present, forcing removal...');
+        await this.forceRemoveOneTrustElements();
+      }
+    } catch (error) {
+      // If waiting fails, force cleanup
+      await this.forceRemoveOneTrustElements();
+    }
+  }
+
+  /**
+   * Check if any OneTrust elements are still visible in the DOM
+   */
+  private async hasVisibleOneTrustElements(): Promise<boolean> {
+    return await this.page.evaluate(() => {
+      const selectors = [
+        '#onetrust-banner-sdk',
+        '#onetrust-pc-sdk',
+        '.onetrust-pc-dark-filter',
+      ];
+
+      return selectors.some((selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return false;
+        
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
+    });
+  }
+
+  /**
+   * Force remove all OneTrust elements from DOM
+   * Used as fallback when dynamic waiting doesn't work
+   */
+  private async forceRemoveOneTrustElements(): Promise<void> {
+    await this.page.evaluate(() => {
+      const elementsToRemove = [
+        '#onetrust-banner-sdk',
+        '#onetrust-pc-sdk',
+        '#onetrust-consent-sdk',
+        '.onetrust-pc-dark-filter',
+      ];
+
+      let removedCount = 0;
+      elementsToRemove.forEach((selector) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach((el) => {
+          el.remove();
+          removedCount++;
+        });
+      });
+
+      if (removedCount > 0) {
+        console.log(
+          `✅ Forcefully removed ${removedCount} OneTrust elements`
+        );
+      }
+    });
   }
 
   /**
