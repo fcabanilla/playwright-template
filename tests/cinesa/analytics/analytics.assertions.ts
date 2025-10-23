@@ -1,11 +1,16 @@
 import { expect, TestInfo } from '@playwright/test';
+import type {
+  DataLayerEvent,
+  AddToCartEvent,
+  BeginCheckoutEvent,
+} from '../../../pageObjectsManagers/cinesa/analytics/analytics.types';
 
 /**
  * Validates that dataLayer events were captured successfully
  * @param allEvents Array of captured dataLayer events
  */
 export async function assertEventsWereCaptured(
-  allEvents: any[]
+  allEvents: DataLayerEvent[]
 ): Promise<void> {
   expect(allEvents.length).toBeGreaterThan(0);
 }
@@ -15,13 +20,16 @@ export async function assertEventsWereCaptured(
  * @param allEvents Array of captured dataLayer events
  */
 export async function assertCriticalEventsExist(
-  allEvents: any[]
-): Promise<{ addToCartEvents: any[]; beginCheckoutEvents: any[] }> {
+  allEvents: DataLayerEvent[]
+): Promise<{
+  addToCartEvents: AddToCartEvent[];
+  beginCheckoutEvents: BeginCheckoutEvent[];
+}> {
   const addToCartEvents = allEvents.filter(
-    (event) => event.event === 'add_to_cart'
+    (event): event is AddToCartEvent => event.event === 'add_to_cart'
   );
   const beginCheckoutEvents = allEvents.filter(
-    (event) => event.event === 'begin_checkout'
+    (event): event is BeginCheckoutEvent => event.event === 'begin_checkout'
   );
 
   expect(addToCartEvents.length).toBeGreaterThan(0);
@@ -35,7 +43,7 @@ export async function assertCriticalEventsExist(
  * @param latestBeginCheckout The latest begin_checkout event
  */
 export async function assertBeginCheckoutEventStructure(
-  latestBeginCheckout: any
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
   expect(latestBeginCheckout).toHaveProperty('event');
   expect(latestBeginCheckout).toHaveProperty('ecommerce');
@@ -56,7 +64,7 @@ export async function assertBeginCheckoutEventStructure(
  * @param beginCheckoutEvent The begin_checkout event to validate
  */
 export async function assertAnalyticsTotalIsReasonable(
-  beginCheckoutEvent: any
+  beginCheckoutEvent: BeginCheckoutEvent
 ): Promise<void> {
   const analyticsTotal = beginCheckoutEvent.ecommerce?.value || 0;
   expect(analyticsTotal).toBeGreaterThan(0);
@@ -68,7 +76,7 @@ export async function assertAnalyticsTotalIsReasonable(
  * @param beginCheckoutEvent The begin_checkout event containing items
  */
 export async function assertEcommerceItemsStructure(
-  beginCheckoutEvent: any
+  beginCheckoutEvent: BeginCheckoutEvent
 ): Promise<void> {
   if (beginCheckoutEvent.ecommerce?.items) {
     const items = beginCheckoutEvent.ecommerce.items;
@@ -88,8 +96,8 @@ export async function assertEcommerceItemsStructure(
  */
 export async function attachEventsToReport(
   testInfo: TestInfo,
-  allEvents: any[],
-  latestBeginCheckout: any
+  allEvents: DataLayerEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
   await testInfo.attach('All captured dataLayer events', {
     body: JSON.stringify(allEvents, null, 2),
@@ -114,15 +122,15 @@ export async function attachEventsToReport(
 export async function logAnalyticsSummary(
   cinemaName: string,
   menuType: string,
-  allEvents: any[],
-  addToCartEvents: any[],
-  beginCheckoutEvents: any[],
-  latestBeginCheckout: any
+  allEvents: DataLayerEvent[],
+  addToCartEvents: AddToCartEvent[],
+  beginCheckoutEvents: BeginCheckoutEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
   // List all items
   if (latestBeginCheckout.ecommerce?.items) {
     console.log('🎫 Items breakdown:');
-    latestBeginCheckout.ecommerce.items.forEach((item: any, index: number) => {
+    latestBeginCheckout.ecommerce.items.forEach((item, index) => {
       console.log(
         `   ${index + 1}. ${item.item_name}: €${item.price} x ${item.quantity || 1}`
       );
@@ -136,10 +144,10 @@ export async function logAnalyticsSummary(
  * Logs simplified analytics summary for Grancasa
  */
 export async function logGrancasaAnalyticsSummary(
-  allEvents: any[],
-  addToCartEvents: any[],
-  beginCheckoutEvents: any[],
-  latestBeginCheckout: any
+  allEvents: DataLayerEvent[],
+  addToCartEvents: AddToCartEvent[],
+  beginCheckoutEvents: BeginCheckoutEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
   const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
 

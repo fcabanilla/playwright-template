@@ -1,45 +1,14 @@
 import { WebActions } from '../../../core/webactions/webActions';
 import * as allure from 'allure-playwright';
 import { ANALYTICS_SELECTORS } from './analytics.selectors';
+import type { DataLayerEvent, PriceSummary } from './analytics.types';
 
 // Extend window interface to include Google Analytics dataLayer and our custom properties
 declare global {
   interface Window {
-    dataLayer: any[];
-    dataLayerEvents: any[];
+    dataLayer: DataLayerEvent[];
+    dataLayerEvents: DataLayerEvent[];
   }
-}
-
-export interface DataLayerEvent {
-  event: string;
-  gtm?: {
-    startInTicks: number;
-  };
-  ecommerce?: {
-    items: Array<{
-      item_id: string;
-      item_name: string;
-      item_category: string;
-      price: number;
-      quantity?: number;
-      item_variant?: string;
-      cinema_name?: string;
-      performance_date?: string;
-      performance_time?: string;
-      showtime_id?: string;
-      [key: string]: any;
-    }>;
-    currency?: string;
-    value?: number;
-    transaction_id?: string;
-  };
-}
-
-export interface PriceSummary {
-  ticketPrice: number;
-  foodBeveragePrice: number;
-  totalPrice: number;
-  taxes: number;
 }
 
 export class AnalyticsPage {

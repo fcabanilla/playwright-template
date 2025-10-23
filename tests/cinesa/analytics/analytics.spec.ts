@@ -10,12 +10,13 @@ import {
   logAnalyticsSummary,
   logGrancasaAnalyticsSummary,
 } from './analytics.assertions';
+import type { DataLayerEvent } from '../../../pageObjectsManagers/cinesa/analytics/analytics.types';
 
 // Extend window type to include dataLayer and our custom properties
 declare global {
   interface Window {
-    dataLayer: any[];
-    dataLayerEvents: any[];
+    dataLayer: DataLayerEvent[];
+    dataLayerEvents: DataLayerEvent[];
   }
 }
 
@@ -65,11 +66,10 @@ test.describe('Google Analytics DataLayer Validation', () => {
 
       await assertBeginCheckoutEventStructure(latestBeginCheckout);
 
-      const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
-      await assertAnalyticsTotalIsReasonable(analyticsTotal);
+      await assertAnalyticsTotalIsReasonable(latestBeginCheckout);
 
       if (latestBeginCheckout.ecommerce?.items) {
-        await assertEcommerceItemsStructure(latestBeginCheckout.ecommerce.items);
+        await assertEcommerceItemsStructure(latestBeginCheckout);
       }
 
     await attachEventsToReport(test.info(), allEvents, latestBeginCheckout);
