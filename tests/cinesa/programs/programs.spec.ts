@@ -12,7 +12,7 @@ test.describe('Programs Page', () => {
   test('Programs unlimited display and layout from URL', async ({ page, unlimitedProgramsPage, cookieBanner }) => {
     await test.step('Navigate to Programs page', async () => {
   const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
-  await page.goto(config.baseUrl + 'unlimited/informacion/');
+  await page.goto(config.baseUrl + '/unlimited/informacion/');
     });
     await cookieBanner.acceptAllCookies();
     await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
