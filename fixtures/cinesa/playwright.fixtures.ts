@@ -15,6 +15,7 @@ import { TicketPicker } from '../../pageObjectsManagers/cinesa/ticketPicker/tick
 import { BarPage } from '../../pageObjectsManagers/cinesa/bar/bar.page';
 import { PurchaseSummary } from '../../pageObjectsManagers/cinesa/purchaseSummary/purchaseSummary.page';
 import { PaymentPage } from '../../pageObjectsManagers/cinesa/paymentPage/paymentPage.page';
+import { ProgramsPage } from '../../pageObjectsManagers/cinesa/programs/programs.page';
 import { UnlimitedProgramsPage } from '../../pageObjectsManagers/cinesa/programs/unlimitedPrograms.page';
 import { SignupPage } from '../../pageObjectsManagers/cinesa/signup/signup.page';
 import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
@@ -35,6 +36,7 @@ type CustomFixtures = {
   purchaseSummary: PurchaseSummary;
   paymentPage: PaymentPage;
   analyticsPage: AnalyticsPage;
+  programsPage: ProgramsPage;
   unlimitedProgramsPage: UnlimitedProgramsPage;
   signupPage: SignupPage;
   mailing: Mailing;
@@ -147,9 +149,15 @@ export const test = base.extend<CustomFixtures>({
     const analyticsPage = new AnalyticsPage(webActions);
     await use(analyticsPage);
   },
-  unlimitedProgramsPage: async ({ page }, use) => {
-    const programsPage = new UnlimitedProgramsPage(page);
+  programsPage: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const programsPage = new ProgramsPage(webActions);
     await use(programsPage);
+  },
+  unlimitedProgramsPage: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const unlimitedProgramsPage = new UnlimitedProgramsPage(webActions);
+    await use(unlimitedProgramsPage);
   },
   signupPage: async ({ page }, use) => {
     const signupPage = new SignupPage(page);

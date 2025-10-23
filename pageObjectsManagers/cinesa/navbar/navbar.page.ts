@@ -110,6 +110,7 @@ export class Navbar {
   async navigateToPrograms(): Promise<void> {
     await allure.test.step('Navigating to Programs page', async () => {
       await this.webActions.click(this.selectors.programas);
+      await this.webActions.waitForLoadState('networkidle');
     });
   }
 

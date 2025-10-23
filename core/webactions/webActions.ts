@@ -96,7 +96,6 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  
 
   /**
    * Performs a standard click action on an element identified by CSS selector.
@@ -231,6 +230,16 @@ export class WebActions {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('networkidle');
+  }
+
+  /**
+   * Wait for a specific load state
+   * @param state - The load state to wait for: 'load' | 'domcontentloaded' | 'networkidle'
+   */
+  async waitForLoadState(
+    state: 'load' | 'domcontentloaded' | 'networkidle' = 'networkidle'
+  ): Promise<void> {
+    await this.page.waitForLoadState(state);
   }
 
   /**

@@ -1,25 +1,23 @@
-import { Page } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import { PROGRAMS_PAGE_SELECTORS } from './programs.selectors';
 
 export class ProgramsPage {
-  readonly page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
+  constructor(private readonly webActions: WebActions) {}
 
   /**
-   * Espera a que la página de programas esté visible.
+   * Waits for the programs page grid to be visible.
    */
   async waitForProgramsPage(): Promise<void> {
-    await this.page.waitForSelector(PROGRAMS_PAGE_SELECTORS.gridRow, { state: 'visible', timeout: 10000 });
+    await this.webActions.waitForVisible(PROGRAMS_PAGE_SELECTORS.gridRow);
   }
 
   /**
-   * Hace clic en el botón de la tarjeta derecha (Unlimited).
+   * Clicks the Unlimited program button (right card).
    */
   async clickUnlimitedButton(): Promise<void> {
-    await this.page.waitForSelector(PROGRAMS_PAGE_SELECTORS.unlimitedButton, { state: 'visible', timeout: 10000 });
-    await this.page.click(PROGRAMS_PAGE_SELECTORS.unlimitedButton);
+    await this.webActions.waitForVisible(
+      PROGRAMS_PAGE_SELECTORS.unlimitedButton
+    );
+    await this.webActions.click(PROGRAMS_PAGE_SELECTORS.unlimitedButton);
   }
 }
