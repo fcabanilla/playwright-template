@@ -3,17 +3,23 @@ import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/gene
 import { assertPromotionsRedirection } from './promotions.assertions';
 
 test.describe('Cinesa Promotions Tests', () => {
-  test('Promotions page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+  });
+
+  test('Promotions page display and layout', 
+    { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
+    async ({ page, navbar }, testInfo) => {
     await navbar.navigateToPromotions();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Promotions page display and layout');
   });
 
-  test('Cinesa Promotions page redirection test', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
+  test('Cinesa Promotions page redirection test',
+    { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
+    async ({ page, navbar }) => {
     await navbar.navigateToPromotions();
     await page.waitForLoadState('networkidle');
     assertPromotionsRedirection(page);

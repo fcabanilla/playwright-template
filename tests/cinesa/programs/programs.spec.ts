@@ -9,8 +9,11 @@ test.describe(
     tag: ['@programs', '@cinesa'],
   },
   () => {
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page, cookieBanner, promotionalModal, navbar }) => {
       await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
+      await navbar.navigateToHome();
+      await cookieBanner.acceptAllCookies();
+      await promotionalModal.closeModalIfVisible();
     });
 
     test(
@@ -18,11 +21,12 @@ test.describe(
       {
         tag: ['@smoke', '@fast'],
       },
-      async ({ page, unlimitedProgramsPage, cookieBanner }) => {
+      async ({ page, unlimitedProgramsPage, cookieBanner, promotionalModal }) => {
         await test.step('Navigate to Programs Unlimited page', async () => {
           await page.goto(UNLIMITED_PROGRAMS_URL);
         });
         await cookieBanner.acceptAllCookies();
+        await promotionalModal.closeModalIfVisible();
         await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
         await takeScreenshot(page, test.info());
       }
@@ -37,13 +41,8 @@ test.describe(
         page,
         programsPage,
         unlimitedProgramsPage,
-        cookieBanner,
         navbar,
       }) => {
-        await test.step('Navigate to Home page', async () => {
-          await navbar.navigateToHome();
-        });
-        await cookieBanner.acceptAllCookies();
         await navbar.navigateToPrograms();
 
         await programsPage.waitForProgramsPage();
@@ -61,9 +60,7 @@ test.describe(
       {
         tag: ['@regression', '@medium'],
       },
-      async ({ page, navbar, cookieBanner }, testInfo) => {
-        await navbar.navigateToHome();
-        await cookieBanner.acceptAllCookies();
+      async ({ page, navbar }, testInfo) => {
         await navbar.navigateToPrograms();
         await takeScreenshot(
           page,
@@ -78,9 +75,7 @@ test.describe(
       {
         tag: ['@regression', '@medium'],
       },
-      async ({ page, navbar, cookieBanner }) => {
-        await navbar.navigateToHome();
-        await cookieBanner.acceptAllCookies();
+      async ({ page, navbar }) => {
         await navbar.navigateToPrograms();
         await assertProgramsRedirection(page);
       }

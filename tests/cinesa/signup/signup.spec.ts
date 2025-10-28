@@ -4,12 +4,15 @@ import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/sig
 import { defaultUser } from './signup.data';
 
 test.describe('Signup', () => {
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
   });
 
-  test('Signup display and layout', async ({ page, navbar }, testInfo) => {
+  test('Signup display and layout', 
+    { tag: ['@signup', '@cinesa', '@smoke', '@fast'] },
+    async ({ page, navbar }, testInfo) => {
     await navbar.navigateToSignup();
     await takeScreenshotForModal(
       page,
@@ -18,7 +21,9 @@ test.describe('Signup', () => {
     );
   });
 
-  test('Validate mandatory fields DEMO test', async ({
+  test('Validate mandatory fields DEMO test', 
+    { tag: ['@signup', '@cinesa', '@regression', '@medium'] },
+    async ({
     page,
     navbar,
     signupPage,
@@ -33,7 +38,9 @@ test.describe('Signup', () => {
     );
   });
 
-  test('Validate email', async ({ page, navbar, signupPage }, testInfo) => {
+  test('Validate email', 
+    { tag: ['@signup', '@cinesa', '@regression', '@medium'] },
+    async ({ page, navbar, signupPage }, testInfo) => {
     await navbar.navigateToSignup();
     await signupPage.validateEmailFields();
     await takeScreenshotForModal(
@@ -43,7 +50,9 @@ test.describe('Signup', () => {
     );
   });
 
-  test('Validate password', async ({ page, navbar, signupPage }, testInfo) => {
+  test('Validate password', 
+    { tag: ['@signup', '@cinesa', '@regression', '@medium'] },
+    async ({ page, navbar, signupPage }, testInfo) => {
     await navbar.navigateToSignup();
     await signupPage.validatePasswordFields();
     await takeScreenshotForModal(
@@ -53,7 +62,9 @@ test.describe('Signup', () => {
     );
   });
 
-  test('Signup with valid data and unique email', async ({
+  test('Signup with valid data and unique email', 
+    { tag: ['@signup', '@cinesa', '@regression', '@high'] },
+    async ({
     page,
     navbar,
     signupPage,
