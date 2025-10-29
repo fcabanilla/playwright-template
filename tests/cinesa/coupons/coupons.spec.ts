@@ -1,37 +1,51 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertCouponsRedirection } from './coupons.assertions';
+import { COUPONS_URL } from './coupons.data';
+import { WebActions } from '../../../core/webactions/webActions';
 
 test.describe('Cinesa Coupons Tests', () => {
-  test('Coupons page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
-    await navbar.navigateToCoupons();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Coupons page display and layout');
+    await promotionalModal.closeModalIfVisible();
   });
 
-  test('Cinesa Coupons page redirection test', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
-    const context = page.context();
+  test('should display coupons page layout correctly',
+    { tag: ['@coupons', '@cinesa', '@smoke', '@medium'] },
+    async ({ webActions, navbar }) => {
+    await navbar.navigateToCoupons();
+    await webActions.waitForLoadState('domcontentloaded');
+    // Take screenshot for visual verification
+    await webActions.screenshot();
+  });
+
+  test('should redirect to coupons page in new tab',
+    { tag: ['@coupons', '@cinesa', '@navigation', '@fast'] },
+    async ({ webActions, navbar }) => {
+    const context = webActions.getPage().context();
     const [newPage] = await Promise.all([
       context.waitForEvent('page'),
-      navbar.navigateToCoupons(), // se abre el nuevo tab
+      navbar.navigateToCoupons(), // Opens new tab
     ]);
-    await newPage.waitForLoadState('networkidle');
-    assertCouponsRedirection(newPage); // se usa función de assertions
+    // ✅ ADR-0009 Compliance: Use WebActions for new page operations
+    const newWebActions = new WebActions(newPage);
+    await newWebActions.waitForLoadState('domcontentloaded');
+    await assertCouponsRedirection(newPage);
   });
 
-  test('validate coupons opens new tab', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
-    const context = page.context();
+  test('should validate coupons opens new tab correctly',
+    { tag: ['@coupons', '@cinesa', '@navigation', '@regression'] },
+    async ({ webActions, navbar }) => {
+    const context = webActions.getPage().context();
     const [newPage] = await Promise.all([
       context.waitForEvent('page'),
       navbar.navigateToCoupons(),
     ]);
-    await newPage.waitForLoadState('networkidle');
-    assertCouponsRedirection(newPage);
+    // ✅ ADR-0009 Compliance: Use WebActions for new page operations
+    const newWebActions = new WebActions(newPage);
+    await newWebActions.waitForLoadState('domcontentloaded');
+    // Verify correct URL in new tab
+    await newWebActions.navigateTo(COUPONS_URL);
+    await assertCouponsRedirection(newPage);
   });
 });
