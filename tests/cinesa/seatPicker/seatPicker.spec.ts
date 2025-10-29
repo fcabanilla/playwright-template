@@ -17,29 +17,33 @@ test.describe('Seat Picker', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Simulate a Full Purchase - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-    barPage,
-    purchaseSummary,
-    paymentPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket();
-    await barPage.skipBar();
-    await purchaseSummary.acceptAndContinue();
-    await paymentPage.completePayment();
-  });
+  test(
+    'Simulate a Full Purchase - Oasiz',
+    { tag: ['@seatpicker', '@cinesa', '@e2e', '@booking', '@COMS-16843'] },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+      barPage,
+      purchaseSummary,
+      paymentPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket();
+      await barPage.skipBar();
+      await purchaseSummary.acceptAndContinue();
+      await paymentPage.completePayment();
+    }
+  );
 
   test(
     'Simulate a Full Purchase - Grancasa',
@@ -69,30 +73,43 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Simulate a Full Purchase with multiple seats - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-    barPage,
-    purchaseSummary,
-    paymentPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    const seatsToSelect = 4;
-    await seatPicker.selectLastAvailableSeats(seatsToSelect);
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket(seatsToSelect);
-    await barPage.skipBar();
-    await purchaseSummary.acceptAndContinue();
-    await paymentPage.completePayment();
-  });
+  test(
+    'Simulate a Full Purchase with multiple seats - Oasiz',
+    {
+      tag: [
+        '@seatpicker',
+        '@cinesa',
+        '@e2e',
+        '@booking',
+        '@COMS-16842',
+        '@COMS-5087',
+      ],
+    },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+      barPage,
+      purchaseSummary,
+      paymentPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      const seatsToSelect = 4;
+      await seatPicker.selectLastAvailableSeats(seatsToSelect);
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket(seatsToSelect);
+      await barPage.skipBar();
+      await purchaseSummary.acceptAndContinue();
+      await paymentPage.completePayment();
+    }
+  );
 
   test(
     'Simulate a Full Purchase with multiple seats - Grancasa',
@@ -123,21 +140,19 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Attempt to select seats leaving an empty space between selection - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-  }) => {
-    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectSeatsWithEmptySpaceBetween();
-    await assertWarningMessageDisplayed(seatPicker.page);
-    await assertConfirmButtonDisabled(seatPicker.page);
-  });
+  test(
+    'Attempt to select seats leaving an empty space between selection - Oasiz',
+    { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-5620'] },
+    async ({ navbar, cinema, cinemaDetail, cookieBanner, seatPicker }) => {
+      test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectSeatsWithEmptySpaceBetween();
+      await assertWarningMessageDisplayed(seatPicker.page);
+      await assertConfirmButtonDisabled(seatPicker.page);
+    }
+  );
 
   test(
     'Attempt to select seats leaving an empty space between selection - Grancasa',
@@ -155,21 +170,19 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Attempt to select seats separating group in the same row - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-  }) => {
-    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectSeatsSeparatingGroupInSameRow();
-    await assertWarningMessageDisplayed(seatPicker.page);
-    await assertConfirmButtonDisabled(seatPicker.page);
-  });
+  test(
+    'Attempt to select seats separating group in the same row - Oasiz',
+    { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-4752'] },
+    async ({ navbar, cinema, cinemaDetail, cookieBanner, seatPicker }) => {
+      test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectSeatsSeparatingGroupInSameRow();
+      await assertWarningMessageDisplayed(seatPicker.page);
+      await assertConfirmButtonDisabled(seatPicker.page);
+    }
+  );
 
   test(
     'Attempt to select seats separating group in the same row - Grancasa',
@@ -249,23 +262,21 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Select more than max seat capacity - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-  }) => {
-    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    const selectedSeats = await seatPicker.selectMoreThanMaxSeats();
-    await assertWarningMessageNotDisplayed(seatPicker.page);
-    await assertConfirmButtonEnabled(seatPicker.page);
-    await assertFirstSeatsDeselected(selectedSeats);
-    await assertLastSeatsSelected(selectedSeats);
-  });
+  test(
+    'Select more than max seat capacity - Oasiz',
+    { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-5088'] },
+    async ({ navbar, cinema, cinemaDetail, cookieBanner, seatPicker }) => {
+      test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      const selectedSeats = await seatPicker.selectMoreThanMaxSeats();
+      await assertWarningMessageNotDisplayed(seatPicker.page);
+      await assertConfirmButtonEnabled(seatPicker.page);
+      await assertFirstSeatsDeselected(selectedSeats);
+      await assertLastSeatsSelected(selectedSeats);
+    }
+  );
 
   test(
     'Select more than max seat capacity - Grancasa',
@@ -630,23 +641,29 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Simulate a Full Purchase with promotional code - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[0].values[0]);
-  });
+  test(
+    'Simulate a Full Purchase with promotional code - Oasiz',
+    {
+      tag: ['@seatpicker', '@cinesa', '@promo', '@ticketpicker', '@COMS-16845'],
+    },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[0].values[0]);
+    }
+  );
 
   test(
     'Simulate a Full Purchase with promotional code - Grancasa',
@@ -670,23 +687,29 @@ test.describe('Seat Picker', () => {
     }
   );
 
-  test('Simulate a Full Purchase with promotional code - La Vanguardia - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[1].values[0]);
-  });
+  test(
+    'Simulate a Full Purchase with promotional code - La Vanguardia - Oasiz',
+    {
+      tag: ['@seatpicker', '@cinesa', '@promo', '@ticketpicker', '@COMS-16844'],
+    },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[1].values[0]);
+    }
+  );
 
   test(
     'Simulate a Full Purchase with promotional code - La Vanguardia - Grancasa',

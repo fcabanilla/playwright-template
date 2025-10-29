@@ -8,19 +8,26 @@ test.describe(
     tag: ['@programs', '@cinesa'],
   },
   () => {
-    test.beforeEach(async ({ page, cookieBanner, promotionalModal, navbar }) => {
-      await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
-      await navbar.navigateToHome();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
-    });
+    test.beforeEach(
+      async ({ page, cookieBanner, promotionalModal, navbar }) => {
+        await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
+        await navbar.navigateToHome();
+        await cookieBanner.acceptAllCookies();
+        await promotionalModal.closeModalIfVisible();
+      }
+    );
 
     test(
       'Programs unlimited display and layout from URL',
       {
-        tag: ['@smoke', '@fast'],
+        tag: ['@smoke', '@fast', '@COMS-11226'],
       },
-      async ({ page, unlimitedProgramsPage, cookieBanner, promotionalModal }) => {
+      async ({
+        page,
+        unlimitedProgramsPage,
+        cookieBanner,
+        promotionalModal,
+      }) => {
         await test.step('Navigate to Programs Unlimited page', async () => {
           await unlimitedProgramsPage.navigateToUnlimitedPrograms();
         });
@@ -34,14 +41,9 @@ test.describe(
     test(
       'Programs unlimited display and layout from home page',
       {
-        tag: ['@smoke', '@fast'],
+        tag: ['@smoke', '@fast', '@COMS-11226'],
       },
-      async ({
-        page,
-        programsPage,
-        unlimitedProgramsPage,
-        navbar,
-      }) => {
+      async ({ page, programsPage, unlimitedProgramsPage, navbar }) => {
         await navbar.navigateToPrograms();
 
         await programsPage.waitForProgramsPage();

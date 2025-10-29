@@ -10,15 +10,29 @@ test.describe('Blog Landing Page Tests', () => {
     await blogLanding.navigateToPage();
   });
 
-  test('should display the expected number of article cards', async () => {
-    await blogLandingAssertions.expectArticleCardsCount(blogLandingData.expectedArticleCardsCount);
-  });
+  test(
+    'should display the expected number of article cards',
+    { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
+    async () => {
+      await blogLandingAssertions.expectArticleCardsCount(
+        blogLandingData.expectedArticleCardsCount
+      );
+    }
+  );
 
-  test('should have all article cards visible', async () => {
-    await blogLandingAssertions.expectArticleCardsVisible();
-  });
+  test(
+    'should have all article cards visible',
+    { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
+    async () => {
+      await blogLandingAssertions.expectArticleCardsVisible();
+    }
+  );
 
-  test('should navigate through each related article and return to the Blog Landing page', async () => {
-    await blogLandingAssertions.expectNavigationThroughRelatedArticles();
-  });
+  test(
+    'should navigate through each related article and return to the Blog Landing page',
+    { tag: ['@blog', '@cinesa', '@navigation', '@medium', '@OCG-2030'] },
+    async () => {
+      await blogLandingAssertions.expectNavigationThroughRelatedArticles();
+    }
+  );
 });

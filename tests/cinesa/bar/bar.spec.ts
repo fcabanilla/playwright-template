@@ -6,54 +6,62 @@ test.describe('Bar', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Buy ticket with Classic menu - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-    barPage,
-    purchaseSummary,
-    paymentPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    await seatPicker.selectLastAvailableSeat();
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket();
-    await barPage.buyClassicMenuOasiz();
-    await purchaseSummary.acceptAndContinue();
-    await paymentPage.completePayment();
-  });
+  test(
+    'Buy ticket with Classic menu - Oasiz',
+    { tag: ['@bar', '@cinesa', '@e2e', '@booking', '@COMS-16857'] },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+      barPage,
+      purchaseSummary,
+      paymentPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      await seatPicker.selectLastAvailableSeat();
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket();
+      await barPage.buyClassicMenuOasiz();
+      await purchaseSummary.acceptAndContinue();
+      await paymentPage.completePayment();
+    }
+  );
 
-  test('Buy multiple tickets with Classic menu - Oasiz', async ({
-    navbar,
-    cinema,
-    cinemaDetail,
-    cookieBanner,
-    seatPicker,
-    ticketPicker,
-    loginPage,
-    barPage,
-    purchaseSummary,
-    paymentPage,
-  }) => {
-    await navbar.navigateToCinemas();
-    await cinema.selectOasizCinema();
-    await cinemaDetail.selectNormalRandomFilmAndShowtime();
-    const seatsToSelect = 4;
-    await seatPicker.selectLastAvailableSeats(seatsToSelect);
-    await seatPicker.confirmSeats();
-    await loginPage.clickContinueAsGuest();
-    await ticketPicker.selectTicket(seatsToSelect);
-    await barPage.buyClassicMenuOasiz();
-    await purchaseSummary.acceptAndContinue();
-    await paymentPage.completePayment();
-  });
+  test(
+    'Buy multiple tickets with Classic menu - Oasiz',
+    { tag: ['@bar', '@cinesa', '@e2e', '@booking', '@COMS-16858'] },
+    async ({
+      navbar,
+      cinema,
+      cinemaDetail,
+      cookieBanner,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+      barPage,
+      purchaseSummary,
+      paymentPage,
+    }) => {
+      await navbar.navigateToCinemas();
+      await cinema.selectOasizCinema();
+      await cinemaDetail.selectNormalRandomFilmAndShowtime();
+      const seatsToSelect = 4;
+      await seatPicker.selectLastAvailableSeats(seatsToSelect);
+      await seatPicker.confirmSeats();
+      await loginPage.clickContinueAsGuest();
+      await ticketPicker.selectTicket(seatsToSelect);
+      await barPage.buyClassicMenuOasiz();
+      await purchaseSummary.acceptAndContinue();
+      await paymentPage.completePayment();
+    }
+  );
 
   test('Buy ticket with Classic menu - Grancasa', async ({
     navbar,
