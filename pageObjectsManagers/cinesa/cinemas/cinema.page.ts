@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { cinemaSelectors, CinemaSelectors } from './cinema.selectors';
 import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
 
@@ -55,7 +55,7 @@ export class Cinema {
    * @returns Promise that resolves when the click action is complete.
    */
   async selectCinemaByName(name: string): Promise<void> {
-    await allure.test.step(`Selecting cinema with name "${name}"`, async () => {
+    await allure.step(`Selecting cinema with name "${name}"`, async () => {
       const cinema = this.getCinemaByName(name);
       await cinema.first().click();
     });
@@ -67,7 +67,7 @@ export class Cinema {
    * @returns Promise that resolves to an array of cinema names.
    */
   async getCinemaNames(): Promise<string[]> {
-    return await allure.test.step('Getting list of cinema names', async () => {
+    return await allure.step('Getting list of cinema names', async () => {
       await this.page.waitForSelector(this.selectors.cinemaElement, {
         state: 'attached',
         timeout: 10000,
@@ -86,7 +86,7 @@ export class Cinema {
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async selectRandomCinema(): Promise<string> {
-    return await allure.test.step('Selecting a random cinema', async () => {
+    return await allure.step('Selecting a random cinema', async () => {
       await this.page.waitForSelector(this.selectors.cinemaElement, {
         state: 'attached',
         timeout: 10000,
@@ -122,7 +122,7 @@ export class Cinema {
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async selectOasizCinema(): Promise<string> {
-    return await allure.test.step('Selecting Oasiz cinema', async () => {
+    return await allure.step('Selecting Oasiz cinema', async () => {
       await this.page.fill(this.selectors.filterInput, cinemasData.oasiz);
       await this.page.waitForTimeout(1000);
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
@@ -132,7 +132,7 @@ export class Cinema {
   }
 
   async selectSantanderCinema(): Promise<string> {
-    return await allure.test.step('Selecting Santander cinema', async () => {
+    return await allure.step('Selecting Santander cinema', async () => {
       await this.page.fill(this.selectors.filterInput, cinemasData.santander);
       await this.page.waitForTimeout(1000);
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
@@ -142,7 +142,7 @@ export class Cinema {
   }
 
   async selectGrancasaCinema(): Promise<string> {
-    return await allure.test.step('Selecting Grancasa cinema', async () => {
+    return await allure.step('Selecting Grancasa cinema', async () => {
       await this.page.fill(this.selectors.filterInput, cinemasData.grancasa);
       await this.page.waitForTimeout(1000);
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();

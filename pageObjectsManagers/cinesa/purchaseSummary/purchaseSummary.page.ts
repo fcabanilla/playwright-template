@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { PURCHASE_SUMMARY_SELECTORS } from './purchaseSummary.selectors';
 import { purchaseSummaryTestData } from './purchaseSummary.data';
 
@@ -30,7 +30,7 @@ export class PurchaseSummary {
    * @private
    */
   private async acceptTermsAndConditions(): Promise<void> {
-    await allure.test.step('Accepting terms and conditions', async () => {
+    await allure.step('Accepting terms and conditions', async () => {
       await this.page.waitForSelector(PURCHASE_SUMMARY_SELECTORS.termsCheckbox, { state: 'attached' });
       await this.page.evaluate((selector) => {
         const el = document.querySelector(selector);
@@ -46,7 +46,7 @@ export class PurchaseSummary {
    * @private
    */
   private async clickContinue(): Promise<void> {
-    await allure.test.step('Clicking the continue button', async () => {
+    await allure.step('Clicking the continue button', async () => {
       await this.page.locator(PURCHASE_SUMMARY_SELECTORS.continueButton).click();
     });
   }
@@ -56,7 +56,7 @@ export class PurchaseSummary {
    * @private
    */
   private async confirmPopup(): Promise<void> {
-    await allure.test.step('Confirming popup', async () => {
+    await allure.step('Confirming popup', async () => {
       const confirmButton = this.page.locator(PURCHASE_SUMMARY_SELECTORS.confirmPopupButton);
       await confirmButton.waitFor({ state: 'visible' });
       await expect(confirmButton).toBeEnabled();
@@ -72,7 +72,7 @@ export class PurchaseSummary {
    * @param phone - The phone number to enter.
    */
   private async fillForm(firstName: string, lastName: string, email: string, phone: string): Promise<void> {
-    await allure.test.step('Filling out the form', async () => {
+    await allure.step('Filling out the form', async () => {
       await this.page.locator(PURCHASE_SUMMARY_SELECTORS.firstNameInput).fill(firstName);
       await this.page.locator(PURCHASE_SUMMARY_SELECTORS.lastNameInput).fill(lastName);
       await this.page.locator(PURCHASE_SUMMARY_SELECTORS.emailInput).fill(email);

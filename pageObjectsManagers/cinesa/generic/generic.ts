@@ -1,12 +1,12 @@
 import { Page, TestInfo } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 
 export async function takeScreenshot(
   page: Page,
   testInfo: TestInfo,
   name = 'Captura de pantalla'
 ): Promise<void> {
-  await allure.test.step('Taking screenshot', async () => {
+  await allure.step('Taking screenshot', async () => {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(1000);
     const screenshotBuffer = await page.screenshot({ fullPage: true });
@@ -23,7 +23,7 @@ export async function takeScreenshotForModal(
   modalSelector: string,
   name = 'Modal Screen Capture'
 ): Promise<void> {
-  await allure.test.step('Taking screenshot of modal', async () => {
+  await allure.step('Taking screenshot of modal', async () => {
     let modal;
     try {
       modal = await page.waitForSelector(modalSelector, {

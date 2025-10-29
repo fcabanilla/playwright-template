@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   promoModalSelectors,
   PromoModalSelectors,
@@ -23,7 +23,7 @@ export class PromoModal {
    * This method should be called at the beginning of each test to avoid blocking.
    */
   async waitAndCloseModal(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Waiting and closing promotional modal',
       async () => {
         try {
@@ -109,7 +109,7 @@ export class PromoModal {
    * Useful for tests that want to test the modal functionality.
    */
   async clickCTA(): Promise<void> {
-    await allure.test.step('Clicking on modal CTA button', async () => {
+    await allure.step('Clicking on modal CTA button', async () => {
       const ctaButton = this.page.locator(this.selectors.ctaButton);
       await ctaButton.click();
     });

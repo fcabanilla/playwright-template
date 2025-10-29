@@ -1,4 +1,4 @@
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
   CookieBannerSelectors,
@@ -45,7 +45,7 @@ export class CookieBanner {
       this.selectors.acceptButton
     );
     if (isVisible) {
-      await allure.test.step('Accepting cookies', async () => {
+      await allure.step('Accepting cookies', async () => {
         await this.webActions.click(this.selectors.acceptButton);
       });
     }
@@ -66,81 +66,94 @@ export class CookieBanner {
    * - User preferences are cached
    */
   async acceptAllCookies(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Accepting all cookies and dismissing overlays',
       async () => {
         try {
-          console.log('🍪 Checking for cookie banner...');
+          await allure.step('🍪 Check for cookie banner', async () => {
+            // Wait for the banner to appear with a short timeout (3s)
+            const bannerAppeared = await this.webActions
+              .waitForVisible(this.selectors.banner, 3000)
+              .then(() => true)
+              .catch(() => false);
 
-          // Wait for the banner to appear with a short timeout (3s)
-          // Short timeout to avoid slowing down tests when banner doesn't appear
-          const bannerAppeared = await this.webActions
-            .waitForVisible(this.selectors.banner, 3000)
-            .then(() => true)
-            .catch(() => false);
-
-          if (!bannerAppeared) {
-            console.log(
-              '✅ No cookie banner detected (cookies already accepted or not required)'
+            await allure.parameter(
+              'Banner Detected',
+              bannerAppeared ? 'Yes' : 'No'
             );
-            // ⚠️ CRITICAL: Even if banner doesn't appear, overlay might still exist
-            // Check and clean up any remaining OneTrust overlays
-            console.log('🔍 Checking for lingering OneTrust overlays...');
-            await this.waitForOneTrustCleanup();
-            console.log('✅ Cookie overlay cleanup completed');
-            return;
-          }
 
-          console.log('🍪 Cookie banner detected! Clicking accept button...');
-
-          // Wait for accept button to be ready
-          await this.webActions.waitForVisible(
-            this.selectors.acceptButton,
-            5000
-          );
-
-          // Use JavaScript to click the button directly (bypasses overlay blocking)
-          const clicked = await this.webActions.evaluate(() => {
-            const acceptButton = document.querySelector(
-              '#onetrust-accept-btn-handler'
-            ) as HTMLButtonElement;
-            if (acceptButton) {
-              acceptButton.click();
-              return true;
+            if (!bannerAppeared) {
+              await allure.step(
+                '✅ No cookie banner detected - checking overlays',
+                async () => {
+                  // ⚠️ CRITICAL: Even if banner doesn't appear, overlay might still exist
+                  await this.waitForOneTrustCleanup();
+                }
+              );
+              return;
             }
-            return false;
-          });
 
-          if (clicked) {
-            console.log('✅ Clicked accept button via JS');
-          } else {
-            console.log(
-              '⚠️ Accept button not found, trying force click via page.locator()...'
+            await allure.step(
+              '🍪 Cookie banner detected - accepting cookies',
+              async () => {
+                // Wait for accept button to be ready
+                await this.webActions.waitForVisible(
+                  this.selectors.acceptButton,
+                  5000,
+                  'Wait for accept button to be visible'
+                );
+
+                // Use JavaScript to click the button directly (bypasses overlay blocking)
+                const clicked = await this.webActions.evaluate(() => {
+                  const acceptButton = document.querySelector(
+                    '#onetrust-accept-btn-handler'
+                  ) as HTMLButtonElement;
+                  if (acceptButton) {
+                    acceptButton.click();
+                    return true;
+                  }
+                  return false;
+                });
+
+                if (clicked) {
+                  await allure.step(
+                    '✅ Clicked accept button via JavaScript',
+                    async () => {}
+                  );
+                } else {
+                  await allure.step(
+                    '⚠️ Fallback: Force click accept button',
+                    async () => {
+                      await this.webActions.clickWithOverlayHandling(
+                        this.selectors.acceptButton
+                      );
+                    }
+                  );
+                }
+
+                // Wait dynamically for banner to disappear (DOM state change)
+                await this.webActions
+                  .waitForSelector(this.selectors.banner, {
+                    state: 'hidden',
+                    timeout: 5000,
+                  })
+                  .catch(() => {
+                    // Banner still visible, will be handled by cleanup
+                  });
+
+                // Wait for any remaining OneTrust elements to be removed from DOM
+                await this.waitForOneTrustCleanup();
+              }
             );
-            // Force click to bypass any overlay blocking
-            await this.webActions.clickWithOverlayHandling(this.selectors.acceptButton);
-          }
-
-          // Wait dynamically for banner to disappear (DOM state change)
-          await this.webActions.waitForSelector(this.selectors.banner, { 
-            state: 'hidden', 
-            timeout: 5000 
-          }).catch(() =>
-            console.log('⚠️ Banner still visible, forcing removal...')
-          );
-
-          // Wait for any remaining OneTrust elements to be removed from DOM
-          // This is a dynamic wait for the SDK to clean up after acceptance
-          await this.waitForOneTrustCleanup();
-
-          console.log('✅ Cookie handling completed successfully');
+          });
         } catch (error) {
-          console.log('⚠️ Error handling cookies:', (error as Error).message);
-
-          // Emergency cleanup - force remove everything
-          console.log('🔧 Running emergency cleanup...');
-          await this.forceRemoveOneTrustElements();
-          console.log('✅ Emergency cleanup completed');
+          await allure.step(
+            '⚠️ Error handling cookies - running emergency cleanup',
+            async () => {
+              await allure.parameter('Error Message', (error as Error).message);
+              await this.forceRemoveOneTrustElements();
+            }
+          );
         }
       }
     );
@@ -155,23 +168,31 @@ export class CookieBanner {
       // Use Playwright's built-in wait for selector to be detached/hidden
       await Promise.race([
         // Wait for overlay to be detached from DOM
-        this.webActions.waitForSelector(this.selectors.overlay, { 
-          state: 'detached', 
-          timeout: 2000 
-        }).catch(() => {}),
+        this.webActions
+          .waitForSelector(this.selectors.overlay, {
+            state: 'detached',
+            timeout: 2000,
+          })
+          .catch(() => {}),
 
         // Or wait for consent SDK container to be hidden
-        this.webActions.waitForSelector(this.selectors.consentSdk, { 
-          state: 'hidden', 
-          timeout: 2000 
-        }).catch(() => {}),
+        this.webActions
+          .waitForSelector(this.selectors.consentSdk, {
+            state: 'hidden',
+            timeout: 2000,
+          })
+          .catch(() => {}),
       ]);
 
       // If elements still exist, force remove them
       const stillVisible = await this.hasVisibleOneTrustElements();
       if (stillVisible) {
-        console.log('⚠️ OneTrust elements still present, forcing removal...');
-        await this.forceRemoveOneTrustElements();
+        await allure.step(
+          '⚠️ OneTrust elements still present - forcing removal',
+          async () => {
+            await this.forceRemoveOneTrustElements();
+          }
+        );
       }
     } catch (error) {
       // If waiting fails, force cleanup
@@ -205,7 +226,7 @@ export class CookieBanner {
    * Used as fallback when dynamic waiting doesn't work
    */
   private async forceRemoveOneTrustElements(): Promise<void> {
-    await this.webActions.evaluate(() => {
+    const removedCount = await this.webActions.evaluate(() => {
       const elementsToRemove = [
         '#onetrust-banner-sdk',
         '#onetrust-pc-sdk',
@@ -213,19 +234,26 @@ export class CookieBanner {
         '.onetrust-pc-dark-filter',
       ];
 
-      let removedCount = 0;
+      let count = 0;
       elementsToRemove.forEach((selector) => {
         const elements = document.querySelectorAll(selector);
         elements.forEach((el) => {
           el.remove();
-          removedCount++;
+          count++;
         });
       });
 
-      if (removedCount > 0) {
-        console.log(`✅ Forcefully removed ${removedCount} OneTrust elements`);
-      }
+      return count;
     });
+
+    if (removedCount > 0) {
+      await allure.step(
+        `✅ Forcefully removed ${removedCount} OneTrust elements`,
+        async () => {
+          await allure.parameter('Elements Removed', removedCount.toString());
+        }
+      );
+    }
   }
 
   /**
@@ -235,9 +263,9 @@ export class CookieBanner {
    */
   async waitForBannerToDisappear(): Promise<void> {
     try {
-      await this.webActions.waitForSelector(this.selectors.banner, { 
-        state: 'hidden', 
-        timeout: 3000 
+      await this.webActions.waitForSelector(this.selectors.banner, {
+        state: 'hidden',
+        timeout: 3000,
       });
     } catch {
       // Banner was not present or already hidden

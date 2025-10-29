@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { FooterSelectors } from '../../../pageObjectsManagers/cinesa/footer/footer.selectors'
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { baseUrl } from './footer.data';
 
 /**
@@ -15,44 +15,44 @@ export async function assertFooterCoreElementsVisible(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Verifying core footer elements visibility', async () => {
-    await allure.test.step("Verify 'quienesSomosLink' element", async () => {
+  await allure.step('Verifying core footer elements visibility', async () => {
+    await allure.step("Verify 'quienesSomosLink' element", async () => {
       await expect(page.locator(selectors.quienesSomosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'trabajaConNosotrosLink' element", async () => {
+    await allure.step("Verify 'trabajaConNosotrosLink' element", async () => {
       await expect(page.locator(selectors.trabajaConNosotrosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'cinesaBusinessLink' element", async () => {
+    await allure.step("Verify 'cinesaBusinessLink' element", async () => {
       await expect(page.locator(selectors.cinesaBusinessLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'transparenciaLink' element", async () => {
+    await allure.step("Verify 'transparenciaLink' element", async () => {
       await expect(page.locator(selectors.transparenciaLink)).toBeVisible();
     });
 
-    await allure.test.step("Verify 'eventosLink' element", async () => {
+    await allure.step("Verify 'eventosLink' element", async () => {
       await expect(page.locator(selectors.eventosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'cinesaLuxeLink' element", async () => {
+    await allure.step("Verify 'cinesaLuxeLink' element", async () => {
       await expect(page.locator(selectors.cinesaLuxeLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'blogDeCinesaLink' element", async () => {
+    await allure.step("Verify 'blogDeCinesaLink' element", async () => {
       await expect(page.locator(selectors.blogDeCinesaLink)).toBeVisible();
     });
 
-    await allure.test.step("Verify 'avisoLegalLink' element", async () => {
+    await allure.step("Verify 'avisoLegalLink' element", async () => {
       await expect(page.locator(selectors.avisoLegalLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'politicaPrivacidadLink' element", async () => {
+    await allure.step("Verify 'politicaPrivacidadLink' element", async () => {
       await expect(page.locator(selectors.politicaPrivacidadLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'politicaCookiesLink' element", async () => {
+    await allure.step("Verify 'politicaCookiesLink' element", async () => {
       await expect(page.locator(selectors.politicaCookiesLink)).toBeVisible();
     });
 
-    await allure.test.step("Verify 'facebookLink' element", async () => {
+    await allure.step("Verify 'facebookLink' element", async () => {
       await expect(page.locator(selectors.facebookLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'instagramLink' element", async () => {
+    await allure.step("Verify 'instagramLink' element", async () => {
       await expect(page.locator(selectors.instagramLink)).toBeVisible();
     });
   });
@@ -70,77 +70,77 @@ export async function assertFooterElementsVisible(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Verifying footer elements visibility', async () => {
-    await allure.test.step("Verify 'quienesSomosLink' element", async () => {
+  await allure.step('Verifying footer elements visibility', async () => {
+    await allure.step("Verify 'quienesSomosLink' element", async () => {
       await expect(page.locator(selectors.quienesSomosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'trabajaConNosotrosLink' element", async () => {
+    await allure.step("Verify 'trabajaConNosotrosLink' element", async () => {
       await expect(page.locator(selectors.trabajaConNosotrosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'cinesaBusinessLink' element", async () => {
+    await allure.step("Verify 'cinesaBusinessLink' element", async () => {
       await expect(page.locator(selectors.cinesaBusinessLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'atencionAlClienteLink' element", async () => {
+    await allure.step("Verify 'atencionAlClienteLink' element", async () => {
       await expect(page.locator(selectors.atencionAlClienteLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'transparenciaLink' element", async () => {
+    await allure.step("Verify 'transparenciaLink' element", async () => {
       await expect(page.locator(selectors.transparenciaLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'eventosLink' element", async () => {
+    await allure.step("Verify 'eventosLink' element", async () => {
       await expect(page.locator(selectors.eventosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'cinesaLuxeLink' element", async () => {
+    await allure.step("Verify 'cinesaLuxeLink' element", async () => {
       await expect(page.locator(selectors.cinesaLuxeLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'salasPremiumLink' element", async () => {
+    await allure.step("Verify 'salasPremiumLink' element", async () => {
       await expect(page.locator(selectors.salasPremiumLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'infantilYColegiosLink' element", async () => {
+    await allure.step("Verify 'infantilYColegiosLink' element", async () => {
       await expect(page.locator(selectors.infantilYColegiosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'ciclosLink' element", async () => {
+    await allure.step("Verify 'ciclosLink' element", async () => {
       await expect(page.locator(selectors.ciclosLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'blogDeCinesaLink' element", async () => {
+    await allure.step("Verify 'blogDeCinesaLink' element", async () => {
       await expect(page.locator(selectors.blogDeCinesaLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'avisoLegalLink' element", async () => {
+    await allure.step("Verify 'avisoLegalLink' element", async () => {
       await expect(page.locator(selectors.avisoLegalLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'condicionesCompraLink' element", async () => {
+    await allure.step("Verify 'condicionesCompraLink' element", async () => {
       await expect(page.locator(selectors.condicionesCompraLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'condicionesUnlimitedLink' element", async () => {
+    await allure.step("Verify 'condicionesUnlimitedLink' element", async () => {
       await expect(page.locator(selectors.condicionesUnlimitedLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'politicaPrivacidadLink' element", async () => {
+    await allure.step("Verify 'politicaPrivacidadLink' element", async () => {
       await expect(page.locator(selectors.politicaPrivacidadLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'politicaCookiesLink' element", async () => {
+    await allure.step("Verify 'politicaCookiesLink' element", async () => {
       await expect(page.locator(selectors.politicaCookiesLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'androidAppLink' element", async () => {
+    await allure.step("Verify 'androidAppLink' element", async () => {
       await expect(page.locator(selectors.androidAppLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'appleAppLink' element", async () => {
+    await allure.step("Verify 'appleAppLink' element", async () => {
       await expect(page.locator(selectors.appleAppLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'facebookLink' element", async () => {
+    await allure.step("Verify 'facebookLink' element", async () => {
       await expect(page.locator(selectors.facebookLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'twitterLink' element", async () => {
+    await allure.step("Verify 'twitterLink' element", async () => {
       await expect(page.locator(selectors.twitterLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'instagramLink' element", async () => {
+    await allure.step("Verify 'instagramLink' element", async () => {
       await expect(page.locator(selectors.instagramLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'linkedinLink' element", async () => {
+    await allure.step("Verify 'linkedinLink' element", async () => {
       await expect(page.locator(selectors.linkedinLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'tiktokLink' element", async () => {
+    await allure.step("Verify 'tiktokLink' element", async () => {
       await expect(page.locator(selectors.tiktokLink)).toBeVisible();
     });
-    await allure.test.step("Verify 'youtubeLink' element", async () => {
+    await allure.step("Verify 'youtubeLink' element", async () => {
       await expect(page.locator(selectors.youtubeLink)).toBeVisible();
     });
   });
@@ -160,7 +160,7 @@ export async function assertFooterNavClick(
   selector: string,
   expectedUrl: string
 ): Promise<void> {
-  await allure.test.step(
+  await allure.step(
     `Clicking on footer nav element and verifying navigation to ${expectedUrl}`,
     async () => {
       await page.click(selector);
@@ -183,7 +183,7 @@ export async function assertFooterExternalNavClick(
   selector: string,
   expectedUrl: string
 ): Promise<void> {
-  await allure.test.step(
+  await allure.step(
     `Clicking on external footer nav element and verifying navigation to ${expectedUrl} in new tab`,
     async () => {
       const [newPage] = await Promise.all([
@@ -209,24 +209,24 @@ export async function assertFooterCompanyNavigation(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Testing footer company navigation functionality', async () => {
-    await allure.test.step('Test "Quiénes somos" navigation capability', async () => {
+  await allure.step('Testing footer company navigation functionality', async () => {
+    await allure.step('Test "Quiénes somos" navigation capability', async () => {
       await expect(page.locator(selectors.quienesSomosLink)).toBeVisible();
       await expect(page.locator(selectors.quienesSomosLink)).toHaveAttribute('href', '/quienes-somos/');
     });
 
-    await allure.test.step('Test "Transparencia" navigation capability', async () => {
+    await allure.step('Test "Transparencia" navigation capability', async () => {
       await expect(page.locator(selectors.transparenciaLink)).toBeVisible();
       await expect(page.locator(selectors.transparenciaLink)).toHaveAttribute('href', '/quienes-somos/transparencia/');
     });
 
-    await allure.test.step('Test external "Trabaja con nosotros" link', async () => {
+    await allure.step('Test external "Trabaja con nosotros" link', async () => {
       await expect(page.locator(selectors.trabajaConNosotrosLink)).toBeVisible();
       await expect(page.locator(selectors.trabajaConNosotrosLink))
         .toHaveAttribute('href', 'https://cinesa-uci.jobtrain.co.uk/cinesajobs/Home/Job');
     });
 
-    await allure.test.step('Test external "Cinesa Business" link', async () => {
+    await allure.step('Test external "Cinesa Business" link', async () => {
       await expect(page.locator(selectors.cinesaBusinessLink)).toBeVisible();
       await expect(page.locator(selectors.cinesaBusinessLink))
         .toHaveAttribute('href', 'http://www.cinesabusiness.es/');
@@ -245,7 +245,7 @@ export async function assertFooterSocialMediaLinks(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Validating social media links presence and attributes', async () => {
+  await allure.step('Validating social media links presence and attributes', async () => {
     const socialMediaLinks = [
       { name: 'Facebook', selector: selectors.facebookLink, expectedHref: 'https://www.facebook.com/cinesa.es' },
       { name: 'Twitter', selector: selectors.twitterLink, expectedHref: 'https://twitter.com/Cinesa' },
@@ -256,7 +256,7 @@ export async function assertFooterSocialMediaLinks(
     ];
 
     for (const link of socialMediaLinks) {
-      await allure.test.step(`Verify ${link.name} link visibility and href`, async () => {
+      await allure.step(`Verify ${link.name} link visibility and href`, async () => {
         await expect(page.locator(link.selector)).toBeVisible();
         await expect(page.locator(link.selector)).toHaveAttribute('href', link.expectedHref);
       });
@@ -275,7 +275,7 @@ export async function assertFooterLegalLinks(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Validating legal documentation links', async () => {
+  await allure.step('Validating legal documentation links', async () => {
     const legalLinks = [
       { name: 'Aviso Legal', selector: selectors.avisoLegalLink, expectedHref: '/documentos-legales/aviso-legal' },
       { name: 'Condiciones de Compra', selector: selectors.condicionesCompraLink, expectedHref: '/documentos-legales/condiciones-compra/' },
@@ -285,7 +285,7 @@ export async function assertFooterLegalLinks(
     ];
 
     for (const link of legalLinks) {
-      await allure.test.step(`Verify ${link.name} link visibility and href`, async () => {
+      await allure.step(`Verify ${link.name} link visibility and href`, async () => {
         await expect(page.locator(link.selector)).toBeVisible();
         await expect(page.locator(link.selector)).toHaveAttribute('href', link.expectedHref);
       });
@@ -304,14 +304,14 @@ export async function assertFooterAppLinks(
   page: Page,
   selectors: FooterSelectors
 ): Promise<void> {
-  await allure.test.step('Validating mobile app download links', async () => {
-    await allure.test.step('Verify Android app download link', async () => {
+  await allure.step('Validating mobile app download links', async () => {
+    await allure.step('Verify Android app download link', async () => {
       await expect(page.locator(selectors.androidAppLink)).toBeVisible();
       await expect(page.locator(selectors.androidAppLink))
         .toHaveAttribute('href', 'https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa');
     });
 
-    await allure.test.step('Verify Apple app download link', async () => {
+    await allure.step('Verify Apple app download link', async () => {
       await expect(page.locator(selectors.appleAppLink)).toBeVisible();
       await expect(page.locator(selectors.appleAppLink))
         .toHaveAttribute('href', 'https://apps.apple.com/es/app/cinesa-app/id6444631578?l=ca');
@@ -330,7 +330,7 @@ export async function assertFooterAppLinks(
  * @returns A Promise that resolves when navigation and assertion are complete
  */
 export async function assertNavigateToBlog(page: Page, footer: FooterSelectors): Promise<void> {
-  await allure.test.step('Navigating to Cinesa blog page and validating URL', async () => {
+  await allure.step('Navigating to Cinesa blog page and validating URL', async () => {
     await page.click(footer.blogDeCinesaLink);
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(`${baseUrl}/blog-cinesa/`);

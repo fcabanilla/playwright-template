@@ -1,5 +1,5 @@
 import { WebActions } from '../../../core/webactions/webActions';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   CookieBannerSelectors,
   cookieBannerSelectors,
@@ -16,7 +16,7 @@ export class CookieBanner {
 
   async acceptCookies(): Promise<void> {
     if (await this.webActions.isVisible(this.selectors.acceptButton)) {
-      await allure.test.step('Accepting cookies', async () => {
+      await allure.step('Accepting cookies', async () => {
         await this.webActions.click(this.selectors.acceptButton);
       });
     }
@@ -24,7 +24,7 @@ export class CookieBanner {
 
   async rejectCookies(): Promise<void> {
     if (await this.webActions.isVisible(this.selectors.rejectButton)) {
-      await allure.test.step('Rejecting cookies', async () => {
+      await allure.step('Rejecting cookies', async () => {
         await this.webActions.click(this.selectors.rejectButton);
       });
     }
@@ -32,7 +32,7 @@ export class CookieBanner {
 
   async openCookieSettings(): Promise<void> {
     if (await this.webActions.isVisible(this.selectors.settingsButton)) {
-      await allure.test.step('Opening cookie settings', async () => {
+      await allure.step('Opening cookie settings', async () => {
         await this.webActions.click(this.selectors.settingsButton);
       });
     }

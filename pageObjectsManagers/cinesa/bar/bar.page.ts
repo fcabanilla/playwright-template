@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { BAR_SELECTORS } from './bar.selectors';
 
 /**
@@ -19,7 +19,7 @@ export class BarPage {
    * Compatible with all test cases.
    */
   async skipModal(): Promise<void> {
-    await allure.test.step('Handling the bar modal', async () => {
+    await allure.step('Handling the bar modal', async () => {
       const modal = this.page.locator(BAR_SELECTORS.modal);
       const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
       
@@ -42,7 +42,7 @@ export class BarPage {
    * Compatible with all test cases.
    */
   async skipModalGrancasa(): Promise<void> {
-    await allure.test.step('Handling the bar modal', async () => {
+    await allure.step('Handling the bar modal', async () => {
       const modal = this.page.locator(BAR_SELECTORS.modal);
       const modalButton = this.page.locator(BAR_SELECTORS.modalButton);
       if (await modal.waitFor({ state: 'visible', timeout: 5000 }).catch(() => false)) {
@@ -69,7 +69,7 @@ export class BarPage {
    * Solo selecciona opciones que tengan radio button (no agotadas).
    */
   async selectClassicMenuOptionsAndAddToCart(): Promise<void> {
-    await allure.test.step('Seleccionar última opción de cada sección del modal y añadir a la compra', async () => {
+    await allure.step('Seleccionar última opción de cada sección del modal y añadir a la compra', async () => {
       const sections = this.page.locator(BAR_SELECTORS.modalSections);
       const sectionCount = await sections.count();
       for (let i = 0; i < Math.min(2, sectionCount); i++) {
@@ -97,7 +97,7 @@ export class BarPage {
    * Selects the "MENUS" tab and clicks on the first available menu item.
    */
   async selectClassicMenu(): Promise<void> {
-    await allure.test.step('Select MENUS tab and click on first available menu item', async () => {
+    await allure.step('Select MENUS tab and click on first available menu item', async () => {
       await this.page.locator(BAR_SELECTORS.menusTab).click();
       const menuItems = this.page.locator(BAR_SELECTORS.menuItems);
       await menuItems.first().waitFor({ state: 'visible', timeout: 10000 });

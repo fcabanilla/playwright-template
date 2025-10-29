@@ -1,4 +1,5 @@
 import { expect, Page, Locator } from '@playwright/test';
+import { allure } from 'allure-playwright';
 import { CorsHandler } from './corsHandler';
 
 /**
@@ -11,11 +12,12 @@ import { CorsHandler } from './corsHandler';
  * - Robust element interaction with wait strategies
  * - Screenshot and debugging capabilities
  * - Consistent error handling and reporting
+ * - Allure 2 step integration for enhanced reporting
  *
  * @example
  * ```typescript
  * const webActions = new WebActions(page);
- * await webActions.clickWithOverlayHandling('.movie-button');
+ * await webActions.clickWithOverlayHandling('.movie-button', 'Click on movie button');
  * const isVisible = await webActions.isVisible('.navbar');
  * ```
  *
@@ -68,19 +70,29 @@ export class WebActions {
    * Navigates to the specified URL using standard Playwright navigation.
    *
    * @param {string} url - The target URL to navigate to
+   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when navigation is complete
    *
    * @throws {Error} When navigation fails or times out
    *
    * @example
    * ```typescript
-   * await webActions.navigateTo('https://www.ucicinemas.it/about');
+   * await webActions.navigateTo('https://www.ucicinemas.it/about', 'Navigate to About page');
    * ```
    *
    * @since 1.0.0
    */
-  async navigateTo(url: string): Promise<void> {
-    await this.page.goto(url);
+  async navigateTo(url: string, stepMessage?: string): Promise<void> {
+    const message = stepMessage || `Navigate to ${url}`;
+    await allure.step(message, async () => {
+      // Only essential parameters: URL and Environment
+      await allure.parameter('URL', url);
+      await allure.parameter(
+        'Environment',
+        process.env.TEST_ENV || 'production'
+      );
+      await this.page.goto(url);
+    });
   }
 
   /**
@@ -107,19 +119,24 @@ export class WebActions {
    * For elements that might be blocked by overlays, use clickWithOverlayHandling instead.
    *
    * @param {string} selector - CSS selector for the target element
+   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when click action is complete
    *
    * @throws {Error} When element is not found or not clickable
    *
    * @example
    * ```typescript
-   * await webActions.click('.movie-card[data-id="123"]');
+   * await webActions.click('.movie-card[data-id="123"]', 'Click on movie card');
    * ```
    *
    * @since 1.0.0
    */
-  async click(selector: string): Promise<void> {
-    await this.page.locator(selector).click();
+  async click(selector: string, stepMessage?: string): Promise<void> {
+    const message = stepMessage || `Click on ${selector}`;
+    await allure.step(message, async () => {
+      // Selector already in step message, no need to duplicate as parameter
+      await this.page.locator(selector).click();
+    });
   }
 
   /**
@@ -128,6 +145,7 @@ export class WebActions {
    * that might intercept click events. Uses force click as fallback strategy.
    *
    * @param {string} selector - CSS selector for the target element
+   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when click action is complete and overlays are handled
    *
    * @throws {Error} When element is not found after overlay handling
@@ -135,54 +153,81 @@ export class WebActions {
    * @example
    * ```typescript
    * // Will handle promotional modals, cookie banners, etc. automatically
-   * await webActions.clickWithOverlayHandling('.navbar-cinemas');
+   * await webActions.clickWithOverlayHandling('.navbar-cinemas', 'Click on Cinemas menu');
    * ```
    *
    * @since 1.0.0
    */
-  async clickWithOverlayHandling(selector: string): Promise<void> {
-    // Wait for element to be visible first
-    await this.page.locator(selector).waitFor({ state: 'visible' });
+  async clickWithOverlayHandling(
+    selector: string,
+    stepMessage?: string
+  ): Promise<void> {
+    const message = stepMessage || `Click ${selector} (with overlay handling)`;
+    await allure.step(message, async () => {
+      // Wait for element to be visible first
+      await this.page.locator(selector).waitFor({ state: 'visible' });
 
-    // Check for common overlays that might intercept clicks
-    const overlaySelectors = [
-      '.bg-blue-1\\/80',
-      '[class*="fixed"][class*="z-"]',
-      '.modal-backdrop',
-      '.overlay',
-      '[role="dialog"]',
-    ];
+      // Check for common overlays that might intercept clicks
+      const overlaySelectors = [
+        '.bg-blue-1\\/80',
+        '[class*="fixed"][class*="z-"]',
+        '.modal-backdrop',
+        '.overlay',
+        '[role="dialog"]',
+      ];
 
-    for (const overlaySelector of overlaySelectors) {
-      try {
-        const overlay = this.page.locator(overlaySelector).first();
-        if (await overlay.isVisible({ timeout: 1000 })) {
-          // Try clicking the overlay to close it
-          await overlay.click({ timeout: 2000 });
-          await this.page.waitForTimeout(1000);
+      for (const overlaySelector of overlaySelectors) {
+        try {
+          const overlay = this.page.locator(overlaySelector).first();
+          if (await overlay.isVisible({ timeout: 1000 })) {
+            // Try clicking the overlay to close it
+            await overlay.click({ timeout: 2000 });
+            await this.page.waitForTimeout(1000);
+          }
+        } catch {
+          // Continue if overlay selector doesn't exist or can't be clicked
         }
-      } catch {
-        // Continue if overlay selector doesn't exist or can't be clicked
       }
-    }
 
-    // Now try to click the target element
-    await this.page.locator(selector).click({ force: true });
+      // Now try to click the target element
+      await this.page.locator(selector).click({ force: true });
+    });
   }
 
   /**
    * Click on an element and wait for it to be actionable
+   *
+   * @param {string} selector - CSS selector for the target element
+   * @param {string} stepMessage - Optional custom message for Allure report step
    */
-  async clickAndWait(selector: string): Promise<void> {
-    await this.page.locator(selector).click();
-    await this.page.waitForLoadState('networkidle');
+  async clickAndWait(selector: string, stepMessage?: string): Promise<void> {
+    const message = stepMessage || `Click ${selector} and wait for load`;
+    await allure.step(message, async () => {
+      await this.page.locator(selector).click();
+      await this.page.waitForLoadState('networkidle');
+    });
   }
 
   /**
    * Fill text into an input field
+   *
+   * @param {string} selector - CSS selector for the input field
+   * @param {string} text - Text to fill
+   * @param {string} stepMessage - Optional custom message for Allure report step
    */
-  async fill(selector: string, text: string): Promise<void> {
-    await this.page.locator(selector).fill(text);
+  async fill(
+    selector: string,
+    text: string,
+    stepMessage?: string
+  ): Promise<void> {
+    const message = stepMessage || `Fill ${selector} with text`;
+    await allure.step(message, async () => {
+      // Only show value for important fields, masked by default for security
+      if (stepMessage && !stepMessage.toLowerCase().includes('password')) {
+        await allure.parameter('Value', text);
+      }
+      await this.page.locator(selector).fill(text);
+    });
   }
 
   /**
@@ -208,11 +253,22 @@ export class WebActions {
 
   /**
    * Wait for an element to be visible
+   *
+   * @param {string} selector - CSS selector for the element
+   * @param {number} timeout - Optional timeout in milliseconds
+   * @param {string} stepMessage - Optional custom message for Allure report step
    */
-  async waitForVisible(selector: string, timeout?: number): Promise<void> {
-    await this.page.locator(selector).waitFor({
-      state: 'visible',
-      timeout: timeout || 30000,
+  async waitForVisible(
+    selector: string,
+    timeout?: number,
+    stepMessage?: string
+  ): Promise<void> {
+    const message = stepMessage || `Wait for ${selector} to be visible`;
+    await allure.step(message, async () => {
+      await this.page.locator(selector).waitFor({
+        state: 'visible',
+        timeout: timeout || 30000,
+      });
     });
   }
 
@@ -225,9 +281,15 @@ export class WebActions {
 
   /**
    * Hover over an element
+   *
+   * @param {string} selector - CSS selector for the element
+   * @param {string} stepMessage - Optional custom message for Allure report step
    */
-  async hover(selector: string): Promise<void> {
-    await this.page.locator(selector).hover();
+  async hover(selector: string, stepMessage?: string): Promise<void> {
+    const message = stepMessage || `Hover over ${selector}`;
+    await allure.step(message, async () => {
+      await this.page.locator(selector).hover();
+    });
   }
 
   /**
@@ -335,10 +397,16 @@ export class WebActions {
   /**
    * Wait for element to be available in DOM with selector
    */
-  async waitForSelector(selector: string, options?: { timeout?: number; state?: 'attached' | 'detached' | 'visible' | 'hidden' }): Promise<void> {
-    await this.page.waitForSelector(selector, { 
-      timeout: options?.timeout, 
-      state: options?.state || 'visible'
+  async waitForSelector(
+    selector: string,
+    options?: {
+      timeout?: number;
+      state?: 'attached' | 'detached' | 'visible' | 'hidden';
+    }
+  ): Promise<void> {
+    await this.page.waitForSelector(selector, {
+      timeout: options?.timeout,
+      state: options?.state || 'visible',
     });
   }
 

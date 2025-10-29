@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { Navbar } from '../../../pageObjectsManagers/uci/navbar/navbar.page';
 
 /**
@@ -55,24 +55,24 @@ export class NavbarAssertions {
    * @since 1.0.0
    */
   async expectNavbarElementsVisible(): Promise<void> {
-    await allure.test.step('Verifying navbar elements visibility', async () => {
-      await allure.test.step("Verify 'Cinema' element", async () => {
+    await allure.step('Verifying navbar elements visibility', async () => {
+      await allure.step("Verify 'Cinema' element", async () => {
         const isVisible = await this.navbar.isCinemasVisible();
         expect(isVisible).toBe(true);
       });
-      await allure.test.step("Verify 'Film' element", async () => {
+      await allure.step("Verify 'Film' element", async () => {
         const isVisible = await this.navbar.isMoviesVisible();
         expect(isVisible).toBe(true);
       });
-      await allure.test.step("Verify 'Offerte' element", async () => {
+      await allure.step("Verify 'Offerte' element", async () => {
         const isVisible = await this.navbar.isPromotionsVisible();
         expect(isVisible).toBe(true);
       });
-      await allure.test.step("Verify 'Esperienze' element", async () => {
+      await allure.step("Verify 'Esperienze' element", async () => {
         const isVisible = await this.navbar.isExperiencesVisible();
         expect(isVisible).toBe(true);
       });
-      await allure.test.step("Verify 'Membership' element", async () => {
+      await allure.step("Verify 'Membership' element", async () => {
         const isVisible = await this.navbar.isMembershipVisible();
         expect(isVisible).toBe(true);
       });
@@ -98,7 +98,7 @@ export class NavbarAssertions {
    * @since 1.0.0
    */
   async expectHomeUrl(expectedUrl: string): Promise<void> {
-    await allure.test.step('Validating that URL remains home', async () => {
+    await allure.step('Validating that URL remains home', async () => {
       // Make the URL matching more flexible to handle www vs non-www and trailing slashes
       const normalizedExpected = expectedUrl
         .replace(/^https?:\/\/(www\.)?/, '')
@@ -131,7 +131,7 @@ export class NavbarAssertions {
    * @since 1.0.0
    */
   async expectNavClick(expectedUrl: string): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Verifying navigation to ${expectedUrl}`,
       async () => {
         // Make URL matching more flexible to handle www vs non-www and trailing slashes
@@ -166,7 +166,7 @@ export class NavbarAssertions {
    * @since 1.0.0
    */
   async expectPromoModalClosed(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Verifying promotional modal is closed',
       async () => {
         // Verify that no overlay is visible
@@ -198,7 +198,7 @@ export class NavbarAssertions {
    * @since 1.0.0
    */
   async expectLogoFunctionality(): Promise<void> {
-    await allure.test.step('Verifying logo functionality', async () => {
+    await allure.step('Verifying logo functionality', async () => {
       const isLogoVisible = await this.navbar.isLogoVisible();
       expect(isLogoVisible).toBe(true);
     });

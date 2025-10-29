@@ -10,10 +10,15 @@ import {
 } from './seatPicker.assertions';
 import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
+import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 
 test.describe('Seat Picker', () => {
   test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await navbar.navigateToHome();
+
+    // Verificar que no estamos bloqueados por Cloudflare
+    await assertNoCloudflareProtection(page, 'beforeEach setup');
+
     await cookieBanner.acceptAllCookies();
   });
 
@@ -241,7 +246,7 @@ test.describe('Seat Picker', () => {
     cookieBanner,
     seatPicker,
   }) => {
-    test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
+    test.step('Fede TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectNormalRandomFilmAndShowtime();

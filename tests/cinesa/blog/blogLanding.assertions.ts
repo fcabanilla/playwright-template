@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 
 /**
@@ -26,7 +26,7 @@ export class BlogLandingAssertions {
    * @returns A Promise that resolves when the assertion is complete.
    */
   async expectArticleCardsCount(expectedCount: number): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Verifying the number of article cards',
       async () => {
         const count: number = await this.blogLanding.countArticleCards();
@@ -41,11 +41,11 @@ export class BlogLandingAssertions {
    * @returns A Promise that resolves when all assertions are complete.
    */
   async expectArticleCardsVisible(): Promise<void> {
-    await allure.test.step('Verifying article cards visibility', async () => {
+    await allure.step('Verifying article cards visibility', async () => {
       const cardsLocator = this.blogLanding.getArticleCardsLocator();
       const count: number = await cardsLocator.count();
       for (const index of Array.from(Array(count).keys())) {
-        await allure.test.step(
+        await allure.step(
           `Verifying article card at index ${index} is visible`,
           async () => {
             await expect(cardsLocator.nth(index)).toBeVisible();
@@ -62,7 +62,7 @@ export class BlogLandingAssertions {
  * @returns A Promise that resolves when all assertions are complete.
  */
   async expectNavigationThroughRelatedArticles(): Promise<void> {
-    await allure.test.step('Verifying navigation through each related article', async () => {
+    await allure.step('Verifying navigation through each related article', async () => {
       // Save the original URL of the Blog Landing page.
       const originalUrl: string = this.page.url();
       // Get the count of article cards.
@@ -70,7 +70,7 @@ export class BlogLandingAssertions {
   
       // Use for-of loop over generated indices.
       for (const index of Array.from(Array(count).keys())) {
-        await allure.test.step(`Navigating through article card at index ${index}`, async () => {
+        await allure.step(`Navigating through article card at index ${index}`, async () => {
           // Re-query the locator in each iteration to prevent stale element issues.
           const articleCardLocator = this.blogLanding.getArticleCardsLocator().nth(index);
           await expect(articleCardLocator).toBeVisible();

@@ -11,7 +11,7 @@
     "ui": "npx playwright test --ui",
     "report": "npm run report:copy-history && npm run report:generate && npm run report:open",
     "report:generate": "npx allure generate .allure/results --output .allure/report --clean",
-    "report:copy-history": "mkdir -p .allure/results/history && cp -r .allure/report/history/* .allure/results/history/ 2>/dev/null || true",
+    "report:copy-history": "mkdir -p .allure/results/history && (cp -r .allure/report/history/* .allure/results/history/ 2>/dev/null || true)",
     "report:open": "npx allure open .allure/report",
     "report:clean": "rm -rf .allure/results/* .allure/report/* .allure/playwright-artifacts/*",
     "report:watch": "npx allure watch .allure/results",

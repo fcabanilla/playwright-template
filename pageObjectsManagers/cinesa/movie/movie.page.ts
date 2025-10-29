@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { MOVIE_SELECTORS } from './movie.selectors';
 
 /**
@@ -33,7 +33,7 @@ export class MoviePage {
    * @returns Promise that resolves to the movie schema data.
    */
   async extractMovieSchema(): Promise<any> {
-    return await allure.test.step('Extracting movie schema from page', async () => {
+    return await allure.step('Extracting movie schema from page', async () => {
       await this.waitForPageLoad();
       
       // Try to find React Helmet script with JSON-LD

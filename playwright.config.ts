@@ -93,7 +93,7 @@ export default defineConfig({
       'allure-playwright',
       {
         resultsDir: '.allure/results',
-        detail: true, // Genera steps automáticos para llamadas Playwright, hooks y assertions
+        detail: false, // Oculta steps internos de Playwright (browser, context, page, evaluate) para reportes más limpios
         suiteTitle: true, // Agrupa tests por archivo en el reporte (default: true)
         links: {
           // Plantillas para enlaces a JIRA, GitHub Issues, etc.

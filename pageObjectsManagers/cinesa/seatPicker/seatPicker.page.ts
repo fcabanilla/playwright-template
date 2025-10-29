@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { SEAT_PICKER_SELECTORS } from './seatPicker.selectors';
 
 /**
@@ -49,7 +49,7 @@ export class SeatPicker {
    * Waits for the seat picker container to be visible.
    */
   async waitForSeatPicker(): Promise<void> {
-    await allure.test.step('Waiting for seat picker container', async () => {
+    await allure.step('Waiting for seat picker container', async () => {
       await this.page.waitForSelector(SEAT_PICKER_SELECTORS.container, {
         state: 'visible',
         timeout: 10000,
@@ -185,7 +185,7 @@ export class SeatPicker {
    * Waits for the seats to load and ensures they are visible and interactable.
    */
   private async waitForSeatsToBeReady(): Promise<void> {
-    await allure.test.step('Waiting for seats to be ready', async () => {
+    await allure.step('Waiting for seats to be ready', async () => {
       // First, close any blocking modals
       await this.closeBlockingModals();
       
@@ -232,7 +232,7 @@ export class SeatPicker {
    * Retrieves all seats from the DOM by parsing their aria-label.
    */
   async getAllSeats(): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Retrieving all seats from the DOM',
       async () => {
         await this.waitForSeatPicker();
@@ -279,7 +279,7 @@ export class SeatPicker {
    * Each sublist represents a row, and each element in the sublist is a seat.
    */
   async getAllSofaSeats(): Promise<Seat[][]> {
-    return await allure.test.step(
+    return await allure.step(
       'Retrieving all sofa seats from the sofa section as a matrix',
       async () => {
         await this.waitForSeatPicker();
@@ -376,7 +376,7 @@ export class SeatPicker {
    * Each sublist represents a row, and each element in the sublist is a seat.
    */
   async getAvailableSeatsMatrix(): Promise<Seat[][]> {
-    return await allure.test.step(
+    return await allure.step(
       'Retrieving available seats as a matrix',
       async () => {
         const availableSeats = await this.getAvailableSeats();
@@ -405,7 +405,7 @@ export class SeatPicker {
    * Selects a given seat (click on it) and waits for its state to change.
    */
   async selectSeat(seat: Seat): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Selecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
         // First attempt to click the seat
@@ -430,7 +430,7 @@ export class SeatPicker {
    * Selects multiple seats given an array of Seat objects.
    */
   async selectMultipleSeats(seats: Seat[]): Promise<void> {
-    await allure.test.step(`Selecting ${seats.length} seats`, async () => {
+    await allure.step(`Selecting ${seats.length} seats`, async () => {
       for (const seat of seats) {
         await this.selectSeat(seat);
       }
@@ -442,7 +442,7 @@ export class SeatPicker {
    * Returns the chosen seat.
    */
   async selectRandomSeat(): Promise<Seat> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random available seat',
       async () => {
         await this.page.waitForResponse(
@@ -468,7 +468,7 @@ export class SeatPicker {
    * Returns the chosen seat.
    */
   async selectLastAvailableSeat(): Promise<Seat> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting last available seat from back',
       async () => {
         await this.page.waitForResponse(
@@ -496,7 +496,7 @@ export class SeatPicker {
    * Selecciona el último sofá disponible (de atrás hacia adelante) y devuelve el objeto Seat completo.
    */
   async selectLastAvailableSofaSeat(): Promise<Seat> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting last available sofa seat from back',
       async () => {
         await this.waitForSeatsToBeReady();
@@ -526,7 +526,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectLastAvailableSeats(seatCount: number): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       `Selecting ${seatCount} seats from back to front`,
       async () => {
         if (seatCount > maxSeatSelection) {
@@ -568,7 +568,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectRandomSeats(count: number): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       `Selecting ${count} random seats`,
       async () => {
         const availableSeats = await this.getAvailableSeats();
@@ -594,7 +594,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectSeatsWithEmptySpaceBetween(): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting seats with an empty space between them',
       async () => {
         await this.page.waitForResponse(
@@ -648,7 +648,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectSeatsSeparatingGroupInSameRow(): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting seats separating group in the same row',
       async () => {
         await this.page.waitForResponse(
@@ -712,7 +712,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectSeatsSeparatingGroupInDifferentRows(): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting seats separating group in different rows',
       async () => {
         await this.page.waitForResponse(
@@ -770,7 +770,7 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectMoreThanMaxSeats(): Promise<Seat[]> {
-    return await allure.test.step(
+    return await allure.step(
       `Selecting seats to exceed max capacity`,
       async () => {
         const extraSeatsToTest = 3; // Number of extra seats to test
@@ -821,7 +821,7 @@ export class SeatPicker {
    * Finds the first available companion seat and selects it.
    */
   async selectCompanionSeat(): Promise<void> {
-    return await allure.test.step('Selecting a companion seat', async () => {
+    return await allure.step('Selecting a companion seat', async () => {
       await this.page.waitForResponse(
         (response) =>
           response.url().includes('/seat-availability') &&
@@ -845,7 +845,7 @@ export class SeatPicker {
    * @param wheelchairSeat The wheelchair seat to select.
    */
   async selectWheelchairSeat(wheelchairSeat: Seat): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Selecting wheelchair seat [Row ${wheelchairSeat.row}, Seat ${wheelchairSeat.seatNumber}]`,
       async () => {
         await wheelchairSeat.locator.click();
@@ -864,7 +864,7 @@ export class SeatPicker {
    * Finds the first available companion seat and its contiguous wheelchair seat, then selects both.
    */
   async selectCompanionAndWheelchairSeats(): Promise<void> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a companion seat and a contiguous wheelchair seat',
       async () => {
         await this.page.waitForResponse(
@@ -904,7 +904,7 @@ export class SeatPicker {
    * Selects a sofa seat within a specific section and returns the selected Seat object.
    */
   async selectSofaSeat(): Promise<Seat> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a sofa seat within a specific section',
       async () => {
         const sofaSeatsMatrix = await this.getAllSofaSeats();
@@ -928,7 +928,7 @@ export class SeatPicker {
    * Throws an error if no such seats are found.
    */
   async selectMiddleOfThreeContiguousSeats(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Selecting the middle seat of three contiguous available seats',
       async () => {
         const availableSeatsMatrix = await this.getAvailableSeatsMatrix();
@@ -958,7 +958,7 @@ export class SeatPicker {
    * Handles the wheelchair modal by clicking the "Continue" button.
    */
   async acceptWheelchairMessage(): Promise<void> {
-    return await allure.test.step('Handling the wheelchair modal', async () => {
+    return await allure.step('Handling the wheelchair modal', async () => {
       const modal = this.page.locator(SEAT_PICKER_SELECTORS.wheelchairModal);
       const continueButton = this.page.locator(
         SEAT_PICKER_SELECTORS.wheelchairModalAcceptButton
@@ -974,7 +974,7 @@ export class SeatPicker {
    * Accepts the D-BOX warning modal by clicking the continue/accept button.
    */
   async acceptDBoxMessage(): Promise<void> {
-    await allure.test.step('Accepting the D-BOX warning modal', async () => {
+    await allure.step('Accepting the D-BOX warning modal', async () => {
       const modalSelector = SEAT_PICKER_SELECTORS.dboxModal;
       const modal = this.page.locator(modalSelector);
       await modal.waitFor({ state: 'visible', timeout: 5000 });
@@ -988,7 +988,7 @@ export class SeatPicker {
    * Handles the showtime attribute modal by dismissing it if it appears.
    */
   async handleShowtimeAttributeModal(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Handling showtime attribute modal if present',
       async () => {
         try {
@@ -1029,7 +1029,7 @@ export class SeatPicker {
    * Confirms the selected seats by clicking the confirm/continue button.
    */
   async confirmSeats(): Promise<void> {
-    await allure.test.step('Confirming selected seats', async () => {
+    await allure.step('Confirming selected seats', async () => {
       await this.page.locator(SEAT_PICKER_SELECTORS.confirmSeatsButton).click();
     });
   }
@@ -1038,7 +1038,7 @@ export class SeatPicker {
    * Deselects a seat by clicking on it if it's selected.
    */
   async deselectSeat(seat: Seat): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Deselecting seat [Row ${seat.row}, Seat ${seat.seatNumber}]`,
       async () => {
         if (seat.seatState === 'selected') {
@@ -1052,7 +1052,7 @@ export class SeatPicker {
    * Validates that the red warning message is displayed.
    */
   async validateWarningMessage(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Validating red warning message is displayed',
       async () => {
         const warningMessage = this.page.locator(
@@ -1069,7 +1069,7 @@ export class SeatPicker {
    * Validates that the "Continuar" button is disabled.
    */
   async validateConfirmButtonDisabled(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Validating "Continuar" button is disabled',
       async () => {
         const confirmButton = this.page.locator(

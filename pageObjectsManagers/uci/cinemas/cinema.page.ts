@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   cinemaSelectors,
   CinemaSelectors,
@@ -87,7 +87,7 @@ export class Cinema {
    * @returns Promise that resolves when the click action is complete.
    */
   async selectCinemaByName(name: string): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Selecting UCI cinema with name "${name}"`,
       async () => {
         // First wait for cinema list to be visible
@@ -112,7 +112,7 @@ export class Cinema {
    * @returns Promise that resolves to an array of cinema names.
    */
   async getCinemaNames(): Promise<string[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Getting list of UCI cinema names',
       async () => {
         await this.webActions.waitForVisible(this.selectors.container);
@@ -131,7 +131,7 @@ export class Cinema {
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async selectRandomCinema(): Promise<string> {
-    return await allure.test.step('Selecting a random UCI cinema', async () => {
+    return await allure.step('Selecting a random UCI cinema', async () => {
       await this.webActions.waitForVisible(this.selectors.container);
 
       const names = await this.getCinemaNames();
@@ -165,7 +165,7 @@ export class Cinema {
    * @param searchText - Text to search for.
    */
   async filterCinemas(searchText: string): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Filtering UCI cinemas by "${searchText}"`,
       async () => {
         try {
@@ -185,7 +185,7 @@ export class Cinema {
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async searchAndSelectCinema(cinemaName: string): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       `Searching and selecting "${cinemaName}" cinema`,
       async () => {
         await this.filterCinemas(cinemaName);
@@ -201,7 +201,7 @@ export class Cinema {
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async selectFirstCinema(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting first available UCI cinema',
       async () => {
         await this.webActions.waitForVisible(this.selectors.container);
@@ -222,7 +222,7 @@ export class Cinema {
    * @returns Promise that resolves to true if cinemas are visible.
    */
   async verifyCinemasListVisible(): Promise<boolean> {
-    return await allure.test.step(
+    return await allure.step(
       'Verifying UCI cinemas list is visible',
       async () => {
         try {
