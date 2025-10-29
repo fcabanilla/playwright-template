@@ -1,7 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertProgramsRedirection } from './programs.assertions';
-import { UNLIMITED_PROGRAMS_URL } from './programs.data';
 
 test.describe(
   'Programs Page',
@@ -23,7 +22,7 @@ test.describe(
       },
       async ({ page, unlimitedProgramsPage, cookieBanner, promotionalModal }) => {
         await test.step('Navigate to Programs Unlimited page', async () => {
-          await page.goto(UNLIMITED_PROGRAMS_URL);
+          await unlimitedProgramsPage.navigateToUnlimitedPrograms();
         });
         await cookieBanner.acceptAllCookies();
         await promotionalModal.closeModalIfVisible();

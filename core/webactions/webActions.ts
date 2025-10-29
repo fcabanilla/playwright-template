@@ -46,6 +46,14 @@ export class WebActions {
   }
 
   /**
+   * Gets the underlying Page instance for assertions that require direct Page access.
+   * This is allowed in ADR-0009 for test assertions only.
+   */
+  getPage(): Page {
+    return this.page;
+  }
+
+  /**
    * Initialize CORS handling automatically for all WebActions instances
    */
   private async initializeCorsHandling(): Promise<void> {
@@ -322,5 +330,44 @@ export class WebActions {
     arg?: unknown
   ): Promise<T> {
     return await this.page.evaluate(script, arg);
+  }
+
+  /**
+   * Wait for element to be available in DOM with selector
+   */
+  async waitForSelector(selector: string, options?: { timeout?: number; state?: 'attached' | 'detached' | 'visible' | 'hidden' }): Promise<void> {
+    await this.page.waitForSelector(selector, { 
+      timeout: options?.timeout, 
+      state: options?.state || 'visible'
+    });
+  }
+
+  /**
+   * Get a locator for the given selector
+   */
+  locator(selector: string): Locator {
+    return this.page.locator(selector);
+  }
+
+  /**
+   * Navigate back in browser history
+   */
+  async goBack(): Promise<void> {
+    await this.page.goBack();
+  }
+
+  /**
+   * Get all elements matching the selector
+   */
+  async getAllElements(selector: string): Promise<Locator[]> {
+    const elements = await this.page.locator(selector).all();
+    return elements;
+  }
+
+  /**
+   * Scroll element into view if needed
+   */
+  async scrollIntoView(selector: string): Promise<void> {
+    await this.page.locator(selector).scrollIntoViewIfNeeded();
   }
 }

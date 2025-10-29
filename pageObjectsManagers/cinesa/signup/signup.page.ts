@@ -1,4 +1,4 @@
-import { Page, test } from '@playwright/test';
+import { test } from '@playwright/test';
 import { WebActions } from '../../../core/webactions/webActions';
 import { SIGNUP_SELECTORS } from './signup.selectors';
 import {
@@ -16,26 +16,18 @@ import {
 
 /**
  * SignupPage - Manages signup form interactions
- *
- * Architecture compliance:
- * - Uses WebActions for standard Playwright operations (click, fill, waitForVisible)
- * - Keeps Page only for:
- *   1. evaluate() - JavaScript execution (checkbox manipulation)
- *   2. locator().waitFor({ state }) - Dynamic waiting for error messages (not in WebActions)
- *   3. waitForSelector() with advanced options (scrollIntoViewIfNeeded)
- *
- * Dynamic waiting strategy:
- * - All form validation errors use waitFor({ state: 'visible' }) instead of fixed timeouts
- * - Waits for actual DOM state changes (error messages appearing) rather than arbitrary time
- * - Performance improvement: ~2.8 seconds saved per test (28 × 100ms eliminated)
+ * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
+ * 
+ * All browser interactions delegated to WebActions:
+ * - click, fill, waitForSelector → webActions methods
+ * - evaluate() for JavaScript execution → webActions.evaluate()
+ * - Dynamic waiting for error messages → webActions.waitForSelector()
  */
 export class SignupPage {
-  readonly page: Page;
   private readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
-    this.webActions = new WebActions(page);
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   async fillFirstName(firstName: string): Promise<void> {
@@ -63,20 +55,15 @@ export class SignupPage {
   }
 
   async selectFavoriteCinema(cinema: string): Promise<void> {
-    await this.page.waitForSelector(
+    await this.webActions.waitForSelector(
       SIGNUP_SELECTORS.primarySiteDropdownButton,
-      { state: 'visible', timeout: 10000 }
+      { timeout: 10000 }
     );
-    await this.page
-      .locator(SIGNUP_SELECTORS.primarySiteDropdownButton)
-      .scrollIntoViewIfNeeded();
-    await this.page.click(SIGNUP_SELECTORS.primarySiteDropdownButton);
-    await this.page.waitForSelector(
-      SIGNUP_SELECTORS.favoriteCinemaDropdownList,
-      { state: 'visible' }
-    );
+    await this.webActions.scrollIntoView(SIGNUP_SELECTORS.primarySiteDropdownButton);
+    await this.webActions.click(SIGNUP_SELECTORS.primarySiteDropdownButton);
+    await this.webActions.waitForSelector(SIGNUP_SELECTORS.favoriteCinemaDropdownList);
     const itemSelector = SIGNUP_SELECTORS.favoriteCinemaDropdownItem(cinema);
-    await this.page.click(itemSelector);
+    await this.webActions.click(itemSelector);
   }
 
   async fillNationalId(id: string): Promise<void> {
@@ -96,7 +83,7 @@ export class SignupPage {
   }
 
   async checkTermsAndConditionsCheckbox(): Promise<void> {
-    await this.page.evaluate(() => {
+    await this.webActions.evaluate(() => {
       const checkbox = document.querySelector(
         '#v-member-sign-up-form-field__terms-and-conditions-input'
       ) as HTMLInputElement;
@@ -146,7 +133,7 @@ export class SignupPage {
   }
 
   async validateMandatoryFields(): Promise<void> {
-    const page = this.page;
+    const page = this.webActions.getPage();
 
     await test.step('Validate email mandatory', async () => {
       await this.webActions.click(SIGNUP_SELECTORS.emailInput);
@@ -206,7 +193,7 @@ export class SignupPage {
   }
 
   async validateEmailFields(): Promise<void> {
-    const page = this.page;
+    const page = this.webActions.getPage();
 
     await test.step('Validate email without @', async () => {
       await this.webActions.fill(
@@ -266,7 +253,7 @@ export class SignupPage {
   }
 
   async validatePasswordFields(): Promise<void> {
-    const page = this.page;
+    const page = this.webActions.getPage();
 
     await test.step('Validate all rules neutral at start', async () => {
       for (let i = 0; i < 5; i++) {

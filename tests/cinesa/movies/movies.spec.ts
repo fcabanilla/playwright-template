@@ -5,144 +5,158 @@ import {
   assertMovieSchemaMatches,
   assertMovieSchemaURLsAreValid,
 } from './movies.assertions';
-import { MovieList } from '../../../pageObjectsManagers/cinesa/movies/movies.page';
-import { MoviePage } from '../../../pageObjectsManagers/cinesa/movie/movie.page';
 
 test.describe('Cinesa Movies Tests', () => {
-  test('Movies page display and layout', async ({
-    page,
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+    await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+  });
+
+  test('Movies page display and layout', 
+    { tag: ['@movies', '@cinesa', '@smoke', '@fast'] },
+    async ({
+    webActions,
     navbar,
     cookieBanner,
+    promotionalModal,
   }, testInfo) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    await page.waitForLoadState('networkidle', { timeout: 60000 });
-    await takeScreenshot(page, testInfo, 'Movies page display and layout');
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+    await webActions.waitForLoadState('networkidle');
+    await takeScreenshot(webActions.getPage(), testInfo, 'Movies page display and layout');
   });
 
-  test('Cinesa Movies page redirection test', async ({
-    page,
+  test('Cinesa Movies page redirection test', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
+    webActions,
     navbar,
     cookieBanner,
+    promotionalModal,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    await page.waitForLoadState('networkidle', { timeout: 60000 });
-    assertMoviesRedirection(page);
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+    await webActions.waitForLoadState('networkidle');
+    assertMoviesRedirection(webActions.getPage());
   });
 
-  test('Navigate through Top Movies', async ({
-    page,
+  test('Navigate through Top Movies', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
     navbar,
     cookieBanner,
+    promotionalModal,
+    movieList,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    const movieList = new MovieList(page);
-    await movieList.iterateAndClickMovies();
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+    
+    await movieList.loadTopMovies();
+    await movieList.navigateToFirstTopMovie();
   });
 
-  test('Navigate through Random Movies from All Movies', async ({
-    page,
+  test('Navigate through Random Movies from All Movies', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
     navbar,
     cookieBanner,
+    promotionalModal,
+    movieList,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    const movieList = new MovieList(page);
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Navigate through Random Movies from Now Showing', async ({
-    page,
+  test('Navigate through Random Movies from Now Showing', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
     navbar,
     cookieBanner,
+    promotionalModal,
+    movieList,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    const movieList = new MovieList(page);
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
     await movieList.clickMoviesTabByIndex(1);
     await movieList.navigateThroughRandomMovies();
   });
 
-  test('Navigate through Random Movies from Coming Soon', async ({
-    page,
+  test('Navigate through Random Movies from Coming Soon', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
     navbar,
     cookieBanner,
+    promotionalModal,
+    movieList,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    const movieList = new MovieList(page);
-    await movieList.clickMoviesTabByIndex(2);
-    await movieList.navigateThroughRandomMovies();
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+    await movieList.navigateComingSoonMovies();
   });
 
-  test('Navigate through Random Movies from Advance Sale', async ({
-    page,
+  test('Navigate through Random Movies from Advance Sale', 
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
+    async ({
     navbar,
     cookieBanner,
+    promotionalModal,
+    movieList,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToMovies();
-    const movieList = new MovieList(page);
-    await movieList.clickMoviesTabByIndex(3);
-    await movieList.navigateThroughRandomMovies();
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+    await movieList.navigateAdvanceSaleMovies();
   });
 
-  test('Oasiz Movie Schema validation test', async ({
-    page,
+  test('Oasiz Movie Schema validation test', 
+    { tag: ['@movies', '@cinesa', '@schema', '@regression', '@high'] },
+    async ({
+    moviePage,
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
-    const moviePage = new MoviePage(page);
     const movieSchema = await moviePage.extractMovieSchema();
     await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
   });
 
-  test('Grancasa Movie Schema validation test', async ({
-    page,
+  test('Grancasa Movie Schema validation test', 
+    { tag: ['@movies', '@cinesa', '@schema', '@regression', '@high'] },
+    async ({
+    moviePage,
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectGrancasaCinema();
     const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
-    const moviePage = new MoviePage(page);
     const movieSchema = await moviePage.extractMovieSchema();
     await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
   });
 
-  test('Movie Schema URL validation test - Bug Detection', async ({
-    page,
+  test('Movie Schema URL validation test - Bug Detection', 
+    { tag: ['@movies', '@cinesa', '@schema', '@regression', '@high'] },
+    async ({
+    moviePage,
     navbar,
     cinema,
     cinemaDetail,
-    cookieBanner,
   }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await navbar.navigateToCinemas();
     await cinema.selectOasizCinema();
     await cinemaDetail.selectRandomFilmForDetails();
-    const moviePage = new MoviePage(page);
     const movieSchema = await moviePage.extractMovieSchema();
     await assertMovieSchemaURLsAreValid(movieSchema);
   });

@@ -1,4 +1,3 @@
-import { Page } from '@playwright/test';
 import * as allure from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
@@ -25,18 +24,17 @@ import {
  * @see docs/adrs/0009-page-object-architecture-rules.md
  */
 export class CookieBanner {
-  private readonly page: Page; // For evaluate() and specialized waitFor operations
   private readonly webActions: WebActions;
   private readonly selectors: CookieBannerSelectors;
 
   /**
-   * Constructor - Accepts Page and creates WebActions internally
+   * Constructor - Accepts WebActions for ADR-0009 compliance
+   * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
    *
-   * @param page - Playwright Page instance (required for evaluate and advanced operations)
+   * @param webActions - WebActions instance for all browser interactions
    */
-  constructor(page: Page) {
-    this.page = page;
-    this.webActions = new WebActions(page);
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
     this.selectors = cookieBannerSelectors;
   } /**
    * Accept cookies using the simple "Accept All" button
@@ -102,8 +100,7 @@ export class CookieBanner {
           );
 
           // Use JavaScript to click the button directly (bypasses overlay blocking)
-          // Note: Using page.evaluate() here is acceptable as WebActions doesn't expose evaluate()
-          const clicked = await this.page.evaluate(() => {
+          const clicked = await this.webActions.evaluate(() => {
             const acceptButton = document.querySelector(
               '#onetrust-accept-btn-handler'
             ) as HTMLButtonElement;
@@ -120,20 +117,17 @@ export class CookieBanner {
             console.log(
               '⚠️ Accept button not found, trying force click via page.locator()...'
             );
-            // Note: Using page.locator() here as WebActions doesn't expose force click
-            await this.page
-              .locator(this.selectors.acceptButton)
-              .click({ force: true, timeout: 5000 });
+            // Force click to bypass any overlay blocking
+            await this.webActions.clickWithOverlayHandling(this.selectors.acceptButton);
           }
 
           // Wait dynamically for banner to disappear (DOM state change)
-          // Note: Using page.locator() here as WebActions doesn't expose waitFor with state
-          await this.page
-            .locator(this.selectors.banner)
-            .waitFor({ state: 'hidden', timeout: 5000 })
-            .catch(() =>
-              console.log('⚠️ Banner still visible, forcing removal...')
-            );
+          await this.webActions.waitForSelector(this.selectors.banner, { 
+            state: 'hidden', 
+            timeout: 5000 
+          }).catch(() =>
+            console.log('⚠️ Banner still visible, forcing removal...')
+          );
 
           // Wait for any remaining OneTrust elements to be removed from DOM
           // This is a dynamic wait for the SDK to clean up after acceptance
@@ -161,16 +155,16 @@ export class CookieBanner {
       // Use Playwright's built-in wait for selector to be detached/hidden
       await Promise.race([
         // Wait for overlay to be detached from DOM
-        this.page
-          .locator(this.selectors.overlay)
-          .waitFor({ state: 'detached', timeout: 2000 })
-          .catch(() => {}),
+        this.webActions.waitForSelector(this.selectors.overlay, { 
+          state: 'detached', 
+          timeout: 2000 
+        }).catch(() => {}),
 
         // Or wait for consent SDK container to be hidden
-        this.page
-          .locator(this.selectors.consentSdk)
-          .waitFor({ state: 'hidden', timeout: 2000 })
-          .catch(() => {}),
+        this.webActions.waitForSelector(this.selectors.consentSdk, { 
+          state: 'hidden', 
+          timeout: 2000 
+        }).catch(() => {}),
       ]);
 
       // If elements still exist, force remove them
@@ -189,7 +183,7 @@ export class CookieBanner {
    * Check if any OneTrust elements are still visible in the DOM
    */
   private async hasVisibleOneTrustElements(): Promise<boolean> {
-    return await this.page.evaluate(() => {
+    return await this.webActions.evaluate(() => {
       const selectors = [
         '#onetrust-banner-sdk',
         '#onetrust-pc-sdk',
@@ -211,7 +205,7 @@ export class CookieBanner {
    * Used as fallback when dynamic waiting doesn't work
    */
   private async forceRemoveOneTrustElements(): Promise<void> {
-    await this.page.evaluate(() => {
+    await this.webActions.evaluate(() => {
       const elementsToRemove = [
         '#onetrust-banner-sdk',
         '#onetrust-pc-sdk',
@@ -241,9 +235,10 @@ export class CookieBanner {
    */
   async waitForBannerToDisappear(): Promise<void> {
     try {
-      await this.page
-        .locator(this.selectors.banner)
-        .waitFor({ state: 'hidden', timeout: 3000 });
+      await this.webActions.waitForSelector(this.selectors.banner, { 
+        state: 'hidden', 
+        timeout: 3000 
+      });
     } catch {
       // Banner was not present or already hidden
     }

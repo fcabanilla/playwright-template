@@ -1,16 +1,17 @@
-import { Page } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import { promotionalModalSelectors } from './promotionalModal.selectors';
 
 /**
  * Page Object for handling the promotional modal/popup that appears on LAB environment
  * This modal shows "VENTA ANTICIPADA" message and needs to be closed before interacting with the page
+ * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
  */
 export class PromotionalModal {
-  private readonly page: Page;
+  private readonly webActions: WebActions;
   private readonly selectors = promotionalModalSelectors;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
@@ -18,9 +19,9 @@ export class PromotionalModal {
    * Waits for the modal to be visible first, then clicks the close button
    */
   async closeModal(): Promise<void> {
-    await this.page.locator(this.selectors.modal).waitFor({ state: 'visible', timeout: 5000 });
-    await this.page.locator(this.selectors.closeButton).click();
-    await this.page.waitForTimeout(500); // Wait for modal close animation
+    await this.webActions.waitForSelector(this.selectors.modal, { timeout: 5000 });
+    await this.webActions.click(this.selectors.closeButton);
+    await this.webActions.wait(500); // Wait for modal close animation
   }
 
   /**
@@ -31,10 +32,10 @@ export class PromotionalModal {
   async closeModalIfVisible(): Promise<void> {
     try {
       // Wait max 2 seconds for modal to appear
-      await this.page.locator(this.selectors.modal).waitFor({ state: 'visible', timeout: 2000 });
+      await this.webActions.waitForSelector(this.selectors.modal, { timeout: 2000 });
       // If we get here, modal is visible, so close it
-      await this.page.locator(this.selectors.closeButton).click();
-      await this.page.waitForTimeout(500);
+      await this.webActions.click(this.selectors.closeButton);
+      await this.webActions.wait(500);
     } catch {
       // Modal not visible or timeout, that's ok, just continue
     }
@@ -44,6 +45,6 @@ export class PromotionalModal {
    * Checks if the promotional modal is currently visible
    */
   async isModalVisible(): Promise<boolean> {
-    return await this.page.locator(this.selectors.modal).isVisible();
+    return await this.webActions.isVisible(this.selectors.modal);
   }
 }

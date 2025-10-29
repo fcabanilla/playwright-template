@@ -11,17 +11,17 @@ test.describe('Cinesa Promotions Tests', () => {
 
   test('Promotions page display and layout', 
     { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
-    async ({ page, navbar }, testInfo) => {
+    async ({ page, navbar, webActions }, testInfo) => {
     await navbar.navigateToPromotions();
-    await page.waitForLoadState('networkidle');
+    await webActions.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Promotions page display and layout');
   });
 
   test('Cinesa Promotions page redirection test',
     { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
-    async ({ page, navbar }) => {
+    async ({ page, navbar, webActions }) => {
     await navbar.navigateToPromotions();
-    await page.waitForLoadState('networkidle');
+    await webActions.waitForLoadState('networkidle');
     assertPromotionsRedirection(page);
   });
 });

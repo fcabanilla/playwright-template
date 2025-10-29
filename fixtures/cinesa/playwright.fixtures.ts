@@ -20,6 +20,8 @@ import { UnlimitedProgramsPage } from '../../pageObjectsManagers/cinesa/programs
 import { SignupPage } from '../../pageObjectsManagers/cinesa/signup/signup.page';
 import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
 import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analytics.page';
+import { MovieList } from '../../pageObjectsManagers/cinesa/movies/movies.page';
+import { MoviePage } from '../../pageObjectsManagers/cinesa/movie/movie.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -40,6 +42,9 @@ type CustomFixtures = {
   unlimitedProgramsPage: UnlimitedProgramsPage;
   signupPage: SignupPage;
   mailing: Mailing;
+  movieList: MovieList;
+  moviePage: MoviePage;
+  webActions: WebActions;
   whoarewe: Footer;
   workwithus: Footer;
   cinesabusiness: Footer;
@@ -92,11 +97,13 @@ export const test = base.extend<CustomFixtures>({
     await use(navbar);
   },
   cookieBanner: async ({ page }, use) => {
-    const cookieBanner = new CookieBanner(page);
+    const webActions = new WebActions(page);
+    const cookieBanner = new CookieBanner(webActions);
     await use(cookieBanner);
   },
   promotionalModal: async ({ page }, use) => {
-    const promotionalModal = new PromotionalModal(page);
+    const webActions = new WebActions(page);
+    const promotionalModal = new PromotionalModal(webActions);
     await use(promotionalModal);
   },
   seatPicker: async ({ page }, use) => {
@@ -160,7 +167,8 @@ export const test = base.extend<CustomFixtures>({
     await use(unlimitedProgramsPage);
   },
   signupPage: async ({ page }, use) => {
-    const signupPage = new SignupPage(page);
+    const webActions = new WebActions(page);
+    const signupPage = new SignupPage(webActions);
     await use(signupPage);
   },
   mailing: async ({ page }, use) => {
@@ -229,6 +237,19 @@ export const test = base.extend<CustomFixtures>({
   },
   appleAppDownload: async ({ footer }, use) => {
     await use(footer);
+  },
+  movieList: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const movieList = new MovieList(webActions);
+    await use(movieList);
+  },
+  moviePage: async ({ page }, use) => {
+    const moviePage = new MoviePage(page);
+    await use(moviePage);
+  },
+  webActions: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    await use(webActions);
   },
 });
 

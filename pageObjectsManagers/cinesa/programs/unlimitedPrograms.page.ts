@@ -1,13 +1,24 @@
 import * as allure from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import { PROGRAMS_SELECTORS } from './unlimitedPrograms.selectors';
+import { UNLIMITED_PROGRAMS_URL } from '../../../tests/cinesa/programs/programs.data';
 
 /**
  * The Unlimited Programs Page Object Model.
  * Contains methods to interact with the unlimited programs page.
+ * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
  */
 export class UnlimitedProgramsPage {
   constructor(private readonly webActions: WebActions) {}
+
+  /**
+   * Navigates to the unlimited programs page.
+   */
+  async navigateToUnlimitedPrograms(): Promise<void> {
+    await allure.test.step('Navigate to unlimited programs page', async () => {
+      await this.webActions.navigateTo(UNLIMITED_PROGRAMS_URL);
+    });
+  }
 
   /**
    * Waits for the unlimited programs page to load completely.

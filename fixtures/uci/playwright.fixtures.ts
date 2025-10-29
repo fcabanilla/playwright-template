@@ -9,6 +9,7 @@ import { Films } from '../../pageObjectsManagers/uci/films/films.page';
 import { FilmsAssertions } from '../../tests/uci/films/films.assertions';
 import { NavbarAssertions } from '../../tests/uci/navbar/navbar.assertions';
 import { CinemasAssertions } from '../../tests/uci/cinemas/cinemas.assertions';
+import { WebActions } from '../../core/webactions/webActions';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -30,7 +31,8 @@ export const test = base.extend<CustomFixtures>({
     await use(navbar);
   },
   cookieBanner: async ({ page }, use) => {
-    const cookieBanner = new CookieBanner(page);
+    const webActions = new WebActions(page);
+    const cookieBanner = new CookieBanner(webActions);
     await use(cookieBanner);
   },
   promoModal: async ({ page }, use) => {
