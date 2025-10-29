@@ -1,5 +1,6 @@
 import { WebActions } from '../../../core/webactions/webActions';
 import { LOGIN_SELECTORS } from './login.selectors';
+import { loginTestData } from '../../../tests/cinesa/login/login.data';
 
 /**
  * The Login Page Object Model.
@@ -19,13 +20,19 @@ export class LoginPage {
   }
 
   /**
-   * Rellena los campos de email y password en el login.
+   * Rellena los campos de email y password en el login con datos válidos.
    */
   async fillData() {
-    const email = `${'matiasslpknt08'}@${'gmail.com'}`;
-    const password = 'EstoEsUnaPrueba.1';
-    await this.webActions.fill(this.selectors.emailInput, email);
-    await this.webActions.fill(this.selectors.passwordInput, password);
+    await this.webActions.fill(this.selectors.emailInput, loginTestData.validCredentials.email);
+    await this.webActions.fill(this.selectors.passwordInput, loginTestData.validCredentials.password);
+  }
+
+  /**
+   * Rellena los campos de email y password con credenciales inválidas.
+   */
+  async fillInvalidData() {
+    await this.webActions.fill(this.selectors.emailInput, loginTestData.invalidCredentials.email);
+    await this.webActions.fill(this.selectors.passwordInput, loginTestData.invalidCredentials.password);
   }
 
   /**
