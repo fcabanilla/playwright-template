@@ -40,6 +40,7 @@
     "test:cinesa:preprod:regression": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/ --project='Cinesa'",
     "test:cinesa:preprod:headed": "cross-env TEST_ENV=preprod npx playwright test --project='Cinesa' --headed --workers=1",
     "test:cinesa:preprod:seatPicker": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts --project='Cinesa'",
+    "test:cinesa:preprod:seatPicker:refactored": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/seatPicker/seatPicker-refactored.spec.ts --project='Cinesa'",
     "test:cinesa:lab": "cross-env TEST_ENV=lab npx playwright test --project='Cinesa'",
     "test:cinesa:lab:smoke": "cross-env TEST_ENV=lab npx playwright test --project='Cinesa' --grep '@smoke'",
     "test:cinesa:lab:critical": "cross-env TEST_ENV=lab npx playwright test --project='Cinesa' --grep '@critical'",

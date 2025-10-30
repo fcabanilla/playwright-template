@@ -487,6 +487,144 @@ await webActions.navigateTo(url, 'Navigate to home'); // Creates Allure step
 - No `any` types without justification
 - Prefer interfaces over types for objects
 
+### Language and Naming Standards
+
+**CRITICAL: All code MUST be written in English**
+
+**✅ CORRECT:**
+
+```typescript
+// Test names and descriptions in English
+test('Should display navbar elements correctly', async ({ navbar }) => {
+  await allure.step('Verify logo is visible', async () => {
+    // Implementation
+  });
+});
+
+// Variables, functions, comments in English
+const selectedSeats = await seatPicker.selectLastAvailableSeat();
+// Check if confirmation button is enabled
+await assertConfirmButtonEnabled(page);
+```
+
+**❌ FORBIDDEN:**
+
+```typescript
+// ❌ Test names in Spanish
+test('Debe mostrar elementos de la barra de navegación', async ({ navbar }) => {
+  // ❌ Spanish step descriptions
+  await allure.step('Verificar que el logo es visible', async () => {
+    // Implementation
+  });
+});
+
+// ❌ Spanish variable names
+const butacasSeleccionadas = await seatPicker.selectLastAvailableSeat();
+// ❌ Spanish comments
+// Verificar si el botón de confirmación está habilitado
+await assertConfirmButtonEnabled(page);
+```
+
+**Exceptions (Spanish allowed):**
+
+- Allure report labels for business visibility (via `allure.parameter()`)
+- Test data representing real Spanish content (e.g., cinema names, movie titles)
+- Documentation explicitly targeting Spanish-speaking stakeholders
+
+**Rationale:**
+
+- **Searchability:** English enables global search across codebase
+- **Telemetry:** CI/CD systems parse English keywords better
+- **Maintainability:** International teams can contribute
+- **Industry Standard:** Aligns with open-source best practices
+
+### Test Parametrization and Data-Driven Testing
+
+**Avoid test duplication by using data-driven patterns**
+
+**✅ CORRECT - Parametrized Tests:**
+
+```typescript
+// Define cinema configurations in *.data.ts
+export const AVAILABLE_CINEMAS = [
+  {
+    name: 'Oasiz',
+    selectMethod: 'selectOasizCinema',
+    tags: ['@oasiz'],
+    availableInEnvironments: ['production', 'lab', 'preprod'],
+  },
+  {
+    name: 'Grancasa',
+    selectMethod: 'selectGrancasaCinema',
+    tags: ['@grancasa'],
+    availableInEnvironments: ['production', 'lab'], // Not in preprod
+  },
+];
+
+// Get cinemas for current environment
+const CINEMAS = getCinemasForEnvironment();
+
+// Parametrized test loop
+for (const cinema of CINEMAS) {
+  test(
+    `Full purchase - ${cinema.name}`,
+    {
+      tag: ['@e2e', '@booking', ...cinema.tags],
+    },
+    async ({ cinemaPage, seatPicker }) => {
+      await cinemaPage[cinema.selectMethod]();
+      await seatPicker.selectLastAvailableSeat();
+    }
+  );
+}
+```
+
+**❌ FORBIDDEN - Duplicated Tests:**
+
+```typescript
+// ❌ Copy-pasted test for each cinema
+test('Full purchase - Oasiz', async ({ cinema, seatPicker }) => {
+  await cinema.selectOasizCinema();
+  await seatPicker.selectLastAvailableSeat();
+});
+
+test('Full purchase - Grancasa', async ({ cinema, seatPicker }) => {
+  await cinema.selectGrancasaCinema();
+  await seatPicker.selectLastAvailableSeat();
+});
+```
+
+**Benefits:**
+
+- **Less Maintenance:** Add new cinema by adding one configuration object
+- **Consistency:** Same test logic applied uniformly across variants
+- **Environment Awareness:** Tests only run for available cinemas in each environment
+- **Readability:** Test intent separated from cinema configurations
+
+**When to Parametrize:**
+
+- Multiple cinemas with same test scenarios
+- Multiple formats (Normal, D-BOX, 4DX, IMAX) executing same validations
+- Multiple promo codes tested with same flow
+- Any scenario where logic is identical but data varies
+
+**Environment-Aware Cinema Configuration:**
+
+```typescript
+// In *.data.ts file
+export function getCinemasForEnvironment(env?: string) {
+  const currentEnv = env || process.env.TEST_ENV || 'production';
+  return AVAILABLE_CINEMAS.filter((cinema) =>
+    cinema.availableInEnvironments.includes(currentEnv)
+  );
+}
+
+// Usage in tests
+const CINEMAS = getCinemasForEnvironment();
+// preprod: returns only [Oasiz]
+// lab/production: returns [Oasiz, Grancasa]
+```
+
 ### ESLint Configuration
 
 Run `npm run lint` before commits. Key rules:
@@ -494,6 +632,7 @@ Run `npm run lint` before commits. Key rules:
 - No unused variables
 - Consistent naming (camelCase for variables, PascalCase for classes)
 - No console.logs in production code
+- All code in English (enforced via review, not automated)
 
 ### Commit Conventions
 
@@ -521,6 +660,9 @@ test: Add loyalty program smoke tests
 ❌ **Don't** use `import * as allure` - use `import { allure }` instead
 ❌ **Don't** run tests without cleaning results first (`npm run report:clean:results`)
 ❌ **Don't** delete `.allure/report/history/` (needed for TREND graphs)
+❌ **Don't** write test names, descriptions, or comments in Spanish
+❌ **Don't** duplicate tests for different cinemas/variants (use parametrization)
+❌ **Don't** hardcode test data in spec files (extract to `*.testData.ts`)
 
 ✅ **Do** use `WebActions` for ALL Playwright API interactions in Page Objects
 ✅ **Do** use fixtures for all component dependencies
@@ -533,6 +675,9 @@ test: Add loyalty program smoke tests
 ✅ **Do** handle cookie banners in `beforeEach` hooks
 ✅ **Do** use Allure 2 API: `import { allure } from 'allure-playwright'` and `allure.step()`
 ✅ **Do** clean results before each test execution: `npm run report:clean:results`
+✅ **Do** write ALL code in English (test names, variables, comments, functions)
+✅ **Do** use data-driven parametrization for test variants (cinemas, formats, etc.)
+✅ **Do** store test data in separate `*.testData.ts` files for reusability
 
 ## Key Files Reference
 
