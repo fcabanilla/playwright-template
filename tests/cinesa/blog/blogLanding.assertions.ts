@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import * as allure from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLanding.page';
 
 /**
@@ -7,6 +8,7 @@ import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLandin
  */
 export class BlogLandingAssertions {
   readonly page: Page;
+  readonly webActions: WebActions;
   readonly blogLanding: BlogLanding;
 
   /**
@@ -16,6 +18,7 @@ export class BlogLandingAssertions {
    */
   constructor(page: Page) {
     this.page = page;
+    this.webActions = new WebActions(page);
     this.blogLanding = new BlogLanding(page);
   }
 
@@ -78,16 +81,19 @@ export class BlogLandingAssertions {
           // Click on the link inside the article card.
           const articleLink = articleCardLocator.locator('a.article-card-hero-link');
           await expect(articleLink).toBeVisible();
-          await articleLink.click();
-          await this.page.waitForLoadState('networkidle');
-  
+          
+          // Use force click to bypass OneTrust overlay interception
+          await articleLink.click({ force: true });
+          await this.webActions.waitForLoadState('domcontentloaded');
+          
+          // Add small wait to ensure navigation completes
+          await this.webActions.wait(1000);
+
           // Validate that the URL has changed.
           const newUrl: string = this.page.url();
-          await expect(newUrl).not.toBe(originalUrl);
-  
-          // Navigate back to the original Blog Landing page.
+          await expect(newUrl).not.toBe(originalUrl);          // Navigate back to the original Blog Landing page.
           await this.page.goBack();
-          await this.page.waitForLoadState('networkidle');
+          await this.webActions.waitForLoadState('domcontentloaded');
   
           // Confirm that we have returned to the original URL.
           await expect(this.page.url()).toBe(originalUrl);

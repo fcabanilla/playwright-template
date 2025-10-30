@@ -1,9 +1,10 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 
 test.describe('Bar', () => {
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
   });
 
   test(
@@ -63,7 +64,9 @@ test.describe('Bar', () => {
     }
   );
 
-  test('Buy ticket with Classic menu - Grancasa', async ({
+  test('Buy ticket with Classic menu - Grancasa', 
+    { tag: ['@bar', '@cinesa', '@e2e', '@booking', '@grancasa'] },
+    async ({
     navbar,
     cinema,
     cinemaDetail,
@@ -87,7 +90,9 @@ test.describe('Bar', () => {
     await paymentPage.completePayment();
   });
 
-  test('Buy multiple tickets with Classic menu - Grancasa', async ({
+  test('Buy multiple tickets with Classic menu - Grancasa', 
+    { tag: ['@bar', '@cinesa', '@e2e', '@booking', '@grancasa', '@multiple'] },
+    async ({
     navbar,
     cinema,
     cinemaDetail,

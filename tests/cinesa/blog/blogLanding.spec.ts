@@ -5,8 +5,10 @@ import { blogLandingData } from './blogLanding.data';
 test.describe('Blog Landing Page Tests', () => {
   let blogLandingAssertions: BlogLandingAssertions;
 
-  test.beforeEach(async ({ page, blogLanding }) => {
+  test.beforeEach(async ({ page, blogLanding, cookieBanner, promotionalModal }) => {
     blogLandingAssertions = new BlogLandingAssertions(page);
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
     await blogLanding.navigateToPage();
   });
 
