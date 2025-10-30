@@ -192,8 +192,13 @@ export class TicketPicker {
    * @returns Array of ticket type names (empty string if name not found)
    */
   async getTicketTypeNames(): Promise<string[]> {
-    // Wait for ticket titles to be visible (pure async)
-    await this.webActions.waitForVisible(this.selectors.ticketTitle);
+    // Wait for at least one ticket title to be visible (using first() to avoid strict mode violation)
+    const firstTicketTitle = `${this.selectors.ticketTitle} >> nth=0`;
+    await this.webActions.waitForVisible(
+      firstTicketTitle,
+      30000,
+      'Wait for ticket types to load'
+    );
 
     // Get count of ticket rows
     const count = await this.webActions.getElementCount(

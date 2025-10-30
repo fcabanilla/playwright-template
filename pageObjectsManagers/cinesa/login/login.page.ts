@@ -15,24 +15,43 @@ export class LoginPage {
    * Clicks the "Continuar como invitado" button.
    */
   async clickContinueAsGuest(): Promise<void> {
-    await this.webActions.waitForVisible(this.selectors.continueAsGuestButton, 10000);
-    await this.webActions.click(this.selectors.continueAsGuestButton);
+    await this.webActions.waitForVisible(
+      this.selectors.continueAsGuestButton,
+      10000,
+      'Wait for "Continue as Guest" button'
+    );
+    await this.webActions.click(
+      this.selectors.continueAsGuestButton,
+      'Click "Continue as Guest" button'
+    );
   }
 
   /**
    * Rellena los campos de email y password en el login con datos válidos.
    */
   async fillData() {
-    await this.webActions.fill(this.selectors.emailInput, loginTestData.validCredentials.email);
-    await this.webActions.fill(this.selectors.passwordInput, loginTestData.validCredentials.password);
+    await this.webActions.fill(
+      this.selectors.emailInput,
+      loginTestData.validCredentials.email
+    );
+    await this.webActions.fill(
+      this.selectors.passwordInput,
+      loginTestData.validCredentials.password
+    );
   }
 
   /**
    * Rellena los campos de email y password con credenciales inválidas.
    */
   async fillInvalidData() {
-    await this.webActions.fill(this.selectors.emailInput, loginTestData.invalidCredentials.email);
-    await this.webActions.fill(this.selectors.passwordInput, loginTestData.invalidCredentials.password);
+    await this.webActions.fill(
+      this.selectors.emailInput,
+      loginTestData.invalidCredentials.email
+    );
+    await this.webActions.fill(
+      this.selectors.passwordInput,
+      loginTestData.invalidCredentials.password
+    );
   }
 
   /**

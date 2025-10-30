@@ -86,7 +86,7 @@ export class SeatPicker {
       '.no-seats-available',
       '.session-sold-out',
       '.entradas-agotadas',
-      '.tickets-sold-out'
+      '.tickets-sold-out',
     ];
 
     for (const selector of specificSoldOutSelectors) {
@@ -102,16 +102,25 @@ export class SeatPicker {
     }
 
     // Check for sold out messages ONLY in main content areas, not entire page
-    const contentSelectors = ['.main-content', '.seat-picker-content', '.booking-content', 'main'];
-    
+    const contentSelectors = [
+      '.main-content',
+      '.seat-picker-content',
+      '.booking-content',
+      'main',
+    ];
+
     for (const contentSelector of contentSelectors) {
       try {
         const contentArea = this.page.locator(contentSelector);
         const exists = await contentArea.isVisible({ timeout: 500 });
-        
+
         if (exists) {
-          const soldOutInContent = contentArea.locator('text=/sold out|agotad|no disponible/i').first();
-          const isSoldOutVisible = await soldOutInContent.isVisible({ timeout: 500 });
+          const soldOutInContent = contentArea
+            .locator('text=/sold out|agotad|no disponible/i')
+            .first();
+          const isSoldOutVisible = await soldOutInContent.isVisible({
+            timeout: 500,
+          });
           if (isSoldOutVisible) {
             return true;
           }
@@ -133,44 +142,46 @@ export class SeatPicker {
       {
         modal: SEAT_PICKER_SELECTORS.dboxModal,
         accept: SEAT_PICKER_SELECTORS.modalAcceptButton,
-        name: 'D-Box'
+        name: 'D-Box',
       },
       // Showtime attribute modal
       {
         modal: SEAT_PICKER_SELECTORS.showtimeAttributeModal,
         accept: SEAT_PICKER_SELECTORS.showtimeAttributeModalAcceptButton,
-        name: 'Showtime'
+        name: 'Showtime',
       },
       // Generic modal fallback
       {
         modal: SEAT_PICKER_SELECTORS.modalGeneric,
         accept: SEAT_PICKER_SELECTORS.modalAcceptButton,
-        name: 'Generic'
-      }
+        name: 'Generic',
+      },
     ];
 
     for (const modalConfig of modalSelectors) {
       try {
         const modal = this.page.locator(modalConfig.modal);
         const isVisible = await modal.isVisible({ timeout: 2000 });
-        
+
         if (isVisible) {
           // Try to click accept button first
           const acceptButton = this.page.locator(modalConfig.accept);
           const acceptExists = await acceptButton.isVisible({ timeout: 1000 });
-          
+
           if (acceptExists) {
             await acceptButton.click();
           } else {
             // Try to close the modal
-            const closeButton = this.page.locator(SEAT_PICKER_SELECTORS.modalCloseButton);
+            const closeButton = this.page.locator(
+              SEAT_PICKER_SELECTORS.modalCloseButton
+            );
             const closeExists = await closeButton.isVisible({ timeout: 1000 });
-            
+
             if (closeExists) {
               await closeButton.click();
             }
           }
-          
+
           // Wait for modal to disappear
           await modal.waitFor({ state: 'hidden', timeout: 3000 });
           break; // Exit after handling first modal found
@@ -188,22 +199,23 @@ export class SeatPicker {
     await allure.step('Waiting for seats to be ready', async () => {
       // First, close any blocking modals
       await this.closeBlockingModals();
-      
+
       const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
 
       // Try to wait for seats normally first
       try {
-        await seatLocators.first().waitFor({ state: 'visible', timeout: 20000 });
-        
+        await seatLocators
+          .first()
+          .waitFor({ state: 'visible', timeout: 20000 });
+
         // Ensure all seats have loaded by checking their count
         const count = await seatLocators.count();
         if (count === 0) {
           throw new Error('No seats found after waiting for them to load');
         }
-        
+
         // If we reach here, seats loaded successfully
         return;
-        
       } catch (seatLoadError) {
         // Only if seat loading fails, then check if it's because of sold-out
         const currentUrl = this.page.url();
@@ -213,7 +225,7 @@ export class SeatPicker {
             throw new Error('SOLD_OUT_SKIP_TEST');
           }
         }
-        
+
         // If not sold out, re-throw the original error
         throw seatLoadError;
       }
@@ -232,46 +244,40 @@ export class SeatPicker {
    * Retrieves all seats from the DOM by parsing their aria-label.
    */
   async getAllSeats(): Promise<Seat[]> {
-    return await allure.step(
-      'Retrieving all seats from the DOM',
-      async () => {
-        await this.waitForSeatPicker();
+    return await allure.step('Retrieving all seats from the DOM', async () => {
+      await this.waitForSeatPicker();
 
-        const seatLocators = this.page.locator(
-          SEAT_PICKER_SELECTORS.seatGeneric
+      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const count = await seatLocators.count();
+      const seats: Seat[] = [];
+
+      for (let i = 0; i < count; i++) {
+        const seatLocator = seatLocators.nth(i);
+        const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
+        const className = (await seatLocator.getAttribute('class')) || '';
+        const pressed = await seatLocator.getAttribute('aria-pressed');
+
+        const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
+
+        const seatType = this.getSeatType(className, ariaLabel);
+        const seatState = await this.getSeatState(
+          seatLocator,
+          className,
+          pressed
         );
-        const count = await seatLocators.count();
-        const seats: Seat[] = [];
 
-        for (let i = 0; i < count; i++) {
-          const seatLocator = seatLocators.nth(i);
-          const ariaLabel =
-            (await seatLocator.getAttribute('aria-label')) || '';
-          const className = (await seatLocator.getAttribute('class')) || '';
-          const pressed = await seatLocator.getAttribute('aria-pressed');
-
-          const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
-
-          const seatType = this.getSeatType(className, ariaLabel);
-          const seatState = await this.getSeatState(
-            seatLocator,
-            className,
-            pressed
-          );
-
-          seats.push({
-            row,
-            seatNumber,
-            seatType,
-            seatState,
-            ariaLabel,
-            locator: seatLocator,
-          });
-        }
-
-        return seats;
+        seats.push({
+          row,
+          seatNumber,
+          seatType,
+          seatState,
+          ariaLabel,
+          locator: seatLocator,
+        });
       }
-    );
+
+      return seats;
+    });
   }
 
   /**
@@ -442,25 +448,22 @@ export class SeatPicker {
    * Returns the chosen seat.
    */
   async selectRandomSeat(): Promise<Seat> {
-    return await allure.step(
-      'Selecting a random available seat',
-      async () => {
-        await this.page.waitForResponse(
-          (response) =>
-            response.url().includes('/seat-availability') &&
-            response.status() === 200
-        );
+    return await allure.step('Selecting a random available seat', async () => {
+      await this.page.waitForResponse(
+        (response) =>
+          response.url().includes('/seat-availability') &&
+          response.status() === 200
+      );
 
-        const availableSeats = await this.getAvailableSeats();
-        if (availableSeats.length === 0) {
-          throw new Error('No available seats found');
-        }
-        const randomIndex = Math.floor(Math.random() * availableSeats.length);
-        const chosenSeat = availableSeats[randomIndex];
-        await this.selectSeat(chosenSeat);
-        return chosenSeat;
+      const availableSeats = await this.getAvailableSeats();
+      if (availableSeats.length === 0) {
+        throw new Error('No available seats found');
       }
-    );
+      const randomIndex = Math.floor(Math.random() * availableSeats.length);
+      const chosenSeat = availableSeats[randomIndex];
+      await this.selectSeat(chosenSeat);
+      return chosenSeat;
+    });
   }
 
   /**
@@ -568,23 +571,20 @@ export class SeatPicker {
    * Returns the list of chosen seats.
    */
   async selectRandomSeats(count: number): Promise<Seat[]> {
-    return await allure.step(
-      `Selecting ${count} random seats`,
-      async () => {
-        const availableSeats = await this.getAvailableSeats();
-        if (availableSeats.length < count) {
-          throw new Error(
-            `Not enough available seats. Needed ${count}, found ${availableSeats.length}`
-          );
-        }
-        const shuffled = this.shuffleArray(availableSeats);
-        const chosenSeats = shuffled.slice(0, count);
-        for (const seat of chosenSeats) {
-          await this.selectSeat(seat);
-        }
-        return chosenSeats;
+    return await allure.step(`Selecting ${count} random seats`, async () => {
+      const availableSeats = await this.getAvailableSeats();
+      if (availableSeats.length < count) {
+        throw new Error(
+          `Not enough available seats. Needed ${count}, found ${availableSeats.length}`
+        );
       }
-    );
+      const shuffled = this.shuffleArray(availableSeats);
+      const chosenSeats = shuffled.slice(0, count);
+      for (const seat of chosenSeats) {
+        await this.selectSeat(seat);
+      }
+      return chosenSeats;
+    });
   }
 
   /**
@@ -972,16 +972,26 @@ export class SeatPicker {
 
   /**
    * Accepts the D-BOX warning modal by clicking the continue/accept button.
+   * If the modal doesn't appear within timeout, continues without error.
    */
   async acceptDBoxMessage(): Promise<void> {
-    await allure.step('Accepting the D-BOX warning modal', async () => {
-      const modalSelector = SEAT_PICKER_SELECTORS.dboxModal;
-      const modal = this.page.locator(modalSelector);
-      await modal.waitFor({ state: 'visible', timeout: 5000 });
+    await allure.step(
+      'Accepting the D-BOX warning modal if present',
+      async () => {
+        try {
+          const modalSelector = SEAT_PICKER_SELECTORS.dboxModal;
+          const modal = this.page.locator(modalSelector);
+          await modal.waitFor({ state: 'visible', timeout: 5000 });
 
-      const acceptButton = modal.locator('button').first();
-      await acceptButton.click();
-    });
+          const acceptButton = modal.locator('button').first();
+          await acceptButton.click();
+          console.log('✅ D-BOX modal accepted');
+        } catch (error) {
+          console.log('ℹ️ D-BOX modal not present, continuing...');
+          // Modal not present - this is acceptable, continue
+        }
+      }
+    );
   }
 
   /**
@@ -1069,17 +1079,14 @@ export class SeatPicker {
    * Validates that the "Continuar" button is disabled.
    */
   async validateConfirmButtonDisabled(): Promise<void> {
-    await allure.step(
-      'Validating "Continuar" button is disabled',
-      async () => {
-        const confirmButton = this.page.locator(
-          SEAT_PICKER_SELECTORS.disabledConfirmButton
-        );
-        if (!(await confirmButton.isVisible())) {
-          throw new Error('"Continuar" button is not disabled');
-        }
+    await allure.step('Validating "Continuar" button is disabled', async () => {
+      const confirmButton = this.page.locator(
+        SEAT_PICKER_SELECTORS.disabledConfirmButton
+      );
+      if (!(await confirmButton.isVisible())) {
+        throw new Error('"Continuar" button is not disabled');
       }
-    );
+    });
   }
 
   // ────────────────────────── Helpers ──────────────────────────

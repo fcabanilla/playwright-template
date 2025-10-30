@@ -36,7 +36,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Full purchase with single seat - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@e2e', '@booking', '@COMS-16843', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@e2e',
+            '@booking',
+            '@COMS-16843',
+            ...cinema.tags,
+          ],
+        },
         async ({
           navbar,
           cinema: cinemaPage,
@@ -69,7 +78,17 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Full purchase with multiple seats - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@e2e', '@booking', '@COMS-16842', '@COMS-5087', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@e2e',
+            '@booking',
+            '@COMS-16842',
+            '@COMS-5087',
+            ...cinema.tags,
+          ],
+        },
         async ({
           navbar,
           cinema: cinemaPage,
@@ -104,10 +123,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Attempt to select seats leaving empty space between selection - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-5620', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@validation',
+            '@COMS-5620',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -121,10 +148,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Attempt to select seats separating group in same row - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-4752', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@validation',
+            '@COMS-4752',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4752', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -141,7 +176,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         { tag: ['@seatpicker', '@cinesa', '@validation', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -156,10 +191,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `No seat selection validation - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-4853', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@validation',
+            '@COMS-4853',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -171,10 +214,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select more than max seat capacity - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@validation', '@COMS-5088', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@validation',
+            '@COMS-5088',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5088', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -192,10 +243,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select only companion seat - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@accessibility', '@COMS-4853', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@accessibility',
+            '@COMS-4853',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -212,7 +271,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         { tag: ['@seatpicker', '@cinesa', '@accessibility', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -227,10 +286,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select only wheelchair seat - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@accessibility', '@COMS-5638', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@accessibility',
+            '@COMS-5638',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5638', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectNormalRandomFilmAndShowtime();
@@ -250,7 +317,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -266,10 +333,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select sofa leaving 1 space - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', '@validation', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            '@validation',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -284,10 +359,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Attempt to select sofa seats leaving empty space between selection - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', '@validation', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            '@validation',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -302,10 +385,18 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Attempt to select sofa seats separating group in same row - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', '@validation', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            '@validation',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -323,7 +414,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
@@ -339,7 +430,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Display regular and sofa ticket types - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', '@ticketpicker', '@COMS-4665', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            '@ticketpicker',
+            '@COMS-4665',
+            ...cinema.tags,
+          ],
+        },
         async ({
           navbar,
           cinema: cinemaPage,
@@ -349,16 +449,29 @@ test.describe('Seat Picker - Seat Selection', () => {
           loginPage,
         }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4665', async () => {});
-          
+
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectDBoxRandomFilmAndShowtime();
           await seatPicker.acceptDBoxMessage();
           await seatPicker.getRegularAndSofaSeatTypes();
           await seatPicker.confirmSeats();
-          await loginPage.clickContinueAsGuest();
-          const ticketTypeNames = await ticketPicker.getTicketTypeNames();
-          assertTicketTypeNamesMatchExpectedTexts(ticketTypeNames, ticketTypeMappings);
+
+          await test.step('Continue as guest user', async () => {
+            await loginPage.clickContinueAsGuest();
+          });
+
+          const ticketTypeNames =
+            await test.step('Get ticket type names from picker', async () => {
+              return await ticketPicker.getTicketTypeNames();
+            });
+
+          await test.step('Verify ticket types include regular and D-BOX options', async () => {
+            assertTicketTypeNamesMatchExpectedTexts(
+              ticketTypeNames,
+              ticketTypeMappings
+            );
+          });
         }
       );
     }
@@ -368,7 +481,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Full purchase with standard promotional code - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@promo', '@ticketpicker', '@COMS-16845', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@promo',
+            '@ticketpicker',
+            '@COMS-16845',
+            ...cinema.tags,
+          ],
+        },
         async ({
           navbar,
           cinema: cinemaPage,
@@ -386,7 +508,9 @@ test.describe('Seat Picker - Seat Selection', () => {
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
-          await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[0].values[0]);
+          await ticketPicker.selectPromotionalCode(
+            PROMO_CODE_OPTIONS[0].values[0]
+          );
         }
       );
     }
@@ -394,7 +518,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Full purchase with La Vanguardia promotional code - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@promo', '@ticketpicker', '@COMS-16844', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@promo',
+            '@ticketpicker',
+            '@COMS-16844',
+            ...cinema.tags,
+          ],
+        },
         async ({
           navbar,
           cinema: cinemaPage,
@@ -412,7 +545,9 @@ test.describe('Seat Picker - Seat Selection', () => {
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
-          await ticketPicker.selectPromotionalCode(PROMO_CODE_OPTIONS[1].values[0]);
+          await ticketPicker.selectPromotionalCode(
+            PROMO_CODE_OPTIONS[1].values[0]
+          );
         }
       );
     }
@@ -421,7 +556,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   /**
    * TODO: Implement when room configuration is available
    * Rule: allowWhenAllSeatsBetweenTheSeatGapAndAnUnavailableSeatAreSelected
-   * 
+   *
    * This rule allows leaving a single seat gap when the selection
    * abuts an existing order on one side.
    */
