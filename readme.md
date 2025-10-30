@@ -105,12 +105,84 @@ TEST_ENV=production npm run test:cinesa          # Production (default)
 npm run report:generate          # Generate HTML report from results
 npm run report:open              # Open report in browser
 npm run report                   # Generate + open in one command
-npm run report:clean             # Clean old artifacts (before new execution)
+npm run report:clean:results     # Clean results BEFORE new test execution (CRITICAL)
+npm run report:clean             # Full cleanup (results + reports + videos)
 
 # Development and debugging
 npm run test:debug               # Debug mode
 npm run test:headed              # With browser UI
 npm run test:trace               # With trace recording
+```
+
+### ⚠️ CRITICAL: Allure Workflow - Results Accumulation
+
+**Allure accumulates results by design.** If you don't clean `.allure/results/` before running tests, new results are ADDED to existing ones.
+
+**Example of the problem:**
+
+```bash
+# First execution: 268 tests
+npx playwright test
+
+# Second execution: 1 test (without cleaning)
+npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts:406:3
+
+# Report shows: 269 tests (268 + 1) ❌ WRONG
+```
+
+**Correct workflow for single test execution:**
+
+```bash
+# Step 1: Clear old results (MANDATORY)
+npm run report:clean:results
+
+# Step 2: Run your test
+TEST_ENV=preprod npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts:406:3 --project='Cinesa'
+
+# Step 3: Generate report with history
+npm run report
+
+# Result: Report shows 1 test ✅ CORRECT
+```
+
+**Correct workflow for full test suite:**
+
+```bash
+# Step 1: Clear old results
+npm run report:clean:results
+
+# Step 2: Run complete suite
+npm run test:cinesa:preprod
+
+# Step 3: Generate report
+npm run report
+```
+
+**Understanding Allure directories:**
+
+- **`.allure/results/`** - Current execution data (JSON files)
+  - **MUST be cleared** before each test run: `npm run report:clean:results`
+  - Contains test results from current execution only
+- **`.allure/report/history/`** - Historical trend data
+  - **MUST be preserved** for TREND graphs
+  - Automatically copied by `npm run report` command
+  - Shows last 20 executions for trend analysis
+
+**NPM Scripts (Correct Configuration):**
+
+```json
+{
+  "report:clean:results": "rm -rf .allure/results/*", // Clears ONLY results
+  "report": "npm run report:copy-history && npm run report:generate && npm run report:open",
+  "report:copy-history": "mkdir -p .allure/results/history && (cp -r .allure/report/history/* .allure/results/history/ 2>/dev/null || true)"
+}
+```
+
+**Common mistake:**
+
+```json
+// ❌ WRONG - This deletes videos, NOT results
+"report:clean:results": "rm -rf .allure/playwright-artifacts/*"
 ```
 
 ## 🎯 Key Features

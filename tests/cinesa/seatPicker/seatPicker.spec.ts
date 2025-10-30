@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import {
   assertWarningMessageDisplayed,
   assertConfirmButtonDisabled,
@@ -12,8 +13,11 @@ import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 
-test.describe('Seat Picker', () => {
+test.describe('Seat Picker - Selección de Butacas', () => {
   test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Seat Picker - Seat Selection');
+    
     await navbar.navigateToHome();
 
     // Verificar que no estamos bloqueados por Cloudflare
@@ -22,61 +26,75 @@ test.describe('Seat Picker', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test(
-    'Simulate a Full Purchase - Oasiz',
-    { tag: ['@seatpicker', '@cinesa', '@e2e', '@booking', '@COMS-16843'] },
-    async ({
-      navbar,
-      cinema,
-      cinemaDetail,
-      cookieBanner,
-      seatPicker,
-      ticketPicker,
-      loginPage,
-      barPage,
-      purchaseSummary,
-      paymentPage,
-    }) => {
-      await navbar.navigateToCinemas();
-      await cinema.selectOasizCinema();
-      await cinemaDetail.selectNormalRandomFilmAndShowtime();
-      await seatPicker.selectLastAvailableSeat();
-      await seatPicker.confirmSeats();
-      await loginPage.clickContinueAsGuest();
-      await ticketPicker.selectTicket();
-      await barPage.skipBar();
-      await purchaseSummary.acceptAndContinue();
-      await paymentPage.completePayment();
-    }
-  );
+  test.describe('Flujo Completo de Compra', () => {
+    test.beforeEach(async () => {
+      await allure.story('Compra completa desde selección de butacas');
+    });
 
-  test(
-    'Simulate a Full Purchase - Grancasa',
-    { tag: ['@grancasa', '@skip-no-programming', '@e2e', '@booking'] },
-    async ({
-      navbar,
-      cinema,
-      cinemaDetail,
-      cookieBanner,
-      seatPicker,
-      ticketPicker,
-      loginPage,
-      barPage,
-      purchaseSummary,
-      paymentPage,
-    }) => {
-      await navbar.navigateToCinemas();
-      await cinema.selectGrancasaCinema();
-      await cinemaDetail.selectNormalRandomFilmAndShowtime();
-      await seatPicker.selectLastAvailableSeat();
-      await seatPicker.confirmSeats();
-      await loginPage.clickContinueAsGuest();
-      await ticketPicker.selectTicket();
-      await barPage.skipBar();
-      await purchaseSummary.acceptAndContinue();
-      await paymentPage.completePayment();
-    }
-  );
+    test(
+      'Simulate a Full Purchase - Oasiz',
+      { tag: ['@seatpicker', '@cinesa', '@e2e', '@booking', '@COMS-16843'] },
+      async ({
+        navbar,
+        cinema,
+        cinemaDetail,
+        cookieBanner,
+        seatPicker,
+        ticketPicker,
+        loginPage,
+        barPage,
+        purchaseSummary,
+        paymentPage,
+      }) => {
+        await allure.parameter('Cinema', 'Oasiz');
+        await allure.parameter('Seats', '1');
+        await allure.parameter('User Type', 'Guest');
+        
+        await navbar.navigateToCinemas();
+        await cinema.selectOasizCinema();
+        await cinemaDetail.selectNormalRandomFilmAndShowtime();
+        await seatPicker.selectLastAvailableSeat();
+        await seatPicker.confirmSeats();
+        await loginPage.clickContinueAsGuest();
+        await ticketPicker.selectTicket();
+        await barPage.skipBar();
+        await purchaseSummary.acceptAndContinue();
+        await paymentPage.completePayment();
+      }
+    );
+
+    test(
+      'Simulate a Full Purchase - Grancasa',
+      { tag: ['@grancasa', '@skip-no-programming', '@e2e', '@booking'] },
+      async ({
+        navbar,
+        cinema,
+        cinemaDetail,
+        cookieBanner,
+        seatPicker,
+        ticketPicker,
+        loginPage,
+        barPage,
+        purchaseSummary,
+        paymentPage,
+      }) => {
+        await allure.parameter('Cinema', 'Grancasa');
+        await allure.parameter('Seats', '1');
+        await allure.parameter('User Type', 'Guest');
+        
+        await navbar.navigateToCinemas();
+        await cinema.selectGrancasaCinema();
+        await cinemaDetail.selectNormalRandomFilmAndShowtime();
+        await seatPicker.selectLastAvailableSeat();
+        await seatPicker.confirmSeats();
+        await loginPage.clickContinueAsGuest();
+        await ticketPicker.selectTicket();
+        await barPage.skipBar();
+        await purchaseSummary.acceptAndContinue();
+        await paymentPage.completePayment();
+      }
+    );
+  });
 
   test(
     'Simulate a Full Purchase with multiple seats - Oasiz',

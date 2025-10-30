@@ -29,13 +29,10 @@ export class BlogLandingAssertions {
    * @returns A Promise that resolves when the assertion is complete.
    */
   async expectArticleCardsCount(expectedCount: number): Promise<void> {
-    await allure.step(
-      'Verifying the number of article cards',
-      async () => {
-        const count: number = await this.blogLanding.countArticleCards();
-        await expect(count).toBe(expectedCount);
-      }
-    );
+    await allure.step('Verifying the number of article cards', async () => {
+      const count: number = await this.blogLanding.countArticleCards();
+      await expect(count).toBe(expectedCount);
+    });
   }
 
   /**
@@ -59,46 +56,56 @@ export class BlogLandingAssertions {
   }
 
   /**
- * Iterates over each related article card, clicks its link, verifies navigation to a new URL, 
- * and then navigates back to the original Blog Landing page.
- *
- * @returns A Promise that resolves when all assertions are complete.
- */
+   * Iterates over each related article card, clicks its link, verifies navigation to a new URL,
+   * and then navigates back to the original Blog Landing page.
+   *
+   * @returns A Promise that resolves when all assertions are complete.
+   */
   async expectNavigationThroughRelatedArticles(): Promise<void> {
-    await allure.step('Verifying navigation through each related article', async () => {
-      // Save the original URL of the Blog Landing page.
-      const originalUrl: string = this.page.url();
-      // Get the count of article cards.
-      const count: number = await this.blogLanding.countArticleCards();
-  
-      // Use for-of loop over generated indices.
-      for (const index of Array.from(Array(count).keys())) {
-        await allure.step(`Navigating through article card at index ${index}`, async () => {
-          // Re-query the locator in each iteration to prevent stale element issues.
-          const articleCardLocator = this.blogLanding.getArticleCardsLocator().nth(index);
-          await expect(articleCardLocator).toBeVisible();
-  
-          // Click on the link inside the article card.
-          const articleLink = articleCardLocator.locator('a.article-card-hero-link');
-          await expect(articleLink).toBeVisible();
-          
-          // Use force click to bypass OneTrust overlay interception
-          await articleLink.click({ force: true });
-          await this.webActions.waitForLoadState('domcontentloaded');
-          
-          // Add small wait to ensure navigation completes
-          await this.webActions.wait(1000);
+    await allure.step(
+      'Verifying navigation through each related article',
+      async () => {
+        // Save the original URL of the Blog Landing page.
+        const originalUrl: string = this.page.url();
+        // Get the count of article cards.
+        const count: number = await this.blogLanding.countArticleCards();
 
-          // Validate that the URL has changed.
-          const newUrl: string = this.page.url();
-          await expect(newUrl).not.toBe(originalUrl);          // Navigate back to the original Blog Landing page.
-          await this.page.goBack();
-          await this.webActions.waitForLoadState('domcontentloaded');
-  
-          // Confirm that we have returned to the original URL.
-          await expect(this.page.url()).toBe(originalUrl);
-        });
+        // Use for-of loop over generated indices.
+        for (const index of Array.from(Array(count).keys())) {
+          await allure.step(
+            `Navigating through article card at index ${index}`,
+            async () => {
+              // Re-query the locator in each iteration to prevent stale element issues.
+              const articleCardLocator = this.blogLanding
+                .getArticleCardsLocator()
+                .nth(index);
+              await expect(articleCardLocator).toBeVisible();
+
+              // Click on the link inside the article card.
+              const articleLink = articleCardLocator.locator(
+                'a.article-card-hero-link'
+              );
+              await expect(articleLink).toBeVisible();
+
+              // Use force click to bypass OneTrust overlay interception
+              await articleLink.click({ force: true });
+              await this.webActions.waitForLoadState('domcontentloaded');
+
+              // Add small wait to ensure navigation completes
+              await this.webActions.wait(1000);
+
+              // Validate that the URL has changed.
+              const newUrl: string = this.page.url();
+              await expect(newUrl).not.toBe(originalUrl); // Navigate back to the original Blog Landing page.
+              await this.page.goBack();
+              await this.webActions.waitForLoadState('domcontentloaded');
+
+              // Confirm that we have returned to the original URL.
+              await expect(this.page.url()).toBe(originalUrl);
+            }
+          );
+        }
       }
-    });
+    );
   }
 }

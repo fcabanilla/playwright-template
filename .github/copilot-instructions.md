@@ -283,13 +283,8 @@ npm run report             # Complete workflow: copy history + generate + open
 npm run report:generate    # Generate Allure report from results
 npm run report:open        # Open report in browser
 npm run report:clean       # Clean all Allure artifacts (results + reports + videos)
+npm run report:clean:results  # Clean ONLY results (before new test execution)
 ```
-
-**Important:** Always use `npm run report` to ensure history tracking works correctly. This command:
-
-1. Copies history from previous report (`.allure/report/history/` → `.allure/results/history/`)
-2. Generates new report from results (`.allure/results/` → `.allure/report/`)
-3. Opens report in browser
 
 **Directory Structure:**
 
@@ -298,6 +293,94 @@ npm run report:clean       # Clean all Allure artifacts (results + reports + vid
 - `.allure/playwright-artifacts/` - Videos, screenshots, traces from Playwright
 
 See `docs/ALLURE_DIRECTORY_STRUCTURE.md` for complete documentation.
+
+### ⚠️ CRITICAL: Allure Results Accumulation Behavior
+
+Allure accumulates results by design. According to official documentation:
+
+> "If the directory already exists, the new files will be added to the existing ones, so that a future report will be based on them all."
+
+**Problem:** Running 1 test without cleaning results shows accumulated totals (e.g., 268 old + 1 new = 269 tests).
+
+**Solution: Always clean results before each new test execution**
+
+#### Correct Workflow for Single Test Execution
+
+```bash
+# Step 1: Clear old results (MANDATORY before each test run)
+npm run report:clean:results
+
+# Step 2: Run your test(s)
+TEST_ENV=preprod npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts:406:3 --project='Cinesa'
+
+# Step 3: Generate report with history preservation
+npm run report
+```
+
+#### Correct Workflow for Full Test Suite
+
+```bash
+# Step 1: Clear old results
+npm run report:clean:results
+
+# Step 2: Run complete suite
+npm run test:cinesa:preprod
+
+# Step 3: Generate report
+npm run report
+```
+
+#### Understanding the Two Directories
+
+**`.allure/results/` (Current Execution Data)**
+
+- Contains JSON files from current test run
+- **MUST be cleared** before each new execution to avoid accumulation
+- Command: `npm run report:clean:results` (runs `rm -rf .allure/results/*`)
+
+**`.allure/report/history/` (Historical Trend Data)**
+
+- Contains trend data for TREND graph (last 20 executions)
+- **MUST be preserved** and copied before report generation
+- Command: `npm run report:copy-history` (copies `.allure/report/history/` → `.allure/results/history/`)
+
+#### NPM Script Order (CRITICAL)
+
+**✅ CORRECT ORDER (Current Configuration):**
+
+```json
+"report": "npm run report:copy-history && npm run report:generate && npm run report:open"
+```
+
+**❌ WRONG ORDER (Previous Bug):**
+
+```json
+"report": "npm run report:clean && npm run report:copy-history && ..."  // ❌ Deletes history before copy
+```
+
+#### TREND Graph Behavior
+
+- Each column in TREND graph = one complete test execution
+- NOT cumulative totals
+- Shows test count evolution across runs
+- Example:
+  - Column 1: Execution with 269 tests
+  - Column 2: Execution with 1 test (focused debugging)
+  - This is expected behavior, not a bug
+
+#### Common Mistake: Wrong Script Used
+
+**❌ WRONG - Old script definition:**
+
+```json
+"report:clean:results": "rm -rf .allure/playwright-artifacts/*"  // ❌ Deletes videos, NOT results
+```
+
+**✅ CORRECT - Fixed script:**
+
+```json
+"report:clean:results": "rm -rf .allure/results/*"  // ✅ Deletes JSON results
+```
 
 ### Debugging
 
@@ -436,6 +519,8 @@ test: Add loyalty program smoke tests
 ❌ **Don't** instantiate Page Objects directly (always use fixtures)
 ❌ **Don't** use `allure.test.step()` (Allure 3 API) - use `allure.step()` (Allure 2 API)
 ❌ **Don't** use `import * as allure` - use `import { allure }` instead
+❌ **Don't** run tests without cleaning results first (`npm run report:clean:results`)
+❌ **Don't** delete `.allure/report/history/` (needed for TREND graphs)
 
 ✅ **Do** use `WebActions` for ALL Playwright API interactions in Page Objects
 ✅ **Do** use fixtures for all component dependencies
@@ -447,6 +532,7 @@ test: Add loyalty program smoke tests
 ✅ **Do** check environment with `process.env.TEST_ENV` for conditional logic
 ✅ **Do** handle cookie banners in `beforeEach` hooks
 ✅ **Do** use Allure 2 API: `import { allure } from 'allure-playwright'` and `allure.step()`
+✅ **Do** clean results before each test execution: `npm run report:clean:results`
 
 ## Key Files Reference
 
@@ -486,7 +572,9 @@ test: Add loyalty program smoke tests
 - **Results Directory:** `.allure/results/` (configured via `ALLURE_RESULTS_DIR` env var)
 - **Reports Directory:** `.allure/report/`
 - **Artifacts:** `.allure/playwright-artifacts/` (videos, screenshots, traces)
-- **Documentation:** `docs/ALLURE_DIRECTORY_STRUCTURE.md` - Complete directory structure guide
+- **Documentation:**
+  - `docs/ALLURE_DIRECTORY_STRUCTURE.md` - Complete directory structure guide
+  - `docs/ALLURE_WORKFLOW_CRITICAL.md` - **CRITICAL: Results accumulation behavior and workflow**
 
 ## When Creating New Components
 
