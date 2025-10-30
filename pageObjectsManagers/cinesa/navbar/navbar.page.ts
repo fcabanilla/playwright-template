@@ -65,7 +65,7 @@ export class Navbar {
    */
   async navigateToCinemas(): Promise<void> {
     await allure.step('Navigating to Cinemas page', async () => {
-      await this.webActions.click(this.selectors.cines);
+      await this.webActions.clickWithOverlayHandling(this.selectors.cines);
     });
   }
 
@@ -109,8 +109,8 @@ export class Navbar {
    */
   async navigateToPrograms(): Promise<void> {
     await allure.step('Navigating to Programs page', async () => {
-      await this.webActions.click(this.selectors.programas);
-      await this.webActions.waitForLoadState('networkidle');
+      await this.webActions.clickWithOverlayHandling(this.selectors.programas);
+      await this.webActions.waitForLoadState('domcontentloaded');
     });
   }
 

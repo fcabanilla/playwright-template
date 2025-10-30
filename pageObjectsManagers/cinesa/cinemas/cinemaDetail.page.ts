@@ -1,6 +1,7 @@
 // cinemaDetail.page.ts
 import { Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   cinemaDetailSelectors,
   CinemaDetailSelectors,
@@ -34,6 +35,7 @@ import {
  */
 export class CinemaDetail {
   private readonly page: Page; // For complex locator filtering and allTextContents
+  private readonly webActions: WebActions; // For standard Playwright operations
   private readonly selectors: CinemaDetailSelectors;
 
   /**
@@ -42,6 +44,7 @@ export class CinemaDetail {
    */
   constructor(page: Page) {
     this.page = page;
+    this.webActions = new WebActions(page);
     this.selectors = cinemaDetailSelectors;
   }
 
@@ -434,54 +437,49 @@ export class CinemaDetail {
    * @throws Error if schema script is not found or cannot be parsed
    */
   async extractCinemaSchema(): Promise<any> {
-    return await allure.step(
-      'Extracting cinema schema from page',
-      async () => {
-        // Wait for network to be idle (pure async, no fixed delay after)
-        await this.page.waitForLoadState('networkidle');
+    return await allure.step('Extracting cinema schema from page', async () => {
+      // Wait for dom content loaded (optimized for Cloudflare environments)
+      await this.webActions.waitForLoadState('domcontentloaded');
 
-        // Try React Helmet schema first
-        const reactHelmetJsonLd = this.page.locator(
-          'script[data-react-helmet="true"][type="application/ld+json"]'
-        );
-        const reactHelmetCount = await reactHelmetJsonLd.count();
+      // Try React Helmet schema first
+      const reactHelmetJsonLd = this.page.locator(
+        'script[data-react-helmet="true"][type="application/ld+json"]'
+      );
+      const reactHelmetCount = await reactHelmetJsonLd.count();
 
-        if (reactHelmetCount > 0) {
-          const scriptContent = await reactHelmetJsonLd.first().textContent();
-          if (!scriptContent) {
-            throw new Error(
-              'React Helmet cinema schema script content is empty'
-            );
-          }
-          try {
-            return JSON.parse(scriptContent);
-          } catch (error) {
-            throw new Error(
-              `Failed to parse React Helmet cinema schema JSON: ${error}`
-            );
-          }
+      if (reactHelmetCount > 0) {
+        const scriptContent = await reactHelmetJsonLd.first().textContent();
+        if (!scriptContent) {
+          throw new Error('React Helmet cinema schema script content is empty');
         }
-
-        // Fallback: Try standard JSON-LD scripts
-        const jsonLdScripts = this.page.locator(
-          'script[type="application/ld+json"]'
-        );
-        const jsonLdCount = await jsonLdScripts.count();
-
-        if (jsonLdCount > 0) {
-          const scriptContent = await jsonLdScripts.first().textContent();
-          if (!scriptContent) {
-            throw new Error('Cinema schema script content is empty');
-          }
-          try {
-            return JSON.parse(scriptContent);
-          } catch (error) {
-            throw new Error(`Failed to parse cinema schema JSON: ${error}`);
-          }
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(
+            `Failed to parse React Helmet cinema schema JSON: ${error}`
+          );
         }
-
-        throw new Error('Cinema schema script not found on the page');
       }
-    );
+
+      // Fallback: Try standard JSON-LD scripts
+      const jsonLdScripts = this.page.locator(
+        'script[type="application/ld+json"]'
+      );
+      const jsonLdCount = await jsonLdScripts.count();
+
+      if (jsonLdCount > 0) {
+        const scriptContent = await jsonLdScripts.first().textContent();
+        if (!scriptContent) {
+          throw new Error('Cinema schema script content is empty');
+        }
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(`Failed to parse cinema schema JSON: ${error}`);
+        }
+      }
+
+      throw new Error('Cinema schema script not found on the page');
+    });
   }
 }

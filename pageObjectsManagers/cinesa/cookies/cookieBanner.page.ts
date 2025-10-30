@@ -104,7 +104,8 @@ export class CookieBanner {
         this.selectors.settingsModal,
       ];
 
-      await this.webActions.evaluate((selectors: string[]) => {
+      await this.webActions.evaluate((arg) => {
+        const selectors = arg as string[];
         selectors.forEach((selector) => {
           const elements = document.querySelectorAll(selector);
           elements.forEach((el) => el.remove());

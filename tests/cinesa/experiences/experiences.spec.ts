@@ -1,21 +1,30 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertExperiencesRedirection } from './experiences.assertions';
+import { EXPERIENCES_URL } from './experiences.data';
 
 test.describe('Cinesa Experiences Tests', () => {
-  test('Experiences page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
-    await navbar.navigateToExperiences();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Experiences page display and layout');
+    await promotionalModal.closeModalIfVisible();
   });
 
-  test('Cinesa Experiences page redirection test', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
+  test('should display experiences page layout correctly', 
+    { tag: ['@experiences', '@cinesa', '@smoke', '@medium'] },
+    async ({ webActions, navbar }) => {
     await navbar.navigateToExperiences();
-    await page.waitForLoadState('networkidle');
-    assertExperiencesRedirection(page);
+    await webActions.waitForLoadState('domcontentloaded');
+    // Verify we're on the correct experiences URL
+    await webActions.expectUrl(EXPERIENCES_URL);
+    // Take screenshot for visual verification
+    await webActions.screenshot();
+  });
+
+  test('should redirect to experiences page correctly', 
+    { tag: ['@experiences', '@cinesa', '@navigation', '@fast'] },
+    async ({ webActions, navbar }) => {
+    await navbar.navigateToExperiences();
+    await webActions.waitForLoadState('domcontentloaded');
+    await assertExperiencesRedirection(webActions.getPage());
   });
 });
