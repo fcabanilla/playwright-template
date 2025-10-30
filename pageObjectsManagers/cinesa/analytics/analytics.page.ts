@@ -1,5 +1,5 @@
 import { WebActions } from '../../../core/webactions/webActions';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { ANALYTICS_SELECTORS } from './analytics.selectors';
 import type { DataLayerEvent, PriceSummary } from './analytics.types';
 
@@ -22,7 +22,7 @@ export class AnalyticsPage {
    * Initializes dataLayer capture for the current page
    */
   async initializeDataLayerCapture(): Promise<void> {
-    await allure.test.step('Initializing dataLayer capture', async () => {
+    await allure.step('Initializing dataLayer capture', async () => {
       await this.webActions.addInitScript(() => {
         // Create array to store ALL events (existing + new)
         window.dataLayerEvents = [];
@@ -73,7 +73,7 @@ export class AnalyticsPage {
    * Captures all dataLayer events that have been fired so far
    */
   async captureDataLayerEvents(): Promise<DataLayerEvent[]> {
-    return await allure.test.step('Capturing dataLayer events', async () => {
+    return await allure.step('Capturing dataLayer events', async () => {
       const events = await this.webActions.evaluate<DataLayerEvent[]>(() => {
         // Get both the original dataLayer content AND our captured events
         const originalEvents = window.dataLayer || [];
@@ -99,7 +99,7 @@ export class AnalyticsPage {
    * Extracts price information from the current page UI
    */
   async extractUIPrices(): Promise<PriceSummary> {
-    return await allure.test.step('Extracting UI prices', async () => {
+    return await allure.step('Extracting UI prices', async () => {
       return await this.webActions.evaluate<PriceSummary>((selectors: any) => {
         const summary: PriceSummary = {
           ticketPrice: 0,

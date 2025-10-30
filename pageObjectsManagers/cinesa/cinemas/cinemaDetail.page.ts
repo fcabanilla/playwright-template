@@ -1,6 +1,6 @@
 // cinemaDetail.page.ts
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
   cinemaDetailSelectors,
@@ -59,7 +59,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to an array of film names
    */
   async getFilmNames(): Promise<string[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Getting list of film names from cinema detail page',
       async () => {
         // Wait for film list to be visible (pure async, no timeout)
@@ -94,7 +94,7 @@ export class CinemaDetail {
    * @returns Promise that resolves when the click action is complete.
    */
   async selectFilmByName(name: string): Promise<void> {
-    await allure.test.step(`Selecting film with name "${name}"`, async () => {
+    await allure.step(`Selecting film with name "${name}"`, async () => {
       const filmLocator = this.getFilmByName(name);
       await filmLocator.first().click();
     });
@@ -105,7 +105,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the name of the selected film.
    */
   async selectRandomFilm(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film from cinema detail page',
       async () => {
         const names = await this.getFilmNames();
@@ -125,7 +125,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the name of the selected film.
    */
   async selectRandomNormalFilm(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film with normal showtimes from cinema detail page',
       async () => {
         const names = await this.getFilmNames();
@@ -197,7 +197,7 @@ export class CinemaDetail {
    * @throws Error if film name is not provided
    */
   async getShowtimesForFilm(filmName: string): Promise<string[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Getting list of showtimes for the selected film',
       async () => {
         // Get film container filtered by film name
@@ -225,7 +225,7 @@ export class CinemaDetail {
    * @returns Promise that resolves when the click action is complete.
    */
   async selectShowtimeByText(timeText: string): Promise<void> {
-    await allure.test.step(`Selecting showtime "${timeText}"`, async () => {
+    await allure.step(`Selecting showtime "${timeText}"`, async () => {
       await this.page
         .locator(this.selectors.showtime, { hasText: timeText })
         .click();
@@ -237,7 +237,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the text of the selected showtime.
    */
   async selectRandomShowtime(filmName: string): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random showtime for the selected film',
       async () => {
         const showtimes = await this.getShowtimesForFilm(filmName);
@@ -262,7 +262,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the text of the selected showtime
    */
   async selectNormalRandomShowtime(filmName: string): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random normal showtime for the selected film',
       async () => {
         const filmContainer = this.page.locator(this.selectors.filmItem, {
@@ -317,7 +317,7 @@ export class CinemaDetail {
     film: string;
     showtime: string;
   }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film and a random normal showtime',
       async () => {
         const film = await this.selectRandomNormalFilm();
@@ -332,7 +332,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to an object containing the selected film name.
    */
   async selectRandomFilmForDetails(): Promise<{ film: string }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film and navigating to its details page',
       async () => {
         const names = await this.getFilmNames();
@@ -364,7 +364,7 @@ export class CinemaDetail {
     film: string;
     showtime: string;
   }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film and a random showtime',
       async () => {
         const film = await this.selectRandomFilm();
@@ -382,7 +382,7 @@ export class CinemaDetail {
     film: string;
     showtime: string;
   }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random D-BOX film and showtime',
       async () => {
         const names = await this.getFilmNames();
@@ -437,54 +437,49 @@ export class CinemaDetail {
    * @throws Error if schema script is not found or cannot be parsed
    */
   async extractCinemaSchema(): Promise<any> {
-    return await allure.test.step(
-      'Extracting cinema schema from page',
-      async () => {
-        // Wait for dom content loaded (optimized for Cloudflare environments)
-        await this.webActions.waitForLoadState('domcontentloaded');
+    return await allure.step('Extracting cinema schema from page', async () => {
+      // Wait for dom content loaded (optimized for Cloudflare environments)
+      await this.webActions.waitForLoadState('domcontentloaded');
 
-        // Try React Helmet schema first
-        const reactHelmetJsonLd = this.page.locator(
-          'script[data-react-helmet="true"][type="application/ld+json"]'
-        );
-        const reactHelmetCount = await reactHelmetJsonLd.count();
+      // Try React Helmet schema first
+      const reactHelmetJsonLd = this.page.locator(
+        'script[data-react-helmet="true"][type="application/ld+json"]'
+      );
+      const reactHelmetCount = await reactHelmetJsonLd.count();
 
-        if (reactHelmetCount > 0) {
-          const scriptContent = await reactHelmetJsonLd.first().textContent();
-          if (!scriptContent) {
-            throw new Error(
-              'React Helmet cinema schema script content is empty'
-            );
-          }
-          try {
-            return JSON.parse(scriptContent);
-          } catch (error) {
-            throw new Error(
-              `Failed to parse React Helmet cinema schema JSON: ${error}`
-            );
-          }
+      if (reactHelmetCount > 0) {
+        const scriptContent = await reactHelmetJsonLd.first().textContent();
+        if (!scriptContent) {
+          throw new Error('React Helmet cinema schema script content is empty');
         }
-
-        // Fallback: Try standard JSON-LD scripts
-        const jsonLdScripts = this.page.locator(
-          'script[type="application/ld+json"]'
-        );
-        const jsonLdCount = await jsonLdScripts.count();
-
-        if (jsonLdCount > 0) {
-          const scriptContent = await jsonLdScripts.first().textContent();
-          if (!scriptContent) {
-            throw new Error('Cinema schema script content is empty');
-          }
-          try {
-            return JSON.parse(scriptContent);
-          } catch (error) {
-            throw new Error(`Failed to parse cinema schema JSON: ${error}`);
-          }
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(
+            `Failed to parse React Helmet cinema schema JSON: ${error}`
+          );
         }
-
-        throw new Error('Cinema schema script not found on the page');
       }
-    );
+
+      // Fallback: Try standard JSON-LD scripts
+      const jsonLdScripts = this.page.locator(
+        'script[type="application/ld+json"]'
+      );
+      const jsonLdCount = await jsonLdScripts.count();
+
+      if (jsonLdCount > 0) {
+        const scriptContent = await jsonLdScripts.first().textContent();
+        if (!scriptContent) {
+          throw new Error('Cinema schema script content is empty');
+        }
+        try {
+          return JSON.parse(scriptContent);
+        } catch (error) {
+          throw new Error(`Failed to parse cinema schema JSON: ${error}`);
+        }
+      }
+
+      throw new Error('Cinema schema script not found on the page');
+    });
   }
 }

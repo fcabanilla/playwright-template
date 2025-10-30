@@ -27,3 +27,4 @@ reports/
 
 # Temporary files
 tests/cinesa/.DS_Store
+allure-results/

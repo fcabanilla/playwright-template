@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   blogLandingSelectors,
   BlogLandingSelectors,
@@ -42,7 +42,7 @@ export class BlogLanding {
    * @returns A Promise that resolves when navigation is complete.
    */
   async navigateToPage(): Promise<void> {
-    await allure.test.step('Navigating to the Blog Landing Page', async () => {
+    await allure.step('Navigating to the Blog Landing Page', async () => {
       await this.page.goto(this.url);
     });
   }
@@ -53,7 +53,7 @@ export class BlogLanding {
    * @returns A Promise that resolves when the click action is complete.
    */
   async clickLogo(): Promise<void> {
-    await allure.test.step('Clicking on the blog logo', async () => {
+    await allure.step('Clicking on the blog logo', async () => {
       await this.page.click(this.selectors.logo);
     });
   }

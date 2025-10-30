@@ -1,4 +1,4 @@
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import { PROGRAMS_SELECTORS } from './unlimitedPrograms.selectors';
 import { UNLIMITED_PROGRAMS_URL } from '../../../tests/cinesa/programs/programs.data';
@@ -15,7 +15,7 @@ export class UnlimitedProgramsPage {
    * Navigates to the unlimited programs page.
    */
   async navigateToUnlimitedPrograms(): Promise<void> {
-    await allure.test.step('Navigate to unlimited programs page', async () => {
+    await allure.step('Navigate to unlimited programs page', async () => {
       await this.webActions.navigateTo(UNLIMITED_PROGRAMS_URL);
     });
   }
@@ -24,7 +24,7 @@ export class UnlimitedProgramsPage {
    * Waits for the unlimited programs page to load completely.
    */
   async waitForProgramsUnlimitedPage(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Waiting for unlimited programs page to load',
       async () => {
         await this.webActions.waitForVisible(PROGRAMS_SELECTORS.container);

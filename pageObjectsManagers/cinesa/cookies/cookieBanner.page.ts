@@ -1,4 +1,3 @@
-import * as allure from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
   CookieBannerSelectors,
@@ -9,17 +8,8 @@ import {
  * CookieBanner Page Object
  *
  * Handles OneTrust cookie consent banner interactions.
- * Follows framework architecture: delegates Playwright API calls to WebActions where possible.
- *
- * Architecture Notes:
- * - Uses WebActions for: click(), fill(), isVisible(), waitForVisible()
- * - Uses page.locator() for: waitFor({ state: 'hidden' }), click({ force: true })
- * - Uses page.evaluate() for: JavaScript DOM manipulation
- *
- * Rationale:
- * - WebActions doesn't currently expose waitFor with state options or force click
- * - JavaScript evaluation is needed for bypassing overlay blocking
- * - This is acceptable as these are specialized cookie banner interactions
+ * Follows ADR-0009: Only uses WebActions, no direct Playwright API access.
+ * Simple orchestration layer - complex logic belongs in WebActions.
  *
  * @see docs/adrs/0009-page-object-architecture-rules.md
  */
@@ -27,225 +17,117 @@ export class CookieBanner {
   private readonly webActions: WebActions;
   private readonly selectors: CookieBannerSelectors;
 
-  /**
-   * Constructor - Accepts WebActions for ADR-0009 compliance
-   * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
-   *
-   * @param webActions - WebActions instance for all browser interactions
-   */
   constructor(webActions: WebActions) {
     this.webActions = webActions;
     this.selectors = cookieBannerSelectors;
-  } /**
-   * Accept cookies using the simple "Accept All" button
-   * @deprecated Use acceptAllCookies() instead for better reliability
-   */
-  async acceptCookies(): Promise<void> {
-    const isVisible = await this.webActions.isVisible(
-      this.selectors.acceptButton
-    );
-    if (isVisible) {
-      await allure.test.step('Accepting cookies', async () => {
-        await this.webActions.click(this.selectors.acceptButton);
-      });
-    }
   }
 
   /**
-   * Accept all cookies and dismiss any cookie-related overlays
-   *
-   * Uses dynamic waiting based on actual DOM state changes instead of fixed timeouts.
-   * This method handles:
-   * - Cookie banner (may or may not appear)
-   * - Cookie settings modal
-   * - Dark overlay that blocks interactions
-   *
-   * The banner may not appear if:
-   * - Cookies were already accepted in a previous session
-   * - Storage state is being reused
-   * - User preferences are cached
+   * Accept all cookies and dismiss overlays
+   * Simple orchestration - delegates to WebActions
    */
   async acceptAllCookies(): Promise<void> {
-    await allure.test.step(
-      'Accepting all cookies and dismissing overlays',
-      async () => {
-        try {
-          console.log('🍪 Checking for cookie banner...');
+    // Check if banner appears (uses waitForVisible with timeout)
+    const bannerVisible = await this.webActions
+      .waitForVisible(this.selectors.banner, 3000)
+      .then(() => true)
+      .catch(() => false);
 
-          // Wait for the banner to appear with a short timeout (3s)
-          // Short timeout to avoid slowing down tests when banner doesn't appear
-          const bannerAppeared = await this.webActions
-            .waitForVisible(this.selectors.banner, 3000)
-            .then(() => true)
-            .catch(() => false);
+    if (!bannerVisible) {
+      // No banner, but may have leftover overlays
+      await this.removeOverlays();
+      return;
+    }
 
-          if (!bannerAppeared) {
-            console.log(
-              '✅ No cookie banner detected (cookies already accepted or not required)'
-            );
-            // ⚠️ CRITICAL: Even if banner doesn't appear, overlay might still exist
-            // Check and clean up any remaining OneTrust overlays
-            console.log('🔍 Checking for lingering OneTrust overlays...');
-            await this.waitForOneTrustCleanup();
-            console.log('✅ Cookie overlay cleanup completed');
-            return;
-          }
+    // Click accept button (WebActions handles overlay blocking)
+    await this.webActions.clickWithOverlayHandling(this.selectors.acceptButton);
 
-          console.log('🍪 Cookie banner detected! Clicking accept button...');
+    // Wait for banner to disappear
+    await this.webActions
+      .waitForSelector(this.selectors.banner, {
+        state: 'hidden',
+        timeout: 5000,
+      })
+      .catch(() => {});
 
-          // Wait for accept button to be ready
-          await this.webActions.waitForVisible(
-            this.selectors.acceptButton,
-            5000
-          );
+    // 🔧 PHASE 1: Wait for overlay to disappear
+    await this.webActions
+      .waitForSelector(this.selectors.overlay, {
+        state: 'hidden',
+        timeout: 10000,
+      })
+      .catch(() => {});
 
-          // Use JavaScript to click the button directly (bypasses overlay blocking)
-          const clicked = await this.webActions.evaluate(() => {
-            const acceptButton = document.querySelector(
-              '#onetrust-accept-btn-handler'
-            ) as HTMLButtonElement;
-            if (acceptButton) {
-              acceptButton.click();
-              return true;
-            }
-            return false;
-          });
+    // Clean up any remaining overlays
+    await this.removeOverlays();
 
-          if (clicked) {
-            console.log('✅ Clicked accept button via JS');
-          } else {
-            console.log(
-              '⚠️ Accept button not found, trying force click via page.locator()...'
-            );
-            // Force click to bypass any overlay blocking
-            await this.webActions.clickWithOverlayHandling(this.selectors.acceptButton);
-          }
-
-          // Wait dynamically for banner to disappear (DOM state change)
-          await this.webActions.waitForSelector(this.selectors.banner, { 
-            state: 'hidden', 
-            timeout: 5000 
-          }).catch(() =>
-            console.log('⚠️ Banner still visible, forcing removal...')
-          );
-
-          // Wait for any remaining OneTrust elements to be removed from DOM
-          // This is a dynamic wait for the SDK to clean up after acceptance
-          await this.waitForOneTrustCleanup();
-
-          console.log('✅ Cookie handling completed successfully');
-        } catch (error) {
-          console.log('⚠️ Error handling cookies:', (error as Error).message);
-
-          // Emergency cleanup - force remove everything
-          console.log('🔧 Running emergency cleanup...');
-          await this.forceRemoveOneTrustElements();
-          console.log('✅ Emergency cleanup completed');
-        }
-      }
-    );
+    // 🔧 PHASE 1: Wait for page stability
+    await this.webActions.waitForLoadState('networkidle').catch(() => {});
   }
 
   /**
-   * Wait dynamically for OneTrust SDK to clean up after cookie acceptance
-   * Uses MutationObserver to detect when elements are removed from DOM
+   * Remove OneTrust overlay elements
+   * Uses selectors from cookieBannerSelectors - no hardcoded selectors
    */
-  private async waitForOneTrustCleanup(): Promise<void> {
-    try {
-      // Use Playwright's built-in wait for selector to be detached/hidden
-      await Promise.race([
-        // Wait for overlay to be detached from DOM
-        this.webActions.waitForSelector(this.selectors.overlay, { 
-          state: 'detached', 
-          timeout: 2000 
-        }).catch(() => {}),
+  private async removeOverlays(): Promise<void> {
+    // Wait for overlays to detach naturally first (with timeout)
+    await Promise.race([
+      this.webActions
+        .waitForSelector(this.selectors.overlay, {
+          state: 'detached',
+          timeout: 2000,
+        })
+        .catch(() => {}),
+      this.webActions
+        .waitForSelector(this.selectors.consentSdk, {
+          state: 'hidden',
+          timeout: 2000,
+        })
+        .catch(() => {}),
+    ]);
 
-        // Or wait for consent SDK container to be hidden
-        this.webActions.waitForSelector(this.selectors.consentSdk, { 
-          state: 'hidden', 
-          timeout: 2000 
-        }).catch(() => {}),
-      ]);
+    // Check if overlay still exists (quick check with 500ms timeout)
+    const overlayGone = await this.webActions
+      .waitForSelector(this.selectors.overlay, {
+        state: 'detached',
+        timeout: 500,
+      })
+      .then(() => true)
+      .catch(() => false);
 
-      // If elements still exist, force remove them
-      const stillVisible = await this.hasVisibleOneTrustElements();
-      if (stillVisible) {
-        console.log('⚠️ OneTrust elements still present, forcing removal...');
-        await this.forceRemoveOneTrustElements();
-      }
-    } catch (error) {
-      // If waiting fails, force cleanup
-      await this.forceRemoveOneTrustElements();
+    // If overlay still present, force remove elements
+    if (!overlayGone) {
+      const selectorsToRemove = [
+        this.selectors.overlay,
+        this.selectors.banner,
+        this.selectors.consentSdk,
+        this.selectors.settingsModal,
+      ];
+
+      await this.webActions.evaluate((arg) => {
+        const selectors = arg as string[];
+        selectors.forEach((selector) => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach((el) => el.remove());
+        });
+      }, selectorsToRemove);
     }
   }
 
   /**
-   * Check if any OneTrust elements are still visible in the DOM
-   */
-  private async hasVisibleOneTrustElements(): Promise<boolean> {
-    return await this.webActions.evaluate(() => {
-      const selectors = [
-        '#onetrust-banner-sdk',
-        '#onetrust-pc-sdk',
-        '.onetrust-pc-dark-filter',
-      ];
-
-      return selectors.some((selector) => {
-        const element = document.querySelector(selector);
-        if (!element) return false;
-
-        const style = window.getComputedStyle(element);
-        return style.display !== 'none' && style.visibility !== 'hidden';
-      });
-    });
-  }
-
-  /**
-   * Force remove all OneTrust elements from DOM
-   * Used as fallback when dynamic waiting doesn't work
-   */
-  private async forceRemoveOneTrustElements(): Promise<void> {
-    await this.webActions.evaluate(() => {
-      const elementsToRemove = [
-        '#onetrust-banner-sdk',
-        '#onetrust-pc-sdk',
-        '#onetrust-consent-sdk',
-        '.onetrust-pc-dark-filter',
-      ];
-
-      let removedCount = 0;
-      elementsToRemove.forEach((selector) => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach((el) => {
-          el.remove();
-          removedCount++;
-        });
-      });
-
-      if (removedCount > 0) {
-        console.log(`✅ Forcefully removed ${removedCount} OneTrust elements`);
-      }
-    });
-  }
-
-  /**
-   * Wait for cookie banner to disappear (useful after navigation)
-   *
-   * Note: Uses page.locator() as WebActions doesn't expose waitFor with state: 'hidden'
+   * Wait for cookie banner to disappear
    */
   async waitForBannerToDisappear(): Promise<void> {
-    try {
-      await this.webActions.waitForSelector(this.selectors.banner, { 
-        state: 'hidden', 
-        timeout: 3000 
-      });
-    } catch {
-      // Banner was not present or already hidden
-    }
+    await this.webActions
+      .waitForSelector(this.selectors.banner, {
+        state: 'hidden',
+        timeout: 3000,
+      })
+      .catch(() => {});
   }
 
   /**
-   * Check if cookie banner is currently visible
+   * Check if cookie banner is visible
    */
   async isBannerVisible(): Promise<boolean> {
     return await this.webActions.isVisible(this.selectors.banner);

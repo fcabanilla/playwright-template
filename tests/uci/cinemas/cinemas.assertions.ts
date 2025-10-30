@@ -1,4 +1,4 @@
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 // import { Page } from '@playwright/test'; // Reserved for future use
 import { Cinema } from '../../../pageObjectsManagers/uci/cinemas/cinema.page';
 import { CinemaDetail } from '../../../pageObjectsManagers/uci/cinemas/cinemaDetail.page';
@@ -22,7 +22,7 @@ export class CinemasAssertions {
    * Shows complete list of cinemas found or empty state for debugging
    */
   async assertCinemasListVisible(): Promise<void> {
-    await allure.test.step('Assert cinemas list is visible', async () => {
+    await allure.step('Assert cinemas list is visible', async () => {
       const isVisible = await this.cinema.verifyCinemasListVisible();
 
       // Get cinema names for debugging
@@ -52,7 +52,7 @@ export class CinemasAssertions {
         },
       };
 
-      await allure.test.step('Cinemas List Assertion Details', async () => {
+      await allure.step('Cinemas List Assertion Details', async () => {
         console.log(
           `Cinemas List Full Data: ${JSON.stringify(assertionData, null, 2)}`
         );
@@ -71,7 +71,7 @@ export class CinemasAssertions {
    * Shows complete information about the cinema detail page state
    */
   async assertCinemaDetailPageLoaded(): Promise<void> {
-    await allure.test.step('Assert cinema detail page loaded', async () => {
+    await allure.step('Assert cinema detail page loaded', async () => {
       const isLoaded = await this.cinemaDetail.verifyCinemaDetailPageLoaded();
 
       // Get additional debugging info
@@ -100,7 +100,7 @@ export class CinemasAssertions {
         },
       };
 
-      await allure.test.step('Cinema Detail Assertion Details', async () => {
+      await allure.step('Cinema Detail Assertion Details', async () => {
         console.log(
           `Cinema Detail Full Data: ${JSON.stringify(assertionData, null, 2)}`
         );
@@ -119,7 +119,7 @@ export class CinemasAssertions {
    * Shows complete films list and cinema information
    */
   async assertCinemaHasFilms(): Promise<void> {
-    await allure.test.step('Assert cinema has films available', async () => {
+    await allure.step('Assert cinema has films available', async () => {
       const filmNames = await this.cinemaDetail.getFilmNames();
       const hasFilms = filmNames.length > 0;
 
@@ -146,7 +146,7 @@ export class CinemasAssertions {
         },
       };
 
-      await allure.test.step('Cinema Films Assertion Details', async () => {
+      await allure.step('Cinema Films Assertion Details', async () => {
         console.log(
           `Cinema Films Full Data: ${JSON.stringify(assertionData, null, 2)}`
         );
@@ -164,7 +164,7 @@ export class CinemasAssertions {
    * Asserts that cinema selection flow works end-to-end
    */
   async assertCinemaSelectionFlow(): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       'Assert complete cinema selection flow',
       async () => {
         // Check list is visible
@@ -185,7 +185,7 @@ export class CinemasAssertions {
           timestamp: new Date().toISOString(),
         };
 
-        await allure.test.step('Flow Completion Details', async () => {
+        await allure.step('Flow Completion Details', async () => {
           console.log(
             `Cinema Selection Flow: ${JSON.stringify(flowData, null, 2)}`
           );
