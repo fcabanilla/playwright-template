@@ -1,12 +1,12 @@
-import {
-  getCinesaConfig,
-  CinesaEnvironment,
-} from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { getCinemasForSchemaTests } from './cinemas.data';
 import {
   assertCinemasRedirection,
   assertCinemaSchemaMatches,
 } from './cinemas.assertions';
+
+// Get available cinemas for schema tests
+const CINEMAS_FOR_SCHEMA = getCinemasForSchemaTests();
 
 test.describe('Cinesa Cinemas Tests', () => {
   test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
@@ -15,42 +15,47 @@ test.describe('Cinesa Cinemas Tests', () => {
     await promotionalModal.closeModalIfVisible();
   });
 
-  test('should display cinemas page layout correctly',
+  test(
+    'should display cinemas page layout correctly',
     { tag: ['@cinemas', '@cinesa', '@smoke', '@medium'] },
     async ({ webActions, navbar }) => {
-    await navbar.navigateToCinemas();
-    await webActions.waitForLoadState('domcontentloaded');
-    // Take screenshot for visual verification
-    await webActions.screenshot();
-  });
+      await navbar.navigateToCinemas();
+      await webActions.waitForLoadState('domcontentloaded');
+      // Take screenshot for visual verification
+      await webActions.screenshot();
+    }
+  );
 
-  test('should redirect to cinemas page correctly',
+  test(
+    'should redirect to cinemas page correctly',
     { tag: ['@cinemas', '@cinesa', '@navigation', '@fast'] },
     async ({ webActions, navbar }) => {
-    await navbar.navigateToCinemas();
-    await webActions.waitForLoadState('domcontentloaded');
-    await assertCinemasRedirection(webActions.getPage());
-  });
+      await navbar.navigateToCinemas();
+      await webActions.waitForLoadState('domcontentloaded');
+      await assertCinemasRedirection(webActions.getPage());
+    }
+  );
 
-  test('Oasiz Cinema Schema validation test',
-    { tag: ['@cinemas', '@cinesa', '@schema', '@seo', '@OCG-2550'] },
-    async ({ webActions, navbar, cinema, cinemaDetail }) => {
-    await navbar.navigateToCinemas();
-    const selectedCinemaName = await cinema.selectOasizCinema();
-    const cinemaSchema = await cinemaDetail.extractCinemaSchema();
-    await assertCinemaSchemaMatches(cinemaSchema, selectedCinemaName);
-  });
-
-  test('Grancasa Cinema Schema validation test',
-    { tag: ['@cinemas', '@cinesa', '@schema', '@seo', '@grancasa'] },
-    async ({ webActions, navbar, cinema, cinemaDetail }) => {
-    const config = getCinesaConfig(
-      (process.env.TEST_ENV as CinesaEnvironment) || 'production'
+  // Parametrized Cinema Schema validation tests
+  for (const cinema of CINEMAS_FOR_SCHEMA) {
+    test(
+      `${cinema.name} Cinema Schema validation test`,
+      {
+        tag: [
+          '@cinemas',
+          '@cinesa',
+          '@schema',
+          '@seo',
+          '@OCG-2550',
+          ...cinema.tags,
+        ],
+      },
+      async ({ navbar, cinema: cinemaPage, cinemaDetail }) => {
+        await navbar.navigateToCinemas();
+        const selectedCinemaName = await cinemaPage[cinema.selectMethod]();
+        const cinemaSchema = await cinemaDetail.extractCinemaSchema();
+        await assertCinemaSchemaMatches(cinemaSchema, selectedCinemaName);
+      }
     );
-    await webActions.navigateTo(config.baseUrl);
-    await navbar.navigateToCinemas();
-    const selectedCinemaName = await cinema.selectGrancasaCinema();
-    const cinemaSchema = await cinemaDetail.extractCinemaSchema();
-    await assertCinemaSchemaMatches(cinemaSchema, selectedCinemaName);
-  });
+  }
 });

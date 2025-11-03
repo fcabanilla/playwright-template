@@ -26,40 +26,11 @@ export const legendData: LegendData = {
 };
 
 /**
- * Cinema configuration for parametrized tests
+ * Re-export centralized cinema configuration
+ * All cinema-related configuration is managed in config/cinemas.config.ts
  */
-export interface CinemaConfig {
-  name: string;
-  selectMethod: 'selectOasizCinema' | 'selectGrancasaCinema';
-  tags: string[];
-  availableInEnvironments: string[]; // ['production', 'lab', 'preprod']
-}
-
-/**
- * Available cinemas for testing
- * Note: Grancasa is not available in preprod environment
- */
-export const AVAILABLE_CINEMAS: CinemaConfig[] = [
-  {
-    name: 'Oasiz',
-    selectMethod: 'selectOasizCinema',
-    tags: ['@oasiz'],
-    availableInEnvironments: ['production', 'lab', 'preprod'],
-  },
-  {
-    name: 'Grancasa',
-    selectMethod: 'selectGrancasaCinema',
-    tags: ['@grancasa', '@skip-no-programming'],
-    availableInEnvironments: ['production', 'lab'], // Not available in preprod
-  },
-];
-
-/**
- * Get cinemas available for current environment
- */
-export function getCinemasForEnvironment(env?: string): CinemaConfig[] {
-  const currentEnv = env || process.env.TEST_ENV || 'production';
-  return AVAILABLE_CINEMAS.filter((cinema) =>
-    cinema.availableInEnvironments.includes(currentEnv)
-  );
-}
+export type { CinemaConfig } from '../../../config/cinemas.config';
+export {
+  AVAILABLE_CINEMAS,
+  getCinemasForEnvironment,
+} from '../../../config/cinemas.config';

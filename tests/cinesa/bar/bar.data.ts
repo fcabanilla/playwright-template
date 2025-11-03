@@ -1,30 +1,14 @@
-import { CinemaConfig } from '../seatPicker/seatPicker.data';
+import {
+  CinemaConfig,
+  getCinemasForEnvironment,
+} from '../../../config/cinemas.config';
 
 /**
  * Get available cinemas for bar tests based on current environment
- * Grancasa is NOT available in preprod environment
+ * Uses centralized cinema configuration from config/cinemas.config.ts
  */
 export function getCinemasForBarTests(env?: string): CinemaConfig[] {
-  const currentEnv = env || process.env.TEST_ENV || 'production';
-
-  const AVAILABLE_CINEMAS: CinemaConfig[] = [
-    {
-      name: 'Oasiz',
-      selectMethod: 'selectOasizCinema',
-      tags: ['@oasiz'],
-      availableInEnvironments: ['production', 'lab', 'preprod'],
-    },
-    {
-      name: 'Grancasa',
-      selectMethod: 'selectGrancasaCinema',
-      tags: ['@grancasa'],
-      availableInEnvironments: ['production', 'lab'], // NOT in preprod
-    },
-  ];
-
-  return AVAILABLE_CINEMAS.filter((cinema) =>
-    cinema.availableInEnvironments.includes(currentEnv)
-  );
+  return getCinemasForEnvironment(env);
 }
 
 /**

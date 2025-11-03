@@ -1,10 +1,14 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { getCinemasForMovieTests } from './movies.data';
 import {
   assertMoviesRedirection,
   assertMovieSchemaMatches,
   assertMovieSchemaURLsAreValid,
 } from './movies.assertions';
+
+// Get available cinemas for movie schema tests
+const CINEMAS_FOR_SCHEMA = getCinemasForMovieTests();
 
 test.describe('Cinesa Movies Tests', () => {
   test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
@@ -102,29 +106,29 @@ test.describe('Cinesa Movies Tests', () => {
     }
   );
 
-  test(
-    'Oasiz Movie Schema validation test',
-    { tag: ['@movies', '@cinesa', '@schema', '@regression', '@high'] },
-    async ({ moviePage, navbar, cinema, cinemaDetail }) => {
-      await navbar.navigateToCinemas();
-      await cinema.selectOasizCinema();
-      const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
-      const movieSchema = await moviePage.extractMovieSchema();
-      await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
-    }
-  );
-
-  test(
-    'Grancasa Movie Schema validation test',
-    { tag: ['@movies', '@cinesa', '@schema', '@regression', '@high'] },
-    async ({ moviePage, navbar, cinema, cinemaDetail }) => {
-      await navbar.navigateToCinemas();
-      await cinema.selectGrancasaCinema();
-      const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
-      const movieSchema = await moviePage.extractMovieSchema();
-      await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
-    }
-  );
+  // Parametrized Movie Schema validation tests
+  for (const cinema of CINEMAS_FOR_SCHEMA) {
+    test(
+      `${cinema.name} Movie Schema validation test`,
+      {
+        tag: [
+          '@movies',
+          '@cinesa',
+          '@schema',
+          '@regression',
+          '@high',
+          ...cinema.tags,
+        ],
+      },
+      async ({ moviePage, navbar, cinema: cinemaPage, cinemaDetail }) => {
+        await navbar.navigateToCinemas();
+        await cinemaPage[cinema.selectMethod]();
+        const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
+        const movieSchema = await moviePage.extractMovieSchema();
+        await assertMovieSchemaMatches(movieSchema, selectedInfo.film, '');
+      }
+    );
+  }
 
   test(
     'Movie Schema URL validation test - Bug Detection',
