@@ -268,7 +268,15 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select companion and wheelchair seat - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@accessibility', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@accessibility',
+            '@fix-test',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
@@ -488,6 +496,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@promo',
             '@ticketpicker',
             '@COMS-16845',
+            '@fix-test',
             ...cinema.tags,
           ],
         },
@@ -525,6 +534,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@promo',
             '@ticketpicker',
             '@COMS-16844',
+            '@fix-test',
             ...cinema.tags,
           ],
         },

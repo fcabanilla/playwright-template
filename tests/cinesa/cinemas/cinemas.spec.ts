@@ -47,6 +47,7 @@ test.describe('Cinesa Cinemas Tests', () => {
           '@schema',
           '@seo',
           '@OCG-2550',
+          '@fix-test',
           ...cinema.tags,
         ],
       },

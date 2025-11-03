@@ -438,4 +438,36 @@ export class WebActions {
   async scrollIntoView(selector: string): Promise<void> {
     await this.page.locator(selector).scrollIntoViewIfNeeded();
   }
+
+  /**
+   * Handle PDF link interactions that may result in download or popup
+   * Sets up event listeners before executing click action
+   *
+   * @param clickAction - Function that performs the click
+   * @returns Object with download or popup (one will be null)
+   */
+  async handlePDFInteraction(
+    clickAction: () => Promise<void>
+  ): Promise<{ download: any | null; popup: Page | null }> {
+    // Set up event listeners before clicking
+    const downloadPromise = this.page
+      .waitForEvent('download')
+      .catch(() => null);
+    const popupPromise = this.page
+      .context()
+      .waitForEvent('page')
+      .catch(() => null);
+
+    // Execute the click action
+    const clickPromise = clickAction();
+
+    // Wait for all promises to resolve
+    const [download, popup] = await Promise.all([
+      downloadPromise,
+      popupPromise,
+      clickPromise,
+    ]);
+
+    return { download, popup };
+  }
 }

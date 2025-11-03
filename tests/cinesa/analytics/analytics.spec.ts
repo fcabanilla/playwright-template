@@ -40,6 +40,7 @@ test.describe('Google Analytics DataLayer Validation', () => {
           '@ga4',
           '@COMS-13733',
           '@COMS-13727',
+          '@fix-test',
           ...config.cinema.tags,
         ],
       },

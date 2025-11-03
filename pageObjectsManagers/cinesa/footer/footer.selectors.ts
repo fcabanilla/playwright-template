@@ -32,7 +32,8 @@ export interface FooterSelectors {
 export const footerSelectors: FooterSelectors = {
   goToTopButton: '.go-to-top button',
   quienesSomosLink: 'a[href="/quienes-somos/"]',
-  trabajaConNosotrosLink: 'a[href="https://cinesa-uci.jobtrain.co.uk/cinesajobs/Home/Job"]',
+  trabajaConNosotrosLink:
+    'a[href="https://cinesa-uci.jobtrain.co.uk/cinesajobs/Home/Job"]',
   cinesaBusinessLink: 'a[href="http://www.cinesabusiness.es/"]',
   atencionAlClienteLink: 'a[href="http://ayuda.cinesa.es/"]',
   transparenciaLink: 'a[href="/quienes-somos/transparencia/"]',
@@ -44,14 +45,18 @@ export const footerSelectors: FooterSelectors = {
   blogDeCinesaLink: 'a[href="/blog-cinesa/"]',
   avisoLegalLink: 'a[href="/documentos-legales/aviso-legal"]',
   condicionesCompraLink: 'a[href="/documentos-legales/condiciones-compra/"]',
-  condicionesUnlimitedLink: 'a[href="/documentos-legales/condiciones-unlimited/"]',
+  condicionesUnlimitedLink:
+    'a[href="/documentos-legales/condiciones-unlimited/"]',
   politicaPrivacidadLink: 'a[href="/documentos-legales/politica-privacidad/"]',
   politicaCookiesLink: 'a[href="/documentos-legales/cookies"]',
-  esclavitudModernaLink: 'a[href="/media/1b5fgcfo/modernslavery_es.pdf#/"]',
-  codigoConductaLink: 'a[href="/quienes-somos/codigo-de-conducta-y-etica-empresariales"]',
-  politicaDenunciaLink: 'a[href="/media/qxjp2u4p/ocg-whistleblowing-policy-2024-spain-web-version.pdf"]',
-  androidAppLink: 'a[href="https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa"]',
-  appleAppLink: 'a[href="https://apps.apple.com/es/app/cinesa-app/id6444631578?l=ca"]',
+  esclavitudModernaLink: 'a[href*="modernslavery_es.pdf"]',
+  codigoConductaLink:
+    'a[href="/quienes-somos/codigo-de-conducta-y-etica-empresariales"]',
+  politicaDenunciaLink: 'a[href*="whistleblowing-policy"]',
+  androidAppLink:
+    'a[href="https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa"]',
+  appleAppLink:
+    'a[href="https://apps.apple.com/es/app/cinesa-app/id6444631578?l=ca"]',
   facebookLink: 'a[href="https://www.facebook.com/cinesa.es"]',
   twitterLink: 'a[href="https://twitter.com/Cinesa"]',
   instagramLink: 'a[href="https://www.instagram.com/cinesa.es/"]',

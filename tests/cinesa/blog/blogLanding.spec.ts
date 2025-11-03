@@ -5,12 +5,14 @@ import { blogLandingData } from './blogLanding.data';
 test.describe('Blog Landing Page Tests', () => {
   let blogLandingAssertions: BlogLandingAssertions;
 
-  test.beforeEach(async ({ page, blogLanding, cookieBanner, promotionalModal }) => {
-    blogLandingAssertions = new BlogLandingAssertions(page);
-    await cookieBanner.acceptAllCookies();
-    await promotionalModal.closeModalIfVisible();
-    await blogLanding.navigateToPage();
-  });
+  test.beforeEach(
+    async ({ page, blogLanding, cookieBanner, promotionalModal }) => {
+      blogLandingAssertions = new BlogLandingAssertions(page);
+      await cookieBanner.acceptAllCookies();
+      await promotionalModal.closeModalIfVisible();
+      await blogLanding.navigateToPage();
+    }
+  );
 
   test(
     'should display the expected number of article cards',
@@ -32,7 +34,16 @@ test.describe('Blog Landing Page Tests', () => {
 
   test(
     'should navigate through each related article and return to the Blog Landing page',
-    { tag: ['@blog', '@cinesa', '@navigation', '@medium', '@OCG-2030'] },
+    {
+      tag: [
+        '@blog',
+        '@cinesa',
+        '@navigation',
+        '@medium',
+        '@OCG-2030',
+        '@fix-test',
+      ],
+    },
     async () => {
       await blogLandingAssertions.expectNavigationThroughRelatedArticles();
     }

@@ -1,33 +1,55 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
+import {
+  assertWhistleblowingNavigation,
+  assertWhistleblowingPDFDownload,
+  assertWhistleblowingPDFPopup,
+} from './whistleblowing.assertions';
+import { handlePDFInteraction } from './whistleblowing.helpers';
 import { expectedUrl } from './whistleblowing.data';
-import { assertWhistleblowingNavigation } from './whistleblowing.assertions';
-import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Whistleblowing Policy Tests', () => {
-  test.beforeEach(async ({ cookieBanner, whistleblowing }) => {
-    await whistleblowing.navigateToHome();
+  test.beforeEach(async ({ cookieBanner, footer }) => {
+    await footer.navigateToHome();
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Whistleblowing Policy display and layout', async ({ page, footer }, testInfo) => {
-    const context = page.context();
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      footer.clickPoliticaDenuncia()  // (Optionally, later update method name if desired)
-    ]);
-    await newPage.waitForLoadState('networkidle');
-    await takeScreenshot(newPage, testInfo, 'Whistleblowing Policy display and layout');
-    await newPage.close();
-  });
+  test(
+    'Whistleblowing Policy display and layout',
+    { tag: ['@fix-test'] },
+    async ({ webActions, footer }, testInfo) => {
+      const { download, popup } = await handlePDFInteraction(
+        webActions,
+        async () => {
+          await footer.clickPoliticaDenuncia();
+        }
+      );
 
-  test('Whistleblowing Policy redirection test', async ({ page, footer }) => {
-    const context = page.context();
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      footer.clickPoliticaDenuncia()
-    ]);
-    await newPage.waitForLoadState('networkidle');
-    await assertWhistleblowingNavigation(newPage, expectedUrl);
-    await newPage.close();
-  });
+      if (download) {
+        await assertWhistleblowingPDFDownload(download);
+      } else if (popup) {
+        await assertWhistleblowingPDFPopup(popup, testInfo);
+        await popup.close();
+      }
+    }
+  );
+
+  test(
+    'Whistleblowing Policy redirection test',
+    { tag: ['@fix-test'] },
+    async ({ webActions, footer }) => {
+      const { download, popup } = await handlePDFInteraction(
+        webActions,
+        async () => {
+          await footer.clickPoliticaDenuncia();
+        }
+      );
+
+      if (download) {
+        await assertWhistleblowingPDFDownload(download);
+      } else if (popup) {
+        await assertWhistleblowingNavigation(popup, expectedUrl);
+        await popup.close();
+      }
+    }
+  );
 });

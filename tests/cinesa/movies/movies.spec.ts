@@ -140,6 +140,7 @@ test.describe('Cinesa Movies Tests', () => {
         '@regression',
         '@high',
         '@OCG-3316',
+        '@fix-test',
       ],
     },
     async ({ moviePage, navbar, cinema, cinemaDetail }) => {

@@ -48,6 +48,8 @@
     "test:cinesa:preprod:coupons": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/coupons/coupons.spec.ts --project='Cinesa'",
     "test:cinesa:preprod:experiences": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/experiences/experiences.spec.ts --project='Cinesa'",
     "test:cinesa:preprod:footer": "cross-env TEST_ENV=preprod npx playwright test tests/cinesa/footer/ --project='Cinesa'",
+    "test:cinesa:preprod:fix-test": "cross-env TEST_ENV=preprod npx playwright test --grep '@fix-test' --project='Cinesa'",
+    "test:cinesa:preprod:777": "cross-env TEST_ENV=preprod npx playwright test --grep '@777' --project='Cinesa'",
     "test:cinesa:preprod:list": "cross-env TEST_ENV=preprod npx playwright test --project='Cinesa' --list",
     "test:cinesa:lab": "cross-env TEST_ENV=lab npx playwright test --project='Cinesa'",
     "test:cinesa:lab:smoke": "cross-env TEST_ENV=lab npx playwright test --project='Cinesa' --grep '@smoke'",
