@@ -1,6 +1,6 @@
 # 🎬 Cinema Multi-Platform Test Automation Framework
 
-End-to-end test automation framework for multiple cinema chains using **Playwright** with **TypeScript**. Supports **Cinesa** (Spain) and **UCI Cinemas** (Italy) with scalable architecture for future expansions.
+End-to-end test automation framework for multiple cinema chains using **Playwright** with **TypeScript**. Supports **Cinesa** (Spain), **UCI Cinemas** (Portugal), and **UCI Cinemas** (Italy) with scalable architecture for future expansions.
 
 ## 🎯 Project Purpose
 
@@ -74,28 +74,47 @@ npm run test:cinesa:navbar
 #### Test Execution
 
 ```bash
-# Complete tests per platform
-npm run test:cinesa              # All Cinesa tests
-npm run test:uci                 # All UCI tests
+# STANDARDIZED SCRIPTS - By Region/Environment
+# Format: npm run test:{region}:{environment} -- {flags}
 
-# Tests by functionality (Cinesa)
-npm run test:navbar              # Navigation
+# Spain (Cinesa) - ES
+npm run test:es                      # Spain production
+npm run test:es:preprod              # Spain preprod
+npm run test:es:lab                  # Spain lab
+npm run test:es -- --grep '@smoke'   # Spain with smoke tests
+
+# Portugal (UCI Cinemas) - PT
+npm run test:pt                      # Portugal production
+npm run test:pt:preprod              # Portugal preprod
+npm run test:pt:lab                  # Portugal lab
+npm run test:pt -- --grep '@smoke'   # Portugal with smoke tests
+
+# Italy (UCI Cinemas) - IT
+npm run test:it                      # Italy production
+npm run test:it:preprod              # Italy preprod
+npm run test:it:lab                  # Italy lab
+npm run test:it -- --grep '@smoke'   # Italy with smoke tests
+
+# DYNAMIC FLAGS - Combine any flags with base scripts
+npm run test:es:preprod -- --grep '@smoke'                    # Smoke tests
+npm run test:pt:preprod -- --grep '@critical' --headed        # Critical tests headed
+npm run test:it:lab -- --grep '@fast' --workers=1             # Fast tests serial
+
+# COMPONENT-SPECIFIC TESTS
+npm run test:navbar              # Navigation (default: Spain production)
 npm run test:movies              # Movies
 npm run test:cinemas             # Cinemas
 npm run test:seatpicker          # Seat selection
-npm run test:login               # Authentication
-npm run test:booking             # Booking flow
+npm run test:footer              # Footer
 
-# Filter tests by tags
-npx playwright test --grep "@smoke"              # Critical smoke tests
-npx playwright test --grep "@fast"               # Quick tests
-npx playwright test --grep-invert "@grancasa"    # Exclude Grancasa cinema
-npx playwright test --grep "@cinesa.*@navbar"    # Multiple tags
+# Component tests with environment override
+TEST_ENV=preprod-pt npm run test:navbar     # Navbar in Portugal preprod
+TEST_ENV=lab npm run test:seatpicker        # Seat picker in Spain lab
 
-# Environment-specific execution
-TEST_ENV=preprod npm run test:cinesa             # Preprod environment
-TEST_ENV=lab npm run test:uci                    # Lab environment
-TEST_ENV=production npm run test:cinesa          # Production (default)
+# LEGACY ALIASES (backward compatibility)
+npm run test:cinesa              # → npm run test:es
+npm run test:cinesa:preprod      # → npm run test:es:preprod
+npm run test:uci                 # → npm run test:it
 ```
 
 #### Reports and Analysis
@@ -189,10 +208,11 @@ npm run report
 
 ### Multi-Platform Architecture
 
-- **Cinesa Platform**: Full support for Spanish market
-- **UCI Platform**: Complete Italian market coverage
-- **Shared Components**: Reusable across platforms
-- **Scalable Design**: Easy addition of new cinema chains
+- **Cinesa Spain**: Full support for Spanish market (`cinesa.es`)
+- **UCI Portugal**: Complete Portuguese market coverage (`ucicinemas.pt`)
+- **UCI Italy**: Complete Italian market coverage (`ucicinemas.it`)
+- **Shared Components**: Reusable across platforms (Spain & Portugal share same HTML structure)
+- **Scalable Design**: Easy addition of new cinema chains and regions
 
 ### Advanced Testing Capabilities
 
@@ -285,18 +305,53 @@ export const test = base.extend<{
 });
 ```
 
-### Multi-Environment Support
+### Multi-Environment & Multi-Region Support
 
 ```typescript
-// Environment configuration
-export const environments = {
+// Environment configuration with region support
+export const cinesaEnvironments = {
+  // Spain
   production: {
-    cinesa: 'https://www.cinesa.es',
-    uci: 'https://www.uci.it',
+    baseUrl: 'https://www.cinesa.es',
+    region: 'es',
+    locale: 'es-ES',
   },
-  staging: {
-    cinesa: 'https://staging.cinesa.es',
-    uci: 'https://staging.uci.it',
+  preprod: {
+    baseUrl: 'https://preprod-web.ocgtest.es',
+    region: 'es',
+    locale: 'es-ES',
+  },
+  lab: { baseUrl: 'https://lab-web.ocgtest.es', region: 'es', locale: 'es-ES' },
+
+  // Portugal (shares Cinesa namespace - same HTML structure)
+  'production-pt': {
+    baseUrl: 'https://www.ucicinemas.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+  },
+  'preprod-pt': {
+    baseUrl: 'https://preprod-web.ocgtest.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+  },
+  'lab-pt': {
+    baseUrl: 'https://lab-web.cinesa.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+  },
+};
+
+export const uciEnvironments = {
+  // Italy
+  production: {
+    baseUrl: 'https://ucicinemas.it',
+    region: 'it',
+    locale: 'it-IT',
+  },
+  preprod: {
+    baseUrl: 'https://preprod.ucicinemas.it',
+    region: 'it',
+    locale: 'it-IT',
   },
 };
 ```
@@ -320,21 +375,30 @@ export const environments = {
 
 ### Platform Coverage
 
-#### Cinesa Platform
+#### Cinesa Spain Platform (ES)
 
 - Movie browsing and filtering
-- Cinema location selection
-- Seat picker functionality
+- Cinema location selection (Oasiz, Grancasa)
+- Seat picker functionality (30+ tests, 100% coverage)
 - Payment flow validation
 - User account management
 - Mobile responsive testing
+- Analytics tracking validation
 
-#### UCI Platform
+#### UCI Portugal Platform (PT)
+
+- Shared HTML structure with Spain (reuses Cinesa Page Objects)
+- Portuguese language content
+- Portugal-specific URLs and configurations
+- Cloudflare Access protection (requires credentials)
+- Multi-environment support (production, preprod, lab)
+
+#### UCI Italy Platform (IT)
 
 - Film catalog navigation
 - Theater selection process
 - Booking confirmation flow
-- Multi-language support
+- Italian language support
 - Payment method validation
 - Accessibility compliance
 
@@ -349,10 +413,26 @@ export const environments = {
 ### Environment Variables
 
 ```bash
-# Set target environment
-export TEST_ENV=production    # production | staging | development
-export BROWSER=chromium       # chromium | firefox | webkit
-export WORKERS=4              # Parallel execution workers
+# Set target environment (automatic with new scripts)
+export TEST_ENV=production       # Spain production
+export TEST_ENV=preprod          # Spain preprod
+export TEST_ENV=lab              # Spain lab
+export TEST_ENV=production-pt    # Portugal production
+export TEST_ENV=preprod-pt       # Portugal preprod
+export TEST_ENV=lab-pt           # Portugal lab
+
+# Browser and execution settings
+export BROWSER=chromium          # chromium | firefox | webkit
+export WORKERS=4                 # Parallel execution workers (default)
+export WORKERS=1                 # Serial execution (for Cloudflare environments)
+
+# Cloudflare Access credentials (per region)
+export CF_ACCESS_CLIENT_ID_PREPROD=xxx          # Spain preprod
+export CF_ACCESS_CLIENT_SECRET_PREPROD=xxx
+export CF_ACCESS_CLIENT_ID_PREPROD_PT=xxx       # Portugal preprod
+export CF_ACCESS_CLIENT_SECRET_PREPROD_PT=xxx
+export CF_ACCESS_CLIENT_ID_LAB_PT=xxx           # Portugal lab
+export CF_ACCESS_CLIENT_SECRET_LAB_PT=xxx
 ```
 
 ### Configuration Files
@@ -404,79 +484,146 @@ npm run test:coverage          # Coverage analysis
 
 ## 📚 Documentation
 
+### Core Documentation
+
 - **[Architecture Guide](./docs/ARCHITECTURE.md)** - System design and patterns
 - **[Style Guide](./docs/STYLEGUIDE.md)** - Coding conventions and best practices
 - **[ADRs](./docs/adrs/)** - Architectural Decision Records
 - **[Contributing](./CONTRIBUTING.md)** - Contribution workflow and guidelines
 
-## 🔒 Running Tests by Environment
+### Configuration & Setup
 
-### Production (No Cloudflare - Direct)
+- **[NPM Scripts (Standardized)](./docs/NPM_SCRIPTS_STANDARDIZED.md)** - New multi-region script system
+- **[Portugal Configuration](./docs/PORTUGAL_CONFIGURATION.md)** - Portugal-specific setup
+- **[Cloudflare Handling](./docs/CLOUDFLARE_HANDLING.md)** - Cloudflare bypass strategies
+- **[URL Configuration](./docs/URL_CONFIGURATION.md)** - Multi-region URL management
 
-```bash
-npx playwright test --project="Cinesa" --workers=1
-```
+### Technical References
 
-**PowerShell:**
+- **[ADR-0010: Cloudflare Access Tokens](./docs/adrs/0010-cloudflare-access-tokens.md)** - Credentials strategy
+- **[ADR-0009: Page Object Architecture](./docs/adrs/0009-page-object-architecture-rules.md)** - Architecture rules
 
-```powershell
-npx playwright test --project="Cinesa" --workers=1
-```
+## 🔒 Cloudflare Access Configuration
 
-### Preprod, Lab, Staging (With Cloudflare)
+### Overview
 
-**Step 1: Generate session (one-time):**
+**Cloudflare-Protected Environments:**
 
-```bash
-# Lab
-TEST_ENV=lab npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+| Region        | Production | Preprod | Lab    |
+| ------------- | ---------- | ------- | ------ |
+| Spain (ES)    | ❌ No      | ✅ Yes  | ✅ Yes |
+| Portugal (PT) | ✅ Yes     | ✅ Yes  | ✅ Yes |
+| Italy (IT)    | ❌ No      | ✅ Yes  | ✅ Yes |
 
-# Preprod
-TEST_ENV=preprod npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
+### Automatic Credentials Injection
 
-# Staging
-TEST_ENV=staging npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
-```
-
-**PowerShell:**
-
-```powershell
-$env:TEST_ENV="lab"; npx playwright test tests/cinesa/cloudflare/auth.saveState.spec.ts --headed --project="Cinesa"
-```
-
-_Login manually, pass Cloudflare, browser closes automatically and saves session._
-
-**Step 2: Run tests:**
+The framework automatically injects Cloudflare Access credentials based on environment:
 
 ```bash
-# Lab
-TEST_ENV=lab npx playwright test --project="Cinesa" --workers=1
+# Spain preprod - uses CF_ACCESS_CLIENT_ID_PREPROD
+npm run test:es:preprod -- --headed --workers=1
 
-# Preprod
-TEST_ENV=preprod npx playwright test --project="Cinesa" --workers=1
+# Portugal preprod - uses CF_ACCESS_CLIENT_ID_PREPROD_PT
+npm run test:pt:preprod -- --headed --workers=1
+
+# Portugal production - uses CF_ACCESS_CLIENT_ID_PRODUCTION_PT
+npm run test:pt -- --headed --workers=1
 ```
 
-**PowerShell:**
+### Setting Up Credentials
 
-```powershell
-$env:TEST_ENV="lab"; npx playwright test --project="Cinesa" --workers=1
+**1. Create `.env` file** (gitignored, never commit):
+
+```bash
+# Spain - Preprod & Lab
+CF_ACCESS_CLIENT_ID_PREPROD=your_spain_client_id.access
+CF_ACCESS_CLIENT_SECRET_PREPROD=your_spain_client_secret
+CF_ACCESS_CLIENT_ID_LAB=your_spain_client_id.access
+CF_ACCESS_CLIENT_SECRET_LAB=your_spain_client_secret
+
+# Portugal - Production, Preprod & Lab
+CF_ACCESS_CLIENT_ID_PRODUCTION_PT=your_portugal_prod_client_id.access
+CF_ACCESS_CLIENT_SECRET_PRODUCTION_PT=your_portugal_prod_client_secret
+CF_ACCESS_CLIENT_ID_PREPROD_PT=your_portugal_preprod_client_id.access
+CF_ACCESS_CLIENT_SECRET_PREPROD_PT=your_portugal_preprod_client_secret
+CF_ACCESS_CLIENT_ID_LAB_PT=your_portugal_lab_client_id.access
+CF_ACCESS_CLIENT_SECRET_LAB_PT=your_portugal_lab_client_secret
 ```
+
+**2. Request credentials** from infrastructure team with these details:
+
+- **Cloudflare Access Domain:** `uci-pt.cloudflareaccess.com` (Portugal), `cinesa-es.cloudflareaccess.com` (Spain)
+- **Protected URLs:** List specific environment URLs
+- **Purpose:** Automated testing via Playwright
+
+**3. Run tests with Cloudflare:**
+
+```bash
+# Always use headed mode and workers=1 for Cloudflare environments
+npm run test:es:preprod -- --headed --workers=1
+npm run test:pt:preprod -- --grep '@smoke' --headed --workers=1
+npm run test:it:lab -- --grep '@critical' --headed --workers=1
+```
+
+### Credential Lookup Priority
+
+The system looks for credentials in this order:
+
+1. **Per-deployment:** `CF_ACCESS_CLIENT_ID_PREPROD_PT` (most specific)
+2. **Per-environment:** `CF_ACCESS_CLIENT_ID_PREPROD` (fallback)
+3. **Generic:** `CF_ACCESS_CLIENT_ID` (last resort)
+
+### Troubleshooting Cloudflare
+
+**Issue:** Tests show Cloudflare challenge page
+
+**Solutions:**
+
+1. **Verify credentials in `.env`:**
+
+   ```bash
+   cat .env | grep CF_ACCESS
+   ```
+
+2. **Check environment normalization:**
+
+   - `preprod-pt` → `PREPROD_PT` (correct)
+   - Hyphens are converted to underscores automatically
+
+3. **Run diagnostic test:**
+
+   ```bash
+   TEST_ENV=preprod-pt npx playwright test tests/cinesa/cloudflare/check-portugal-preprod.spec.ts --project='cloudflare-only' --headed
+   ```
+
+4. **Contact infrastructure team** if credentials are invalid or expired
+
+See [docs/CLOUDFLARE_HANDLING.md](./docs/CLOUDFLARE_HANDLING.md) for detailed troubleshooting.
 
 ## 🎯 Roadmap
 
-### Immediate Goals (Q4 2025)
+### ✅ Completed (Q4 2024)
 
-- **Cloudflare Integration**: Seamless challenge handling
+- **Multi-Region Support**: Spain, Portugal, Italy with standardized scripts
+- **Cloudflare Integration**: Automatic credentials injection per region
+- **Standardized NPM Scripts**: 90% reduction in script duplication
+- **Portugal Configuration**: Full support for `ucicinemas.pt`
+
+### Immediate Goals (Q1 2025)
+
+- **Valid Portugal Credentials**: Obtain working Cloudflare Access tokens
 - **Performance Testing**: Load time benchmarks and monitoring
 - **Visual Regression**: Automated screenshot comparison
 - **API Testing**: Backend service validation
+- **CI/CD Integration**: Azure DevOps pipeline with multi-region support
 
-### Future Enhancements (2026)
+### Future Enhancements (2025-2026)
 
-- **Additional Platforms**: Expansion to other cinema chains
+- **Additional Regions**: France, Germany, other European markets
 - **AI-Powered Testing**: Intelligent test generation and maintenance
 - **Advanced Analytics**: Predictive quality metrics
 - **Mobile App Testing**: Native mobile application support
+- **Legacy Script Deprecation**: Remove old scripts in v2.0.0
 
 ## 🐛 Troubleshooting
 
@@ -524,8 +671,16 @@ npx playwright install-deps   # Install system dependencies
 
 ---
 
-**Last Updated**: October 2, 2025  
-**Version**: 1.0.0
+**Last Updated**: November 4, 2025  
+**Version**: 1.1.0 - Multi-Region Standardization
+
+**Major Changes in 1.1.0:**
+
+- 🌍 **Portugal Support**: Full UCI Cinemas Portugal integration
+- 🎯 **Standardized Scripts**: New `test:es`, `test:pt`, `test:it` pattern
+- 🔐 **Cloudflare Auto-Injection**: Automatic credential handling per region
+- 📚 **Enhanced Documentation**: New guides for multi-region testing
+- 🧹 **90% Script Reduction**: From 166+ to ~20 base scripts with dynamic flags
 
 ---
 

@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import {
   getUCICinemasProject,
   getCinesaProject,
+  getCinesaPortugalProject,
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
@@ -77,11 +78,12 @@ export default defineConfig({
   fullyParallel: true,
   workers: process.env.CI ? 2 : 3, // CI: 2 workers, Local: 3 workers (balance estabilidad/velocidad)
 
-  // Proyectos separados para UCI, Cinesa y un proyecto específico para
+  // Proyectos separados para UCI, Cinesa España, Cinesa Portugal y un proyecto específico para
   // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
   projects: [
     getUCICinemasProject(),
     getCinesaProject(),
+    getCinesaPortugalProject(),
     getCloudflareOnlyProject(),
     getCinesaCloudflareProject(),
   ],

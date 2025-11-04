@@ -5,9 +5,15 @@ function buildKey(
   env: CloudflareEnv,
   deployment?: Deployment
 ) {
-  if (deployment)
-    return `${base}_${env.toUpperCase()}_${deployment.toUpperCase()}`;
-  return `${base}_${env.toUpperCase()}`;
+  // Normalize env: convert hyphens to underscores for env var names
+  // "preprod-pt" -> "PREPROD_PT"
+  const normalizedEnv = env.toUpperCase().replace(/-/g, '_');
+
+  if (deployment) {
+    const normalizedDeployment = deployment.toUpperCase().replace(/-/g, '_');
+    return `${base}_${normalizedEnv}_${normalizedDeployment}`;
+  }
+  return `${base}_${normalizedEnv}`;
 }
 
 function lookupSecret(

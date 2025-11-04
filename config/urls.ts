@@ -7,6 +7,9 @@ import {
   getCinesaConfig,
   getUCIConfig,
   getConfigWithOverrides,
+  getRegionFromEnvironment,
+  getCurrentEnvironment,
+  Region,
 } from './environments';
 
 /**
@@ -55,11 +58,18 @@ export interface NavigationUrls {
 }
 
 /**
- * Generates Cinesa navigation URLs based on configuration
+ * Generates Cinesa navigation URLs based on configuration and region
+ * @param region - Optional region override ('es' | 'pt'). If not provided, auto-detects from TEST_ENV
  */
-export function getCinesaUrls(): NavigationUrls {
+export function getCinesaUrls(region?: Region): NavigationUrls {
   const config = getConfigWithOverrides(getCinesaConfig(), 'cinesa');
   const baseUrl = config.baseUrl;
+
+  // Auto-detect region from environment if not explicitly provided
+  const currentRegion =
+    region ||
+    config.region ||
+    getRegionFromEnvironment(getCurrentEnvironment(), 'cinesa');
 
   return {
     base: baseUrl,
@@ -86,14 +96,29 @@ export function getCinesaUrls(): NavigationUrls {
     },
     apps: {
       android:
-        'https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa',
-      ios: 'https://apps.apple.com/es/app/cinesa-app/id6444631578?l=ca',
+        currentRegion === 'pt'
+          ? 'https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa.pt'
+          : 'https://play.google.com/store/apps/details?id=nz.co.vista.android.movie.cinesa',
+      ios:
+        currentRegion === 'pt'
+          ? 'https://apps.apple.com/pt/app/cinesa-app/id6444631578'
+          : 'https://apps.apple.com/es/app/cinesa-app/id6444631578?l=ca',
     },
     social: {
-      facebook: 'https://www.facebook.com/cinesa.es',
-      twitter: 'https://twitter.com/cinesa_es',
-      instagram: 'https://www.instagram.com/cinesa_es',
-      youtube: 'https://www.youtube.com/user/CinesaEspana',
+      facebook:
+        currentRegion === 'pt'
+          ? 'https://www.facebook.com/cinesa.pt'
+          : 'https://www.facebook.com/cinesa.es',
+      twitter:
+        currentRegion === 'pt' ? undefined : 'https://twitter.com/cinesa_es',
+      instagram:
+        currentRegion === 'pt'
+          ? 'https://www.instagram.com/cinesa_pt'
+          : 'https://www.instagram.com/cinesa_es',
+      youtube:
+        currentRegion === 'pt'
+          ? undefined
+          : 'https://www.youtube.com/user/CinesaEspana',
     },
   };
 }

@@ -49,7 +49,7 @@ export const footerSelectors: FooterSelectors = {
     'a[href="/documentos-legales/condiciones-unlimited/"]',
   politicaPrivacidadLink: 'a[href="/documentos-legales/politica-privacidad/"]',
   politicaCookiesLink: 'a[href="/documentos-legales/cookies"]',
-  esclavitudModernaLink: 'a[href*="modernslavery_es.pdf"]',
+  esclavitudModernaLink: 'a[href*="modernslavery"]',
   codigoConductaLink:
     'a[href="/quienes-somos/codigo-de-conducta-y-etica-empresariales"]',
   politicaDenunciaLink: 'a[href*="whistleblowing-policy"]',
