@@ -120,6 +120,10 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Seat Selection Validation', () => {
+    test.beforeEach(async () => {
+      await allure.story('Seat selection validation rules');
+    });
+
     for (const cinema of CINEMAS) {
       test(
         `Attempt to select seats leaving empty space between selection - ${cinema.name}`,
@@ -240,6 +244,10 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Accessibility - Wheelchair and Companion Seats', () => {
+    test.beforeEach(async () => {
+      await allure.story('Wheelchair and companion seat selection');
+    });
+
     for (const cinema of CINEMAS) {
       test(
         `Select only companion seat - ${cinema.name}`,
@@ -319,6 +327,10 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('D-BOX Sofa Seat Selection', () => {
+    test.beforeEach(async () => {
+      await allure.story('D-BOX sofa seat selection and validation');
+    });
+
     for (const cinema of CINEMAS) {
       test(
         `Select one sofa seat correctly - ${cinema.name}`,
@@ -486,6 +498,10 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Promotional Codes', () => {
+    test.beforeEach(async () => {
+      await allure.story('Promotional code application in booking flow');
+    });
+
     for (const cinema of CINEMAS) {
       test(
         `Full purchase with standard promotional code - ${cinema.name}`,
