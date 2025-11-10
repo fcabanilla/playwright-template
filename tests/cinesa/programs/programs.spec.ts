@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertProgramsRedirection } from './programs.assertions';
 
@@ -10,6 +11,9 @@ test.describe(
   () => {
     test.beforeEach(
       async ({ page, cookieBanner, promotionalModal, navbar }) => {
+        await allure.epic('Cinesa Platform');
+        await allure.feature('Loyalty Programs - Rewards');
+
         await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
         await navbar.navigateToHome();
         await cookieBanner.acceptAllCookies();
@@ -28,6 +32,7 @@ test.describe(
         cookieBanner,
         promotionalModal,
       }) => {
+        await allure.story('COMS-11226 - Unlimited programs page from URL');
         await test.step('Navigate to Programs Unlimited page', async () => {
           await unlimitedProgramsPage.navigateToUnlimitedPrograms();
         });
@@ -44,6 +49,7 @@ test.describe(
         tag: ['@smoke', '@fast', '@COMS-11226'],
       },
       async ({ page, programsPage, unlimitedProgramsPage, navbar }) => {
+        await allure.story('COMS-11226 - Unlimited programs page from home');
         await navbar.navigateToPrograms();
 
         await programsPage.waitForProgramsPage();
@@ -62,6 +68,7 @@ test.describe(
         tag: ['@regression', '@medium'],
       },
       async ({ page, navbar }, testInfo) => {
+        await allure.story('Programs page display and layout');
         await navbar.navigateToPrograms();
         await takeScreenshot(
           page,
@@ -77,6 +84,7 @@ test.describe(
         tag: ['@regression', '@medium'],
       },
       async ({ page, navbar }) => {
+        await allure.story('Programs page URL redirection validation');
         await navbar.navigateToPrograms();
         await assertProgramsRedirection(page);
       }

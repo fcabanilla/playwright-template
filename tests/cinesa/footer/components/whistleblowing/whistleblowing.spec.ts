@@ -1,4 +1,5 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import {
   assertWhistleblowingNavigation,
   assertWhistleblowingPDFDownload,
@@ -9,6 +10,9 @@ import { expectedUrl } from './whistleblowing.data';
 
 test.describe('Whistleblowing Policy Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Footer - Site Navigation');
+
     await footer.navigateToHome();
     await cookieBanner.acceptAllCookies();
   });
@@ -17,6 +21,7 @@ test.describe('Whistleblowing Policy Tests', () => {
     'Whistleblowing Policy display and layout',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }, testInfo) => {
+      await allure.story('Whistleblowing Policy PDF display and layout');
       const { download, popup } = await handlePDFInteraction(
         webActions,
         async () => {
@@ -37,6 +42,9 @@ test.describe('Whistleblowing Policy Tests', () => {
     'Whistleblowing Policy redirection test',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }) => {
+      await allure.story(
+        'Whistleblowing Policy PDF navigation and URL validation'
+      );
       const { download, popup } = await handlePDFInteraction(
         webActions,
         async () => {

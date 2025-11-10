@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import { getAnalyticsTestConfigs } from './analytics.data';
 import {
   assertEventsWereCaptured,
@@ -24,6 +25,9 @@ declare global {
 
 test.describe('Google Analytics DataLayer Validation', () => {
   test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Analytics - Tracking');
+
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
@@ -55,6 +59,9 @@ test.describe('Google Analytics DataLayer Validation', () => {
         loginPage,
         analyticsPage,
       }) => {
+        await allure.story(
+          `COMS-13733 / COMS-13727 - GA4 DataLayer validation - ${config.cinema.name} - ${config.menuType}`
+        );
         await analyticsPage.initializeDataLayerCapture();
 
         try {

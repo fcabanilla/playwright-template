@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import { BlogLandingAssertions } from './blogLanding.assertions';
 import { blogLandingData } from './blogLanding.data';
 
@@ -7,6 +8,9 @@ test.describe('Blog Landing Page Tests', () => {
 
   test.beforeEach(
     async ({ page, blogLanding, cookieBanner, promotionalModal }) => {
+      await allure.epic('Cinesa Platform');
+      await allure.feature('Blog - Content Platform');
+
       blogLandingAssertions = new BlogLandingAssertions(page);
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -18,6 +22,7 @@ test.describe('Blog Landing Page Tests', () => {
     'should display the expected number of article cards',
     { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
     async () => {
+      await allure.story('OCG-2009 - Article cards count validation');
       await blogLandingAssertions.expectArticleCardsCount(
         blogLandingData.expectedArticleCardsCount
       );
@@ -28,6 +33,7 @@ test.describe('Blog Landing Page Tests', () => {
     'should have all article cards visible',
     { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
     async () => {
+      await allure.story('OCG-2009 - Article cards visibility');
       await blogLandingAssertions.expectArticleCardsVisible();
     }
   );
@@ -45,6 +51,7 @@ test.describe('Blog Landing Page Tests', () => {
       ],
     },
     async () => {
+      await allure.story('OCG-2030 - Related articles navigation flow');
       await blogLandingAssertions.expectNavigationThroughRelatedArticles();
     }
   );

@@ -1,4 +1,5 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { getCinemasForMovieTests } from './movies.data';
 import {
@@ -12,6 +13,9 @@ const CINEMAS_FOR_SCHEMA = getCinemasForMovieTests();
 
 test.describe('Cinesa Movies Tests', () => {
   test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Movies - Content Catalog');
+
     await navbar.navigateToHome();
     await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
@@ -24,6 +28,7 @@ test.describe('Cinesa Movies Tests', () => {
       { webActions, navbar, cookieBanner, promotionalModal },
       testInfo
     ) => {
+      await allure.story('Movies catalog page display and layout');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -40,6 +45,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Cinesa Movies page redirection test',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ webActions, navbar, cookieBanner, promotionalModal }) => {
+      await allure.story('Movies page URL redirection validation');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -52,6 +58,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Navigate through Top Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+      await allure.story('Navigation through Top Movies section');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -65,6 +72,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Navigate through Random Movies from All Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+      await allure.story('Random movie navigation - All Movies tab');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -76,6 +84,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Navigate through Random Movies from Now Showing',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+      await allure.story('Random movie navigation - Now Showing tab');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -88,6 +97,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Navigate through Random Movies from Coming Soon',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+      await allure.story('Random movie navigation - Coming Soon tab');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -99,6 +109,7 @@ test.describe('Cinesa Movies Tests', () => {
     'Navigate through Random Movies from Advance Sale',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+      await allure.story('Random movie navigation - Advance Sale tab');
       await navbar.navigateToMovies();
       await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
@@ -121,6 +132,7 @@ test.describe('Cinesa Movies Tests', () => {
         ],
       },
       async ({ moviePage, navbar, cinema: cinemaPage, cinemaDetail }) => {
+        await allure.story(`Movie Schema validation - ${cinema.name}`);
         await navbar.navigateToCinemas();
         await cinemaPage[cinema.selectMethod]();
         const selectedInfo = await cinemaDetail.selectRandomFilmForDetails();
@@ -144,6 +156,7 @@ test.describe('Cinesa Movies Tests', () => {
       ],
     },
     async ({ moviePage, navbar, cinema, cinemaDetail }) => {
+      await allure.story('OCG-3316 - Movie Schema URL validation');
       await navbar.navigateToCinemas();
       await cinema.selectOasizCinema();
       await cinemaDetail.selectRandomFilmForDetails();

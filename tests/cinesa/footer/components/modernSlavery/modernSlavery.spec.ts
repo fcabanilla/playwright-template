@@ -1,4 +1,5 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import {
   assertModernSlaveryNavigation,
   assertModernSlaveryPDFDownload,
@@ -9,6 +10,9 @@ import { expectedUrl } from './modernSlavery.data';
 
 test.describe('Modern Slavery Declaration Tests', () => {
   test.beforeEach(async ({ cookieBanner, footer }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Footer - Site Navigation');
+
     await footer.navigateToHome();
     await cookieBanner.acceptAllCookies();
   });
@@ -17,6 +21,7 @@ test.describe('Modern Slavery Declaration Tests', () => {
     'Modern Slavery Declaration display and layout',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }, testInfo) => {
+      await allure.story('Modern Slavery Declaration PDF display and layout');
       const { download, popup } = await handlePDFInteraction(
         webActions,
         async () => {
@@ -37,6 +42,9 @@ test.describe('Modern Slavery Declaration Tests', () => {
     'Modern Slavery Declaration redirection test',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }) => {
+      await allure.story(
+        'Modern Slavery Declaration PDF navigation and URL validation'
+      );
       const { download, popup } = await handlePDFInteraction(
         webActions,
         async () => {

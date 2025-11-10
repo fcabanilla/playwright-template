@@ -481,6 +481,148 @@ await webActions.click(selector, 'Click on movie card'); // Creates Allure step
 await webActions.navigateTo(url, 'Navigate to home'); // Creates Allure step
 ```
 
+### Allure Hierarchical Labels (EPIC, FEATURE, STORY)
+
+**CRITICAL: All tests MUST include hierarchical labels for proper organization in Allure reports.**
+
+Allure supports 3-level hierarchy for test organization:
+
+- **EPIC:** Highest level (e.g., "Cinesa Platform")
+- **FEATURE:** Component/module level (e.g., "Navbar - Main Navigation", "Movies - Content Catalog")
+- **STORY:** Individual test scenario (e.g., "User login with valid credentials", "Movie schema validation")
+
+**Standard Pattern:**
+
+```typescript
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
+
+test.describe('Component Tests', () => {
+  test.beforeEach(async ({ navbar, cookieBanner }) => {
+    // Add EPIC and FEATURE in beforeEach (applies to all tests in describe block)
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Component Name - Purpose');
+
+    await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
+  });
+
+  test('should perform action', async ({ component }) => {
+    // Add STORY per test for specific scenario
+    await allure.story('Action description');
+    await component.performAction();
+  });
+});
+```
+
+**Including JIRA Tags in Stories:**
+
+When tests have JIRA tags (e.g., `@OCG-3316`, `@COMS-7212`), include them in the story label:
+
+```typescript
+test(
+  'Movie Schema URL validation test',
+  {
+    tag: ['@movies', '@schema', '@OCG-3316', '@fix-test'],
+  },
+  async ({ moviePage }) => {
+    // Include JIRA tag in story for traceability
+    await allure.story('OCG-3316 - Movie Schema URL validation');
+    await moviePage.validateSchema();
+  }
+);
+```
+
+**Standardized Feature Names by Component:**
+
+| Component       | FEATURE Label                   |
+| --------------- | ------------------------------- |
+| navbar          | Navbar - Main Navigation        |
+| footer          | Footer - Site Navigation        |
+| movies          | Movies - Content Catalog        |
+| cinemas         | Cinemas - Location Finder       |
+| blog            | Blog - Content Platform         |
+| seatPicker      | Seat Picker - Seat Selection    |
+| bar             | Bar & Food Services             |
+| ticketPicker    | Ticket Picker - Entry Selection |
+| purchaseSummary | Purchase Summary - Order Review |
+| login           | Authentication - User Access    |
+| signup          | Registration - New Users        |
+| promotions      | Promotions - Marketing          |
+| coupons         | Coupons - Discount System       |
+| experiences     | Experiences - Premium Formats   |
+| programs        | Loyalty Programs - Rewards      |
+| analytics       | Analytics - Tracking            |
+| mailing         | Mailing - Communications        |
+
+**Example - Complete Implementation:**
+
+```typescript
+import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
+
+test.describe('Cinesa Movies Tests', () => {
+  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Movies - Content Catalog');
+
+    await navbar.navigateToHome();
+    await cookieBanner.acceptAllCookies();
+    await promotionalModal.closeModalIfVisible();
+  });
+
+  test(
+    'Movies page display and layout',
+    { tag: ['@movies', '@cinesa', '@smoke'] },
+    async ({ navbar }) => {
+      await allure.story('Movies catalog page display and layout');
+      await navbar.navigateToMovies();
+    }
+  );
+
+  test(
+    'Movie Schema URL validation',
+    { tag: ['@movies', '@schema', '@OCG-3316', '@fix-test'] },
+    async ({ moviePage }) => {
+      await allure.story('OCG-3316 - Movie Schema URL validation');
+      const schema = await moviePage.extractMovieSchema();
+      await moviePage.validateSchemaURLs(schema);
+    }
+  );
+});
+```
+
+**Benefits:**
+
+- **Organized Reports:** Tests grouped by EPIC → FEATURE → STORY hierarchy
+- **Traceability:** JIRA tags linked to specific test scenarios
+- **Business Visibility:** Clear mapping between tests and business requirements
+- **Filtering:** Easy filtering by epic/feature in Allure UI
+
+**Common Mistakes:**
+
+```typescript
+// ❌ WRONG - Missing labels
+test.describe('Tests', () => {
+  test.beforeEach(async ({ navbar }) => {
+    // Missing allure.epic() and allure.feature()
+    await navbar.navigateToHome();
+  });
+
+  test('should work', async ({ component }) => {
+    // Missing allure.story()
+    await component.doSomething();
+  });
+});
+
+// ❌ WRONG - Labels in wrong place
+test('should work', async ({ component }) => {
+  await allure.epic('Cinesa Platform'); // Should be in beforeEach
+  await allure.feature('Component'); // Should be in beforeEach
+  await allure.story('Story'); // ✅ Correct place
+});
+```
+
 ### TypeScript Strict Mode
 
 - All files use strict TypeScript
@@ -663,6 +805,7 @@ test: Add loyalty program smoke tests
 ❌ **Don't** write test names, descriptions, or comments in Spanish
 ❌ **Don't** duplicate tests for different cinemas/variants (use parametrization)
 ❌ **Don't** hardcode test data in spec files (extract to `*.testData.ts`)
+❌ **Don't** forget Allure labels (`epic`, `feature`, `story`) - tests will appear "loose" in reports
 
 ✅ **Do** use `WebActions` for ALL Playwright API interactions in Page Objects
 ✅ **Do** use fixtures for all component dependencies
@@ -678,6 +821,8 @@ test: Add loyalty program smoke tests
 ✅ **Do** write ALL code in English (test names, variables, comments, functions)
 ✅ **Do** use data-driven parametrization for test variants (cinemas, formats, etc.)
 ✅ **Do** store test data in separate `*.testData.ts` files for reusability
+✅ **Do** add Allure hierarchical labels: `epic` in beforeEach, `feature` in beforeEach, `story` per test
+✅ **Do** include JIRA tags in story labels when applicable (e.g., "OCG-3316 - Description")
 
 ## Key Files Reference
 
