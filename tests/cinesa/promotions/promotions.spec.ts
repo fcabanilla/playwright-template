@@ -15,7 +15,7 @@ test.describe('Cinesa Promotions Tests', () => {
 
   test(
     'Promotions page display and layout',
-    { tag: ['@promotions', '@cinesa', '@regression', '@medium', '@broken-prod'] },
+    { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
     async ({ page, navbar, webActions }, testInfo) => {
       await allure.story('Promotions page display and layout');
       await navbar.navigateToPromotions();

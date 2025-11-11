@@ -63,7 +63,11 @@
     "_____BROKEN_TESTS_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
     "test:broken": "npx playwright test --grep @broken-prod --project=Cinesa",
     "test:broken:preprod": "cross-env TEST_ENV=preprod npm run test:broken --",
-    "test:broken:lab": "cross-env TEST_ENV=lab npm run test:broken --"
+    "test:broken:lab": "cross-env TEST_ENV=lab npm run test:broken --",
+    "_____FAILED_TESTS_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "test:failed": "npx playwright test --grep @failed-prod --project=Cinesa",
+    "test:failed:preprod": "cross-env TEST_ENV=preprod npm run test:failed --",
+    "test:failed:lab": "cross-env TEST_ENV=lab npm run test:failed --"
   },
   "repository": {
     "type": "git",

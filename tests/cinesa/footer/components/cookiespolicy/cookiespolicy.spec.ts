@@ -13,17 +13,18 @@ test.describe('Cookies Policy Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Cookies Policy page display and layout', {
-    tag: ['@footer', '@cookiespolicy', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    footer,
-  }, testInfo) => {
-    await allure.story('Cookies Policy page display and layout');
-    await footer.clickPoliticaCookies();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Cookies Policy display and layout');
-  });
+  test(
+    'Cookies Policy page display and layout',
+    {
+      tag: ['@footer', '@cookiespolicy', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, footer }, testInfo) => {
+      await allure.story('Cookies Policy page display and layout');
+      await footer.clickPoliticaCookies();
+      await page.waitForLoadState('networkidle');
+      await takeScreenshot(page, testInfo, 'Cookies Policy display and layout');
+    }
+  );
 
   test('Cookies Policy page redirection test', async ({ page, footer }) => {
     await allure.story('Cookies Policy navigation and URL validation');

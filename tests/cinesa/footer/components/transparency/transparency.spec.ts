@@ -13,24 +13,29 @@ test.describe('Transparency Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Transparency page display and layout', {
-    tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    footer,
-  }, testInfo) => {
-    await allure.story('Transparency page display and layout');
-    await footer.clickTransparencia();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Transparency display and layout');
-  });
+  test(
+    'Transparency page display and layout',
+    {
+      tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, footer }, testInfo) => {
+      await allure.story('Transparency page display and layout');
+      await footer.clickTransparencia();
+      await page.waitForLoadState('networkidle');
+      await takeScreenshot(page, testInfo, 'Transparency display and layout');
+    }
+  );
 
-  test('Transparency page redirection test', {
-    tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
-  }, async ({ page, footer }) => {
-    await allure.story('Transparency navigation and URL validation');
-    await footer.clickTransparencia();
-    await page.waitForLoadState('networkidle');
-    await assertTransparencyNavigation(page, expectedUrl);
-  });
+  test(
+    'Transparency page redirection test',
+    {
+      tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, footer }) => {
+      await allure.story('Transparency navigation and URL validation');
+      await footer.clickTransparencia();
+      await page.waitForLoadState('networkidle');
+      await assertTransparencyNavigation(page, expectedUrl);
+    }
+  );
 });

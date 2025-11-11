@@ -13,17 +13,18 @@ test.describe('Legal Notice Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Legal Notice page display and layout', {
-    tag: ['@footer', '@legalnotice', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    footer,
-  }, testInfo) => {
-    await allure.story('Legal Notice page display and layout');
-    await footer.clickAvisoLegal();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Legal Notice display and layout');
-  });
+  test(
+    'Legal Notice page display and layout',
+    {
+      tag: ['@footer', '@legalnotice', '@cinesa', '@failed-prod'],
+    },
+    async ({ page, footer }, testInfo) => {
+      await allure.story('Legal Notice page display and layout');
+      await footer.clickAvisoLegal();
+      await page.waitForLoadState('networkidle');
+      await takeScreenshot(page, testInfo, 'Legal Notice display and layout');
+    }
+  );
 
   test('Legal Notice page redirection test', async ({ page, footer }) => {
     await allure.story('Legal Notice navigation and URL validation');
