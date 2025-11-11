@@ -13,6 +13,18 @@ export class Footer {
     this.url = baseUrl || 'https://www.cinesa.es/';
   }
 
+  /**
+   * Get environment-appropriate selector for blog link
+   * Production: Opens in same tab, Preprod: Opens in new tab
+   */
+  getBlogSelector(): string {
+    const currentUrl = this.webActions.getPage().url();
+    if (currentUrl?.includes('preprod-web.ocgtest.es') || currentUrl?.includes('lab-web.ocgtest.es')) {
+      return this.selectors.blogDeCinesaLinkPreprod || this.selectors.blogDeCinesaLink;
+    }
+    return this.selectors.blogDeCinesaLinkProd || this.selectors.blogDeCinesaLink;
+  }
+
   async navigateToHome(): Promise<void> {
     await allure.step('Navigating to Cinesa home', async () => {
       await this.webActions.navigateTo(this.url);
@@ -87,7 +99,8 @@ export class Footer {
 
   async clickBlogDeCinesa(): Promise<void> {
     await allure.step('Clicking Blog de Cinesa link', async () => {
-      await this.webActions.click(this.selectors.blogDeCinesaLink);
+      const blogSelector = this.getBlogSelector();
+      await this.webActions.click(blogSelector);
     });
   }
 

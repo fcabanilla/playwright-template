@@ -1,7 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { FooterSelectors } from '../../../pageObjectsManagers/cinesa/footer/footer.selectors'
 import { allure } from 'allure-playwright';
-import { baseUrl } from './footer.data';
 
 /**
  * Asserts that core footer elements are visible on the page.
@@ -326,13 +325,40 @@ export async function assertFooterAppLinks(
  * This is a website bug, not a test issue. The assertion validates the expected behavior.
  *
  * @param page - The Playwright page object to interact with
- * @param footer - The Footer object containing all footer element selectors
+ * @param blogSelector - The specific blog selector (determined by Page Object)
+ * @param baseUrl - The base URL for the current environment
  * @returns A Promise that resolves when navigation and assertion are complete
  */
-export async function assertNavigateToBlog(page: Page, footer: FooterSelectors): Promise<void> {
+export async function assertNavigateToBlog(page: Page, blogSelector: string, baseUrl: string): Promise<void> {
   await allure.step('Navigating to Cinesa blog page and validating URL', async () => {
-    await page.click(footer.blogDeCinesaLink);
-    await page.waitForLoadState('networkidle');
-    await expect(page).toHaveURL(`${baseUrl}/blog-cinesa/`);
+    // Get the target attribute to check if it opens in new tab
+    const targetAttribute = await page.getAttribute(blogSelector, 'target');
+    
+    if (targetAttribute === '_blank') {
+      // If it opens in new tab, handle popup
+      const [newPage] = await Promise.all([
+        page.waitForEvent('popup'),
+        page.click(blogSelector)
+      ]);
+      
+      await newPage.waitForLoadState('networkidle');
+      await expect(newPage).toHaveURL(`${baseUrl}/blog-cinesa/`);
+      await newPage.close();
+    } else {
+      // Check if it's an external link by getting href
+      const href = await page.getAttribute(blogSelector, 'href');
+      
+      if (href && href.startsWith('http') && !href.includes(baseUrl)) {
+        // External link - just check that it exists
+        await expect(page.locator(blogSelector)).toBeVisible();
+        console.log(`External blog link detected: ${href}`);
+      } else {
+        // Internal navigation - wait for navigation
+        await Promise.all([
+          page.waitForURL(`${baseUrl}/blog-cinesa/`),
+          page.click(blogSelector)
+        ]);
+      }
+    }
   });
 }

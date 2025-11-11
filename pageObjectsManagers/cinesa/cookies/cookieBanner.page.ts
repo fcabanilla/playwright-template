@@ -23,13 +23,36 @@ export class CookieBanner {
   }
 
   /**
+   * Helper function to get environment-specific selector
+   */
+  private getEnvironmentSelector(selectorName: keyof CookieBannerSelectors): string {
+    const env = process.env.TEST_ENV || 'production';
+    const prodSelectorName = `${String(selectorName)}Prod` as keyof CookieBannerSelectors;
+    const preprodSelectorName = `${String(selectorName)}Preprod` as keyof CookieBannerSelectors;
+    
+    if (env === 'production' && this.selectors[prodSelectorName]) {
+      return this.selectors[prodSelectorName] as string;
+    } else if ((env === 'preprod' || env === 'lab') && this.selectors[preprodSelectorName]) {
+      return this.selectors[preprodSelectorName] as string;
+    }
+    
+    // Fallback to default selector
+    return this.selectors[selectorName] as string;
+  }
+
+  /**
    * Accept all cookies and dismiss overlays
    * Simple orchestration - delegates to WebActions
    */
   async acceptAllCookies(): Promise<void> {
+    const bannerSelector = this.getEnvironmentSelector('banner');
+    const acceptButtonSelector = this.getEnvironmentSelector('acceptButton');
+    const overlaySelector = this.getEnvironmentSelector('overlay');
+    const consentSdkSelector = this.getEnvironmentSelector('consentSdk');
+
     // Check if banner appears (uses waitForVisible with timeout)
     const bannerVisible = await this.webActions
-      .waitForVisible(this.selectors.banner, 3000)
+      .waitForVisible(bannerSelector, 3000)
       .then(() => true)
       .catch(() => false);
 
@@ -40,11 +63,11 @@ export class CookieBanner {
     }
 
     // Click accept button (WebActions handles overlay blocking)
-    await this.webActions.clickWithOverlayHandling(this.selectors.acceptButton);
+    await this.webActions.clickWithOverlayHandling(acceptButtonSelector);
 
     // Wait for banner to disappear
     await this.webActions
-      .waitForSelector(this.selectors.banner, {
+      .waitForSelector(bannerSelector, {
         state: 'hidden',
         timeout: 5000,
       })
@@ -52,7 +75,7 @@ export class CookieBanner {
 
     // 🔧 PHASE 1: Wait for overlay to disappear
     await this.webActions
-      .waitForSelector(this.selectors.overlay, {
+      .waitForSelector(overlaySelector, {
         state: 'hidden',
         timeout: 10000,
       })
@@ -70,16 +93,20 @@ export class CookieBanner {
    * Uses selectors from cookieBannerSelectors - no hardcoded selectors
    */
   private async removeOverlays(): Promise<void> {
+    const overlaySelector = this.getEnvironmentSelector('overlay');
+    const consentSdkSelector = this.getEnvironmentSelector('consentSdk');
+    const bannerSelector = this.getEnvironmentSelector('banner');
+
     // Wait for overlays to detach naturally first (with timeout)
     await Promise.race([
       this.webActions
-        .waitForSelector(this.selectors.overlay, {
+        .waitForSelector(overlaySelector, {
           state: 'detached',
           timeout: 2000,
         })
         .catch(() => {}),
       this.webActions
-        .waitForSelector(this.selectors.consentSdk, {
+        .waitForSelector(consentSdkSelector, {
           state: 'hidden',
           timeout: 2000,
         })
@@ -88,7 +115,7 @@ export class CookieBanner {
 
     // Check if overlay still exists (quick check with 500ms timeout)
     const overlayGone = await this.webActions
-      .waitForSelector(this.selectors.overlay, {
+      .waitForSelector(overlaySelector, {
         state: 'detached',
         timeout: 500,
       })
@@ -98,9 +125,9 @@ export class CookieBanner {
     // If overlay still present, force remove elements
     if (!overlayGone) {
       const selectorsToRemove = [
-        this.selectors.overlay,
-        this.selectors.banner,
-        this.selectors.consentSdk,
+        overlaySelector,
+        bannerSelector,
+        consentSdkSelector,
         this.selectors.settingsModal,
       ];
 
