@@ -8,6 +8,7 @@ import {
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
+import { getAllureCategories } from './config/allure/categories.config';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -108,38 +109,9 @@ export default defineConfig({
             nameTemplate: 'Test Case %s',
           },
         },
-        categories: [
-          {
-            name: '🔒 Cloudflare Protection Issues',
-            messageRegex: '.*(cloudflare|protection|challenge|captcha).*',
-            traceRegex: '.*(cloudflare|TimeoutError|Navigation timeout).*',
-            matchedStatuses: ['failed', 'broken'], // lowercase en v3
-          },
-          {
-            name: '🎭 Modal & Overlay Issues',
-            messageRegex: '.*(modal|overlay|popup|banner|promotional).*',
-            traceRegex: '.*(click intercepted|element not found|not visible).*',
-            matchedStatuses: ['failed', 'broken'],
-          },
-          {
-            name: '🧭 Navigation & URL Issues',
-            messageRegex: '.*(navigation|url|redirect|timeout).*',
-            traceRegex: '.*(goto|navigate|waitForURL|expect.*toHaveURL).*',
-            matchedStatuses: ['failed', 'broken'],
-          },
-          {
-            name: '🎬 Film Content Issues',
-            messageRegex: '.*(film|movie|title|card).*',
-            traceRegex: '.*(getFilmTitles|selectFilm|film.*not found).*',
-            matchedStatuses: ['failed', 'broken'],
-          },
-          {
-            name: '🏢 Cinema Selection Issues',
-            messageRegex: '.*(cinema|location|venue).*',
-            traceRegex: '.*(getCinemaNames|selectCinema|cinema.*not found).*',
-            matchedStatuses: ['failed', 'broken'],
-          },
-        ],
+        // Defect categories for automatic failure classification
+        // See config/allure/categories.config.ts and docs/ALLURE_CATEGORIES.md
+        categories: getAllureCategories(),
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
           Environment: process.env.TEST_ENV || 'production',
