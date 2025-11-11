@@ -46,7 +46,15 @@ test.describe('Cinesa Footer Tests', () => {
     { tag: ['@smoke', '@footer', '@navigation', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Blog navigation from footer');
-      await assertNavigateToBlog(webActions.getPage(), footer.selectors);
+      
+      // Page Object determines the correct selector for the environment
+      const blogSelector = footer.getBlogSelector();
+      
+      // Import baseUrl from data file
+      const { baseUrl } = await import('./footer.data');
+      
+      // Assertions receive the selector determined by Page Object
+      await assertNavigateToBlog(webActions.getPage(), blogSelector, baseUrl);
     }
   );
 

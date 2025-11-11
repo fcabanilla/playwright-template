@@ -42,9 +42,9 @@ export class CinemaDetail {
    * Creates a new CinemaDetail instance.
    * @param page - The Playwright page object (used for complex filtering)
    */
-  constructor(page: Page) {
-    this.page = page;
-    this.webActions = new WebActions(page);
+  constructor(webActions: WebActions) {
+    this.page = webActions.getPage();
+    this.webActions = webActions;
     this.selectors = cinemaDetailSelectors;
   }
 

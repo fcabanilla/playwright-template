@@ -1,5 +1,6 @@
-import { Page, Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { SEAT_PICKER_SELECTORS } from './seatPicker.selectors';
 
 /**
@@ -39,11 +40,15 @@ const maxSeatSelection = 9;
  * Contains methods to interact with the seat picker page.
  */
 export class SeatPicker {
-  readonly page: Page;
+  private readonly webActions: WebActions;
+  public readonly page: Page; // Public for test access, following TicketPicker pattern
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
+    this.page = webActions.page; // Direct page access for stability
   }
+
+
 
   /**
    * Waits for the seat picker container to be visible.
@@ -200,7 +205,7 @@ export class SeatPicker {
       // First, close any blocking modals
       await this.closeBlockingModals();
 
-      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const seatLocators = this.webActions.getLocator(SEAT_PICKER_SELECTORS.seatGeneric);
 
       // Try to wait for seats normally first
       try {
@@ -247,12 +252,11 @@ export class SeatPicker {
     return await allure.step('Retrieving all seats from the DOM', async () => {
       await this.waitForSeatPicker();
 
-      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
-      const count = await seatLocators.count();
+      const seatLocators = await this.webActions.getAllElements(SEAT_PICKER_SELECTORS.seatGeneric);
       const seats: Seat[] = [];
 
-      for (let i = 0; i < count; i++) {
-        const seatLocator = seatLocators.nth(i);
+      for (let i = 0; i < seatLocators.length; i++) {
+        const seatLocator = seatLocators[i];
         const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
         const className = (await seatLocator.getAttribute('class')) || '';
         const pressed = await seatLocator.getAttribute('aria-pressed');
@@ -419,8 +423,12 @@ export class SeatPicker {
           await seat.locator.click({ timeout: 3000 });
         } catch (error) {
           // If click fails (likely due to modal), handle modal and try again
-          await this.handleShowtimeAttributeModal();
-          await seat.locator.click();
+          try {
+            await this.handleShowtimeAttributeModal();
+            await seat.locator.click();
+          } catch (pageClosedError) {
+            throw new Error(`Unable to select seat [Row ${seat.row}, Seat ${seat.seatNumber}]: Page may have been closed or navigated away`);
+          }
         }
 
         const elementHandle = await seat.locator.elementHandle();
@@ -474,7 +482,7 @@ export class SeatPicker {
     return await allure.step(
       'Selecting last available seat from back',
       async () => {
-        await this.page.waitForResponse(
+        await this.webActions.getPage().waitForResponse(
           (response) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200
@@ -1146,12 +1154,19 @@ export class SeatPicker {
     }
 
     // Check for specific icons or href attributes in <use> elements
-    if ((await useLocator.count()) > 0) {
-      const href = await useLocator.first().getAttribute('href');
-      if (href?.includes('selected')) return 'selected';
-      if (href?.includes('available')) return 'available';
-      if (href?.includes('unavailable') || href?.includes('house'))
-        return 'unavailable';
+    try {
+      const useCount = await useLocator.count();
+      if (useCount > 0) {
+        const href = await useLocator.first().getAttribute('href');
+        if (href?.includes('selected')) return 'selected';
+        if (href?.includes('available')) return 'available';
+        if (href?.includes('unavailable') || href?.includes('house'))
+          return 'unavailable';
+      }
+    } catch (error) {
+      // Handle page closure gracefully - common in production environment
+      console.log('Page closed during seat state check, treating as unavailable');
+      return 'unavailable';
     }
 
     // Check for specific class names indicating state

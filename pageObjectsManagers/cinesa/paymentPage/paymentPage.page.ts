@@ -1,33 +1,34 @@
-import { Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { PAYMENT_SELECTORS } from './paymentPage.selectors';
 import { paymentTestData } from '../../../tests/cinesa/paymentPage/paymentPage.data';
 
 export class PaymentPage {
-  readonly page: Page;
+  readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   async expandAccordion(): Promise<void> {
     await allure.step('Expanding payment accordion', async () => {
-      await this.page.click(PAYMENT_SELECTORS.accordionHeader);
-      await this.page.waitForSelector(PAYMENT_SELECTORS.cardNumberInput, { state: 'visible' });
+      await this.webActions.click(PAYMENT_SELECTORS.accordionHeader, 'Expand payment accordion');
+      await this.webActions.expectVisible(PAYMENT_SELECTORS.cardNumberInput);
     });
   }
 
   async enterCardData(cardNumber: string = paymentTestData.cardNumber, pin: string = paymentTestData.pin): Promise<void> {
     await allure.step('Entering card data (card number & PIN)', async () => {
-      await this.page.fill(PAYMENT_SELECTORS.cardNumberInput, cardNumber);
-      await this.page.waitForSelector(PAYMENT_SELECTORS.pinInput, { state: 'visible' });
-      await this.page.fill(PAYMENT_SELECTORS.pinInput, pin);
+      const page = this.webActions.getPage();
+      await page.fill(PAYMENT_SELECTORS.cardNumberInput, cardNumber);
+      await this.webActions.expectVisible(PAYMENT_SELECTORS.pinInput);
+      await page.fill(PAYMENT_SELECTORS.pinInput, pin);
     });
   }
 
   async clickPay(): Promise<void> {
     await allure.step('Clicking pay button', async () => {
-      await this.page.click(PAYMENT_SELECTORS.payButton);
+      await this.webActions.click(PAYMENT_SELECTORS.payButton, 'Click pay button');
     });
   }
 

@@ -56,6 +56,29 @@ export class WebActions {
   }
 
   /**
+   * Updates the page context to a new page (used for handling new tabs/windows).
+   * This method allows continuing the same WebActions instance with a different page context.
+   *
+   * @param {Page} newPage - The new page to switch context to
+   *
+   * @example
+   * ```typescript
+   * // Handle new tab opening
+   * const pagePromise = page.context().waitForEvent('page');
+   * await button.click(); // Action that opens new tab
+   * const newTab = await pagePromise;
+   * webActions.updatePage(newTab);
+   * ```
+   *
+   * @since 1.1.0
+   */
+  updatePage(newPage: Page): void {
+    (this as any).page = newPage;
+    this.corsHandler = new CorsHandler(newPage);
+    this.initializeCorsHandling();
+  }
+
+  /**
    * Initialize CORS handling automatically for all WebActions instances
    */
   private async initializeCorsHandling(): Promise<void> {
@@ -265,10 +288,19 @@ export class WebActions {
   ): Promise<void> {
     const message = stepMessage || `Wait for ${selector} to be visible`;
     await allure.step(message, async () => {
-      await this.page.locator(selector).waitFor({
-        state: 'visible',
-        timeout: timeout || 30000,
-      });
+      try {
+        await this.page.locator(selector).waitFor({
+          state: 'visible',
+          timeout: timeout || 30000,
+        });
+      } catch (error) {
+        // Handle page closure gracefully - common in production environment
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Target page, context or browser has been closed')) {
+          throw new Error(`Page was closed while waiting for ${selector}. This may indicate navigation/redirect in production environment.`);
+        }
+        throw error;
+      }
     });
   }
 

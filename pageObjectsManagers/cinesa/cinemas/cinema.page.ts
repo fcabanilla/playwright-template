@@ -1,5 +1,5 @@
-import { Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { cinemaSelectors, CinemaSelectors } from './cinema.selectors';
 import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
 
@@ -9,9 +9,9 @@ import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
  */
 export class Cinema {
   /**
-   * Playwright page instance to interact with.
+   * WebActions instance to interact with Playwright.
    */
-  readonly page: Page;
+  private readonly webActions: WebActions;
 
   /**
    * Selectors for cinema page elements.
@@ -20,10 +20,10 @@ export class Cinema {
 
   /**
    * Creates a new Cinema instance.
-   * @param page - The Playwright page object to interact with.
+   * @param webActions - The WebActions instance to interact with Playwright.
    */
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
     this.selectors = cinemaSelectors;
   }
 
@@ -33,7 +33,7 @@ export class Cinema {
    * @returns Locator of the cinema list container.
    */
   getContainer() {
-    return this.page.locator(this.selectors.container);
+    return this.webActions.getLocator(this.selectors.container);
   }
 
   /**
@@ -43,8 +43,9 @@ export class Cinema {
    * @returns Locator for the cinema element.
    */
   getCinemaByName(name: string) {
-    return this.page.locator(this.selectors.cinemaElement, {
-      has: this.page.locator(this.selectors.cinemaName, { hasText: name }),
+    const page = this.webActions.getPage();
+    return page.locator(this.selectors.cinemaElement, {
+      has: page.locator(this.selectors.cinemaName, { hasText: name }),
     });
   }
 
@@ -68,7 +69,7 @@ export class Cinema {
    */
   async getCinemaNames(): Promise<string[]> {
     return await allure.step('Getting list of cinema names', async () => {
-      await this.page.waitForSelector(this.selectors.cinemaElement, {
+      await this.webActions.waitForSelector(this.selectors.cinemaElement, {
         state: 'attached',
         timeout: 10000,
       });
@@ -87,7 +88,7 @@ export class Cinema {
    */
   async selectRandomCinema(): Promise<string> {
     return await allure.step('Selecting a random cinema', async () => {
-      await this.page.waitForSelector(this.selectors.cinemaElement, {
+      await this.webActions.waitForSelector(this.selectors.cinemaElement, {
         state: 'attached',
         timeout: 10000,
       });
@@ -109,33 +110,61 @@ export class Cinema {
    * @returns Promise that resolves to the list of cinema names.
    */
   async logCinemaNames(): Promise<string[]> {
-    const names = await this.page
-      .locator(this.selectors.cinemaName)
+    const names = await this.webActions.getLocator(this.selectors.cinemaName)
       .allTextContents();
     console.log('Cinema Names:', names);
     return names;
   }
 
   /**
-   * Selects the Oasiz cinema.
+   * Selects the Oasiz cinema from the list.
    *
    * @returns Promise that resolves to the name of the selected cinema.
    */
   async selectOasizCinema(): Promise<string> {
     return await allure.step('Selecting Oasiz cinema', async () => {
-      await this.page.fill(this.selectors.filterInput, cinemasData.oasiz);
-      await this.page.waitForTimeout(1000);
-      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
-      await cinemaElement.click();
+      // Try to find Oasiz cinema directly without filtering first
+      const cinemaElements = this.webActions.getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement);
+      
+      const count = await cinemaElements.count();
+      let oasizFound = false;
+      
+      for (let i = 0; i < count; i++) {
+        const element = cinemaElements.nth(i);
+        const nameElement = element.locator(this.selectors.cinemaName);
+        const nameText = await nameElement.textContent();
+        
+        if (nameText && nameText.toLowerCase().includes('oasiz')) {
+          await element.click();
+          oasizFound = true;
+          break;
+        }
+      }
+      
+      if (!oasizFound) {
+        // Fallback: try with filter if direct search didn't work
+        try {
+          await this.webActions.fill(this.selectors.filterInput, cinemasData.oasiz);
+          await this.webActions.wait(1000);
+          const cinemaElement = this.webActions.getLocator(this.selectors.container)
+            .locator(this.selectors.cinemaElement).first();
+          await cinemaElement.click();
+        } catch (error) {
+          throw new Error(`Could not find Oasiz cinema. Available cinemas might be different in this environment. Error: ${error}`);
+        }
+      }
+      
       return cinemasData.oasiz;
     });
   }
 
   async selectSantanderCinema(): Promise<string> {
     return await allure.step('Selecting Santander cinema', async () => {
-      await this.page.fill(this.selectors.filterInput, cinemasData.santander);
-      await this.page.waitForTimeout(1000);
-      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
+      await this.webActions.fill(this.selectors.filterInput, cinemasData.santander);
+      await this.webActions.wait(1000);
+      const cinemaElement = this.webActions.getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement).first();
       await cinemaElement.click();
       return cinemasData.santander;
     });
@@ -143,9 +172,10 @@ export class Cinema {
 
   async selectGrancasaCinema(): Promise<string> {
     return await allure.step('Selecting Grancasa cinema', async () => {
-      await this.page.fill(this.selectors.filterInput, cinemasData.grancasa);
-      await this.page.waitForTimeout(1000);
-      const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
+      await this.webActions.fill(this.selectors.filterInput, cinemasData.grancasa);
+      await this.webActions.wait(1000);
+      const cinemaElement = this.webActions.getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement).first();
       await cinemaElement.click();
       return cinemasData.grancasa;
     });

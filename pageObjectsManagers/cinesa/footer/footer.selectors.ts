@@ -11,6 +11,8 @@ export interface FooterSelectors {
   infantilYColegiosLink: string;
   ciclosLink: string;
   blogDeCinesaLink: string;
+  blogDeCinesaLinkProd?: string; // Selector específico para producción
+  blogDeCinesaLinkPreprod?: string; // Selector específico para preprod
   avisoLegalLink: string;
   condicionesCompraLink: string;
   condicionesUnlimitedLink: string;
@@ -43,6 +45,8 @@ export const footerSelectors: FooterSelectors = {
   infantilYColegiosLink: 'a[href="/infantil/"]',
   ciclosLink: 'a[href="/ciclos/"]',
   blogDeCinesaLink: 'a[href="/blog-cinesa/"]',
+  blogDeCinesaLinkProd: 'a[href="/blog-cinesa/"]', // Producción
+  blogDeCinesaLinkPreprod: 'a[href="/blog-cinesa/"]', // Preprod (por ahora igual, lo ajustaremos según errores)
   avisoLegalLink: 'a[href="/documentos-legales/aviso-legal"]',
   condicionesCompraLink: 'a[href="/documentos-legales/condiciones-compra/"]',
   condicionesUnlimitedLink:
