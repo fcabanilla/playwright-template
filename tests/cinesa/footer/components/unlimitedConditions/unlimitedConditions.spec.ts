@@ -27,17 +27,18 @@ test.describe('UNLIMITED CARD Conditions Tests', () => {
     );
   });
 
-  test('UNLIMITED CARD Conditions page redirection test', {
-    tag: ['@footer', '@unlimitedconditions', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    footer,
-  }) => {
-    await allure.story(
-      'UNLIMITED CARD Conditions navigation and URL validation'
-    );
-    await footer.clickCondicionesUnlimited();
-    await page.waitForLoadState('networkidle');
-    await assertUnlimitedConditionsNavigation(page, expectedUrl);
-  });
+  test(
+    'UNLIMITED CARD Conditions page redirection test',
+    {
+      tag: ['@footer', '@unlimitedconditions', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, footer }) => {
+      await allure.story(
+        'UNLIMITED CARD Conditions navigation and URL validation'
+      );
+      await footer.clickCondicionesUnlimited();
+      await page.waitForLoadState('networkidle');
+      await assertUnlimitedConditionsNavigation(page, expectedUrl);
+    }
+  );
 });

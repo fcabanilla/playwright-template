@@ -23,12 +23,16 @@ test.describe('Who Are We Tests', () => {
     await takeScreenshot(page, testInfo, 'Who Are We display and layout');
   });
 
-  test('Who Are We page redirection test', {
-    tag: ['@footer', '@whoarewe', '@cinesa', '@broken-prod'],
-  }, async ({ page, footer }) => {
-    await allure.story('Who Are We navigation and URL validation');
-    await footer.clickQuienesSomos();
-    await page.waitForLoadState('networkidle');
-    await assertWhoAreWeNavigation(page, expectedUrl);
-  });
+  test(
+    'Who Are We page redirection test',
+    {
+      tag: ['@footer', '@whoarewe', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, footer }) => {
+      await allure.story('Who Are We navigation and URL validation');
+      await footer.clickQuienesSomos();
+      await page.waitForLoadState('networkidle');
+      await assertWhoAreWeNavigation(page, expectedUrl);
+    }
+  );
 });

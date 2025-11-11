@@ -32,16 +32,16 @@ test.describe('Cinesa Coupons Tests', () => {
     async ({ webActions, navbar }) => {
       await allure.story('Coupons navigation in new tab');
       const context = webActions.getPage().context();
-      
+
       // Set up the page listener before clicking
       const pagePromise = context.waitForEvent('page', { timeout: 10000 });
-      
+
       // Click the coupons link
       await navbar.navigateToCoupons();
-      
+
       // Wait for the new page
       const newPage = await pagePromise;
-      
+
       // ✅ ADR-0009 Compliance: Use WebActions for new page operations
       const newWebActions = new WebActions(newPage);
       await newWebActions.waitForLoadState('domcontentloaded');
@@ -51,7 +51,7 @@ test.describe('Cinesa Coupons Tests', () => {
 
   test(
     'should validate coupons opens new tab correctly',
-    { tag: ['@coupons', '@cinesa', '@navigation', '@regression', '@broken-prod'] },
+    { tag: ['@coupons', '@cinesa', '@navigation', '@regression'] },
     async ({ webActions, navbar }) => {
       await allure.story('Coupons new tab URL validation');
       const context = webActions.getPage().context();

@@ -23,15 +23,16 @@ test.describe('Salas Premium Tests', () => {
     await takeScreenshot(page, testInfo, 'Salas Premium display and layout');
   });
 
-  test('Salas Premium page redirection test', {
-    tag: ['@footer', '@salaspremium', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    salaspremium,
-  }) => {
-    await allure.story('Salas Premium navigation and URL validation');
-    await salaspremium.clickSalasPremium();
-    await page.waitForLoadState('networkidle');
-    await assertSalasPremiumNavigation(page, expectedUrl);
-  });
+  test(
+    'Salas Premium page redirection test',
+    {
+      tag: ['@footer', '@salaspremium', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, salaspremium }) => {
+      await allure.story('Salas Premium navigation and URL validation');
+      await salaspremium.clickSalasPremium();
+      await page.waitForLoadState('networkidle');
+      await assertSalasPremiumNavigation(page, expectedUrl);
+    }
+  );
 });

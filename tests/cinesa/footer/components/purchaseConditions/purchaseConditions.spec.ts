@@ -27,15 +27,16 @@ test.describe('Purchase Conditions Tests', () => {
     );
   });
 
-  test('Purchase Conditions page redirection test', {
-    tag: ['@footer', '@purchaseconditions', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    footer,
-  }) => {
-    await allure.story('Purchase Conditions navigation and URL validation');
-    await footer.clickCondicionesCompra();
-    await page.waitForLoadState('networkidle');
-    await assertPurchaseConditionsNavigation(page, expectedUrl);
-  });
+  test(
+    'Purchase Conditions page redirection test',
+    {
+      tag: ['@footer', '@purchaseconditions', '@cinesa', '@failed-prod'],
+    },
+    async ({ page, footer }) => {
+      await allure.story('Purchase Conditions navigation and URL validation');
+      await footer.clickCondicionesCompra();
+      await page.waitForLoadState('networkidle');
+      await assertPurchaseConditionsNavigation(page, expectedUrl);
+    }
+  );
 });

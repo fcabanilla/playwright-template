@@ -15,7 +15,7 @@ const CINEMAS_FOR_SCHEMA = getCinemasForMovieTests();
 test.describe('Cinesa Movies Tests', () => {
   // Force serial execution (1 worker) to avoid concurrency issues
   test.describe.configure({ mode: 'serial' });
-  
+
   test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Movies - Content Catalog');
@@ -42,7 +42,7 @@ test.describe('Cinesa Movies Tests', () => {
 
   test(
     'Cinesa Movies page redirection test',
-    { tag: ['@movies', '@cinesa', '@regression', '@medium', '@broken-prod'] },
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ webActions, navbar }) => {
       await allure.story('Movies page URL redirection validation');
       await navbar.navigateToMovies();
@@ -64,7 +64,7 @@ test.describe('Cinesa Movies Tests', () => {
 
   test(
     'Navigate through Random Movies from All Movies',
-    { tag: ['@movies', '@cinesa', '@regression', '@medium', '@broken-prod'] },
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - All Movies tab');
       await navbar.navigateToMovies();
@@ -74,7 +74,7 @@ test.describe('Cinesa Movies Tests', () => {
 
   test(
     'Navigate through Random Movies from Now Showing',
-    { tag: ['@movies', '@cinesa', '@regression', '@medium', '@broken-prod'] },
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Now Showing tab');
       await navbar.navigateToMovies();
@@ -94,7 +94,7 @@ test.describe('Cinesa Movies Tests', () => {
 
   test(
     'Navigate through Random Movies from Advance Sale',
-    { tag: ['@movies', '@cinesa', '@regression', '@medium', '@broken-prod'] },
+    { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Advance Sale tab');
       await navbar.navigateToMovies();
@@ -113,7 +113,6 @@ test.describe('Cinesa Movies Tests', () => {
           '@schema',
           '@regression',
           '@high',
-          '@broken-prod',
           ...cinema.tags,
         ],
       },
@@ -139,7 +138,6 @@ test.describe('Cinesa Movies Tests', () => {
         '@high',
         '@OCG-3316',
         '@fix-test',
-        '@broken-prod',
       ],
     },
     async ({ moviePage, navbar, cinema, cinemaDetail }) => {

@@ -135,7 +135,6 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@cinesa',
             '@validation',
             '@COMS-5620',
-            '@broken-prod',
             ...cinema.tags,
           ],
         },
@@ -161,7 +160,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@cinesa',
             '@validation',
             '@COMS-4752',
-            '@broken-prod',
+            '@failed-prod',
             ...cinema.tags,
           ],
         },
@@ -181,7 +180,15 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Select seats separating group in different rows - ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@validation', '@broken-prod', ...cinema.tags] },
+        {
+          tag: [
+            '@seatpicker',
+            '@cinesa',
+            '@validation',
+            '@failed-prod',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-5620', async () => {});
 
@@ -261,7 +268,6 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@cinesa',
             '@accessibility',
             '@COMS-4853',
-            '@broken-prod',
             ...cinema.tags,
           ],
         },
@@ -287,7 +293,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@cinesa',
             '@accessibility',
             '@fix-test',
-            '@broken-prod',
+            '@failed-prod',
             ...cinema.tags,
           ],
         },
@@ -391,7 +397,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@cinesa',
             '@dbox',
             '@validation',
-            '@broken-prod',
+            '@failed-prod',
             ...cinema.tags,
           ],
         },
@@ -520,7 +526,7 @@ test.describe('Seat Picker - Seat Selection', () => {
             '@ticketpicker',
             '@COMS-16845',
             '@fix-test',
-            '@broken-prod',
+            '@failed-prod',
             ...cinema.tags,
           ],
         },

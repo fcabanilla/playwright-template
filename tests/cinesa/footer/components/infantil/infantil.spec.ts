@@ -13,31 +13,33 @@ test.describe('Infantil y Colegios Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Infantil y Colegios page display and layout', {
-    tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    infantil,
-  }, testInfo) => {
-    await allure.story('Infantil y Colegios page display and layout');
-    await infantil.clickInfantilYColegios();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(
-      page,
-      testInfo,
-      'Infantil y Colegios display and layout'
-    );
-  });
+  test(
+    'Infantil y Colegios page display and layout',
+    {
+      tag: ['@footer', '@infantil', '@cinesa'],
+    },
+    async ({ page, infantil }, testInfo) => {
+      await allure.story('Infantil y Colegios page display and layout');
+      await infantil.clickInfantilYColegios();
+      await page.waitForLoadState('networkidle');
+      await takeScreenshot(
+        page,
+        testInfo,
+        'Infantil y Colegios display and layout'
+      );
+    }
+  );
 
-  test('Infantil y Colegios page redirection test', {
-    tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
-  }, async ({
-    page,
-    infantil,
-  }) => {
-    await allure.story('Infantil y Colegios navigation and URL validation');
-    await infantil.clickInfantilYColegios();
-    await page.waitForLoadState('networkidle');
-    await assertInfantilNavigation(page, expectedUrl);
-  });
+  test(
+    'Infantil y Colegios page redirection test',
+    {
+      tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
+    },
+    async ({ page, infantil }) => {
+      await allure.story('Infantil y Colegios navigation and URL validation');
+      await infantil.clickInfantilYColegios();
+      await page.waitForLoadState('networkidle');
+      await assertInfantilNavigation(page, expectedUrl);
+    }
+  );
 });
