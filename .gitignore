@@ -17,6 +17,7 @@ artifacts/
 artifacts/cloudflare-check/
 test-results/
 reports/
+playwright-report/
 *.png
 *.jpg
 *.jpeg
