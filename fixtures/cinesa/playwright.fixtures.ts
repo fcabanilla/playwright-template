@@ -125,7 +125,8 @@ export const test = base.extend<CustomFixtures>({
     await use(footer);
   },
   blogLanding: async ({ page }, use) => {
-    const blogLandingPage = new BlogLanding(page);
+    const webActions = new WebActions(page);
+    const blogLandingPage = new BlogLanding(webActions);
     await use(blogLandingPage);
   },
   cinema: async ({ page }, use) => {
