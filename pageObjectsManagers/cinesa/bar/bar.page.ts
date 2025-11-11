@@ -1,4 +1,3 @@
-import { Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { BAR_SELECTORS } from './bar.selectors';
 import { WebActions } from '../../../core/webactions/webActions';
@@ -10,8 +9,8 @@ import { WebActions } from '../../../core/webactions/webActions';
 export class BarPage {
   readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.webActions = new WebActions(page);
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
@@ -113,22 +112,45 @@ export class BarPage {
           );
         }
         
-        // Add to cart
+        // Add to cart - This action may open a new tab or redirect
         const addToCartButton = this.webActions.getLocator(
           'button.v-item-modal-footer__action-button'
         );
+        
         await addToCartButton.click();
+        
+        // Wait a moment for any page transitions to complete
+        await this.webActions.wait(2000);
+        
+        // Try to find the continue button in current page first
+        const currentPage = this.webActions.getPage();
+        const continueButtonInCurrentPage = currentPage.locator(BAR_SELECTORS.barSummaryContinueButton);
+        const isVisible = await continueButtonInCurrentPage.isVisible().catch(() => false);
+        
+        if (!isVisible) {
+          // Check if there are multiple pages (new tab opened)
+          const context = currentPage.context();
+          const pages = context.pages();
+          
+          if (pages.length > 1) {
+            // Switch to the new page (usually the last one)
+            const newPage = pages[pages.length - 1];
+            await newPage.waitForLoadState('networkidle');
+            this.webActions.updatePage(newPage);
+          }
+        }
       }
     );
   }
 
   /**
-   * Selects the "MENUS" tab and clicks on the first available menu item.
+   * Selects the "MENUS" tab and clicks on the menu item containing "CLASICO".
    */
   async selectClassicMenu(): Promise<void> {
     await allure.step(
-      'Select MENUS tab and click on first available menu item',
+      'Select MENUS tab and click on CLASICO menu item',
       async () => {
+        // Click on second tab (MENUS) using position-based selector
         await this.webActions.click(BAR_SELECTORS.menusTab);
         const menuItems = this.webActions.getLocator(BAR_SELECTORS.menuItems);
         await menuItems.first().waitFor({ state: 'visible', timeout: 10000 });
@@ -138,9 +160,23 @@ export class BarPage {
           throw new Error('No menu items found');
         }
 
-        // Get the first menu item and click it
-        const firstItem = menuItems.first();
-        await firstItem.locator(BAR_SELECTORS.menuItemButton).click();
+        // Find and click the menu item that contains "CLASICO" text
+        let clasicoFound = false;
+        for (let i = 0; i < count; i++) {
+          const menuItem = menuItems.nth(i);
+          const menuItemName = menuItem.locator(BAR_SELECTORS.menuItemName);
+          const itemText = await menuItemName.textContent();
+          
+          if (itemText && itemText.toUpperCase().includes('CLASICO')) {
+            await menuItem.locator(BAR_SELECTORS.menuItemButton).click();
+            clasicoFound = true;
+            break;
+          }
+        }
+
+        if (!clasicoFound) {
+          throw new Error('CLASICO menu item not found in available menu items');
+        }
       }
     );
 

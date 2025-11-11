@@ -90,6 +90,12 @@ export const test = base.extend<CustomFixtures>({
     await context.close();
   },
 
+  // Shared WebActions instance - this will be used by all components
+  webActions: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    await use(webActions);
+  },
+
   navbar: async ({ page }, use) => {
     const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
     const config = getCinesaConfig(env);
@@ -128,7 +134,8 @@ export const test = base.extend<CustomFixtures>({
     await use(cinema);
   },
   cinemaDetail: async ({ page }, use) => {
-    const cinemaDetail = new CinemaDetail(page);
+    const webActions = new WebActions(page);
+    const cinemaDetail = new CinemaDetail(webActions);
     await use(cinemaDetail);
   },
   loginPage: async ({ page }, use) => {
@@ -142,15 +149,18 @@ export const test = base.extend<CustomFixtures>({
     await use(ticketPicker);
   },
   barPage: async ({ page }, use) => {
-    const barPage = new BarPage(page);
+    const webActions = new WebActions(page);
+    const barPage = new BarPage(webActions);
     await use(barPage);
   },
   purchaseSummary: async ({ page }, use) => {
-    const purchaseSummary = new PurchaseSummary(page);
+    const webActions = new WebActions(page);
+    const purchaseSummary = new PurchaseSummary(webActions);
     await use(purchaseSummary);
   },
   paymentPage: async ({ page }, use) => {
-    const paymentPage = new PaymentPage(page);
+    const webActions = new WebActions(page);
+    const paymentPage = new PaymentPage(webActions);
     await use(paymentPage);
   },
   analyticsPage: async ({ page }, use) => {
@@ -248,10 +258,6 @@ export const test = base.extend<CustomFixtures>({
   moviePage: async ({ page }, use) => {
     const moviePage = new MoviePage(page);
     await use(moviePage);
-  },
-  webActions: async ({ page }, use) => {
-    const webActions = new WebActions(page);
-    await use(webActions);
   },
 });
 

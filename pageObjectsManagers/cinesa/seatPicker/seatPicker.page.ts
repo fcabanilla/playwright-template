@@ -1,4 +1,4 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import { SEAT_PICKER_SELECTORS } from './seatPicker.selectors';
@@ -41,19 +41,14 @@ const maxSeatSelection = 9;
  */
 export class SeatPicker {
   private readonly webActions: WebActions;
+  public readonly page: Page; // Public for test access, following TicketPicker pattern
 
   constructor(webActions: WebActions) {
     this.webActions = webActions;
+    this.page = webActions.page; // Direct page access for stability
   }
 
-  /**
-   * Get page instance for complex operations that need direct access
-   * NOTE: This is temporary bridge during ADR-0009 migration
-   * TODO: Migrate all operations to use WebActions methods
-   */
-  private get page() {
-    return this.webActions.getPage();
-  }
+
 
   /**
    * Waits for the seat picker container to be visible.
@@ -210,7 +205,7 @@ export class SeatPicker {
       // First, close any blocking modals
       await this.closeBlockingModals();
 
-      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
+      const seatLocators = this.webActions.getLocator(SEAT_PICKER_SELECTORS.seatGeneric);
 
       // Try to wait for seats normally first
       try {
@@ -257,12 +252,11 @@ export class SeatPicker {
     return await allure.step('Retrieving all seats from the DOM', async () => {
       await this.waitForSeatPicker();
 
-      const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
-      const count = await seatLocators.count();
+      const seatLocators = await this.webActions.getAllElements(SEAT_PICKER_SELECTORS.seatGeneric);
       const seats: Seat[] = [];
 
-      for (let i = 0; i < count; i++) {
-        const seatLocator = seatLocators.nth(i);
+      for (let i = 0; i < seatLocators.length; i++) {
+        const seatLocator = seatLocators[i];
         const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
         const className = (await seatLocator.getAttribute('class')) || '';
         const pressed = await seatLocator.getAttribute('aria-pressed');
@@ -488,7 +482,7 @@ export class SeatPicker {
     return await allure.step(
       'Selecting last available seat from back',
       async () => {
-        await this.page.waitForResponse(
+        await this.webActions.getPage().waitForResponse(
           (response) =>
             response.url().includes('/seat-availability') &&
             response.status() === 200

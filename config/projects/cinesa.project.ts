@@ -18,8 +18,8 @@ export function getCinesaProject(): Project {
   const TESTS_TO_IGNORE = [
     // Folders
     'cloudflare/**',
-    'login/**',
-    'signup/**',
+//    'login/**',
+//    'signup/**',
     'mail/**',      // por si existiera
     'mailing/**',   // carpeta real según tu árbol
 

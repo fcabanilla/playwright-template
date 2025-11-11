@@ -56,6 +56,29 @@ export class WebActions {
   }
 
   /**
+   * Updates the page context to a new page (used for handling new tabs/windows).
+   * This method allows continuing the same WebActions instance with a different page context.
+   *
+   * @param {Page} newPage - The new page to switch context to
+   *
+   * @example
+   * ```typescript
+   * // Handle new tab opening
+   * const pagePromise = page.context().waitForEvent('page');
+   * await button.click(); // Action that opens new tab
+   * const newTab = await pagePromise;
+   * webActions.updatePage(newTab);
+   * ```
+   *
+   * @since 1.1.0
+   */
+  updatePage(newPage: Page): void {
+    (this as any).page = newPage;
+    this.corsHandler = new CorsHandler(newPage);
+    this.initializeCorsHandling();
+  }
+
+  /**
    * Initialize CORS handling automatically for all WebActions instances
    */
   private async initializeCorsHandling(): Promise<void> {

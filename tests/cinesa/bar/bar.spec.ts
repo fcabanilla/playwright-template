@@ -42,7 +42,6 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
           loginPage,
           barPage,
           purchaseSummary,
-          paymentPage,
         }) => {
           await allure.parameter('Cinema', menuConfig.cinema.name);
           await allure.parameter('Menu Type', menuConfig.menuType);
@@ -57,7 +56,6 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
           await ticketPicker.selectTicket();
           await barPage[menuConfig.menuMethod]();
           await purchaseSummary.acceptAndContinue();
-          await paymentPage.completePayment();
         }
       );
     }
@@ -92,7 +90,6 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
           loginPage,
           barPage,
           purchaseSummary,
-          paymentPage,
         }) => {
           const seatsToSelect = 4;
           await allure.parameter('Cinema', menuConfig.cinema.name);
@@ -108,7 +105,6 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
           await ticketPicker.selectTicket(seatsToSelect);
           await barPage[menuConfig.menuMethod]();
           await purchaseSummary.acceptAndContinue();
-          await paymentPage.completePayment();
         }
       );
     }

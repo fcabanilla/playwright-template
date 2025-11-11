@@ -48,7 +48,6 @@ export class CookieBanner {
     const bannerSelector = this.getEnvironmentSelector('banner');
     const acceptButtonSelector = this.getEnvironmentSelector('acceptButton');
     const overlaySelector = this.getEnvironmentSelector('overlay');
-    const consentSdkSelector = this.getEnvironmentSelector('consentSdk');
 
     // Check if banner appears (uses waitForVisible with timeout)
     const bannerVisible = await this.webActions

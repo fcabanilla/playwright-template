@@ -2,7 +2,7 @@
  * Selectors for the Purchase Summary page.
  */
 export const PURCHASE_SUMMARY_SELECTORS = {
-  termsCheckbox: 'input[type="checkbox"][value="accept-terms-and-conditions"]',
+  termsCheckbox: '.v-checkbox-input__button', // Click on the visible button element instead of hidden input
   continueButton: '.order-cart-button-wrapper .v-button--color-primary',
   firstNameInput: '#v-customer-details-form-field__given-name-input',
   lastNameInput: '#v-customer-details-form-field__family-name-input',
