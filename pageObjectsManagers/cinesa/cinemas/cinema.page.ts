@@ -1,5 +1,5 @@
-import { Page } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { cinemaSelectors, CinemaSelectors } from './cinema.selectors';
 import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
 
@@ -9,9 +9,9 @@ import { cinemasData } from '../../../tests/cinesa/cinemas/cinemas.data';
  */
 export class Cinema {
   /**
-   * Playwright page instance to interact with.
+   * WebActions instance to interact with Playwright.
    */
-  readonly page: Page;
+  private readonly webActions: WebActions;
 
   /**
    * Selectors for cinema page elements.
@@ -20,35 +20,20 @@ export class Cinema {
 
   /**
    * Creates a new Cinema instance.
-   * @param page - The Playwright page object to interact with.
+   * @param webActions - The WebActions instance to interact with Playwright.
    */
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
     this.selectors = cinemaSelectors;
   }
 
   /**
-   * Safe wrapper for page operations that may fail due to timeouts in production
-   * Provides centralized error handling for Cinema legacy component
+   * Get page instance for complex operations that need direct access
+   * NOTE: This is temporary bridge during ADR-0009 migration
+   * TODO: Migrate all operations to use WebActions methods
    */
-  private async safePageOperation<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    fallbackValue?: T
-  ): Promise<T> {
-    try {
-      return await operation();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('Timeout') || errorMessage.includes('Target page, context or browser has been closed')) {
-        console.log(`Cinema: ${operationName} failed in production, using fallback`);
-        if (fallbackValue !== undefined) {
-          return fallbackValue;
-        }
-        throw new Error(`Cinema: Unable to complete ${operationName} - production environment issue`);
-      }
-      throw error;
-    }
+  private get page() {
+    return this.webActions.getPage();
   }
 
   /**
@@ -147,19 +132,10 @@ export class Cinema {
    */
   async selectOasizCinema(): Promise<string> {
     return await allure.step('Selecting Oasiz cinema', async () => {
-      await this.safePageOperation(
-        () => this.page.fill(this.selectors.filterInput, cinemasData.oasiz),
-        'fill Oasiz cinema filter input'
-      );
-      await this.safePageOperation(
-        () => this.page.waitForTimeout(1000),
-        'wait after filling filter'
-      );
+      await this.page.fill(this.selectors.filterInput, cinemasData.oasiz);
+      await this.page.waitForTimeout(1000);
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
-      await this.safePageOperation(
-        () => cinemaElement.click(),
-        'click Oasiz cinema element'
-      );
+      await cinemaElement.click();
       return cinemasData.oasiz;
     });
   }

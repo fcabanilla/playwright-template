@@ -107,7 +107,8 @@ export const test = base.extend<CustomFixtures>({
     await use(promotionalModal);
   },
   seatPicker: async ({ page }, use) => {
-    const seatPicker = new SeatPicker(page);
+    const webActions = new WebActions(page);
+    const seatPicker = new SeatPicker(webActions);
     await use(seatPicker);
   },
   footer: async ({ page }, use) => {
@@ -122,7 +123,8 @@ export const test = base.extend<CustomFixtures>({
     await use(blogLandingPage);
   },
   cinema: async ({ page }, use) => {
-    const cinema = new Cinema(page);
+    const webActions = new WebActions(page);
+    const cinema = new Cinema(webActions);
     await use(cinema);
   },
   cinemaDetail: async ({ page }, use) => {
