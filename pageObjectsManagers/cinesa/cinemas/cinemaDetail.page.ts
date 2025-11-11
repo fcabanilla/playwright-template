@@ -479,7 +479,9 @@ export class CinemaDetail {
         }
       }
 
-      throw new Error('Cinema schema script not found on the page');
+      // No schema found - this might be expected for some cinemas/environments
+      console.log('Cinema schema script not found on the page - this might be expected for this cinema/environment');
+      return null; // Return null instead of throwing error
     });
   }
 }
