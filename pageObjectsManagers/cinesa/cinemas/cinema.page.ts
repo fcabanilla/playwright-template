@@ -28,6 +28,30 @@ export class Cinema {
   }
 
   /**
+   * Safe wrapper for page operations that may fail due to timeouts in production
+   * Provides centralized error handling for Cinema legacy component
+   */
+  private async safePageOperation<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    fallbackValue?: T
+  ): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('Timeout') || errorMessage.includes('Target page, context or browser has been closed')) {
+        console.log(`Cinema: ${operationName} failed in production, using fallback`);
+        if (fallbackValue !== undefined) {
+          return fallbackValue;
+        }
+        throw new Error(`Cinema: Unable to complete ${operationName} - production environment issue`);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Returns the locator for the cinema list container.
    *
    * @returns Locator of the cinema list container.
@@ -123,10 +147,19 @@ export class Cinema {
    */
   async selectOasizCinema(): Promise<string> {
     return await allure.step('Selecting Oasiz cinema', async () => {
-      await this.page.fill(this.selectors.filterInput, cinemasData.oasiz);
-      await this.page.waitForTimeout(1000);
+      await this.safePageOperation(
+        () => this.page.fill(this.selectors.filterInput, cinemasData.oasiz),
+        'fill Oasiz cinema filter input'
+      );
+      await this.safePageOperation(
+        () => this.page.waitForTimeout(1000),
+        'wait after filling filter'
+      );
       const cinemaElement = this.getContainer().locator(this.selectors.cinemaElement).first();
-      await cinemaElement.click();
+      await this.safePageOperation(
+        () => cinemaElement.click(),
+        'click Oasiz cinema element'
+      );
       return cinemasData.oasiz;
     });
   }

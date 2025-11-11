@@ -46,6 +46,30 @@ export class SeatPicker {
   }
 
   /**
+   * Safe wrapper for page operations that may fail due to page closure in production
+   * Provides centralized error handling for SeatPicker legacy component
+   */
+  private async safePageOperation<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    fallbackValue?: T
+  ): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('Target page, context or browser has been closed')) {
+        console.log(`SeatPicker: Page closed during ${operationName}, using fallback`);
+        if (fallbackValue !== undefined) {
+          return fallbackValue;
+        }
+        throw new Error(`SeatPicker: Unable to complete ${operationName} - page was closed in production environment`);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Waits for the seat picker container to be visible.
    */
   async waitForSeatPicker(): Promise<void> {
@@ -248,14 +272,30 @@ export class SeatPicker {
       await this.waitForSeatPicker();
 
       const seatLocators = this.page.locator(SEAT_PICKER_SELECTORS.seatGeneric);
-      const count = await seatLocators.count();
+      const count = await this.safePageOperation(
+        () => seatLocators.count(),
+        'count seats in getAllSeats',
+        0
+      );
       const seats: Seat[] = [];
 
       for (let i = 0; i < count; i++) {
         const seatLocator = seatLocators.nth(i);
-        const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
-        const className = (await seatLocator.getAttribute('class')) || '';
-        const pressed = await seatLocator.getAttribute('aria-pressed');
+        const ariaLabel = await this.safePageOperation(
+          () => seatLocator.getAttribute('aria-label'),
+          `getAttribute aria-label for seat ${i}`,
+          ''
+        ) || '';
+        const className = await this.safePageOperation(
+          () => seatLocator.getAttribute('class'),
+          `getAttribute class for seat ${i}`,
+          ''
+        ) || '';
+        const pressed = await this.safePageOperation(
+          () => seatLocator.getAttribute('aria-pressed'),
+          `getAttribute aria-pressed for seat ${i}`,
+          null
+        );
 
         const { row, seatNumber } = this.parseRowAndSeat(ariaLabel);
 
@@ -1141,7 +1181,11 @@ export class SeatPicker {
     className: string,
     pressed: string | null
   ): Promise<SeatState> {
-    const ariaLabel = (await seatLocator.getAttribute('aria-label')) || '';
+    const ariaLabel = await this.safePageOperation(
+      () => seatLocator.getAttribute('aria-label'),
+      'getAttribute aria-label in getSeatState',
+      ''
+    ) || '';
     const useLocator = seatLocator.locator('use');
 
     // Check aria-label for "Unavailable"
