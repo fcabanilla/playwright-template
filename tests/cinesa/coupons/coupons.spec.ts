@@ -5,12 +5,11 @@ import { COUPONS_URL } from './coupons.data';
 import { WebActions } from '../../../core/webactions/webActions';
 
 test.describe('Cinesa Coupons Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Coupons - Discount System');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

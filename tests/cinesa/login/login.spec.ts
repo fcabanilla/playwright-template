@@ -2,12 +2,11 @@ import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
 
 test.describe('Login', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Authentication - User Access');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

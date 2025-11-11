@@ -10,6 +10,13 @@
     "lint": "eslint . --ext .ts,.js",
     "test": "npx playwright test",
     "ui": "npx playwright test --ui",
+    "_____CONSENT_BOOTSTRAP_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "bootstrap:consent": "tsx scripts/bootstrap-consent.ts",
+    "bootstrap:consent:cinesa": "PLATFORM=cinesa tsx scripts/bootstrap-consent.ts",
+    "bootstrap:consent:uci": "PLATFORM=uci tsx scripts/bootstrap-consent.ts",
+    "bootstrap:consent:production": "ENV=production tsx scripts/bootstrap-consent.ts",
+    "bootstrap:consent:preprod": "ENV=preprod tsx scripts/bootstrap-consent.ts",
+    "bootstrap:consent:lab": "ENV=lab tsx scripts/bootstrap-consent.ts",
     "_____REPORTING_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
     "report": "npm run report:copy-categories && npm run report:copy-history && npm run report:generate && npm run report:open",
     "report:generate": "npx allure generate .allure/results --output .allure/report --clean",
@@ -93,6 +100,7 @@
     "playwright-core": "^1.50.1",
     "prettier": "3.5.3",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "5.8.2"
   },
   "dependencies": {

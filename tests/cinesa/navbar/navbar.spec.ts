@@ -6,13 +6,12 @@ import { getNavbarData } from './navbar.data';
 test.describe('Navbar - Navegación Principal', () => {
   let navbarAssertions: NavbarAssertions;
 
-  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Navbar - Main Navigation');
 
     navbarAssertions = new NavbarAssertions(page);
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

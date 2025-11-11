@@ -1,0 +1,200 @@
+/**
+ * Consent Seeds Registry
+ *
+ * Maps hostname → cookies for OneTrust consent pre-seeding.
+ * Extracted from bootstrapped storageState files.
+ *
+ * **Purpose:**
+ * Provide fallback consent cookies when storageState is not configured,
+ * eliminating the need for UI interaction with cookie banners in tests.
+ *
+ * **Architecture Context:**
+ * This module is imported dynamically by WebActions.applyConsentSeedsFor()
+ * to avoid circular dependencies. Page Objects MUST NOT import this directly.
+ *
+ * **Maintenance:**
+ * When OneTrust CMP updates cookie structure/names, run:
+ * ```bash
+ * npx ts-node scripts/bootstrap-consent.ts
+ * ```
+ * Then extract cookie values from generated state/*.json files.
+ *
+ * @see docs/adrs/0014-cookie-consent-persistence-with-storage-state.md
+ * @since 1.0.0
+ */
+
+/**
+ * Consent Cookie structure compatible with Playwright's BrowserContext.addCookies()
+ *
+ * @see https://playwright.dev/docs/api/class-browsercontext#browser-context-add-cookies
+ */
+export interface ConsentCookie {
+  /** Cookie name (e.g., 'OptanonConsent') */
+  name: string;
+
+  /** Cookie value (OneTrust consent string) */
+  value: string;
+
+  /**
+   * Cookie domain (must start with . for subdomains)
+   * @example '.cinesa.es' (applies to www.cinesa.es, cdn.cinesa.es, etc.)
+   */
+  domain: string;
+
+  /** Cookie path (usually '/') */
+  path: string;
+
+  /**
+   * Expiration timestamp in Unix seconds (NOT milliseconds)
+   * @example Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60 // 1 year
+   */
+  expires: number;
+
+  /** Whether cookie is HTTP-only (usually false for OneTrust) */
+  httpOnly: boolean;
+
+  /** Whether cookie requires HTTPS (usually true for production) */
+  secure: boolean;
+
+  /** SameSite policy ('Strict' | 'Lax' | 'None') */
+  sameSite: 'Strict' | 'Lax' | 'None';
+}
+
+/**
+ * Registry of consent cookies by hostname.
+ *
+ * **Key Format:** Hostname (e.g., 'www.cinesa.es', 'www.ucicinemas.it')
+ * **Value Format:** Array of ConsentCookie objects
+ *
+ * **Cookie Sources:**
+ * - **OptanonConsent:** Main OneTrust consent string (groups, datestamp, version)
+ * - **OptanonAlertBoxClosed:** Timestamp when user closed banner
+ *
+ * **Update Frequency:**
+ * - When OneTrust CMP version changes
+ * - When cookie structure/names change
+ * - When new hosts/regions are added
+ *
+ * @example
+ * ```typescript
+ * const seeds = consentSeeds['www.cinesa.es'];
+ * // => [{ name: 'OptanonConsent', value: '...', ... }, ...]
+ * ```
+ */
+export const consentSeeds: Record<string, ConsentCookie[]> = {
+  // Cinesa Spain (Production)
+  'www.cinesa.es': [
+    {
+      name: 'OptanonConsent',
+      value:
+        'isGpcEnabled=0&datestamp=Tue+Nov+11+2025+19%3A06%3A22+GMT-0300+(hora+est%C3%A1ndar+de+Argentina)&version=202406.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=46d3c68e-4aa1-4fad-aab2-bf6240226c7e&interactionCount=0&isAnonUser=1&landingPath=https%3A%2F%2Fwww.cinesa.es%2F&groups=C0003%3A0%2CC0004%3A0%2CC0002%3A0%2CC0001%3A1',
+      domain: '.cinesa.es',
+      path: '/',
+      expires: 1794434782, // Real value from bootstrap: 2026-11-11
+      httpOnly: false,
+      secure: false, // Real value from bootstrap
+      sameSite: 'Lax',
+    },
+  ],
+
+  // UCI Cinemas Italy (Production)
+  'www.ucicinemas.it': [
+    {
+      name: 'OptanonConsent',
+      value:
+        'isGpcEnabled=0&datestamp=Tue+Nov+11+2025+19%3A08%3A11+GMT-0300+(Ora+standard+dell%E2%80%99Argentina)&version=202402.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=bb1d91aa-cc8a-406c-a1a9-3ebe501ce9d7&interactionCount=0&isAnonUser=1&landingPath=https%3A%2F%2Fucicinemas.it%2F&groups=C0001%3A1%2CC0003%3A0%2CC0002%3A0%2CC0004%3A0',
+      domain: '.ucicinemas.it',
+      path: '/',
+      expires: 1794434891, // Real value from bootstrap: 2026-11-11
+      httpOnly: false,
+      secure: false, // Real value from bootstrap
+      sameSite: 'Lax',
+    },
+  ],
+
+  // Cinesa Spain (Preprod) - NO OneTrust cookies (Cloudflare headers needed in bootstrap)
+  // TODO: Fix bootstrap-consent.ts to inject Cloudflare headers for preprod/lab/staging
+  'preprod-web.ocgtest.es': [],
+
+  // Cinesa Spain (Lab) - NO OneTrust cookies (Cloudflare headers needed in bootstrap)
+  // TODO: Fix bootstrap-consent.ts to inject Cloudflare headers for preprod/lab/staging
+  'lab-web.ocgtest.es': [],
+};
+
+/**
+ * Get consent cookies for a given URL.
+ *
+ * **Resolution Strategy:**
+ * 1. Parse URL to extract hostname
+ * 2. Look up hostname in consentSeeds registry
+ * 3. Return cookies array or undefined
+ *
+ * **Hostname Extraction:**
+ * - https://www.cinesa.es/peliculas → 'www.cinesa.es'
+ * - www.cinesa.es → 'www.cinesa.es' (passthrough)
+ *
+ * @param {string} url - Full URL or hostname
+ * @returns {ConsentCookie[] | undefined} Consent cookies array, or undefined if no seeds for this host
+ *
+ * @example
+ * ```typescript
+ * const seeds = getConsentSeedsFor('https://www.cinesa.es/peliculas');
+ * if (seeds) {
+ *   await page.context().addCookies(seeds);
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Works with hostname too
+ * const seeds = getConsentSeedsFor('www.cinesa.es');
+ * ```
+ *
+ * @since 1.0.0
+ */
+export function getConsentSeedsFor(url: string): ConsentCookie[] | undefined {
+  try {
+    const hostname = new URL(url).hostname;
+    return consentSeeds[hostname];
+  } catch {
+    // If URL parsing fails, assume it's already a hostname
+    return consentSeeds[url];
+  }
+}
+
+/**
+ * Get all registered hostnames in consent seeds registry.
+ *
+ * @returns {string[]} Array of hostnames with consent seeds configured
+ *
+ * @example
+ * ```typescript
+ * const hosts = getRegisteredHosts();
+ * // => ['www.cinesa.es', 'www.ucicinemas.it', 'preprod-web.ocgtest.es', ...]
+ * ```
+ *
+ * @since 1.0.0
+ */
+export function getRegisteredHosts(): string[] {
+  return Object.keys(consentSeeds);
+}
+
+/**
+ * Check if consent seeds are available for a given URL/hostname.
+ *
+ * @param {string} url - Full URL or hostname
+ * @returns {boolean} True if seeds available, false otherwise
+ *
+ * @example
+ * ```typescript
+ * if (hasConsentSeeds('https://www.cinesa.es')) {
+ *   console.log('Consent seeds available, no banner interaction needed');
+ * }
+ * ```
+ *
+ * @since 1.0.0
+ */
+export function hasConsentSeeds(url: string): boolean {
+  const seeds = getConsentSeedsFor(url);
+  return seeds !== undefined && seeds.length > 0;
+}

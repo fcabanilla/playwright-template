@@ -5,12 +5,11 @@ import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/sig
 import { defaultUser } from './signup.data';
 
 test.describe('Signup', () => {
-  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Registration - New Users');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

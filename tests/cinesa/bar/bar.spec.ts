@@ -6,11 +6,10 @@ import { getBarMenuConfigs } from './bar.data';
 const BAR_MENUS = getBarMenuConfigs();
 
 test.describe('Bar - Servicios de Comida y Bebida', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Bar & Food Services');
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

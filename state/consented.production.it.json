@@ -1,0 +1,275 @@
+{
+  "cookies": [
+    {
+      "name": "cee",
+      "value": "TQfTd6aX2WHN5bfDN6UfKXNXGfTokiz7XLmkkVi3YYk%3D.%7B%7D",
+      "domain": ".mpc2-prod-1-is5qnl632q-uc.a.run.app",
+      "path": "/events/0f41e3826dac2a020d65b268e01363e072230bc99dcc2c7c47a999ddf49f4761",
+      "expires": 1770677767.7121,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "X-AB",
+      "value": "a722cdbea6464e1d9a072a6dc6c93804",
+      "domain": "sc-static.net",
+      "path": "/scevent.min.js",
+      "expires": 1762988138.424635,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "popup",
+      "value": "%5B%22%2F%22%5D",
+      "domain": "ucicinemas.it",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "OptanonAlertBoxClosed",
+      "value": "2025-11-11T22:55:35.182Z",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1794437735,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_gcl_au",
+      "value": "1.1.1522877855.1762901735",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677735,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "OptanonConsent",
+      "value": "isGpcEnabled=0&datestamp=Tue+Nov+11+2025+19%3A55%3A35+GMT-0300+(Ora+standard+dell%E2%80%99Argentina)&version=202402.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=6862d0b4-3d73-43b7-8488-d3648f708975&interactionCount=1&isAnonUser=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A1%2CC0002%3A1%2CC0004%3A1",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1794437735,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "IDE",
+      "value": "AHWqTUkbKJCfJyq5XUFiW93Dcsr7CVl44moTzC0uuJPhfGTeniqPRMzI-iEQnEkAPdk",
+      "domain": ".doubleclick.net",
+      "path": "/",
+      "expires": 1796597736.593574,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.2106877469.1762901738",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1797461738.217686,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ttp",
+      "value": "35LuajQqNlnBc3H4RapIzdDiprF",
+      "domain": ".tiktok.com",
+      "path": "/",
+      "expires": 1770677766.331036,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "_scid",
+      "value": "uWuA-9FS6g0HAnEXqaJkFdhwTH1TsfEk",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1797029738,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_scid_r",
+      "value": "uWuA-9FS6g0HAnEXqaJkFdhwTH1TsfEk",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1797029738,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ScCbts",
+      "value": "%5B%5D",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1763506539,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "TDID",
+      "value": "af869890-d6dd-4201-82b1-28bd33aa5dfe",
+      "domain": ".adsrvr.org",
+      "path": "/",
+      "expires": 1794437741.154959,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "_tt_enable_cookie",
+      "value": "1",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677740,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ttp",
+      "value": "01K9TJ3K4HB7GX6RTNJJ9BYXC2_.tt.1",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677740,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_fbp",
+      "value": "fb.1.1762901740797.96640676291117482",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677767,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "sc_at",
+      "value": "v2|H4sIAAAAAAAAAA3GwQ0AIQgEwIpIdslGtByUuyooXuc1JU58TEtfx0TJ9p/DCpMxwnUK3a++wBAaF8LWGyEyAAAA",
+      "domain": ".snapchat.com",
+      "path": "/",
+      "expires": 1796597740.936174,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "TDCPM",
+      "value": "CAEYBSgGMgsI1LL-tYXg0D4QBUIPIg0IARIJCgV0aWVyMRABWgdpeHo3ZzdzYAE.",
+      "domain": ".adsrvr.org",
+      "path": "/",
+      "expires": 1794437741.15504,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "ttcsid_C8JIO0CB7AN1JESF6590",
+      "value": "1762901740694::kN7Z-vF_HaV_YCuyhVBN.1.1762901767338.0",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677767,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ttcsid_CPO064BC77U75I0QNKMG",
+      "value": "1762901740695::Sq2ochZtUZp4QEcZDOV6.1.1762901767340.0",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677767,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ttcsid_D1N8A1BC77UD8FVUSNI0",
+      "value": "1762901740695::FpsPaYjuCI1CyF9tDZ8C.1.1762901767341.0",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677767,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ttcsid",
+      "value": "1762901740694::oaDBhDM7tg0dHLHzyn3v.1.1762901767341.0",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1770677767,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_GG2L89S3V3",
+      "value": "GS2.1.s1762901738$o1$g1$t1762901767$j31$l0$h0",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1797461767.776136,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__cf_bm",
+      "value": "djkpDug0od5QaiKuus8ao_COGRjx8RPGMpvzItujCe4-1762901768.068389-1.0.1.1-pnShoGs8x_dqW8srRqo4mptqVVqCo3MFF6uoLAPA.04.d4iSUzd.8TGV.pBBqJ9wa0T_zqPfvcrAGDI_hOzSXM4ah5mJ9lSEpws.qqpK8Qlq7goaWpLpmexiFZW5NudV",
+      "domain": ".ucicinemas.it",
+      "path": "/",
+      "expires": 1762903568.014871,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://ucicinemas.it",
+      "localStorage": [
+        {
+          "name": "lastExternalReferrer",
+          "value": "empty"
+        },
+        {
+          "name": "u_sclid_r",
+          "value": "tgfi4L8MBTVITM5ZJJbaSckbrmIxaxxcuWuA-9FS6g0HAnEXqaJkFdhwTH1TsfEk"
+        },
+        {
+          "name": "u_sclid",
+          "value": "tgfi4L8MBTVITM5ZJJbaSckbrmIxaxxcuWuA-9FS6g0HAnEXqaJkFdhwTH1TsfEk"
+        },
+        {
+          "name": "_gcl_ls",
+          "value": "{\"schema\":\"gcl\",\"version\":1,\"gcl_ctr\":{\"value\":{\"value\":0,\"timeouts\":0,\"creationTimeMs\":1762901735187},\"expires\":1770677735187}}"
+        },
+        {
+          "name": "lastExternalReferrerTime",
+          "value": "1762901740789"
+        },
+        {
+          "name": "topicsLastReferenceTime",
+          "value": "1762901767327"
+        }
+      ]
+    }
+  ]
+}

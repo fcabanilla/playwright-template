@@ -8,12 +8,11 @@ import { assertEventsNavigation } from './events.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Eventos Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, events }) => {
+  test.beforeEach(async ({ page, events }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await events.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test(

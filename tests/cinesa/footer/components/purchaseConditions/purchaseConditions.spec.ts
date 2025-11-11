@@ -5,12 +5,11 @@ import { assertPurchaseConditionsNavigation } from './purchaseConditions.asserti
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Purchase Conditions Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, footer }) => {
+  test.beforeEach(async ({ page, footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Purchase Conditions page display and layout', async ({

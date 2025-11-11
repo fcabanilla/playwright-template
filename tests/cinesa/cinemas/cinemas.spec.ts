@@ -10,12 +10,11 @@ import {
 const CINEMAS_FOR_SCHEMA = getCinemasForSchemaTests();
 
 test.describe('Cinesa Cinemas Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Cinemas - Location Finder');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

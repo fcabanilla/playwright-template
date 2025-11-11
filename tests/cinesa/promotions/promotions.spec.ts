@@ -4,12 +4,11 @@ import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/gene
 import { assertPromotionsRedirection } from './promotions.assertions';
 
 test.describe('Cinesa Promotions Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Promotions - Marketing');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

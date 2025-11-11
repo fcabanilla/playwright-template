@@ -16,13 +16,12 @@ test.describe('Cinesa Movies Tests', () => {
   // Force serial execution (1 worker) to avoid concurrency issues
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  test.beforeEach(async ({ page, navbar }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Movies - Content Catalog');
 
     await navbar.navigateToHome();
     await assertNoCloudflareProtection(page, 'beforeEach setup');
-    await cookieBanner.acceptAllCookies();
   });
 
   test(

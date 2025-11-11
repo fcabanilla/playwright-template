@@ -5,12 +5,11 @@ import { assertSalasPremiumNavigation } from './salaspremium.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Salas Premium Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, salaspremium }) => {
+  test.beforeEach(async ({ page, salaspremium }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await salaspremium.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Salas Premium page display and layout', async ({

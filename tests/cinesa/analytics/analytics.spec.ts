@@ -24,12 +24,11 @@ declare global {
 }
 
 test.describe('Google Analytics DataLayer Validation', () => {
-  test.beforeEach(async ({ page, navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Analytics - Tracking');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

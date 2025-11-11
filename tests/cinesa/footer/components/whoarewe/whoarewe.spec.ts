@@ -5,12 +5,11 @@ import { assertWhoAreWeNavigation } from './whoarewe.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Who Are We Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, footer }) => {
+  test.beforeEach(async ({ page, footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Who Are We page display and layout', async ({

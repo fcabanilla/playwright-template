@@ -9,12 +9,11 @@ import { handlePDFInteraction } from './whistleblowing.helpers';
 import { expectedUrl } from './whistleblowing.data';
 
 test.describe('Whistleblowing Policy Tests', () => {
-  test.beforeEach(async ({ cookieBanner, footer }) => {
+  test.beforeEach(async ({ footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test(

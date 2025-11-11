@@ -5,12 +5,11 @@ import { assertCiclosNavigation } from './ciclos.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Ciclos Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, ciclos }) => {
+  test.beforeEach(async ({ page, ciclos }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await ciclos.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Ciclos page display and layout', async ({ page, ciclos }, testInfo) => {

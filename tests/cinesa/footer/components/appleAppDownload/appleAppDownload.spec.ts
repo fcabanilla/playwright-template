@@ -5,12 +5,11 @@ import { assertAppleAppDownloadNavigation } from './appleAppDownload.assertions'
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Apple App Download Tests', () => {
-  test.beforeEach(async ({ cookieBanner, footer }) => {
+  test.beforeEach(async ({ footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Apple App Download display and layout', async ({

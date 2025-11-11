@@ -24,6 +24,38 @@ type CustomFixtures = {
 };
 
 export const test = base.extend<CustomFixtures>({
+  // Override context fixture to apply consent seeds when storageState is not available
+  context: async ({ browser }, use) => {
+    const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
+    const config = getUCIConfig(env);
+
+    const context = await browser.newContext();
+
+    // Apply consent seeds if NO storageState is configured
+    // This eliminates cookie banner interaction when storageState files don't exist
+    const hasStorageState = context.storageState !== undefined;
+    if (!hasStorageState) {
+      const page = await context.newPage();
+      const webActions = new WebActions(page);
+
+      // Pre-seed consent cookies for baseUrl
+      await webActions.applyConsentSeedsFor(
+        config.baseUrl,
+        `[Fixture] Pre-seeding consent cookies for ${config.baseUrl}`
+      );
+
+      await page.close();
+      console.log(
+        `✅ [Consent Seeds] Applied for ${config.baseUrl} (no storageState found)`
+      );
+    } else {
+      console.log(`ℹ️  [Consent Seeds] Skipped - storageState already loaded`);
+    }
+
+    await use(context);
+    await context.close();
+  },
+
   navbar: async ({ page }, use) => {
     const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
     const config = getUCIConfig(env);

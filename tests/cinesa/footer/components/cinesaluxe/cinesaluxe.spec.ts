@@ -5,12 +5,11 @@ import { assertCinesaLuxeNavigation } from './cinesaluxe.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Cinesa Luxe Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, cinesaluxe }) => {
+  test.beforeEach(async ({ page, cinesaluxe }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await cinesaluxe.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Cinesa Luxe page display and layout', async ({

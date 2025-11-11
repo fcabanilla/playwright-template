@@ -11,12 +11,11 @@ import {
 } from './footer.assertions';
 
 test.describe('Cinesa Footer Tests', () => {
-  test.beforeEach(async ({ footer, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ footer, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

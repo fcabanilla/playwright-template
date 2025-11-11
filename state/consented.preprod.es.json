@@ -1,0 +1,35 @@
+{
+  "cookies": [
+    {
+      "name": "CF_AppSession",
+      "value": "n554af7d8bd7057ba",
+      "domain": "preprod-web.ocgtest.es",
+      "path": "/",
+      "expires": 1762985198.234698,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__cf_bm",
+      "value": "tzMVHVNWqzxCcwVQy00inGY7w5uUiMP0wbJEz7N7rzw-1762898798-1.0.1.1-XQVuJHu8La_ySsa5DFX9E0xKHX4lh4PTF1Ls8Rm3FfV.fMFmfX_rnbeExVoz71dP5VRnL9A_39d9SC0XixtdO4DhjWVbBC57lIidYaWsKOU",
+      "domain": ".ocgtest.es",
+      "path": "/",
+      "expires": 1762900598.235446,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "CF_Session",
+      "value": "nwhyoNveHJHP20j9t",
+      "domain": "cinesa.cloudflareaccess.com",
+      "path": "/",
+      "expires": 1762913199.516208,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": []
+}

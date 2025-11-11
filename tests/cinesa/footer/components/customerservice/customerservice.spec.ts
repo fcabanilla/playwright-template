@@ -5,12 +5,11 @@ import { assertCustomerServiceNavigation } from './customerservice.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Customer Service Tests', () => {
-  test.beforeEach(async ({ cookieBanner, footer }) => {
+  test.beforeEach(async ({ footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Customer Service page display and layout', async ({

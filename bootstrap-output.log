@@ -1,0 +1,201 @@
+
+> playwright-template@1.0.0 bootstrap:consent
+> tsx scripts/bootstrap-consent.ts
+
+🚀 Cookie Consent Bootstrap Script
+====================================
+
+📋 Configurations to bootstrap: 7
+   1. Cinesa PRODUCTION (ES) → state/consented.production.es.json
+   2. Cinesa PREPROD (ES) → state/consented.preprod.es.json
+   3. Cinesa LAB (ES) → state/consented.lab.es.json
+   4. Cinesa STAGING (ES) → state/consented.staging.es.json
+   5. Cinesa Production (PT) → state/consented.production.pt.json
+   6. UCI PRODUCTION (IT) → state/consented.production.it.json
+   7. UCI STAGING (IT) → state/consented.staging.it.json
+
+============================================================
+📝 Bootstrapping: Cinesa PRODUCTION (ES)
+   URL: https://www.cinesa.es
+   Output: state/consented.production.es.json
+============================================================
+
+🌐 Navigating to https://www.cinesa.es...
+⏳ Waiting for page to stabilize...
+🍪 Accepting cookies...
+⏳ Waiting for OneTrust SDK to finalize (2s)...
+💾 Saving storageState to state/consented.production.es.json...
+✅ StorageState saved successfully (412906 bytes)
+
+📋 Relevant cookies found (1):
+
+   Cookie: OptanonConsent
+   Domain: .cinesa.es
+   Path: /
+   Value (first 100 chars): isGpcEnabled=0&datestamp=Tue+Nov+11+2025+19%3A06%3A22+GMT-0300+(hora+est%C3%A1ndar+de+Argentina)&ver...
+   Expires: 2026-11-11T22:06:22.000Z
+   Secure: false, HttpOnly: false, SameSite: Lax
+
+✅ Bootstrap completed successfully for Cinesa PRODUCTION (ES)
+
+⏳ Cool-down period (3s)...
+
+============================================================
+📝 Bootstrapping: Cinesa PREPROD (ES)
+   URL: https://preprod-web.ocgtest.es
+   Output: state/consented.preprod.es.json
+============================================================
+
+🌐 Navigating to https://preprod-web.ocgtest.es...
+⏳ Waiting for page to stabilize...
+🍪 Accepting cookies...
+⏳ Waiting for OneTrust SDK to finalize (2s)...
+💾 Saving storageState to state/consented.preprod.es.json...
+✅ StorageState saved successfully (919 bytes)
+
+📋 Relevant cookies found (0):
+⚠️  WARNING: No consent cookies found! Banner may not have been accepted properly.
+
+✅ Bootstrap completed successfully for Cinesa PREPROD (ES)
+
+⏳ Cool-down period (3s)...
+
+============================================================
+📝 Bootstrapping: Cinesa LAB (ES)
+   URL: https://lab-web.ocgtest.es
+   Output: state/consented.lab.es.json
+============================================================
+
+🌐 Navigating to https://lab-web.ocgtest.es...
+⏳ Waiting for page to stabilize...
+🍪 Accepting cookies...
+⏳ Waiting for OneTrust SDK to finalize (2s)...
+💾 Saving storageState to state/consented.lab.es.json...
+✅ StorageState saved successfully (915 bytes)
+
+📋 Relevant cookies found (0):
+⚠️  WARNING: No consent cookies found! Banner may not have been accepted properly.
+
+✅ Bootstrap completed successfully for Cinesa LAB (ES)
+
+⏳ Cool-down period (3s)...
+
+============================================================
+📝 Bootstrapping: Cinesa STAGING (ES)
+   URL: https://stage-web.ocgtest.es
+   Output: state/consented.staging.es.json
+============================================================
+
+🌐 Navigating to https://stage-web.ocgtest.es...
+⏳ Waiting for page to stabilize...
+🍪 Accepting cookies...
+⏳ Waiting for OneTrust SDK to finalize (2s)...
+💾 Saving storageState to state/consented.staging.es.json...
+✅ StorageState saved successfully (915 bytes)
+
+📋 Relevant cookies found (0):
+⚠️  WARNING: No consent cookies found! Banner may not have been accepted properly.
+
+✅ Bootstrap completed successfully for Cinesa STAGING (ES)
+
+⏳ Cool-down period (3s)...
+
+============================================================
+📝 Bootstrapping: Cinesa Production (PT)
+   URL: https://www.ucicinemas.pt
+   Output: state/consented.production.pt.json
+============================================================
+
+🌐 Navigating to https://www.ucicinemas.pt...
+
+❌ Failed to bootstrap Cinesa Production (PT):
+page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "https://www.ucicinemas.pt/", waiting until "networkidle"[22m
+
+    at bootstrapConsent (/Users/fcinesa/cinesa/playwright-template/scripts/bootstrap-consent.ts:174:16)
+    at async main (/Users/fcinesa/cinesa/playwright-template/scripts/bootstrap-consent.ts:312:7) {
+  name: 'TimeoutError'
+}
+📸 Screenshot saved to state/error-cinesa-production-pt.png
+❌ Skipping to next environment due to error
+
+
+============================================================
+📝 Bootstrapping: UCI PRODUCTION (IT)
+   URL: https://ucicinemas.it
+   Output: state/consented.production.it.json
+============================================================
+
+🌐 Navigating to https://ucicinemas.it...
+⏳ Waiting for page to stabilize...
+🍪 Accepting cookies...
+⏳ Waiting for OneTrust SDK to finalize (2s)...
+💾 Saving storageState to state/consented.production.it.json...
+✅ StorageState saved successfully (1222 bytes)
+
+📋 Relevant cookies found (1):
+
+   Cookie: OptanonConsent
+   Domain: .ucicinemas.it
+   Path: /
+   Value (first 100 chars): isGpcEnabled=0&datestamp=Tue+Nov+11+2025+19%3A08%3A11+GMT-0300+(Ora+standard+dell%E2%80%99Argentina)...
+   Expires: 2026-11-11T22:08:11.000Z
+   Secure: false, HttpOnly: false, SameSite: Lax
+
+✅ Bootstrap completed successfully for UCI PRODUCTION (IT)
+
+⏳ Cool-down period (3s)...
+
+============================================================
+📝 Bootstrapping: UCI STAGING (IT)
+   URL: https://staging.ucicinemas.it
+   Output: state/consented.staging.it.json
+============================================================
+
+🌐 Navigating to https://staging.ucicinemas.it...
+
+❌ Failed to bootstrap UCI STAGING (IT):
+page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://staging.ucicinemas.it/
+Call log:
+[2m  - navigating to "https://staging.ucicinemas.it/", waiting until "networkidle"[22m
+
+    at bootstrapConsent (/Users/fcinesa/cinesa/playwright-template/scripts/bootstrap-consent.ts:174:16)
+    at async main (/Users/fcinesa/cinesa/playwright-template/scripts/bootstrap-consent.ts:312:7) {
+  name: 'Error'
+}
+📸 Screenshot saved to state/error-uci-staging.png
+❌ Skipping to next environment due to error
+
+
+============================================================
+📊 Bootstrap Summary
+============================================================
+✅ Successful: 5/7
+❌ Failed: 2/7
+
+❌ Failed configurations:
+   - Cinesa Production (PT): page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "https://www.ucicinemas.pt/", waiting until "networkidle"[22m
+
+   - UCI STAGING (IT): page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://staging.ucicinemas.it/
+Call log:
+[2m  - navigating to "https://staging.ucicinemas.it/", waiting until "networkidle"[22m
+
+
+📁 Generated storageState files:
+   ✓ consented.lab.es.json (915 bytes)
+   ✓ consented.preprod.es.json (919 bytes)
+   ✓ consented.production.es.json (412906 bytes)
+   ✓ consented.production.it.json (1222 bytes)
+   ✓ consented.staging.es.json (915 bytes)
+
+📝 Next steps:
+   1. Review generated storageState files in state/
+   2. Extract cookie values and update core/consent/consentSeeds.ts
+   3. Configure playwright.config.ts to use storageState files
+   4. Run tests to validate consent persistence
+
+✨ Done!
+

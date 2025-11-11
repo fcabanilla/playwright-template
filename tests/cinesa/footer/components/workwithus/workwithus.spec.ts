@@ -5,12 +5,11 @@ import { assertWorkWithUsNavigation } from './workwithus.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Work With Us Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, workwithus }) => {
+  test.beforeEach(async ({ page, workwithus }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await workwithus.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Work With Us page display and layout', async ({

@@ -295,9 +295,16 @@ export class WebActions {
         });
       } catch (error) {
         // Handle page closure gracefully - common in production environment
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        if (errorMessage?.includes('Target page, context or browser has been closed')) {
-          throw new Error(`Page was closed while waiting for ${selector}. This may indicate navigation/redirect in production environment.`);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        if (
+          errorMessage?.includes(
+            'Target page, context or browser has been closed'
+          )
+        ) {
+          throw new Error(
+            `Page was closed while waiting for ${selector}. This may indicate navigation/redirect in production environment.`
+          );
         }
         throw error;
       }
@@ -501,5 +508,163 @@ export class WebActions {
     ]);
 
     return { download, popup };
+  }
+
+  /**
+   * Apply consent cookies for a given URL before navigation.
+   * Uses ConsentSeedRegistry to inject OneTrust consent cookies directly
+   * into the browser context, bypassing the need for UI interaction with cookie banners.
+   *
+   * **Architecture Note:**
+   * This method accesses `page.context().addCookies()` which is a BrowserContext-level API.
+   * Per ADR-0009, WebActions is the ONLY layer allowed to access Playwright APIs directly.
+   * Page Objects MUST NOT call this method directly; use fixtures or test setup instead.
+   *
+   * **Implementation Details:**
+   * 1. Resolves hostname from URL
+   * 2. Looks up consent seeds from ConsentSeedRegistry
+   * 3. Converts ConsentCookie format → Playwright Cookie format
+   * 4. Injects cookies using BrowserContext.addCookies()
+   * 5. Logs Allure parameters for visibility
+   *
+   * **When to Use:**
+   * - **Before** navigating to a new domain for the first time in a test
+   * - When storageState is NOT configured in playwright.config.ts
+   * - For multi-domain flows (e.g., www.cinesa.es → cdn.cinesa.es)
+   *
+   * **When NOT to Use:**
+   * - If storageState is already configured (seeds are redundant)
+   * - After navigation (cookies must be set BEFORE page.goto())
+   * - For non-consent cookies (use page.context().addCookies() directly)
+   *
+   * @param {string} url - Target URL to apply consent cookies for (full URL or hostname)
+   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @returns {Promise<void>} Resolves when cookies are applied (or skipped if no seeds)
+   *
+   * @throws {Error} When cookie injection fails (e.g., invalid cookie format, browser context closed)
+   *
+   * @example
+   * ```typescript
+   * // Typical usage in fixture or test setup
+   * const webActions = new WebActions(page);
+   * await webActions.applyConsentSeedsFor('https://www.cinesa.es');
+   * await webActions.navigateTo('https://www.cinesa.es/peliculas');
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Multi-domain flow
+   * await webActions.applyConsentSeedsFor('https://www.cinesa.es');
+   * await webActions.navigateTo('https://www.cinesa.es/cines');
+   * await webActions.applyConsentSeedsFor('https://cdn.cinesa.es'); // Different domain
+   * await webActions.navigateTo('https://cdn.cinesa.es/assets');
+   * ```
+   *
+   * @see https://playwright.dev/docs/api/class-browsercontext#browser-context-add-cookies
+   * @see docs/adrs/0014-cookie-consent-persistence-with-storage-state.md
+   * @see core/consent/consentSeeds.ts
+   *
+   * @since 1.0.0
+   */
+  async applyConsentSeedsFor(url: string, stepMessage?: string): Promise<void> {
+    const message = stepMessage || `Apply consent seeds for ${url}`;
+
+    await allure.step(message, async () => {
+      // Dynamic import to avoid circular dependencies
+      const { getConsentSeedsFor } = await import('../consent/consentSeeds');
+      const seeds = getConsentSeedsFor(url);
+
+      if (!seeds || seeds.length === 0) {
+        await allure.parameter('Status', 'No seeds found for this host');
+        await allure.parameter('Host', this.extractHostname(url));
+        return;
+      }
+
+      await allure.parameter('Seeds Count', seeds.length.toString());
+      await allure.parameter('Host', this.extractHostname(url));
+
+      try {
+        // Convert ConsentCookie format to Playwright Cookie format
+        // Playwright expects domain, not url, so we extract hostname
+        const playwrightCookies = seeds.map((seed: any) => ({
+          name: seed.name,
+          value: seed.value,
+          domain: seed.domain,
+          path: seed.path,
+          expires: seed.expires,
+          httpOnly: seed.httpOnly,
+          secure: seed.secure,
+          sameSite: seed.sameSite,
+        }));
+
+        // Inject cookies via BrowserContext API
+        // This is the official Playwright way to add cookies BEFORE navigation
+        await this.page.context().addCookies(playwrightCookies);
+
+        await allure.parameter('Status', 'Seeds applied successfully');
+      } catch (error) {
+        await allure.parameter('Status', 'Failed to apply seeds');
+        throw new Error(`Failed to apply consent seeds for ${url}: ${error}`);
+      }
+    });
+  }
+
+  /**
+   * Navigate to URL with automatic consent seed application.
+   * Wraps navigateTo() with consent pre-seeding logic for convenience.
+   *
+   * **Execution Flow:**
+   * 1. Apply consent seeds (if available) for target URL
+   * 2. Navigate to URL using standard navigateTo()
+   *
+   * **Use Case:**
+   * Simplified API for tests that need consent cookies but don't want
+   * to call applyConsentSeedsFor() + navigateTo() separately.
+   *
+   * @param {string} url - The target URL to navigate to
+   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @returns {Promise<void>} Resolves when navigation is complete
+   *
+   * @throws {Error} When consent seed application or navigation fails
+   *
+   * @example
+   * ```typescript
+   * // Automatically applies consent seeds if available for host
+   * await webActions.navigateToWithConsent('https://www.cinesa.es/peliculas');
+   *
+   * // Equivalent to:
+   * // await webActions.applyConsentSeedsFor('https://www.cinesa.es/peliculas');
+   * // await webActions.navigateTo('https://www.cinesa.es/peliculas');
+   * ```
+   *
+   * @see applyConsentSeedsFor
+   * @see navigateTo
+   *
+   * @since 1.0.0
+   */
+  async navigateToWithConsent(
+    url: string,
+    stepMessage?: string
+  ): Promise<void> {
+    await this.applyConsentSeedsFor(url);
+    await this.navigateTo(url, stepMessage);
+  }
+
+  /**
+   * Helper method to extract hostname from URL or return as-is if already hostname.
+   * Used internally by applyConsentSeedsFor() for logging purposes.
+   *
+   * @private
+   * @param {string} urlOrHostname - Full URL or hostname
+   * @returns {string} Extracted hostname or original string
+   */
+  private extractHostname(urlOrHostname: string): string {
+    try {
+      const parsedUrl = new URL(urlOrHostname);
+      return parsedUrl.hostname;
+    } catch {
+      // If URL parsing fails, assume it's already a hostname
+      return urlOrHostname;
+    }
   }
 }

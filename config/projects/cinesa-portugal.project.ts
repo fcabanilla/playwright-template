@@ -4,7 +4,7 @@ import {
   COMMON_SCREENSHOTS,
   COMMON_BROWSER_ARGS,
 } from './common.config';
-import { getCinesaStorageStatePath } from './storageState.helper';
+import { getCinesaPortugalStorageStatePath } from './storageState.helper';
 
 /**
  * Cinesa Portugal project:
@@ -40,7 +40,7 @@ export function getCinesaPortugalProject(): Project {
       actionTimeout: COMMON_TIMEOUTS.action,
       navigationTimeout: COMMON_TIMEOUTS.navigation,
       locale: 'pt-PT', // Portuguese locale
-      storageState: getCinesaStorageStatePath(env),
+      storageState: getCinesaPortugalStorageStatePath(env),
       launchOptions: {
         args: [...COMMON_BROWSER_ARGS],
       },

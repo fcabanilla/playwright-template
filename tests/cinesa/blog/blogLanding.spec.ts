@@ -7,12 +7,11 @@ test.describe('Blog Landing Page Tests', () => {
   let blogLandingAssertions: BlogLandingAssertions;
 
   test.beforeEach(
-    async ({ page, blogLanding, cookieBanner, promotionalModal }) => {
+    async ({ page, blogLanding, promotionalModal }) => {
       await allure.epic('Cinesa Platform');
       await allure.feature('Blog - Content Platform');
 
       blogLandingAssertions = new BlogLandingAssertions(page);
-      await cookieBanner.acceptAllCookies();
       await promotionalModal.closeModalIfVisible();
       await blogLanding.navigateToPage();
     }

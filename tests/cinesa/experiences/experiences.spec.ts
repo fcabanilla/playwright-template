@@ -4,12 +4,11 @@ import { assertExperiencesRedirection } from './experiences.assertions';
 import { EXPERIENCES_URL } from './experiences.data';
 
 test.describe('Cinesa Experiences Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Experiences - Premium Formats');
 
     await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
     await promotionalModal.closeModalIfVisible();
   });
 

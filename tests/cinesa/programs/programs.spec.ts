@@ -10,13 +10,12 @@ test.describe(
   },
   () => {
     test.beforeEach(
-      async ({ page, cookieBanner, promotionalModal, navbar }) => {
+      async ({ page, promotionalModal, navbar }) => {
         await allure.epic('Cinesa Platform');
         await allure.feature('Loyalty Programs - Rewards');
 
         await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
         await navbar.navigateToHome();
-        await cookieBanner.acceptAllCookies();
         await promotionalModal.closeModalIfVisible();
       }
     );
@@ -36,7 +35,6 @@ test.describe(
         await test.step('Navigate to Programs Unlimited page', async () => {
           await unlimitedProgramsPage.navigateToUnlimitedPrograms();
         });
-        await cookieBanner.acceptAllCookies();
         await promotionalModal.closeModalIfVisible();
         await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
         await takeScreenshot(page, test.info());

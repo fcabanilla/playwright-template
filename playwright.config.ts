@@ -81,11 +81,33 @@ export default defineConfig({
   // Proyectos separados para UCI, Cinesa España, Cinesa Portugal y un proyecto específico para
   // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
   projects: [
-    getUCICinemasProject(),
-    getCinesaProject(),
-    getCinesaPortugalProject(),
-    getCloudflareOnlyProject(),
-    getCinesaCloudflareProject(),
+    // Setup project - runs FIRST to generate storageState files with cookie consent
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+
+    // Main projects - depend on setup to have storageState ready
+    {
+      ...getUCICinemasProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCinesaProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCinesaPortugalProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCloudflareOnlyProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCinesaCloudflareProject(),
+      dependencies: ['setup'],
+    },
   ],
 
   // Reporter configurado para diferenciar proyectos

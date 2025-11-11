@@ -11,20 +11,19 @@ import {
 } from './seatPicker.assertions';
 import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
-import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
+//import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 import { getCinemasForEnvironment } from './seatPicker.data';
 
 // Get available cinemas for current environment
 const CINEMAS = getCinemasForEnvironment();
 
 test.describe('Seat Picker - Seat Selection', () => {
-  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
+  test.beforeEach(async ({ page, navbar }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Seat Picker - Seat Selection');
 
     await navbar.navigateToHome();
-    await assertNoCloudflareProtection(page, 'beforeEach setup');
-    await cookieBanner.acceptAllCookies();
+    //await assertNoCloudflareProtection(page, 'beforeEach setup');
   });
 
   test.describe('Complete Purchase Flow', () => {

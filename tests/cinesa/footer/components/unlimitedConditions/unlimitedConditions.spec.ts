@@ -5,12 +5,11 @@ import { assertUnlimitedConditionsNavigation } from './unlimitedConditions.asser
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('UNLIMITED CARD Conditions Tests', () => {
-  test.beforeEach(async ({ cookieBanner, footer }) => {
+  test.beforeEach(async ({ footer }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('UNLIMITED CARD Conditions page display and layout', async ({

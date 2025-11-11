@@ -5,12 +5,11 @@ import { assertCinesaBusinessNavigation } from './cinesabusiness.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Cinesa Business Tests', () => {
-  test.beforeEach(async ({ page, cookieBanner, cinesabusiness }) => {
+  test.beforeEach(async ({ page, cinesabusiness }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
 
     await cinesabusiness.navigateToHome();
-    await cookieBanner.acceptAllCookies();
   });
 
   test('Cinesa Business page display and layout', async ({
