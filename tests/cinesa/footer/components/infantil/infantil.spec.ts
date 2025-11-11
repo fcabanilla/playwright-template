@@ -13,7 +13,9 @@ test.describe('Infantil y Colegios Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Infantil y Colegios page display and layout', async ({
+  test('Infantil y Colegios page display and layout', {
+    tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     infantil,
   }, testInfo) => {
@@ -27,7 +29,9 @@ test.describe('Infantil y Colegios Tests', () => {
     );
   });
 
-  test('Infantil y Colegios page redirection test', async ({
+  test('Infantil y Colegios page redirection test', {
+    tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     infantil,
   }) => {

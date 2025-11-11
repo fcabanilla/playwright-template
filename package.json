@@ -59,7 +59,11 @@
     "test:footer": "npx playwright test tests/cinesa/footer/",
     "test:auth": "npx playwright test tests/cinesa/login tests/cinesa/signup --project=Cinesa",
     "test:auth:preprod": "cross-env TEST_ENV=preprod npm run test:auth --",
-    "test:auth:lab": "cross-env TEST_ENV=lab npm run test:auth --"
+    "test:auth:lab": "cross-env TEST_ENV=lab npm run test:auth --",
+    "_____BROKEN_TESTS_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "test:broken": "npx playwright test --grep @broken-prod --project=Cinesa",
+    "test:broken:preprod": "cross-env TEST_ENV=preprod npm run test:broken --",
+    "test:broken:lab": "cross-env TEST_ENV=lab npm run test:broken --"
   },
   "repository": {
     "type": "git",

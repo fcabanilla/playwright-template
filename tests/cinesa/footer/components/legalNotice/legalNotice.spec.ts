@@ -13,7 +13,9 @@ test.describe('Legal Notice Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Legal Notice page display and layout', async ({
+  test('Legal Notice page display and layout', {
+    tag: ['@footer', '@legalnotice', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }, testInfo) => {

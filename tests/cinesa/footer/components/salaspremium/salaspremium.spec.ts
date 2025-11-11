@@ -23,7 +23,9 @@ test.describe('Salas Premium Tests', () => {
     await takeScreenshot(page, testInfo, 'Salas Premium display and layout');
   });
 
-  test('Salas Premium page redirection test', async ({
+  test('Salas Premium page redirection test', {
+    tag: ['@footer', '@salaspremium', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     salaspremium,
   }) => {

@@ -27,7 +27,9 @@ test.describe('UNLIMITED CARD Conditions Tests', () => {
     );
   });
 
-  test('UNLIMITED CARD Conditions page redirection test', async ({
+  test('UNLIMITED CARD Conditions page redirection test', {
+    tag: ['@footer', '@unlimitedconditions', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }) => {

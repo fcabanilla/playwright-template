@@ -13,7 +13,9 @@ test.describe('Cookies Policy Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Cookies Policy page display and layout', async ({
+  test('Cookies Policy page display and layout', {
+    tag: ['@footer', '@cookiespolicy', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }, testInfo) => {

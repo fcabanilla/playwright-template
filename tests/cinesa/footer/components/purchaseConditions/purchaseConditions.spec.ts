@@ -27,7 +27,9 @@ test.describe('Purchase Conditions Tests', () => {
     );
   });
 
-  test('Purchase Conditions page redirection test', async ({
+  test('Purchase Conditions page redirection test', {
+    tag: ['@footer', '@purchaseconditions', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }) => {

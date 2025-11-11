@@ -51,7 +51,7 @@ test.describe('Cinesa Coupons Tests', () => {
 
   test(
     'should validate coupons opens new tab correctly',
-    { tag: ['@coupons', '@cinesa', '@navigation', '@regression'] },
+    { tag: ['@coupons', '@cinesa', '@navigation', '@regression', '@broken-prod'] },
     async ({ webActions, navbar }) => {
       await allure.story('Coupons new tab URL validation');
       const context = webActions.getPage().context();

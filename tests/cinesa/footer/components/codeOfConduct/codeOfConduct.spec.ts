@@ -13,7 +13,9 @@ test.describe('Code of Conduct Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Code of Conduct page display and layout', async ({
+  test('Code of Conduct page display and layout', {
+    tag: ['@footer', '@codeofconduct', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }, testInfo) => {

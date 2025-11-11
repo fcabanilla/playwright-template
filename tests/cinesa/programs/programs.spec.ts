@@ -24,7 +24,7 @@ test.describe(
     test(
       'Programs unlimited display and layout from URL',
       {
-        tag: ['@smoke', '@fast', '@COMS-11226'],
+        tag: ['@smoke', '@fast', '@COMS-11226', '@broken-prod'],
       },
       async ({
         page,

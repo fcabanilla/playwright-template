@@ -13,7 +13,9 @@ test.describe('Transparency Tests', () => {
     await cookieBanner.acceptAllCookies();
   });
 
-  test('Transparency page display and layout', async ({
+  test('Transparency page display and layout', {
+    tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
+  }, async ({
     page,
     footer,
   }, testInfo) => {
@@ -23,7 +25,9 @@ test.describe('Transparency Tests', () => {
     await takeScreenshot(page, testInfo, 'Transparency display and layout');
   });
 
-  test('Transparency page redirection test', async ({ page, footer }) => {
+  test('Transparency page redirection test', {
+    tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
+  }, async ({ page, footer }) => {
     await allure.story('Transparency navigation and URL validation');
     await footer.clickTransparencia();
     await page.waitForLoadState('networkidle');

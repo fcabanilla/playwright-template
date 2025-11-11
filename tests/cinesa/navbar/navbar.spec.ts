@@ -17,7 +17,9 @@ test.describe('Navbar - Navegación Principal', () => {
   });
 
   test.describe('Visibilidad de Elementos', () => {
-    test('should display all navbar elements', async () => {
+    test('should display all navbar elements', {
+      tag: ['@navbar', '@cinesa', '@smoke', '@broken-prod'],
+    }, async () => {
       await allure.story('Verificar elementos visibles del navbar');
       await allure.parameter(
         'Elements',
@@ -29,7 +31,9 @@ test.describe('Navbar - Navegación Principal', () => {
   });
 
   test.describe('Navegación Logo', () => {
-    test('should click logo and stay on home', async ({ navbar }) => {
+    test('should click logo and stay on home', {
+      tag: ['@navbar', '@cinesa', '@smoke', '@broken-prod'],
+    }, async ({ navbar }) => {
       await allure.story('Click en logo mantiene home');
       const { baseUrl } = getNavbarData();
 
