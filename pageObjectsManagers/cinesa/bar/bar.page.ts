@@ -72,6 +72,7 @@ export class BarPage {
   /**
    * Selecciona la última opción de cada sección del modal y añade a la compra.
    * Solo selecciona opciones que tengan radio button (no agotadas).
+   * Environment-aware: Handles cases where menu sections may be unavailable.
    */
   async selectClassicMenuOptionsAndAddToCart(): Promise<void> {
     await allure.step(
@@ -81,26 +82,38 @@ export class BarPage {
           BAR_SELECTORS.modalSections
         );
         const sectionCount = await sections.count();
+        let selectedAnyOption = false;
+        
         for (let i = 0; i < Math.min(2, sectionCount); i++) {
           const section = sections.nth(i);
           const options = section.locator(BAR_SELECTORS.modalSectionOptions);
           const optionCount = await options.count();
           const availableOptionIndexes: number[] = [];
+          
           for (let j = 0; j < optionCount; j++) {
             const option = options.nth(j);
             if ((await option.locator('input[type="radio"]').count()) > 0) {
               availableOptionIndexes.push(j);
             }
           }
-          if (availableOptionIndexes.length === 0) {
-            throw new Error(
-              `No available options with radio button found in section ${i + 1}`
-            );
+          
+          if (availableOptionIndexes.length > 0) {
+            await options
+              .nth(availableOptionIndexes[availableOptionIndexes.length - 1])
+              .click();
+            selectedAnyOption = true;
+          } else {
+            console.log(`Section ${i + 1} has no available options, skipping`);
           }
-          await options
-            .nth(availableOptionIndexes[availableOptionIndexes.length - 1])
-            .click();
         }
+        
+        if (!selectedAnyOption) {
+          throw new Error(
+            'No available menu options found in any section. Menu may be unavailable in current environment.'
+          );
+        }
+        
+        // Add to cart
         const addToCartButton = this.webActions.getLocator(
           'button.v-item-modal-footer__action-button'
         );

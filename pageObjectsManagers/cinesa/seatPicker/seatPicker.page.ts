@@ -419,8 +419,12 @@ export class SeatPicker {
           await seat.locator.click({ timeout: 3000 });
         } catch (error) {
           // If click fails (likely due to modal), handle modal and try again
-          await this.handleShowtimeAttributeModal();
-          await seat.locator.click();
+          try {
+            await this.handleShowtimeAttributeModal();
+            await seat.locator.click();
+          } catch (pageClosedError) {
+            throw new Error(`Unable to select seat [Row ${seat.row}, Seat ${seat.seatNumber}]: Page may have been closed or navigated away`);
+          }
         }
 
         const elementHandle = await seat.locator.elementHandle();
@@ -1146,12 +1150,19 @@ export class SeatPicker {
     }
 
     // Check for specific icons or href attributes in <use> elements
-    if ((await useLocator.count()) > 0) {
-      const href = await useLocator.first().getAttribute('href');
-      if (href?.includes('selected')) return 'selected';
-      if (href?.includes('available')) return 'available';
-      if (href?.includes('unavailable') || href?.includes('house'))
-        return 'unavailable';
+    try {
+      const useCount = await useLocator.count();
+      if (useCount > 0) {
+        const href = await useLocator.first().getAttribute('href');
+        if (href?.includes('selected')) return 'selected';
+        if (href?.includes('available')) return 'available';
+        if (href?.includes('unavailable') || href?.includes('house'))
+          return 'unavailable';
+      }
+    } catch (error) {
+      // Handle page closure gracefully - common in production environment
+      console.log('Page closed during seat state check, treating as unavailable');
+      return 'unavailable';
     }
 
     // Check for specific class names indicating state

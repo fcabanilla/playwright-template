@@ -265,10 +265,19 @@ export class WebActions {
   ): Promise<void> {
     const message = stepMessage || `Wait for ${selector} to be visible`;
     await allure.step(message, async () => {
-      await this.page.locator(selector).waitFor({
-        state: 'visible',
-        timeout: timeout || 30000,
-      });
+      try {
+        await this.page.locator(selector).waitFor({
+          state: 'visible',
+          timeout: timeout || 30000,
+        });
+      } catch (error) {
+        // Handle page closure gracefully - common in production environment
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Target page, context or browser has been closed')) {
+          throw new Error(`Page was closed while waiting for ${selector}. This may indicate navigation/redirect in production environment.`);
+        }
+        throw error;
+      }
     });
   }
 
