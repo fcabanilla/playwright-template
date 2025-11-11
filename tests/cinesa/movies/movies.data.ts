@@ -14,8 +14,8 @@ export const MOVIES_URL = `${config.baseUrl}/peliculas/`;
 
 /**
  * Get available cinemas for movie schema tests based on current environment
- * Uses centralized cinema configuration from config/cinemas.config.ts
+ * Excludes Grancasa due to environment-specific issues per user instruction
  */
 export function getCinemasForMovieTests(env?: string): CinemaConfig[] {
-  return getCinemasForEnvironment(env);
+  return getCinemasForEnvironment(env).filter(cinema => cinema.name !== 'Grancasa');
 }

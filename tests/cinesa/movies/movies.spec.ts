@@ -7,32 +7,31 @@ import {
   assertMovieSchemaMatches,
   assertMovieSchemaURLsAreValid,
 } from './movies.assertions';
+import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 
 // Get available cinemas for movie schema tests
 const CINEMAS_FOR_SCHEMA = getCinemasForMovieTests();
 
 test.describe('Cinesa Movies Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
+  // Force serial execution (1 worker) to avoid concurrency issues
+  test.describe.configure({ mode: 'serial' });
+  
+  test.beforeEach(async ({ page, navbar, cookieBanner }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Movies - Content Catalog');
 
     await navbar.navigateToHome();
+    await assertNoCloudflareProtection(page, 'beforeEach setup');
     await cookieBanner.acceptAllCookies();
-    await promotionalModal.closeModalIfVisible();
   });
 
   test(
     'Movies page display and layout',
     { tag: ['@movies', '@cinesa', '@smoke', '@fast'] },
-    async (
-      { webActions, navbar, cookieBanner, promotionalModal },
-      testInfo
-    ) => {
+    async ({ webActions, navbar }, testInfo) => {
       await allure.story('Movies catalog page display and layout');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
-      await webActions.waitForLoadState('networkidle');
+      await webActions.waitForLoadState('domcontentloaded');
       await takeScreenshot(
         webActions.getPage(),
         testInfo,
@@ -44,12 +43,10 @@ test.describe('Cinesa Movies Tests', () => {
   test(
     'Cinesa Movies page redirection test',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ webActions, navbar, cookieBanner, promotionalModal }) => {
+    async ({ webActions, navbar }) => {
       await allure.story('Movies page URL redirection validation');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
-      await webActions.waitForLoadState('networkidle');
+      await webActions.waitForLoadState('domcontentloaded');
       assertMoviesRedirection(webActions.getPage());
     }
   );
@@ -57,12 +54,9 @@ test.describe('Cinesa Movies Tests', () => {
   test(
     'Navigate through Top Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+    async ({ navbar, movieList }) => {
       await allure.story('Navigation through Top Movies section');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
-
       await movieList.loadTopMovies();
       await movieList.navigateToFirstTopMovie();
     }
@@ -71,11 +65,9 @@ test.describe('Cinesa Movies Tests', () => {
   test(
     'Navigate through Random Movies from All Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+    async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - All Movies tab');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
       await movieList.navigateThroughRandomMovies();
     }
   );
@@ -83,24 +75,19 @@ test.describe('Cinesa Movies Tests', () => {
   test(
     'Navigate through Random Movies from Now Showing',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+    async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Now Showing tab');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
-      await movieList.clickMoviesTabByIndex(1);
-      await movieList.navigateThroughRandomMovies();
+      await movieList.navigateNowShowingMovies();
     }
   );
 
   test(
     'Navigate through Random Movies from Coming Soon',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+    async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Coming Soon tab');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
       await movieList.navigateComingSoonMovies();
     }
   );
@@ -108,11 +95,9 @@ test.describe('Cinesa Movies Tests', () => {
   test(
     'Navigate through Random Movies from Advance Sale',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
-    async ({ navbar, cookieBanner, promotionalModal, movieList }) => {
+    async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Advance Sale tab');
       await navbar.navigateToMovies();
-      await cookieBanner.acceptAllCookies();
-      await promotionalModal.closeModalIfVisible();
       await movieList.navigateAdvanceSaleMovies();
     }
   );
