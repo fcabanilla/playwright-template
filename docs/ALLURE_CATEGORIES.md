@@ -20,7 +20,7 @@ Categories are defined as TypeScript functions (similar to project configuration
 ✅ **IntelliSense** - Auto-completion in VS Code  
 ✅ **Documentation** - JSDoc comments inline with code  
 ✅ **Maintainability** - Refactoring support, find usages  
-✅ **No Build Step** - Categories applied directly by allure-playwright reporter  
+✅ **No Build Step** - Categories applied directly by allure-playwright reporter
 
 **File Structure:**
 
@@ -50,20 +50,25 @@ export function getAllureCategories(): AllureCategory[] {
 import { getAllureCategories } from './config/allure/categories.config';
 
 reporter: [
-  ['allure-playwright', {
-    categories: getAllureCategories(),  // ✅ Applied here
-  }]
-]
+  [
+    'allure-playwright',
+    {
+      categories: getAllureCategories(), // ✅ Applied here
+    },
+  ],
+];
 ```
 
 ### Why Not JSON?
 
 **Previous approach (removed):**
+
 - `.allure/categories.json` → required `git add -f` to version
 - Needed `npm run report:copy-categories` script
 - No type validation, easy to break with typos
 
 **Current approach:**
+
 - TypeScript file in `config/` → versioned normally
 - No copy script needed
 - Validated at compile time
@@ -71,6 +76,7 @@ reporter: [
 ## How Categories Work
 
 Allure categories automatically classify failed/broken tests based on:
+
 - **Status:** `broken` (infrastructure/test issues) or `failed` (product defects)
 - **Error Messages:** Regex patterns matching exception messages
 - **Stack Traces:** Regex patterns matching stack traces
@@ -80,9 +86,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ## Current Categories (Priority Order)
 
 ### 1. Test Timeouts
+
 **Priority:** 🔴 Critical - Infrastructure Issue
 
 **Pattern:**
+
 ```json
 {
   "name": "Test Timeouts",
@@ -92,11 +100,13 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Tests exceeding 90-second timeout
 - Usually affects Grancasa cinema tests
 - Indicates severe performance or infrastructure problems
 
 **Affected Tests:**
+
 - `bar/bar.spec.ts` - Classic menu tests (Grancasa)
 - `seatPicker/seatPicker.spec.ts` - Multiple seat selection (Grancasa)
 
@@ -105,9 +115,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 2. Page Closed Errors
+
 **Priority:** 🔴 Critical - Stability Issue
 
 **Pattern:**
+
 ```json
 {
   "name": "Page Closed Errors",
@@ -117,11 +129,13 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Unexpected browser/page/context closure
 - 100% of cases occur in Grancasa cinema tests
 - Happens during seat retrieval from DOM
 
 **Affected Tests:**
+
 - `bar/bar.spec.ts` - Buy ticket with Classic menu (Grancasa)
 - `seatPicker/seatPicker.spec.ts` - Full purchase with multiple seats (Grancasa)
 
@@ -132,9 +146,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 3. D-BOX Availability Issues
+
 **Priority:** 🟡 Medium - Test Data Issue
 
 **Pattern:**
+
 ```json
 {
   "name": "D-BOX Availability Issues",
@@ -144,14 +160,17 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Tests expecting D-BOX format films
 - Grancasa cinema doesn't have D-BOX showtimes available
 - Expected behavior in production
 
 **Affected Tests:**
+
 - `seatPicker/seatPicker.spec.ts` - D-BOX sofa seat selection tests (Grancasa)
 
 **Action Required:**
+
 - Skip D-BOX tests for cinemas without this format
 - Update test parametrization to check cinema capabilities before execution
 - Consider using cinema configuration in `config/cinemas.config.ts`
@@ -159,9 +178,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 4. Promotional Code Issues
+
 **Priority:** 🟠 High - Product Defect (Potential)
 
 **Pattern:**
+
 ```json
 {
   "name": "Promotional Code Issues",
@@ -171,14 +192,17 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Tests failing when selecting promotional codes
 - Dropdown options (e.g., "ABCD") not appearing
 - Cookie banner may be interfering (see history: passed after cookie accepted)
 
 **Affected Tests:**
+
 - `seatPicker/seatPicker.spec.ts` - Full purchase with standard promotional code (Oasiz)
 
 **Action Required:**
+
 - Verify promotional codes are active in production
 - Add explicit wait for dropdown to be fully loaded
 - Investigate if cookie banner overlay blocks interaction
@@ -186,9 +210,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 5. Seat Selection Logic Errors
+
 **Priority:** 🟠 High - Product Defect
 
 **Pattern:**
+
 ```json
 {
   "name": "Seat Selection Logic Errors",
@@ -198,13 +224,16 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Algorithm fails to find seats matching criteria
 - Affects tests with complex seat selection rules (separating groups, companion seats)
 
 **Affected Tests:**
+
 - `seatPicker/seatPicker.spec.ts` - Select seats separating group in different rows (Grancasa)
 
 **Action Required:**
+
 - Review seat selection algorithm in `seatPicker.page.ts`
 - Add fallback logic for edge cases
 - Consider using less restrictive selection criteria in tests
@@ -212,9 +241,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 6. Cookie Banner Handling
+
 **Priority:** 🟢 Low - Non-Critical
 
 **Pattern:**
+
 ```json
 {
   "name": "Cookie Banner Handling",
@@ -224,11 +255,13 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Cookie banner sometimes doesn't appear (already accepted in previous session)
 - Test continues normally after timeout (3 seconds)
 - Not a blocking failure
 
 **Affected Tests:**
+
 - Various tests with `cookieBanner.acceptAllCookies()` in beforeEach
 
 **Current Mitigation:** Implemented in `cookieBanner.page.ts` with 3-second timeout and graceful continuation.
@@ -238,9 +271,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 7. Strict Mode Violations
+
 **Priority:** 🟠 High - Test Quality Issue
 
 **Pattern:**
+
 ```json
 {
   "name": "Strict Mode Violations",
@@ -250,14 +285,17 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Selector matches multiple elements
 - Playwright's strict mode prevents ambiguous clicks
 - Example: `.v-number-input__button--plus` matches 5 ticket type buttons
 
 **Affected Tests:**
+
 - `bar/bar.spec.ts` - Buy ticket with Classic menu (Oasiz)
 
 **Action Required:**
+
 - Refine selectors to be more specific
 - Use `first()`, `nth()`, or filter methods
 - Update `*.selectors.ts` files with unique selectors
@@ -265,9 +303,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 8. Grancasa Cinema Issues
+
 **Priority:** 🔴 Critical - Infrastructure
 
 **Pattern:**
+
 ```json
 {
   "name": "Grancasa Cinema Issues",
@@ -277,11 +317,13 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Catch-all category for Grancasa-specific problems
 - Combines timeouts, page closures, and stability issues
 - 90%+ failure rate in Grancasa vs. 5% in Oasiz
 
 **Action Required:**
+
 - Isolate Grancasa tests in separate test runs
 - Add cinema-specific retry logic
 - Consider marking Grancasa tests with `@grancasa-unstable` tag
@@ -290,9 +332,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 9. Product Defects
+
 **Priority:** 🔴 Critical - Development Team
 
 **Pattern:**
+
 ```json
 {
   "name": "Product Defects",
@@ -301,6 +345,7 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Genuine bugs in the application
 - Tests correctly identify incorrect behavior
 - Requires developer fix
@@ -310,9 +355,11 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ---
 
 ### 10. Test Infrastructure Issues
+
 **Priority:** 🟡 Medium - Test Maintenance
 
 **Pattern:**
+
 ```json
 {
   "name": "Test Infrastructure Issues",
@@ -321,6 +368,7 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 ```
 
 **Characteristics:**
+
 - Test framework problems
 - Configuration issues
 - Flaky test patterns
@@ -340,12 +388,14 @@ npm run report
 ```
 
 Navigate to:
+
 - **Categories** tab - See distribution of failures by category
 - **Test Details** - Each failed test shows its assigned category
 
 ### Category Metrics
 
 Categories help answer:
+
 - **What's the main issue?** (e.g., "70% failures are Test Timeouts")
 - **Which cinema is problematic?** (e.g., "Grancasa Cinema Issues" category)
 - **Are failures test bugs or product bugs?** (e.g., "Product Defects" vs. "Test Infrastructure Issues")
@@ -357,6 +407,7 @@ Categories help answer:
 ### When to Add a New Category
 
 Add a new category when:
+
 1. You identify a **new pattern** of failures (3+ tests with same error)
 2. The pattern is **actionable** (different fix strategy than existing categories)
 3. The pattern is **specific enough** to be useful (not too broad)
@@ -366,10 +417,11 @@ Add a new category when:
 Categories are evaluated **top-to-bottom**. More specific categories should come **before** generic ones.
 
 **Example:**
+
 ```json
 [
-  { "name": "D-BOX Availability Issues", "messageRegex": ".*D-BOX.*" },  // Specific
-  { "name": "Product Defects", "matchedStatuses": ["failed"] }          // Generic (catches all)
+  { "name": "D-BOX Availability Issues", "messageRegex": ".*D-BOX.*" }, // Specific
+  { "name": "Product Defects", "matchedStatuses": ["failed"] } // Generic (catches all)
 ]
 ```
 
@@ -386,12 +438,12 @@ Categories are evaluated **top-to-bottom**. More specific categories should come
 
 Categories complement the tag system:
 
-| Tag             | Allure Category                  | Purpose                                |
-|-----------------|----------------------------------|----------------------------------------|
-| `@broken-prod`  | Test Timeouts, Page Closed Errors| Severe failures requiring urgent fix   |
-| `@failed-prod`  | Product Defects, Seat Logic Errors| Minor failures requiring investigation |
-| `@grancasa`     | Grancasa Cinema Issues           | Cinema-specific problems               |
-| `@smoke`        | N/A                              | Critical path tests (should never fail)|
+| Tag            | Allure Category                    | Purpose                                 |
+| -------------- | ---------------------------------- | --------------------------------------- |
+| `@broken-prod` | Test Timeouts, Page Closed Errors  | Severe failures requiring urgent fix    |
+| `@failed-prod` | Product Defects, Seat Logic Errors | Minor failures requiring investigation  |
+| `@grancasa`    | Grancasa Cinema Issues             | Cinema-specific problems                |
+| `@smoke`       | N/A                                | Critical path tests (should never fail) |
 
 ---
 
@@ -402,6 +454,7 @@ Categories complement the tag system:
 **Test:** `bar/bar.spec.ts` - Buy multiple tickets with Classic menu (Oasiz)
 
 **Error:**
+
 ```
 Test timeout of 90000ms exceeded.
 ```
@@ -417,6 +470,7 @@ Test timeout of 90000ms exceeded.
 **Test:** `seatPicker/seatPicker.spec.ts` - Full purchase with multiple seats (Grancasa)
 
 **Error:**
+
 ```
 Error: locator.getAttribute: Target page, context or browser has been closed
 Call log:
@@ -434,6 +488,7 @@ Call log:
 **Test:** `seatPicker/seatPicker.spec.ts` - D-BOX sofa seat selection (Grancasa)
 
 **Error:**
+
 ```
 Error: No D-BOX films with showtimes found on the cinema detail page
 ```
@@ -456,6 +511,7 @@ Error: No D-BOX films with showtimes found on the cinema detail page
 ## Changelog
 
 ### 2025-01-11 - Initial Categories
+
 - Created 10 categories based on production test results analysis
 - Prioritized by failure frequency and impact
 - Aligned with @broken-prod and @failed-prod tags

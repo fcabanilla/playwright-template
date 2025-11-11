@@ -8,7 +8,6 @@ import {
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
-import { getAllureCategories } from './config/allure/categories.config';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -109,9 +108,8 @@ export default defineConfig({
             nameTemplate: 'Test Case %s',
           },
         },
-        // Defect categories for automatic failure classification
-        // See config/allure/categories.config.ts and docs/ALLURE_CATEGORIES.md
-        categories: getAllureCategories(),
+        // Categories are defined in .allure/categories.json (copied to results/ before report generation)
+        // See docs/ALLURE_CATEGORIES.md for details
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
           Environment: process.env.TEST_ENV || 'production',
