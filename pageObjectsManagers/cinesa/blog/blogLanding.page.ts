@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   blogLandingSelectors,
   BlogLandingSelectors,
@@ -17,9 +18,14 @@ export class BlogLanding {
   private readonly url: string = 'https://www.cinesa.es/blog-cinesa/';
 
   /**
-   * Playwright Page instance.
+   * WebActions instance for page interactions.
    */
-  readonly page: Page;
+  private readonly webActions: WebActions;
+
+  /**
+   * Playwright Page instance - public for test access.
+   */
+  public readonly page: Page;
 
   /**
    * Set of selectors for the page.
@@ -29,10 +35,11 @@ export class BlogLanding {
   /**
    * Creates a new instance of BlogLanding.
    *
-   * @param page - Playwright Page object.
+   * @param webActions - WebActions instance.
    */
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
+    this.page = webActions.page;
     this.selectors = blogLandingSelectors;
   }
 
@@ -43,7 +50,7 @@ export class BlogLanding {
    */
   async navigateToPage(): Promise<void> {
     await allure.step('Navigating to the Blog Landing Page', async () => {
-      await this.page.goto(this.url);
+      await this.webActions.navigateTo(this.url);
     });
   }
 
@@ -54,7 +61,7 @@ export class BlogLanding {
    */
   async clickLogo(): Promise<void> {
     await allure.step('Clicking on the blog logo', async () => {
-      await this.page.click(this.selectors.logo);
+      await this.webActions.click(this.selectors.logo);
     });
   }
 
@@ -91,7 +98,7 @@ export class BlogLanding {
    * @returns A Promise that resolves with the number of article cards.
    */
   async countArticleCards(): Promise<number> {
-    await this.page.waitForSelector(this.selectors.articleCard, { timeout: 10000 });
+    await this.webActions.waitForSelector(this.selectors.articleCard, { timeout: 10000 });
     return await this.getArticleCardsLocator().count();
   }
 }
