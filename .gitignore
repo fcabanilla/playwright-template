@@ -1,5 +1,6 @@
 node_modules/
 .allure/
+!.allure/categories.json
 dist/
 
 # Environment variables (contienen credenciales sensibles)
