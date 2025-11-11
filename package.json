@@ -19,6 +19,8 @@
     "report:clean:results": "rm -rf .allure/results/*",
     "report:watch": "npx allure watch .allure/results",
     "report:reset": "npm run report:clean && npm run report:generate && npm run report:open",
+    "xray:export": "node scripts/generate-xray-import.js",
+    "xray:export:open": "npm run xray:export && open xray-import.csv",
     "_____CODEGEN_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
     "codegen": "npx playwright codegen",
     "codegen:es": "npx playwright codegen https://www.cinesa.es",
@@ -54,7 +56,10 @@
     "test:seatpicker": "npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts",
     "test:movies": "npx playwright test tests/cinesa/movies/movies.spec.ts",
     "test:cinemas": "npx playwright test tests/cinesa/cinemas/cinemas.spec.ts",
-    "test:footer": "npx playwright test tests/cinesa/footer/"
+    "test:footer": "npx playwright test tests/cinesa/footer/",
+    "test:auth": "npx playwright test tests/cinesa/login tests/cinesa/signup --project=Cinesa",
+    "test:auth:preprod": "cross-env TEST_ENV=preprod npm run test:auth --",
+    "test:auth:lab": "cross-env TEST_ENV=lab npm run test:auth --"
   },
   "repository": {
     "type": "git",
