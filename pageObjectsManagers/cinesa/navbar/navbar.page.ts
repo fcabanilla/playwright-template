@@ -76,7 +76,7 @@ export class Navbar {
    */
   async navigateToMovies(): Promise<void> {
     await allure.step('Navigating to Movies page', async () => {
-      await this.webActions.click(this.selectors.peliculas);
+      await this.webActions.clickWithOverlayHandling(this.selectors.peliculas);
     });
   }
 

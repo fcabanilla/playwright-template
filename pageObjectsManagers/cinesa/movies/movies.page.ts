@@ -192,7 +192,7 @@ export class MovieList {
         await this.clickMovie(movie);
         await this.validateMovieTitle(movie.title);
         await this.webActions.goBack();
-        await this.webActions.waitForLoadState('networkidle');
+        await this.webActions.waitForLoadState('domcontentloaded');
         await this.loadTopMovies();
         processedCount++;
       } catch (error) {
@@ -200,7 +200,7 @@ export class MovieList {
         console.warn(`Failed to process movie ${i}: ${message}`);
         try {
           await this.webActions.goBack();
-          await this.webActions.waitForLoadState('networkidle');
+          await this.webActions.waitForLoadState('domcontentloaded');
           await this.loadTopMovies();
         } catch (backError) {
           const backMessage =
@@ -238,7 +238,7 @@ export class MovieList {
     const shuffledMovies = movies.sort(() => 0.5 - Math.random());
     const selectedMovies = shuffledMovies.slice(0, numberOfMoviesToVisit);
 
-    await this.webActions.waitForLoadState('networkidle');
+    await this.webActions.waitForLoadState('domcontentloaded');
 
     for (let i = 0; i < selectedMovies.length; i++) {
       const movie = selectedMovies[i];
@@ -251,7 +251,7 @@ export class MovieList {
         
         // More robust back navigation
         await this.webActions.goBack();
-        await this.webActions.waitForLoadState('networkidle');
+        await this.webActions.waitForLoadState('domcontentloaded');
         
         // Small delay between movies to avoid overwhelming the browser
         await this.webActions.wait(500);
@@ -270,7 +270,7 @@ export class MovieList {
         try {
           // Try to go back in case we're stuck on a movie page
           await this.webActions.goBack();
-          await this.webActions.waitForLoadState('networkidle');
+          await this.webActions.waitForLoadState('domcontentloaded');
         } catch (backError) {
           console.warn('Failed to go back after error. Stopping navigation.');
           break;
@@ -331,6 +331,23 @@ export class MovieList {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(`Top Movies navigation failed: ${message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Navigates to Now Showing movies tab and performs random navigation.
+   * Implements business logic with error handling for missing tabs.
+   */
+  async navigateNowShowingMovies(): Promise<void> {
+    try {
+      await this.clickMoviesTabByIndex(1);
+      await this.navigateThroughRandomMovies();
+    } catch (error) {
+      if (error instanceof Error && (error.message.includes('Tab with index 1 not found') || error.message.includes('Tab not available'))) {
+        console.warn('Now Showing tab not available in this environment. Skipping.');
+        return;
+      }
       throw error;
     }
   }
