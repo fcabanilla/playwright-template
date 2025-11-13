@@ -209,9 +209,12 @@ Mantener `CookieBannerPage.acceptIfPresent()` idempotente para:
 
 ### Implementation Plan
 
-#### 1. Estados Base por Entorno/Host (Bootstrap Script)
+#### 1. Estados Base por Entorno/Host (Playwright Setup Test)
 
-**Crear `scripts/bootstrap-consent.ts`:**
+**Implementado en `tests/setup/auth.setup.ts`:**
+
+Este archivo se ejecuta automáticamente como proyecto de setup antes de los tests principales.
+Ver implementación completa en el archivo fuente para detalles.
 
 ```typescript
 import { chromium, BrowserContext } from '@playwright/test';
@@ -311,10 +314,14 @@ async function main() {
 main().catch(console.error);
 ```
 
-**Ejecutar:**
+**Ejecutar setup automáticamente:**
 
 ```bash
-npx ts-node scripts/bootstrap-consent.ts
+# Se ejecuta automáticamente antes de los tests vía project dependencies
+npx playwright test
+
+# O manualmente solo el setup:
+npx playwright test --project=setup
 ```
 
 #### 2. ConsentSeedRegistry
@@ -613,14 +620,13 @@ export const test = base.extend<CustomFixtures>({
   uses: actions/cache@v3
   with:
     path: state/
-    key: consent-states-${{ hashFiles('scripts/bootstrap-consent.ts') }}-${{ env.CMP_VERSION }}
+    key: consent-states-${{ hashFiles('tests/setup/auth.setup.ts') }}-${{ env.CMP_VERSION }}
     restore-keys: |
-      consent-states-${{ hashFiles('scripts/bootstrap-consent.ts') }}-
+      consent-states-${{ hashFiles('tests/setup/auth.setup.ts') }}-
       consent-states-
 
-- name: Bootstrap Consent (if cache miss)
-  if: steps.cache.outputs.cache-hit != 'true'
-  run: npm run bootstrap:consent
+- name: Run Setup Tests (generates consent if cache miss)
+  run: npx playwright test --project=setup
 ```
 
 #### 7. Fallback Controlado
@@ -742,17 +748,20 @@ git restore config/projects/storageState.helper.ts
 
 ## Implementation Checklist
 
-- [ ] **ADR-0014 aprobado por equipo** (Pending)
-- [ ] Crear `scripts/bootstrap-consent.ts`
-- [ ] Ejecutar bootstrap para production/preprod/lab (Cinesa + UCI)
-- [ ] Crear `core/consent/consentSeeds.ts` con seeds extraídos
-- [ ] Implementar `WebActions.applyConsentSeedsFor()`
-- [ ] Implementar `WebActions.navigateToWithConsent()`
-- [ ] Actualizar `playwright.config.ts` con `getStorageStatePath()`
-- [ ] Actualizar `fixtures/cinesa/playwright.fixtures.ts` con seeds fallback
-- [ ] Añadir flag `FORCE_ACCEPT_COOKIES` a `CookieBannerPage.acceptIfPresent()`
+- [x] **ADR-0014 aprobado por equipo**
+- [x] Crear `tests/setup/auth.setup.ts` (reemplaza script manual)
+- [x] Ejecutar setup para production/preprod/lab (Cinesa + UCI)
+- [ ] Crear `core/consent/consentSeeds.ts` con seeds extraídos (opcional)
+- [ ] Implementar `WebActions.applyConsentSeedsFor()` (opcional)
+- [ ] Implementar `WebActions.navigateToWithConsent()` (opcional)
+- [x] Actualizar `playwright.config.ts` con `getStorageStatePath()`
+- [x] Actualizar `fixtures/cinesa/playwright.fixtures.ts` con setup automático
+- [ ] Añadir flag `FORCE_ACCEPT_COOKIES` a `CookieBannerPage.acceptIfPresent()` (si necesario)
 - [ ] Configurar caching CI/CD para `state/`
-- [ ] Ejecutar suite completa (269 tests) y validar success criteria
-- [ ] Documentar en `README.md` (sección "Cookie Consent Management")
+- [ ] Ejecutar suite completa y validar success criteria
+- [x] Documentar en código con TSDoc (`tests/setup/auth.setup.ts`)
 - [ ] Revisión de código (2+ reviewers)
 - [ ] Merge a `main`
+
+**Nota:** `scripts/bootstrap-consent.ts` fue removido - ahora todo se maneja vía `tests/setup/auth.setup.ts`
+```

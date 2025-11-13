@@ -12,14 +12,17 @@ test.describe('Ciclos Tests', () => {
     await ciclos.navigateToHome();
   });
 
-  test('Ciclos page display and layout', async ({ page, ciclos }, testInfo) => {
+  test('Footer · Ciclos · Display & Layout', async ({
+    page,
+    ciclos,
+  }, testInfo) => {
     await allure.story('Ciclos page display and layout');
     await ciclos.clickCiclos();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Ciclos display and layout');
   });
 
-  test('Ciclos page redirection test', async ({ page, ciclos }) => {
+  test('Footer · Ciclos · Navigate · Redirect', async ({ page, ciclos }) => {
     await allure.story('Ciclos navigation and URL validation');
     await ciclos.clickCiclos();
     await page.waitForLoadState('networkidle');

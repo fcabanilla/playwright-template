@@ -1,5 +1,6 @@
 import { WebActions } from '../../../core/webactions/webActions';
 import { promotionalModalSelectors } from './promotionalModal.selectors';
+import { allure } from 'allure-playwright';
 
 /**
  * Page Object for handling the promotional modal/popup that appears on LAB environment
@@ -30,15 +31,19 @@ export class PromotionalModal {
    * Uses a short timeout to avoid hanging if modal doesn't appear
    */
   async closeModalIfVisible(): Promise<void> {
-    try {
-      // Wait max 2 seconds for modal to appear
-      await this.webActions.waitForSelector(this.selectors.modal, { timeout: 2000 });
-      // If we get here, modal is visible, so close it
-      await this.webActions.click(this.selectors.closeButton);
-      await this.webActions.wait(500);
-    } catch {
-      // Modal not visible or timeout, that's ok, just continue
-    }
+    await allure.step('Close promotional modal (if visible)', async () => {
+      try {
+        // Wait max 2 seconds for modal to appear
+        await this.webActions.waitForSelector(this.selectors.modal, {
+          timeout: 2000,
+        });
+        // If we get here, modal is visible, so close it
+        await this.webActions.click(this.selectors.closeButton);
+        await this.webActions.wait(500);
+      } catch {
+        // Modal not visible or timeout, that's ok, just continue
+      }
+    });
   }
 
   /**

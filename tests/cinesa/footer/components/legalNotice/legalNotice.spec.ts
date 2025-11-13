@@ -13,7 +13,7 @@ test.describe('Legal Notice Tests', () => {
   });
 
   test(
-    'Legal Notice page display and layout',
+    'Footer · Legal Notice · Display & Layout',
     {
       tag: ['@footer', '@legalnotice', '@cinesa', '@failed-prod'],
     },
@@ -25,7 +25,10 @@ test.describe('Legal Notice Tests', () => {
     }
   );
 
-  test('Legal Notice page redirection test', async ({ page, footer }) => {
+  test('Footer · Legal Notice · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Legal Notice navigation and URL validation');
     await footer.clickAvisoLegal();
     await page.waitForLoadState('networkidle');

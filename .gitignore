@@ -11,7 +11,7 @@ dist/
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
 sessionState*.json
-
+state/consented.production.es.json
 
 # Test result files
 artifacts/

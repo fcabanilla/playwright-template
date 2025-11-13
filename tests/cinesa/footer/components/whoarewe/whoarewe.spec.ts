@@ -12,7 +12,7 @@ test.describe('Who Are We Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Who Are We page display and layout', async ({
+  test('Footer · Who Are We · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -23,7 +23,7 @@ test.describe('Who Are We Tests', () => {
   });
 
   test(
-    'Who Are We page redirection test',
+    'Footer · Who Are We · Navigate · Redirect',
     {
       tag: ['@footer', '@whoarewe', '@cinesa', '@broken-prod'],
     },

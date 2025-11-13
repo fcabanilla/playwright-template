@@ -17,7 +17,7 @@ test.describe('Navbar - Navegación Principal', () => {
 
   test.describe('Visibilidad de Elementos', () => {
     test(
-      'should display all navbar elements',
+      'Navbar · Visibility · Display · All elements',
       {
         tag: ['@navbar', '@cinesa', '@smoke'],
       },
@@ -35,7 +35,7 @@ test.describe('Navbar - Navegación Principal', () => {
 
   test.describe('Navegación Logo', () => {
     test(
-      'should click logo and stay on home',
+      'Navbar · Navigation · Click logo · Stay on home',
       {
         tag: ['@navbar', '@cinesa', '@smoke'],
       },
@@ -52,7 +52,7 @@ test.describe('Navbar - Navegación Principal', () => {
   });
 
   test.describe('Navegación Completa - DEMO', () => {
-    test('should click each navbar element and navigate accordingly DEMO test', async ({
+    test('Navbar · Navigation · Click each element · Navigate accordingly — DEMO', async ({
       navbar,
     }) => {
       await allure.story('Navegación por todos los elementos del navbar');

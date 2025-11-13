@@ -1,6 +1,7 @@
 import { expect, Page, Locator } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { CorsHandler } from './corsHandler';
+import { step, mask, truncate } from './steps';
 
 /**
  * WebActions provides a unified, abstracted interface for all Playwright browser interactions.
@@ -91,29 +92,26 @@ export class WebActions {
 
   /**
    * Navigates to the specified URL using standard Playwright navigation.
+   * Automatically creates Allure step with standardized format: [NAV] Goto | URL=...
    *
    * @param {string} url - The target URL to navigate to
-   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when navigation is complete
    *
    * @throws {Error} When navigation fails or times out
    *
    * @example
    * ```typescript
-   * await webActions.navigateTo('https://www.ucicinemas.it/about', 'Navigate to About page');
+   * await webActions.navigateTo('https://www.ucicinemas.it/peliculas');
+   * // Allure step: "[NAV] Goto | URL=/peliculas | Env=production"
    * ```
    *
    * @since 1.0.0
    */
-  async navigateTo(url: string, stepMessage?: string): Promise<void> {
-    const message = stepMessage || `Navigate to ${url}`;
-    await allure.step(message, async () => {
-      // Only essential parameters: URL and Environment
-      await allure.parameter('URL', url);
-      await allure.parameter(
-        'Environment',
-        process.env.TEST_ENV || 'production'
-      );
+  async navigateTo(url: string): Promise<void> {
+    const env = process.env.TEST_ENV || 'production';
+    const urlPath = this.extractPath(url);
+
+    await step(`[NAV] Goto | URL=${urlPath} | Env=${env}`, async () => {
       await this.page.goto(url);
     });
   }
@@ -139,36 +137,45 @@ export class WebActions {
 
   /**
    * Performs a standard click action on an element identified by CSS selector.
+   * Automatically creates Allure step with standardized format: [ACT] Click | Target=...
+   *
    * For elements that might be blocked by overlays, use clickWithOverlayHandling instead.
    *
    * @param {string} selector - CSS selector for the target element
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {string} [targetName] - Optional logical name from selectors file (e.g., 'loginButton')
    * @returns {Promise<void>} Resolves when click action is complete
    *
    * @throws {Error} When element is not found or not clickable
    *
    * @example
    * ```typescript
-   * await webActions.click('.movie-card[data-id="123"]', 'Click on movie card');
+   * // With logical name (preferred - from selectors file)
+   * await webActions.click(this.selectors.loginButton, 'loginButton');
+   * // Allure step: "[ACT] Click | Target=loginButton"
+   *
+   * // Without logical name (fallback to selector)
+   * await webActions.click('.btn-submit');
+   * // Allure step: "[ACT] Click | Target=.btn-submit"
    * ```
    *
    * @since 1.0.0
    */
-  async click(selector: string, stepMessage?: string): Promise<void> {
-    const message = stepMessage || `Click on ${selector}`;
-    await allure.step(message, async () => {
-      // Selector already in step message, no need to duplicate as parameter
+  async click(selector: string, targetName?: string): Promise<void> {
+    const target = targetName || selector;
+    await step(`[ACT] Click | Target=${target}`, async () => {
       await this.page.locator(selector).click();
     });
   }
 
   /**
    * Performs a click action with intelligent overlay detection and handling.
+   * Automatically creates Allure step: [ACT] Click (with overlay handling) | Target=...
+   *
    * Automatically detects and attempts to close common overlays (modals, dropdowns, etc.)
    * that might intercept click events. Uses force click as fallback strategy.
    *
    * @param {string} selector - CSS selector for the target element
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {string} [targetName] - Optional logical name from selectors file
    * @returns {Promise<void>} Resolves when click action is complete and overlays are handled
    *
    * @throws {Error} When element is not found after overlay handling
@@ -176,81 +183,108 @@ export class WebActions {
    * @example
    * ```typescript
    * // Will handle promotional modals, cookie banners, etc. automatically
-   * await webActions.clickWithOverlayHandling('.navbar-cinemas', 'Click on Cinemas menu');
+   * await webActions.clickWithOverlayHandling(this.selectors.cinemas, 'cinemasButton');
+   * // Allure step: "[ACT] Click (with overlay handling) | Target=cinemasButton"
    * ```
    *
    * @since 1.0.0
    */
   async clickWithOverlayHandling(
     selector: string,
-    stepMessage?: string
+    targetName?: string
   ): Promise<void> {
-    const message = stepMessage || `Click ${selector} (with overlay handling)`;
-    await allure.step(message, async () => {
-      // Wait for element to be visible first
-      await this.page.locator(selector).waitFor({ state: 'visible' });
+    const target = targetName || selector;
+    await step(
+      `[ACT] Click (with overlay handling) | Target=${target}`,
+      async () => {
+        // Wait for element to be visible first
+        await this.page.locator(selector).waitFor({ state: 'visible' });
 
-      // Check for common overlays that might intercept clicks
-      const overlaySelectors = [
-        '.bg-blue-1\\/80',
-        '[class*="fixed"][class*="z-"]',
-        '.modal-backdrop',
-        '.overlay',
-        '[role="dialog"]',
-      ];
+        // Check for common overlays that might intercept clicks
+        const overlaySelectors = [
+          '.bg-blue-1\\/80',
+          '[class*="fixed"][class*="z-"]',
+          '.modal-backdrop',
+          '.overlay',
+          '[role="dialog"]',
+        ];
 
-      for (const overlaySelector of overlaySelectors) {
-        try {
-          const overlay = this.page.locator(overlaySelector).first();
-          if (await overlay.isVisible({ timeout: 1000 })) {
-            // Try clicking the overlay to close it
-            await overlay.click({ timeout: 2000 });
-            await this.page.waitForTimeout(1000);
+        for (const overlaySelector of overlaySelectors) {
+          try {
+            const overlay = this.page.locator(overlaySelector).first();
+            if (await overlay.isVisible({ timeout: 1000 })) {
+              // Try clicking the overlay to close it
+              await overlay.click({ timeout: 2000 });
+              await this.page.waitForTimeout(1000);
+            }
+          } catch {
+            // Continue if overlay selector doesn't exist or can't be clicked
           }
-        } catch {
-          // Continue if overlay selector doesn't exist or can't be clicked
         }
-      }
 
-      // Now try to click the target element
-      await this.page.locator(selector).click({ force: true });
-    });
+        // Now try to click the target element
+        await this.page.locator(selector).click({ force: true });
+      }
+    );
   }
 
   /**
-   * Click on an element and wait for it to be actionable
+   * Click on an element and wait for network to be idle.
+   * Automatically creates Allure step: [ACT] Click and wait | Target=...
    *
    * @param {string} selector - CSS selector for the target element
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {string} [targetName] - Optional logical name from selectors file
+   * @returns {Promise<void>} Resolves when click and network idle complete
+   *
+   * @example
+   * ```typescript
+   * await webActions.clickAndWait(this.selectors.submitButton, 'submitButton');
+   * // Allure step: "[ACT] Click and wait | Target=submitButton"
+   * ```
    */
-  async clickAndWait(selector: string, stepMessage?: string): Promise<void> {
-    const message = stepMessage || `Click ${selector} and wait for load`;
-    await allure.step(message, async () => {
+  async clickAndWait(selector: string, targetName?: string): Promise<void> {
+    const target = targetName || selector;
+    await step(`[ACT] Click and wait | Target=${target}`, async () => {
       await this.page.locator(selector).click();
       await this.page.waitForLoadState('networkidle');
     });
   }
 
   /**
-   * Fill text into an input field
+   * Fill text into an input field with automatic masking for sensitive data.
+   * Automatically creates Allure step: [ACT] Fill | Field=... | Value=••••
+   *
+   * **Security:** Values are automatically masked in Allure reports by default.
+   * Only the last 4 characters are visible.
    *
    * @param {string} selector - CSS selector for the input field
    * @param {string} text - Text to fill
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {string} [fieldName] - Optional logical name from selectors file (e.g., 'emailInput')
+   * @returns {Promise<void>} Resolves when fill is complete
+   *
+   * @example
+   * ```typescript
+   * await webActions.fill(this.selectors.emailInput, 'user@example.com', 'emailInput');
+   * // Allure step: "[ACT] Fill | Field=emailInput | Value=••••••••••••.com"
+   *
+   * await webActions.fill(this.selectors.passwordInput, 'secret123', 'passwordInput');
+   * // Allure step: "[ACT] Fill | Field=passwordInput | Value=••••••t123"
+   * ```
    */
   async fill(
     selector: string,
     text: string,
-    stepMessage?: string
+    fieldName?: string
   ): Promise<void> {
-    const message = stepMessage || `Fill ${selector} with text`;
-    await allure.step(message, async () => {
-      // Only show value for important fields, masked by default for security
-      if (stepMessage && !stepMessage.toLowerCase().includes('password')) {
-        await allure.parameter('Value', text);
+    const field = fieldName || selector;
+    const displayValue = mask(truncate(text, 80));
+
+    await step(
+      `[ACT] Fill | Field=${field} | Value=${displayValue}`,
+      async () => {
+        await this.page.locator(selector).fill(text);
       }
-      await this.page.locator(selector).fill(text);
-    });
+    );
   }
 
   /**
@@ -275,40 +309,56 @@ export class WebActions {
   }
 
   /**
-   * Wait for an element to be visible
+   * Wait for an element to be visible.
+   * Automatically creates Allure step: [WAIT] Visible | Target=... | Timeout=...
    *
    * @param {string} selector - CSS selector for the element
-   * @param {number} timeout - Optional timeout in milliseconds
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {number} [timeout] - Optional timeout in milliseconds (default: 30000)
+   * @param {string} [targetName] - Optional logical name from selectors file
+   * @returns {Promise<void>} Resolves when element is visible
+   *
+   * @throws {Error} When element is not visible within timeout or page closes
+   *
+   * @example
+   * ```typescript
+   * await webActions.waitForVisible(this.selectors.movieCard, 10000, 'movieCard');
+   * // Allure step: "[WAIT] Visible | Target=movieCard | Timeout=10.0s"
+   * ```
    */
   async waitForVisible(
     selector: string,
     timeout?: number,
-    stepMessage?: string
+    targetName?: string
   ): Promise<void> {
-    const message = stepMessage || `Wait for ${selector} to be visible`;
-    await allure.step(message, async () => {
-      try {
-        await this.page.locator(selector).waitFor({
-          state: 'visible',
-          timeout: timeout || 30000,
-        });
-      } catch (error) {
-        // Handle page closure gracefully - common in production environment
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        if (
-          errorMessage?.includes(
-            'Target page, context or browser has been closed'
-          )
-        ) {
-          throw new Error(
-            `Page was closed while waiting for ${selector}. This may indicate navigation/redirect in production environment.`
-          );
+    const target = targetName || selector;
+    const timeoutMs = timeout || 30000;
+    const timeoutSec = (timeoutMs / 1000).toFixed(1);
+
+    await step(
+      `[WAIT] Visible | Target=${target} | Timeout=${timeoutSec}s`,
+      async () => {
+        try {
+          await this.page.locator(selector).waitFor({
+            state: 'visible',
+            timeout: timeoutMs,
+          });
+        } catch (error) {
+          // Handle page closure gracefully - common in production environment
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          if (
+            errorMessage?.includes(
+              'Target page, context or browser has been closed'
+            )
+          ) {
+            throw new Error(
+              `Page was closed while waiting for ${target}. This may indicate navigation/redirect in production environment.`
+            );
+          }
+          throw error;
         }
-        throw error;
       }
-    });
+    );
   }
 
   /**
@@ -319,14 +369,22 @@ export class WebActions {
   }
 
   /**
-   * Hover over an element
+   * Hover over an element.
+   * Automatically creates Allure step: [ACT] Hover | Target=...
    *
    * @param {string} selector - CSS selector for the element
-   * @param {string} stepMessage - Optional custom message for Allure report step
+   * @param {string} [targetName] - Optional logical name from selectors file
+   * @returns {Promise<void>} Resolves when hover is complete
+   *
+   * @example
+   * ```typescript
+   * await webActions.hover(this.selectors.menuItem, 'menuItem');
+   * // Allure step: "[ACT] Hover | Target=menuItem"
+   * ```
    */
-  async hover(selector: string, stepMessage?: string): Promise<void> {
-    const message = stepMessage || `Hover over ${selector}`;
-    await allure.step(message, async () => {
+  async hover(selector: string, targetName?: string): Promise<void> {
+    const target = targetName || selector;
+    await step(`[ACT] Hover | Target=${target}`, async () => {
       await this.page.locator(selector).hover();
     });
   }
@@ -512,6 +570,8 @@ export class WebActions {
 
   /**
    * Apply consent cookies for a given URL before navigation.
+   * Automatically creates Allure step: [DATA] Apply consent seeds | Host=...
+   *
    * Uses ConsentSeedRegistry to inject OneTrust consent cookies directly
    * into the browser context, bypassing the need for UI interaction with cookie banners.
    *
@@ -525,7 +585,7 @@ export class WebActions {
    * 2. Looks up consent seeds from ConsentSeedRegistry
    * 3. Converts ConsentCookie format → Playwright Cookie format
    * 4. Injects cookies using BrowserContext.addCookies()
-   * 5. Logs Allure parameters for visibility
+   * 5. Logs result in Allure step
    *
    * **When to Use:**
    * - **Before** navigating to a new domain for the first time in a test
@@ -538,7 +598,6 @@ export class WebActions {
    * - For non-consent cookies (use page.context().addCookies() directly)
    *
    * @param {string} url - Target URL to apply consent cookies for (full URL or hostname)
-   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when cookies are applied (or skipped if no seeds)
    *
    * @throws {Error} When cookie injection fails (e.g., invalid cookie format, browser context closed)
@@ -548,6 +607,7 @@ export class WebActions {
    * // Typical usage in fixture or test setup
    * const webActions = new WebActions(page);
    * await webActions.applyConsentSeedsFor('https://www.cinesa.es');
+   * // Allure step: "[DATA] Apply consent seeds | Host=www.cinesa.es | Status=Seeds applied (3)"
    * await webActions.navigateTo('https://www.cinesa.es/peliculas');
    * ```
    *
@@ -566,22 +626,18 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  async applyConsentSeedsFor(url: string, stepMessage?: string): Promise<void> {
-    const message = stepMessage || `Apply consent seeds for ${url}`;
+  async applyConsentSeedsFor(url: string): Promise<void> {
+    const host = this.extractHostname(url);
 
-    await allure.step(message, async () => {
+    await step(`[DATA] Apply consent seeds | Host=${host}`, async () => {
       // Dynamic import to avoid circular dependencies
       const { getConsentSeedsFor } = await import('../consent/consentSeeds');
       const seeds = getConsentSeedsFor(url);
 
       if (!seeds || seeds.length === 0) {
-        await allure.parameter('Status', 'No seeds found for this host');
-        await allure.parameter('Host', this.extractHostname(url));
+        await allure.parameter('Status', 'No seeds found');
         return;
       }
-
-      await allure.parameter('Seeds Count', seeds.length.toString());
-      await allure.parameter('Host', this.extractHostname(url));
 
       try {
         // Convert ConsentCookie format to Playwright Cookie format
@@ -601,7 +657,7 @@ export class WebActions {
         // This is the official Playwright way to add cookies BEFORE navigation
         await this.page.context().addCookies(playwrightCookies);
 
-        await allure.parameter('Status', 'Seeds applied successfully');
+        await allure.parameter('Status', `Seeds applied (${seeds.length})`);
       } catch (error) {
         await allure.parameter('Status', 'Failed to apply seeds');
         throw new Error(`Failed to apply consent seeds for ${url}: ${error}`);
@@ -622,7 +678,6 @@ export class WebActions {
    * to call applyConsentSeedsFor() + navigateTo() separately.
    *
    * @param {string} url - The target URL to navigate to
-   * @param {string} stepMessage - Optional custom message for Allure report step
    * @returns {Promise<void>} Resolves when navigation is complete
    *
    * @throws {Error} When consent seed application or navigation fails
@@ -642,12 +697,9 @@ export class WebActions {
    *
    * @since 1.0.0
    */
-  async navigateToWithConsent(
-    url: string,
-    stepMessage?: string
-  ): Promise<void> {
+  async navigateToWithConsent(url: string): Promise<void> {
     await this.applyConsentSeedsFor(url);
-    await this.navigateTo(url, stepMessage);
+    await this.navigateTo(url);
   }
 
   /**
@@ -665,6 +717,23 @@ export class WebActions {
     } catch {
       // If URL parsing fails, assume it's already a hostname
       return urlOrHostname;
+    }
+  }
+
+  /**
+   * Helper method to extract path from URL for cleaner Allure steps.
+   * Falls back to full URL if parsing fails.
+   *
+   * @private
+   * @param {string} url - Full URL
+   * @returns {string} Path portion of URL (e.g., "/peliculas") or full URL
+   */
+  private extractPath(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.pathname + parsedUrl.search;
+    } catch {
+      return url;
     }
   }
 }

@@ -12,7 +12,7 @@ test.describe('Android App Download Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Android App Download display and layout', async ({
+  test('Footer · Android App · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -32,7 +32,10 @@ test.describe('Android App Download Tests', () => {
     await newPage.close();
   });
 
-  test('Android App Download redirection test', async ({ page, footer }) => {
+  test('Footer · Android App · Navigate · Store link', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Android App Download navigation and URL validation');
     const context = page.context();
     const [newPage] = await Promise.all([

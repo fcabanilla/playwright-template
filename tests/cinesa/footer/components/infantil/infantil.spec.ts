@@ -13,7 +13,7 @@ test.describe('Infantil y Colegios Tests', () => {
   });
 
   test(
-    'Infantil y Colegios page display and layout',
+    'Footer · Infantil y Colegios · Display & Layout',
     {
       tag: ['@footer', '@infantil', '@cinesa'],
     },
@@ -30,7 +30,7 @@ test.describe('Infantil y Colegios Tests', () => {
   );
 
   test(
-    'Infantil y Colegios page redirection test',
+    'Footer · Infantil y Colegios · Navigate · Redirect',
     {
       tag: ['@footer', '@infantil', '@cinesa', '@broken-prod'],
     },

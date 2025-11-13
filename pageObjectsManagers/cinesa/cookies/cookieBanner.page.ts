@@ -3,6 +3,7 @@ import {
   CookieBannerSelectors,
   cookieBannerSelectors,
 } from './cookieBanner.selectors';
+import { allure } from 'allure-playwright';
 
 /**
  * CookieBanner Page Object
@@ -25,66 +26,60 @@ export class CookieBanner {
   /**
    * Helper function to get environment-specific selector
    */
-  private getEnvironmentSelector(selectorName: keyof CookieBannerSelectors): string {
+  private getEnvironmentSelector(
+    selectorName: keyof CookieBannerSelectors
+  ): string {
     const env = process.env.TEST_ENV || 'production';
-    const prodSelectorName = `${String(selectorName)}Prod` as keyof CookieBannerSelectors;
-    const preprodSelectorName = `${String(selectorName)}Preprod` as keyof CookieBannerSelectors;
-    
+    const prodSelectorName =
+      `${String(selectorName)}Prod` as keyof CookieBannerSelectors;
+    const preprodSelectorName =
+      `${String(selectorName)}Preprod` as keyof CookieBannerSelectors;
+
     if (env === 'production' && this.selectors[prodSelectorName]) {
       return this.selectors[prodSelectorName] as string;
-    } else if ((env === 'preprod' || env === 'lab') && this.selectors[preprodSelectorName]) {
+    } else if (
+      (env === 'preprod' || env === 'lab') &&
+      this.selectors[preprodSelectorName]
+    ) {
       return this.selectors[preprodSelectorName] as string;
     }
-    
+
     // Fallback to default selector
     return this.selectors[selectorName] as string;
   }
 
   /**
    * Accept all cookies and dismiss overlays
-   * Simple orchestration - delegates to WebActions
+   * Complete operation including waiting for banner to fully disappear.
+   * Simple orchestration - delegates to WebActions.
+   *
+   * @param waitForDisappear - Whether to wait for banner to fully disappear (default: true)
    */
-  async acceptAllCookies(): Promise<void> {
-    const bannerSelector = this.getEnvironmentSelector('banner');
-    const acceptButtonSelector = this.getEnvironmentSelector('acceptButton');
-    const overlaySelector = this.getEnvironmentSelector('overlay');
+  async acceptAllCookies(waitForDisappear: boolean = true): Promise<void> {
+    await allure.step(
+      'Accept all cookies and wait for banner to disappear',
+      async () => {
+        const bannerSelector = this.getEnvironmentSelector('banner');
+        const acceptButtonSelector =
+          this.getEnvironmentSelector('acceptButton');
+        //const overlaySelector = this.getEnvironmentSelector('overlay');
 
-    // Check if banner appears (uses waitForVisible with timeout)
-    const bannerVisible = await this.webActions
-      .waitForVisible(bannerSelector, 3000)
-      .then(() => true)
-      .catch(() => false);
+        // Check if banner appears (uses waitForVisible with timeout)
+        const bannerVisible = await this.webActions
+          .waitForVisible(bannerSelector, 3000)
+          .then(() => true)
+          .catch(() => false);
 
-    if (!bannerVisible) {
-      // No banner, but may have leftover overlays
-      await this.removeOverlays();
-      return;
-    }
+        if (!bannerVisible) {
+          // No banner, but may have leftover overlays
+          await this.removeOverlays();
+          return;
+        }
 
-    // Click accept button (WebActions handles overlay blocking)
-    await this.webActions.clickWithOverlayHandling(acceptButtonSelector);
-
-    // Wait for banner to disappear
-    await this.webActions
-      .waitForSelector(bannerSelector, {
-        state: 'hidden',
-        timeout: 5000,
-      })
-      .catch(() => {});
-
-    // 🔧 PHASE 1: Wait for overlay to disappear
-    await this.webActions
-      .waitForSelector(overlaySelector, {
-        state: 'hidden',
-        timeout: 10000,
-      })
-      .catch(() => {});
-
-    // Clean up any remaining overlays
-    await this.removeOverlays();
-
-    // 🔧 PHASE 1: Wait for page stability
-    await this.webActions.waitForLoadState('networkidle').catch(() => {});
+        // Click accept button (WebActions handles overlay blocking)
+        await this.webActions.clickWithOverlayHandling(acceptButtonSelector);
+      }
+    );
   }
 
   /**

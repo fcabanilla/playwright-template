@@ -17,7 +17,7 @@ test.describe('Whistleblowing Policy Tests', () => {
   });
 
   test(
-    'Whistleblowing Policy display and layout',
+    'Footer · Whistleblowing Policy · Display & Layout',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }, testInfo) => {
       await allure.story('Whistleblowing Policy PDF display and layout');
@@ -38,7 +38,7 @@ test.describe('Whistleblowing Policy Tests', () => {
   );
 
   test(
-    'Whistleblowing Policy redirection test',
+    'Footer · Whistleblowing Policy · Navigate · Redirect',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }) => {
       await allure.story(

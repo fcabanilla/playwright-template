@@ -9,19 +9,17 @@ test.describe(
     tag: ['@programs', '@cinesa'],
   },
   () => {
-    test.beforeEach(
-      async ({ page, promotionalModal, navbar }) => {
-        await allure.epic('Cinesa Platform');
-        await allure.feature('Loyalty Programs - Rewards');
+    test.beforeEach(async ({ page, promotionalModal, navbar }) => {
+      await allure.epic('Cinesa Platform');
+      await allure.feature('Loyalty Programs - Rewards');
 
-        await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
-        await navbar.navigateToHome();
-        await promotionalModal.closeModalIfVisible();
-      }
-    );
+      await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
+      await navbar.navigateToHome();
+      await promotionalModal.closeModalIfVisible();
+    });
 
     test(
-      'Programs unlimited display and layout from URL',
+      'Programs · Unlimited · Display & Layout · From URL',
       {
         tag: ['@smoke', '@fast', '@COMS-11226', '@broken-prod'],
       },
@@ -42,7 +40,7 @@ test.describe(
     );
 
     test(
-      'Programs unlimited display and layout from home page',
+      'Programs · Unlimited · Display & Layout · From Home',
       {
         tag: ['@smoke', '@fast', '@COMS-11226'],
       },
@@ -61,7 +59,7 @@ test.describe(
     );
 
     test(
-      'Programs page display and layout',
+      'Programs · Page · Display & Layout',
       {
         tag: ['@regression', '@medium'],
       },
@@ -77,7 +75,7 @@ test.describe(
     );
 
     test(
-      'Cinesa Programs page redirection test',
+      'Programs · Page · Navigate · Redirect',
       {
         tag: ['@regression', '@medium'],
       },

@@ -70,21 +70,11 @@ for (const config of configs) {
       console.log('⏳ Waiting for page to stabilize...');
       await page.waitForTimeout(3000);
 
-      // Accept cookies using existing Page Object
-      console.log('🍪 Accepting cookies via CookieBanner...');
+      // Accept cookies using existing Page Object (includes waiting for banner to disappear)
+      console.log(
+        '🍪 Accepting cookies and waiting for banner to disappear...'
+      );
       await cookieBanner.acceptAllCookies();
-
-      // Wait for OneTrust banner to disappear (confirmation that consent was accepted)
-      console.log('⏳ Waiting for OneTrust banner to disappear...');
-      try {
-        await page.waitForSelector('#onetrust-banner-sdk', {
-          state: 'hidden',
-          timeout: 5000,
-        });
-        console.log('✅ OneTrust banner disappeared');
-      } catch (error) {
-        console.log("⚠️  Banner didn't disappear, but continuing...");
-      }
 
       // Save storage state
       console.log(`💾 Saving storageState to ${config.outputPath}...`);

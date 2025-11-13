@@ -14,7 +14,7 @@ test.describe('Signup', () => {
   });
 
   test(
-    'Signup display and layout',
+    'Signup · Form · Display & Layout',
     { tag: ['@signup', '@cinesa', '@smoke', '@fast', '@COMS-7212'] },
     async ({ page, navbar }, testInfo) => {
       await allure.story('COMS-7212 - Signup form display and layout');
@@ -28,7 +28,7 @@ test.describe('Signup', () => {
   );
 
   test(
-    'Validate mandatory fields DEMO test',
+    'Signup · Form · Validate · Mandatory fields',
     { tag: ['@signup', '@cinesa', '@regression', '@medium', '@COMS-7217'] },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('COMS-7217 - Mandatory fields validation');
@@ -44,7 +44,7 @@ test.describe('Signup', () => {
   );
 
   test(
-    'Validate email',
+    'Signup · Form · Validate · Email field',
     { tag: ['@signup', '@cinesa', '@regression', '@medium'] },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('Email field validation');
@@ -59,7 +59,7 @@ test.describe('Signup', () => {
   );
 
   test(
-    'Validate password',
+    'Signup · Form · Validate · Password field',
     { tag: ['@signup', '@cinesa', '@regression', '@medium', '@COMS-7219'] },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('COMS-7219 - Password field validation');
@@ -74,7 +74,7 @@ test.describe('Signup', () => {
   );
 
   test(
-    'Signup with valid data and unique email',
+    'Signup · Registration · Signup · Valid data + unique email',
     {
       tag: [
         '@signup',

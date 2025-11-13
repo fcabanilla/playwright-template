@@ -14,7 +14,7 @@ test.describe('Cinesa Coupons Tests', () => {
   });
 
   test(
-    'should display coupons page layout correctly',
+    'Coupons · Page · Display & Layout',
     { tag: ['@coupons', '@cinesa', '@smoke', '@medium'] },
     async ({ webActions, navbar }) => {
       await allure.story('Coupons page display and layout');
@@ -26,7 +26,7 @@ test.describe('Cinesa Coupons Tests', () => {
   );
 
   test(
-    'should redirect to coupons page in new tab',
+    'Coupons · Navigation · Redirect · New tab',
     { tag: ['@coupons', '@cinesa', '@navigation', '@fast'] },
     async ({ webActions, navbar }) => {
       await allure.story('Coupons navigation in new tab');
@@ -49,7 +49,7 @@ test.describe('Cinesa Coupons Tests', () => {
   );
 
   test(
-    'should validate coupons opens new tab correctly',
+    'Coupons · Navigation · Validate · Open in new tab',
     { tag: ['@coupons', '@cinesa', '@navigation', '@regression'] },
     async ({ webActions, navbar }) => {
       await allure.story('Coupons new tab URL validation');

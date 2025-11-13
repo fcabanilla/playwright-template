@@ -82,7 +82,7 @@ export class CinemaDetail {
    * @param name - The name of the film (e.g., 'Blancanieves').
    * @returns Locator for the film element.
    */
-  getFilmByName(name: string) {
+  private getFilmByName(name: string) {
     return this.page.locator(this.selectors.filmItem, {
       has: this.page.locator(this.selectors.filmName, { hasText: name }),
     });
@@ -480,7 +480,9 @@ export class CinemaDetail {
       }
 
       // No schema found - this might be expected for some cinemas/environments
-      console.log('Cinema schema script not found on the page - this might be expected for this cinema/environment');
+      console.log(
+        'Cinema schema script not found on the page - this might be expected for this cinema/environment'
+      );
       return null; // Return null instead of throwing error
     });
   }

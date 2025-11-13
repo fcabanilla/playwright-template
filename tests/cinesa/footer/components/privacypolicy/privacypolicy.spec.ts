@@ -12,7 +12,7 @@ test.describe('Privacy Policy Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Privacy Policy page display and layout', async ({
+  test('Footer · Privacy Policy · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Privacy Policy Tests', () => {
     await takeScreenshot(page, testInfo, 'Privacy Policy display and layout');
   });
 
-  test('Privacy Policy page redirection test', async ({ page, footer }) => {
+  test('Footer · Privacy Policy · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Privacy Policy navigation and URL validation');
     await footer.clickPoliticaPrivacidad();
     await page.waitForLoadState('networkidle');

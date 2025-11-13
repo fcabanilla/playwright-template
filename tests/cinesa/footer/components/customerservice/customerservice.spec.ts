@@ -12,7 +12,7 @@ test.describe('Customer Service Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Customer Service page display and layout', async ({
+  test('Footer · Customer Service · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Customer Service Tests', () => {
     await takeScreenshot(page, testInfo, 'Customer Service display and layout');
   });
 
-  test('Customer Service page redirection test', async ({ page, footer }) => {
+  test('Footer · Customer Service · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Customer Service navigation and URL validation');
     await footer.clickAtencionAlCliente();
     await page.waitForLoadState('networkidle');

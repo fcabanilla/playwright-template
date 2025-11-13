@@ -13,7 +13,7 @@ test.describe('Code of Conduct Tests', () => {
   });
 
   test(
-    'Code of Conduct page display and layout',
+    'Footer · Code of Conduct · Display & Layout',
     {
       tag: ['@footer', '@codeofconduct', '@cinesa', '@broken-prod'],
     },
@@ -29,7 +29,10 @@ test.describe('Code of Conduct Tests', () => {
     }
   );
 
-  test('Code of Conduct page redirection test', async ({ page, footer }) => {
+  test('Footer · Code of Conduct · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Code of Conduct navigation and URL validation');
     await footer.clickCodigoConducta();
     await page.waitForLoadState('networkidle');

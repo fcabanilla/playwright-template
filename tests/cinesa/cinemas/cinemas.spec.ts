@@ -19,7 +19,7 @@ test.describe('Cinesa Cinemas Tests', () => {
   });
 
   test(
-    'should display cinemas page layout correctly',
+    'Cinemas · Page · Display & Layout',
     { tag: ['@cinemas', '@cinesa', '@smoke', '@medium'] },
     async ({ webActions, navbar }) => {
       await allure.story('Cinemas page display and layout');
@@ -31,7 +31,7 @@ test.describe('Cinesa Cinemas Tests', () => {
   );
 
   test(
-    'should redirect to cinemas page correctly',
+    'Cinemas · Page · Navigate · Redirect',
     { tag: ['@cinemas', '@cinesa', '@navigation', '@fast'] },
     async ({ webActions, navbar }) => {
       await allure.story('Cinemas page URL redirection validation');
@@ -44,7 +44,7 @@ test.describe('Cinesa Cinemas Tests', () => {
   // Parametrized Cinema Schema validation tests
   for (const cinema of CINEMAS_FOR_SCHEMA) {
     test(
-      `${cinema.name} Cinema Schema validation test`,
+      `Cinemas · Schema · Validate · ${cinema.name}`,
       {
         tag: [
           '@cinemas',
@@ -63,13 +63,15 @@ test.describe('Cinesa Cinemas Tests', () => {
         await navbar.navigateToCinemas();
         const selectedCinemaName = await cinemaPage[cinema.selectMethod]();
         const cinemaSchema = await cinemaDetail.extractCinemaSchema();
-        
+
         // Skip validation if schema is not available for this cinema/environment
         if (cinemaSchema === null) {
-          console.log(`Schema not available for ${cinema.name} in current environment - skipping validation`);
+          console.log(
+            `Schema not available for ${cinema.name} in current environment - skipping validation`
+          );
           return;
         }
-        
+
         await assertCinemaSchemaMatches(cinemaSchema, selectedCinemaName);
       }
     );

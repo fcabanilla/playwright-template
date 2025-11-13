@@ -39,10 +39,7 @@ export const test = base.extend<CustomFixtures>({
       const webActions = new WebActions(page);
 
       // Pre-seed consent cookies for baseUrl
-      await webActions.applyConsentSeedsFor(
-        config.baseUrl,
-        `[Fixture] Pre-seeding consent cookies for ${config.baseUrl}`
-      );
+      await webActions.applyConsentSeedsFor(config.baseUrl);
 
       await page.close();
       console.log(

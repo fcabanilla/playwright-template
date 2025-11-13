@@ -16,7 +16,7 @@ test.describe('Eventos Tests', () => {
   });
 
   test(
-    'Eventos page display and layout',
+    'Footer · Eventos · Display & Layout',
     {
       tag: [
         '@footer',
@@ -41,7 +41,7 @@ test.describe('Eventos Tests', () => {
   );
 
   test(
-    'Eventos page redirection test',
+    'Footer · Eventos · Navigate · Redirect',
     {
       tag: [
         '@footer',
@@ -66,7 +66,7 @@ test.describe('Eventos Tests', () => {
   );
 
   test(
-    'validate new tab and link',
+    'Footer · Eventos · Validate · New tab & link',
     {
       tag: [
         '@footer',

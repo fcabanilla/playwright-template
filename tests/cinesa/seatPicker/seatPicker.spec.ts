@@ -34,7 +34,7 @@ test.describe('Seat Picker - Seat Selection', () => {
     // Parametrized by cinema
     for (const cinema of CINEMAS) {
       test(
-        `Full purchase with single seat - ${cinema.name}`,
+        `Seat Picker · Complete Purchase · Purchase · Single seat — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -77,7 +77,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Full purchase with multiple seats - ${cinema.name}`,
+        `Seat Picker · Complete Purchase · Purchase · Multiple seats — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -127,7 +127,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Attempt to select seats leaving empty space between selection - ${cinema.name}`,
+        `Seat Picker · Seat Selection · Attempt selection · Leave empty gap — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -152,7 +152,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Attempt to select seats separating group in same row - ${cinema.name}`,
+        `Seat Picker · Seat Selection · Attempt selection · Separate group same row — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -178,7 +178,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select seats separating group in different rows - ${cinema.name}`,
+        `Seat Picker · Seat Selection · Select seats · Separate group different rows — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -204,7 +204,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `No seat selection validation - ${cinema.name}`,
+        `Seat Picker · Seat Selection · Validate · No seats selected — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -227,7 +227,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select more than max seat capacity - ${cinema.name}`,
+        `Seat Picker · Seat Selection · Select seats · Over capacity — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -260,7 +260,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select only companion seat - ${cinema.name}`,
+        `Seat Picker · Accessibility · Select seats · Companion only — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -285,7 +285,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select companion and wheelchair seat - ${cinema.name}`,
+        `Seat Picker · Accessibility · Select seats · Companion + Wheelchair — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -312,7 +312,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select only wheelchair seat - ${cinema.name}`,
+        `Seat Picker · Accessibility · Select seats · Wheelchair only — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -344,7 +344,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select one sofa seat correctly - ${cinema.name}`,
+        `Seat Picker · D-BOX · Select sofa · Single seat — ${cinema.name}`,
         { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
@@ -363,7 +363,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select sofa leaving 1 space - ${cinema.name}`,
+        `Seat Picker · D-BOX · Select sofa · Leave 1 gap — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -389,7 +389,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Attempt to select sofa seats leaving empty space between selection - ${cinema.name}`,
+        `Seat Picker · D-BOX · Attempt selection · Leave empty gap — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -416,7 +416,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Attempt to select sofa seats separating group in same row - ${cinema.name}`,
+        `Seat Picker · D-BOX · Attempt selection · Separate group same row — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -442,7 +442,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Select sofa seats separating group in different rows - ${cinema.name}`,
+        `Seat Picker · D-BOX · Select sofa · Separate group different rows — ${cinema.name}`,
         { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
@@ -461,7 +461,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Display regular and sofa ticket types - ${cinema.name}`,
+        `Seat Picker · D-BOX · Display · Regular & sofa ticket types — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -516,7 +516,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Full purchase with standard promotional code - ${cinema.name}`,
+        `Seat Picker · Promotional Codes · Purchase · Standard — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',
@@ -555,7 +555,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     for (const cinema of CINEMAS) {
       test(
-        `Full purchase with La Vanguardia promotional code - ${cinema.name}`,
+        `Seat Picker · Promotional Codes · Purchase · La Vanguardia — ${cinema.name}`,
         {
           tag: [
             '@seatpicker',

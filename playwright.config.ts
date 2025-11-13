@@ -24,7 +24,8 @@ export default defineConfig({
   use: {
     headless: true, // Default headless (puedes override con --headed en comando)
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure', // Solo guarda videos de tests fallidos (ahorra espacio)
+    video: 'retain-on-failure', // Graba y retiene solo si falla (más eficiente que 'on')
+    trace: 'retain-on-failure', // Traces solo en fallos
     actionTimeout: 30000, // Reducido a 30s (suficiente con auto-waiting)
     navigationTimeout: 30000, // Reducido a 30s
 
@@ -94,7 +95,7 @@ export default defineConfig({
     },
     {
       ...getCinesaProject(),
-      dependencies: ['setup'],
+      //dependencies: ['setup'],
     },
     {
       ...getCinesaPortugalProject(),

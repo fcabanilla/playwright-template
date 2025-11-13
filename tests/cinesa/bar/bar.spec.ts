@@ -20,7 +20,7 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
 
     for (const menuConfig of BAR_MENUS) {
       test(
-        `Buy ticket with Classic menu - ${menuConfig.cinema.name}`,
+        `F&B · Classic Menu · Purchase · Single ticket — ${menuConfig.cinema.name}`,
         {
           tag: [
             '@bar',
@@ -68,7 +68,7 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
 
     for (const menuConfig of BAR_MENUS) {
       test(
-        `Buy multiple tickets with Classic menu - ${menuConfig.cinema.name}`,
+        `F&B · Classic Menu · Purchase · Multiple tickets — ${menuConfig.cinema.name}`,
         {
           tag: [
             '@bar',

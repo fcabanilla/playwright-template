@@ -12,7 +12,7 @@ test.describe('Apple App Download Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Apple App Download display and layout', async ({
+  test('Footer · Apple App · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -31,7 +31,10 @@ test.describe('Apple App Download Tests', () => {
     await newPage.close();
   });
 
-  test('Apple App Download redirection test', async ({ page, footer }) => {
+  test('Footer · Apple App · Navigate · Store link', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Apple App Download navigation and URL validation');
     const context = page.context();
     const [newPage] = await Promise.all([

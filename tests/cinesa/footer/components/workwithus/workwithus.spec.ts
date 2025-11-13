@@ -12,7 +12,7 @@ test.describe('Work With Us Tests', () => {
     await workwithus.navigateToHome();
   });
 
-  test('Work With Us page display and layout', async ({
+  test('Footer · Work With Us · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Work With Us Tests', () => {
     await takeScreenshot(page, testInfo, 'Work With Us display and layout');
   });
 
-  test('Work With Us page redirection test', async ({ page, footer }) => {
+  test('Footer · Work With Us · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Work With Us navigation and URL validation');
     await footer.clickTrabajaConNosotros();
     await page.waitForLoadState('networkidle');

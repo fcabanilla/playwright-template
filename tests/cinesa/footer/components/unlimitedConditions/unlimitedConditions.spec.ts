@@ -12,7 +12,7 @@ test.describe('UNLIMITED CARD Conditions Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('UNLIMITED CARD Conditions page display and layout', async ({
+  test('Footer · Unlimited Card Conditions · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -27,7 +27,7 @@ test.describe('UNLIMITED CARD Conditions Tests', () => {
   });
 
   test(
-    'UNLIMITED CARD Conditions page redirection test',
+    'Footer · Unlimited Card Conditions · Navigate · Redirect',
     {
       tag: ['@footer', '@unlimitedconditions', '@cinesa', '@broken-prod'],
     },

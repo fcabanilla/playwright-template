@@ -12,7 +12,7 @@ test.describe('Cinesa Business Tests', () => {
     await cinesabusiness.navigateToHome();
   });
 
-  test('Cinesa Business page display and layout', async ({
+  test('Footer · Cinesa Business · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Cinesa Business Tests', () => {
     await takeScreenshot(page, testInfo, 'Cinesa Business display and layout');
   });
 
-  test('Cinesa Business page redirection test', async ({ page, footer }) => {
+  test('Footer · Cinesa Business · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Cinesa Business navigation and URL validation');
     await footer.clickCinesaBusiness();
     await page.waitForLoadState('networkidle');

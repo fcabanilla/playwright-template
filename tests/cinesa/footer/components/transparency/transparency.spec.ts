@@ -13,7 +13,7 @@ test.describe('Transparency Tests', () => {
   });
 
   test(
-    'Transparency page display and layout',
+    'Footer · Transparency · Display & Layout',
     {
       tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
     },
@@ -26,7 +26,7 @@ test.describe('Transparency Tests', () => {
   );
 
   test(
-    'Transparency page redirection test',
+    'Footer · Transparency · Navigate · Redirect',
     {
       tag: ['@footer', '@transparency', '@cinesa', '@broken-prod'],
     },

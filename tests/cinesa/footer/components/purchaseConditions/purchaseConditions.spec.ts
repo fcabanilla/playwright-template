@@ -12,7 +12,7 @@ test.describe('Purchase Conditions Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Purchase Conditions page display and layout', async ({
+  test('Footer · Purchase Conditions · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -27,7 +27,7 @@ test.describe('Purchase Conditions Tests', () => {
   });
 
   test(
-    'Purchase Conditions page redirection test',
+    'Footer · Purchase Conditions · Navigate · Redirect',
     {
       tag: ['@footer', '@purchaseconditions', '@cinesa', '@failed-prod'],
     },

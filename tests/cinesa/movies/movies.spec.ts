@@ -25,7 +25,7 @@ test.describe('Cinesa Movies Tests', () => {
   });
 
   test(
-    'Movies page display and layout',
+    'Films · Catalog · Display & Layout',
     { tag: ['@movies', '@cinesa', '@smoke', '@fast'] },
     async ({ webActions, navbar }, testInfo) => {
       await allure.story('Movies catalog page display and layout');
@@ -40,7 +40,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Cinesa Movies page redirection test',
+    'Films · Catalog · Navigate · Redirect',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ webActions, navbar }) => {
       await allure.story('Movies page URL redirection validation');
@@ -51,7 +51,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Navigate through Top Movies',
+    'Films · Navigation · Browse · Top Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Navigation through Top Movies section');
@@ -62,7 +62,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Navigate through Random Movies from All Movies',
+    'Films · Navigation · Browse · Random from All Movies',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - All Movies tab');
@@ -72,7 +72,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Navigate through Random Movies from Now Showing',
+    'Films · Navigation · Browse · Random from Now Showing',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Now Showing tab');
@@ -82,7 +82,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Navigate through Random Movies from Coming Soon',
+    'Films · Navigation · Browse · Random from Coming Soon',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Coming Soon tab');
@@ -92,7 +92,7 @@ test.describe('Cinesa Movies Tests', () => {
   );
 
   test(
-    'Navigate through Random Movies from Advance Sale',
+    'Films · Navigation · Browse · Random from Advance Sale',
     { tag: ['@movies', '@cinesa', '@regression', '@medium'] },
     async ({ navbar, movieList }) => {
       await allure.story('Random movie navigation - Advance Sale tab');
@@ -104,7 +104,7 @@ test.describe('Cinesa Movies Tests', () => {
   // Parametrized Movie Schema validation tests
   for (const cinema of CINEMAS_FOR_SCHEMA) {
     test(
-      `${cinema.name} Movie Schema validation test`,
+      `Films · Schema · Validate · ${cinema.name}`,
       {
         tag: [
           '@movies',
@@ -127,7 +127,7 @@ test.describe('Cinesa Movies Tests', () => {
   }
 
   test(
-    'Movie Schema URL validation test - Bug Detection',
+    'Films · Schema · Validate URLs · Bug detection',
     {
       tag: [
         '@movies',

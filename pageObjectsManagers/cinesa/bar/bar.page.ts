@@ -63,9 +63,13 @@ export class BarPage {
    * Clicks the main continue button on the bar page.
    */
   async clickContinue(): Promise<void> {
-    const mainButton = this.webActions.getLocator(BAR_SELECTORS.barMainButton);
-    await mainButton.waitFor({ state: 'visible', timeout: 5000 });
-    await mainButton.click();
+    await allure.step('Click bar continue button', async () => {
+      const mainButton = this.webActions.getLocator(
+        BAR_SELECTORS.barMainButton
+      );
+      await mainButton.waitFor({ state: 'visible', timeout: 5000 });
+      await mainButton.click();
+    });
   }
 
   /**
@@ -82,20 +86,20 @@ export class BarPage {
         );
         const sectionCount = await sections.count();
         let selectedAnyOption = false;
-        
+
         for (let i = 0; i < Math.min(2, sectionCount); i++) {
           const section = sections.nth(i);
           const options = section.locator(BAR_SELECTORS.modalSectionOptions);
           const optionCount = await options.count();
           const availableOptionIndexes: number[] = [];
-          
+
           for (let j = 0; j < optionCount; j++) {
             const option = options.nth(j);
             if ((await option.locator('input[type="radio"]').count()) > 0) {
               availableOptionIndexes.push(j);
             }
           }
-          
+
           if (availableOptionIndexes.length > 0) {
             await options
               .nth(availableOptionIndexes[availableOptionIndexes.length - 1])
@@ -105,33 +109,37 @@ export class BarPage {
             console.log(`Section ${i + 1} has no available options, skipping`);
           }
         }
-        
+
         if (!selectedAnyOption) {
           throw new Error(
             'No available menu options found in any section. Menu may be unavailable in current environment.'
           );
         }
-        
+
         // Add to cart - This action may open a new tab or redirect
         const addToCartButton = this.webActions.getLocator(
           'button.v-item-modal-footer__action-button'
         );
-        
+
         await addToCartButton.click();
-        
+
         // Wait a moment for any page transitions to complete
         await this.webActions.wait(2000);
-        
+
         // Try to find the continue button in current page first
         const currentPage = this.webActions.getPage();
-        const continueButtonInCurrentPage = currentPage.locator(BAR_SELECTORS.barSummaryContinueButton);
-        const isVisible = await continueButtonInCurrentPage.isVisible().catch(() => false);
-        
+        const continueButtonInCurrentPage = currentPage.locator(
+          BAR_SELECTORS.barSummaryContinueButton
+        );
+        const isVisible = await continueButtonInCurrentPage
+          .isVisible()
+          .catch(() => false);
+
         if (!isVisible) {
           // Check if there are multiple pages (new tab opened)
           const context = currentPage.context();
           const pages = context.pages();
-          
+
           if (pages.length > 1) {
             // Switch to the new page (usually the last one)
             const newPage = pages[pages.length - 1];
@@ -166,7 +174,7 @@ export class BarPage {
           const menuItem = menuItems.nth(i);
           const menuItemName = menuItem.locator(BAR_SELECTORS.menuItemName);
           const itemText = await menuItemName.textContent();
-          
+
           if (itemText && itemText.toUpperCase().includes('CLASICO')) {
             await menuItem.locator(BAR_SELECTORS.menuItemButton).click();
             clasicoFound = true;
@@ -175,7 +183,9 @@ export class BarPage {
         }
 
         if (!clasicoFound) {
-          throw new Error('CLASICO menu item not found in available menu items');
+          throw new Error(
+            'CLASICO menu item not found in available menu items'
+          );
         }
       }
     );
@@ -187,33 +197,41 @@ export class BarPage {
    * Handles the bar page by skipping the modal and clicking the main button.
    */
   async skipBar(): Promise<void> {
-    await this.skipModal();
-    await this.clickContinue();
+    await allure.step('Skip bar (modal + continue)', async () => {
+      await this.skipModal();
+      await this.clickContinue();
+    });
   }
 
   async buyClassicMenuOasiz(): Promise<void> {
-    await this.skipModal();
-    await this.selectClassicMenu();
-    await this.clickBarSummaryContinue();
+    await allure.step('Buy classic menu (Oasiz)', async () => {
+      await this.skipModal();
+      await this.selectClassicMenu();
+      await this.clickBarSummaryContinue();
+    });
   }
 
   async buyClassicMenuGrancasa(): Promise<void> {
-    await this.skipModalGrancasa();
-    await this.selectClassicMenu();
-    await this.clickBarSummaryContinue();
+    await allure.step('Buy classic menu (Grancasa)', async () => {
+      await this.skipModalGrancasa();
+      await this.selectClassicMenu();
+      await this.clickBarSummaryContinue();
+    });
   }
 
   /**
    * Hace clic en el botón "Continuar" del resumen de compra del bar.
    */
   async clickBarSummaryContinue(): Promise<void> {
-    const summaryContinueButton = this.webActions.getLocator(
-      BAR_SELECTORS.barSummaryContinueButton
-    );
-    await summaryContinueButton.waitFor({ state: 'visible', timeout: 10000 });
-    while (!(await summaryContinueButton.isEnabled())) {
-      await this.webActions.wait(100);
-    }
-    await summaryContinueButton.click();
+    await allure.step('Click bar summary continue button', async () => {
+      const summaryContinueButton = this.webActions.getLocator(
+        BAR_SELECTORS.barSummaryContinueButton
+      );
+      await summaryContinueButton.waitFor({ state: 'visible', timeout: 10000 });
+      while (!(await summaryContinueButton.isEnabled())) {
+        await this.webActions.wait(100);
+      }
+      await summaryContinueButton.click();
+    });
   }
 }

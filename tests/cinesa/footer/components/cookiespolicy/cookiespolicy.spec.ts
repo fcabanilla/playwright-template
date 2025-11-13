@@ -13,7 +13,7 @@ test.describe('Cookies Policy Tests', () => {
   });
 
   test(
-    'Cookies Policy page display and layout',
+    'Footer · Cookies Policy · Display & Layout',
     {
       tag: ['@footer', '@cookiespolicy', '@cinesa', '@broken-prod'],
     },
@@ -25,7 +25,10 @@ test.describe('Cookies Policy Tests', () => {
     }
   );
 
-  test('Cookies Policy page redirection test', async ({ page, footer }) => {
+  test('Footer · Cookies Policy · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Cookies Policy navigation and URL validation');
     await footer.clickPoliticaCookies();
     await page.waitForLoadState('networkidle');

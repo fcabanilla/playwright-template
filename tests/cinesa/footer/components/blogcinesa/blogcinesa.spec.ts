@@ -12,7 +12,7 @@ test.describe('Blog de Cinesa Tests', () => {
     await footer.navigateToHome();
   });
 
-  test('Blog de Cinesa page display and layout', async ({
+  test('Footer · Blog de Cinesa · Display & Layout', async ({
     page,
     footer,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Blog de Cinesa Tests', () => {
     await takeScreenshot(page, testInfo, 'Blog de Cinesa display and layout');
   });
 
-  test('Blog de Cinesa page redirection test', async ({ page, footer }) => {
+  test('Footer · Blog de Cinesa · Navigate · Redirect', async ({
+    page,
+    footer,
+  }) => {
     await allure.story('Blog de Cinesa navigation and URL validation');
     await footer.clickBlogDeCinesa();
     await page.waitForLoadState('networkidle');

@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import { WebActions } from '../../../core/webactions/webActions';
 import { TICKET_PICKER_SELECTORS } from './ticketPicker.selectors';
+import { allure } from 'allure-playwright';
 
 /**
  * TicketPicker Page Object
@@ -48,47 +49,58 @@ export class TicketPicker {
    * @param seats - Number of tickets to add (default: 1)
    */
   private async addTicket(seats?: number): Promise<void> {
-    // Handle glasses modal if present (non-blocking check)
-    await this.handleGlassesModalImmediately();
-
-    // Wait for ticket picker to be visible (pure async, no timeout param)
-    // Note: Using .first() to avoid strict mode violation (multiple ticket rows exist)
-    const firstTicketRow = this.page.locator(this.selectors.ticketRow).first();
-    await firstTicketRow.waitFor({ state: 'visible' });
-
-    const clickCount = typeof seats === 'number' && seats > 0 ? seats : 1;
-
-    for (let i = 0; i < clickCount; i++) {
-      try {
-        // Primary strategy: Use WebActions (framework compliance)
-        await this.webActions.click(this.selectors.incrementButton);
-
-        // Check for modal after each click (may appear during selection)
+    await allure.step(
+      `Add ${seats || 1} ticket(s) by clicking increment button`,
+      async () => {
+        // Handle glasses modal if present (non-blocking check)
         await this.handleGlassesModalImmediately();
-      } catch (error) {
-        // Fallback: Try force click if standard click fails
-        // Note: Using page.locator() here as WebActions doesn't expose force click
-        try {
-          const incrementButton = this.page
-            .locator(this.selectors.incrementButton)
-            .first();
-          await incrementButton.click({ force: true });
-        } catch (fallbackError) {
-          // Final fallback: Try any plus button
-          const genericPlusButton = this.page
-            .locator('button:has-text("+")')
-            .first();
-          await genericPlusButton.click({ force: true });
+
+        // Wait for ticket picker to be visible (pure async, no timeout param)
+        // Note: Using .first() to avoid strict mode violation (multiple ticket rows exist)
+        const firstTicketRow = this.page
+          .locator(this.selectors.ticketRow)
+          .first();
+        await firstTicketRow.waitFor({ state: 'visible' });
+
+        const clickCount = typeof seats === 'number' && seats > 0 ? seats : 1;
+
+        for (let i = 0; i < clickCount; i++) {
+          try {
+            // Primary strategy: Use WebActions (framework compliance)
+            await this.webActions.click(this.selectors.incrementButton);
+
+            // Check for modal after each click (may appear during selection)
+            await this.handleGlassesModalImmediately();
+          } catch (error) {
+            // Fallback: Try force click if standard click fails
+            // Note: Using page.locator() here as WebActions doesn't expose force click
+            try {
+              const incrementButton = this.page
+                .locator(this.selectors.incrementButton)
+                .first();
+              await incrementButton.click({ force: true });
+            } catch (fallbackError) {
+              // Final fallback: Try any plus button
+              const genericPlusButton = this.page
+                .locator('button:has-text("+")')
+                .first();
+              await genericPlusButton.click({ force: true });
+            }
+          }
         }
       }
-    }
+    );
   }
 
   /**
    * Confirms the selected tickets by clicking the confirm button.
    */
   private async confirmTickets(): Promise<void> {
-    await this.webActions.click(this.selectors.confirmButton);
+    await allure.step('Confirm selected tickets', async () => {
+      // Wait for confirm button to be visible before clicking
+      await this.webActions.waitForVisible(this.selectors.confirmButton);
+      await this.webActions.click(this.selectors.confirmButton);
+    });
   }
 
   /**
@@ -105,10 +117,6 @@ export class TicketPicker {
 
     // Add tickets (clicks increment button)
     await this.addTicket(seats);
-
-    // Wait for confirm button to be visible (pure async, no timeout)
-    // Playwright auto-waits for element to be visible and enabled
-    await this.webActions.waitForVisible(this.selectors.confirmButton);
 
     // Final modal check before confirming
     await this.handleGlassesModalImmediately();

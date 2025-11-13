@@ -1,7 +1,8 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect, TestInfo } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import { BlogLanding } from '../../../pageObjectsManagers/cinesa/blog/blogLanding.page';
+import { takeScreenshotOfLocator } from '../../../pageObjectsManagers/cinesa/generic/generic';
 
 /**
  * Provides assertions related to the Blog Landing Page.
@@ -10,16 +11,19 @@ export class BlogLandingAssertions {
   readonly page: Page;
   readonly webActions: WebActions;
   readonly blogLanding: BlogLanding;
+  readonly testInfo?: TestInfo;
 
   /**
    * Creates a new instance of BlogLandingAssertions.
    *
    * @param page - Playwright Page object.
+   * @param testInfo - Optional TestInfo object for screenshots
    */
-  constructor(page: Page) {
+  constructor(page: Page, testInfo?: TestInfo) {
     this.page = page;
     this.webActions = new WebActions(page);
     this.blogLanding = new BlogLanding(this.webActions);
+    this.testInfo = testInfo;
   }
 
   /**
@@ -81,24 +85,37 @@ export class BlogLandingAssertions {
                 .nth(index);
               await expect(articleCardLocator).toBeVisible();
 
+              // Take screenshot of the specific card before clicking
+              if (this.testInfo) {
+                await takeScreenshotOfLocator(
+                  articleCardLocator,
+                  this.testInfo,
+                  `Article Card ${index + 1}`
+                );
+              }
+
               // Click on the link inside the article card using environment-specific selector.
               const articleLink = articleCardLocator.locator(
                 this.blogLanding.selectors.articleLink
               );
-              
+
               // Check if the article link exists and has a valid href
-              const linkExists = await articleLink.count() > 0;
+              const linkExists = (await articleLink.count()) > 0;
               if (!linkExists) {
-                console.log(`Skipping article at index ${index} - no valid link found`);
+                console.log(
+                  `Skipping article at index ${index} - no valid link found`
+                );
                 return; // Return early instead of continue
               }
 
               await expect(articleLink).toBeVisible();
-              
+
               // Get href to validate it's not empty or invalid
               const href = await articleLink.getAttribute('href');
               if (!href || href === '#' || href === '') {
-                console.log(`Skipping article at index ${index} - invalid href: ${href}`);
+                console.log(
+                  `Skipping article at index ${index} - invalid href: ${href}`
+                );
                 return; // Return early instead of continue
               }
 
@@ -111,13 +128,15 @@ export class BlogLandingAssertions {
 
               // Validate that the URL has changed.
               const newUrl: string = this.page.url();
-              
+
               // If URL hasn't changed, this article might not have a working link
               if (newUrl === originalUrl) {
-                console.log(`Article at index ${index} has non-functional link, skipping navigation validation`);
+                console.log(
+                  `Article at index ${index} has non-functional link, skipping navigation validation`
+                );
                 return; // Skip this iteration
               }
-              
+
               await expect(newUrl).not.toBe(originalUrl); // Navigate back to the original Blog Landing page.
               await this.page.goBack();
               await this.webActions.waitForLoadState('domcontentloaded');

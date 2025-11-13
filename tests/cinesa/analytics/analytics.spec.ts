@@ -34,7 +34,7 @@ test.describe('Google Analytics DataLayer Validation', () => {
 
   for (const config of ANALYTICS_CONFIGS) {
     test(
-      `Validate analytics events capture - ${config.cinema.name} with ${config.menuType} menu`,
+      `GA4 · Data Layer · Validate events · ${config.menuType} menu — ${config.cinema.name}`,
       {
         tag: [
           '@analytics',

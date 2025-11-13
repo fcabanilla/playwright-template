@@ -12,7 +12,7 @@ test.describe('Cinesa Luxe Tests', () => {
     await cinesaluxe.navigateToHome();
   });
 
-  test('Cinesa Luxe page display and layout', async ({
+  test('Footer · Cinesa Luxe · Display & Layout', async ({
     page,
     cinesaluxe,
   }, testInfo) => {
@@ -22,7 +22,10 @@ test.describe('Cinesa Luxe Tests', () => {
     await takeScreenshot(page, testInfo, 'Cinesa Luxe display and layout');
   });
 
-  test('Cinesa Luxe page redirection test', async ({ page, cinesaluxe }) => {
+  test('Footer · Cinesa Luxe · Navigate · Redirect', async ({
+    page,
+    cinesaluxe,
+  }) => {
     await allure.story('Cinesa Luxe navigation and URL validation');
     await cinesaluxe.clickCinesaLuxe();
     await page.waitForLoadState('networkidle');

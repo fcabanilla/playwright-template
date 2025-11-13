@@ -1,6 +1,7 @@
 import { WebActions } from '../../../core/webactions/webActions';
 import { LOGIN_SELECTORS } from './login.selectors';
 import { loginTestData } from '../../../tests/cinesa/login/login.data';
+import { allure } from 'allure-playwright';
 
 /**
  * The Login Page Object Model.
@@ -15,49 +16,57 @@ export class LoginPage {
    * Clicks the "Continuar como invitado" button.
    */
   async clickContinueAsGuest(): Promise<void> {
-    await this.webActions.waitForVisible(
-      this.selectors.continueAsGuestButton,
-      10000,
-      'Wait for "Continue as Guest" button'
-    );
-    await this.webActions.click(
-      this.selectors.continueAsGuestButton,
-      'Click "Continue as Guest" button'
-    );
+    await allure.step('Continue as guest', async () => {
+      await this.webActions.waitForVisible(
+        this.selectors.continueAsGuestButton,
+        10000,
+        'Wait for "Continue as Guest" button'
+      );
+      await this.webActions.click(
+        this.selectors.continueAsGuestButton,
+        'Click "Continue as Guest" button'
+      );
+    });
   }
 
   /**
    * Rellena los campos de email y password en el login con datos válidos.
    */
   async fillData() {
-    await this.webActions.fill(
-      this.selectors.emailInput,
-      loginTestData.validCredentials.email
-    );
-    await this.webActions.fill(
-      this.selectors.passwordInput,
-      loginTestData.validCredentials.password
-    );
+    await allure.step('Fill login form with valid credentials', async () => {
+      await this.webActions.fill(
+        this.selectors.emailInput,
+        loginTestData.validCredentials.email
+      );
+      await this.webActions.fill(
+        this.selectors.passwordInput,
+        loginTestData.validCredentials.password
+      );
+    });
   }
 
   /**
    * Rellena los campos de email y password con credenciales inválidas.
    */
   async fillInvalidData() {
-    await this.webActions.fill(
-      this.selectors.emailInput,
-      loginTestData.invalidCredentials.email
-    );
-    await this.webActions.fill(
-      this.selectors.passwordInput,
-      loginTestData.invalidCredentials.password
-    );
+    await allure.step('Fill login form with invalid credentials', async () => {
+      await this.webActions.fill(
+        this.selectors.emailInput,
+        loginTestData.invalidCredentials.email
+      );
+      await this.webActions.fill(
+        this.selectors.passwordInput,
+        loginTestData.invalidCredentials.password
+      );
+    });
   }
 
   /**
    * Hace click en el botón de submit del login.
    */
   async clickSubmit() {
-    await this.webActions.click(this.selectors.submitButton);
+    await allure.step('Click login submit button', async () => {
+      await this.webActions.click(this.selectors.submitButton);
+    });
   }
 }

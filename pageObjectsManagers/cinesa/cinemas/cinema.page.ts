@@ -32,7 +32,7 @@ export class Cinema {
    *
    * @returns Locator of the cinema list container.
    */
-  getContainer() {
+  private getContainer() {
     return this.webActions.getLocator(this.selectors.container);
   }
 
@@ -42,7 +42,7 @@ export class Cinema {
    * @param name - The name of the cinema (e.g., 'As Cancelas').
    * @returns Locator for the cinema element.
    */
-  getCinemaByName(name: string) {
+  private getCinemaByName(name: string) {
     const page = this.webActions.getPage();
     return page.locator(this.selectors.cinemaElement, {
       has: page.locator(this.selectors.cinemaName, { hasText: name }),
@@ -110,7 +110,8 @@ export class Cinema {
    * @returns Promise that resolves to the list of cinema names.
    */
   async logCinemaNames(): Promise<string[]> {
-    const names = await this.webActions.getLocator(this.selectors.cinemaName)
+    const names = await this.webActions
+      .getLocator(this.selectors.cinemaName)
       .allTextContents();
     console.log('Cinema Names:', names);
     return names;
@@ -124,47 +125,60 @@ export class Cinema {
   async selectOasizCinema(): Promise<string> {
     return await allure.step('Selecting Oasiz cinema', async () => {
       // Try to find Oasiz cinema directly without filtering first
-      const cinemaElements = this.webActions.getLocator(this.selectors.container)
+      const cinemaElements = this.webActions
+        .getLocator(this.selectors.container)
         .locator(this.selectors.cinemaElement);
-      
+
       const count = await cinemaElements.count();
       let oasizFound = false;
-      
+
       for (let i = 0; i < count; i++) {
         const element = cinemaElements.nth(i);
         const nameElement = element.locator(this.selectors.cinemaName);
         const nameText = await nameElement.textContent();
-        
+
         if (nameText && nameText.toLowerCase().includes('oasiz')) {
           await element.click();
           oasizFound = true;
           break;
         }
       }
-      
+
       if (!oasizFound) {
         // Fallback: try with filter if direct search didn't work
         try {
-          await this.webActions.fill(this.selectors.filterInput, cinemasData.oasiz);
+          await this.webActions.fill(
+            this.selectors.filterInput,
+            cinemasData.oasiz
+          );
           await this.webActions.wait(1000);
-          const cinemaElement = this.webActions.getLocator(this.selectors.container)
-            .locator(this.selectors.cinemaElement).first();
+          const cinemaElement = this.webActions
+            .getLocator(this.selectors.container)
+            .locator(this.selectors.cinemaElement)
+            .first();
           await cinemaElement.click();
         } catch (error) {
-          throw new Error(`Could not find Oasiz cinema. Available cinemas might be different in this environment. Error: ${error}`);
+          throw new Error(
+            `Could not find Oasiz cinema. Available cinemas might be different in this environment. Error: ${error}`
+          );
         }
       }
-      
+
       return cinemasData.oasiz;
     });
   }
 
   async selectSantanderCinema(): Promise<string> {
     return await allure.step('Selecting Santander cinema', async () => {
-      await this.webActions.fill(this.selectors.filterInput, cinemasData.santander);
+      await this.webActions.fill(
+        this.selectors.filterInput,
+        cinemasData.santander
+      );
       await this.webActions.wait(1000);
-      const cinemaElement = this.webActions.getLocator(this.selectors.container)
-        .locator(this.selectors.cinemaElement).first();
+      const cinemaElement = this.webActions
+        .getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement)
+        .first();
       await cinemaElement.click();
       return cinemasData.santander;
     });
@@ -172,10 +186,15 @@ export class Cinema {
 
   async selectGrancasaCinema(): Promise<string> {
     return await allure.step('Selecting Grancasa cinema', async () => {
-      await this.webActions.fill(this.selectors.filterInput, cinemasData.grancasa);
+      await this.webActions.fill(
+        this.selectors.filterInput,
+        cinemasData.grancasa
+      );
       await this.webActions.wait(1000);
-      const cinemaElement = this.webActions.getLocator(this.selectors.container)
-        .locator(this.selectors.cinemaElement).first();
+      const cinemaElement = this.webActions
+        .getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement)
+        .first();
       await cinemaElement.click();
       return cinemasData.grancasa;
     });

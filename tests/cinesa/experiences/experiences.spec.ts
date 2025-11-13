@@ -13,7 +13,7 @@ test.describe('Cinesa Experiences Tests', () => {
   });
 
   test(
-    'should display experiences page layout correctly',
+    'Experiences · Page · Display & Layout',
     { tag: ['@experiences', '@cinesa', '@smoke', '@medium'] },
     async ({ webActions, navbar }) => {
       await allure.story('Experiences page display and layout');
@@ -27,7 +27,7 @@ test.describe('Cinesa Experiences Tests', () => {
   );
 
   test(
-    'should redirect to experiences page correctly',
+    'Experiences · Navigation · Redirect',
     { tag: ['@experiences', '@cinesa', '@navigation', '@fast'] },
     async ({ webActions, navbar }) => {
       await allure.story('Experiences page URL redirection validation');

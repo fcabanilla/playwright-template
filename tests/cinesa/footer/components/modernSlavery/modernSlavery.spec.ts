@@ -17,7 +17,7 @@ test.describe('Modern Slavery Declaration Tests', () => {
   });
 
   test(
-    'Modern Slavery Declaration display and layout',
+    'Footer · Modern Slavery Declaration · Display & Layout',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }, testInfo) => {
       await allure.story('Modern Slavery Declaration PDF display and layout');
@@ -38,7 +38,7 @@ test.describe('Modern Slavery Declaration Tests', () => {
   );
 
   test(
-    'Modern Slavery Declaration redirection test',
+    'Footer · Modern Slavery Declaration · Navigate · Redirect',
     { tag: ['@fix-test'] },
     async ({ webActions, footer }) => {
       await allure.story(

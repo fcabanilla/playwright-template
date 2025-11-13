@@ -1,9 +1,5 @@
 import type { Project } from '@playwright/test';
-import {
-  COMMON_TIMEOUTS,
-  COMMON_SCREENSHOTS,
-  COMMON_BROWSER_ARGS,
-} from './common.config';
+import { COMMON_TIMEOUTS, COMMON_BROWSER_ARGS } from './common.config';
 import { getCinesaStorageStatePath } from './storageState.helper';
 
 /**
@@ -33,9 +29,12 @@ export function getCinesaProject(): Project {
     name: 'Cinesa',
     testDir: './tests/cinesa',
     testIgnore: TESTS_TO_IGNORE,
+    outputDir: '.allure/playwright-artifacts', // Explicitly set output directory for this project
     use: {
       headless: true,
-      ...COMMON_SCREENSHOTS,
+      screenshot: 'only-on-failure',
+      video: 'retain-on-failure', // Changed from 'on' - only retains video if test fails
+      trace: 'retain-on-failure',
       actionTimeout: COMMON_TIMEOUTS.action,
       navigationTimeout: COMMON_TIMEOUTS.navigation,
       storageState: getCinesaStorageStatePath(env),

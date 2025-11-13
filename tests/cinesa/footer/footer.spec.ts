@@ -20,7 +20,7 @@ test.describe('Cinesa Footer Tests', () => {
   });
 
   test(
-    'should display essential footer navigation elements',
+    'Footer · Navigation · Display · Essential elements',
     { tag: ['@smoke', '@critical', '@footer', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Essential footer elements visibility');
@@ -32,7 +32,7 @@ test.describe('Cinesa Footer Tests', () => {
   );
 
   test(
-    'should display all footer elements comprehensively',
+    'Footer · Navigation · Display · All elements',
     { tag: ['@regression', '@footer', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Comprehensive footer elements display');
@@ -41,24 +41,24 @@ test.describe('Cinesa Footer Tests', () => {
   );
 
   test(
-    'should navigate to blog and validate URL',
+    'Footer · Navigation · Navigate · Blog (validate URL)',
     { tag: ['@smoke', '@footer', '@navigation', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Blog navigation from footer');
-      
+
       // Page Object determines the correct selector for the environment
       const blogSelector = footer.getBlogSelector();
-      
+
       // Import baseUrl from data file
       const { baseUrl } = await import('./footer.data');
-      
+
       // Assertions receive the selector determined by Page Object
       await assertNavigateToBlog(webActions.getPage(), blogSelector, baseUrl);
     }
   );
 
   test(
-    'should navigate to company pages',
+    'Footer · Navigation · Navigate · Company pages',
     { tag: ['@smoke', '@footer', '@company', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Company pages navigation');
@@ -70,7 +70,7 @@ test.describe('Cinesa Footer Tests', () => {
   );
 
   test(
-    'should display all social media links',
+    'Footer · Social · Display · All links',
     { tag: ['@fast', '@footer', '@social', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Social media links display');
@@ -82,7 +82,7 @@ test.describe('Cinesa Footer Tests', () => {
   );
 
   test(
-    'should display legal documentation links',
+    'Footer · Legal Docs · Display · Links',
     { tag: ['@medium', '@footer', '@legal', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Legal documentation links');
@@ -91,7 +91,7 @@ test.describe('Cinesa Footer Tests', () => {
   );
 
   test(
-    'should display mobile app download links',
+    'Footer · Mobile Apps · Display · Download links',
     { tag: ['@medium', '@footer', '@apps', '@cinesa'] },
     async ({ webActions, footer }) => {
       await allure.story('Mobile app download links');

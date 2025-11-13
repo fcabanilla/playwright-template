@@ -12,7 +12,7 @@ test.describe('Salas Premium Tests', () => {
     await salaspremium.navigateToHome();
   });
 
-  test('Salas Premium page display and layout', async ({
+  test('Footer · Salas Premium · Display & Layout', async ({
     page,
     salaspremium,
   }, testInfo) => {
@@ -23,7 +23,7 @@ test.describe('Salas Premium Tests', () => {
   });
 
   test(
-    'Salas Premium page redirection test',
+    'Footer · Salas Premium · Navigate · Redirect',
     {
       tag: ['@footer', '@salaspremium', '@cinesa', '@broken-prod'],
     },
