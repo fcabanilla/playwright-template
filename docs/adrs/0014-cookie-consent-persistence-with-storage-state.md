@@ -764,4 +764,7 @@ git restore config/projects/storageState.helper.ts
 - [ ] Merge a `main`
 
 **Nota:** `scripts/bootstrap-consent.ts` fue removido - ahora todo se maneja vía `tests/setup/auth.setup.ts`
+
+```
+
 ```
