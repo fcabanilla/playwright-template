@@ -13,6 +13,7 @@ import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 //import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 import { getCinemasForEnvironment } from './seatPicker.data';
+import { ensureConsentClosed } from '../../../helpers/consent';
 
 // Get available cinemas for current environment
 const CINEMAS = getCinemasForEnvironment();
@@ -24,6 +25,7 @@ test.describe('Seat Picker - Seat Selection', () => {
 
     await navbar.navigateToHome();
     //await assertNoCloudflareProtection(page, 'beforeEach setup');
+    await ensureConsentClosed(page);
   });
 
   test.describe('Complete Purchase Flow', () => {
