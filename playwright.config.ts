@@ -8,6 +8,11 @@ import {
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
+import { 
+  shouldUsePlaywrightService, 
+  getServiceConnectionOptions,
+  playwrightServiceConfig 
+} from './config/azure/playwright-service.config';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -28,6 +33,12 @@ export default defineConfig({
     trace: 'retain-on-failure', // Traces solo en fallos
     actionTimeout: 30000, // Reducido a 30s (suficiente con auto-waiting)
     navigationTimeout: 30000, // Reducido a 30s
+
+    // Microsoft Playwright Testing Service Configuration
+    // When enabled, tests run in cloud with online reporting
+    ...(getServiceConnectionOptions() ? {
+      connectOptions: getServiceConnectionOptions()
+    } : {}),
 
     // Configuraciones agresivas para evadir Cloudflare
     userAgent:
@@ -139,6 +150,8 @@ export default defineConfig({
           Browser: 'Chromium',
           'Node Version': process.version,
           OS: `${os.platform()} ${os.release()}`,
+          'Playwright Service': shouldUsePlaywrightService() ? 'Enabled (Cloud)' : 'Disabled (Local)',
+          'Service Region': shouldUsePlaywrightService() ? playwrightServiceConfig.region : 'N/A',
         },
       },
     ],
