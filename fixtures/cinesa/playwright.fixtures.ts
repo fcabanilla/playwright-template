@@ -22,6 +22,7 @@ import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
 import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analytics.page';
 import { MovieList } from '../../pageObjectsManagers/cinesa/movies/movies.page';
 import { MoviePage } from '../../pageObjectsManagers/cinesa/movie/movie.page';
+import { ensureConsentClosed } from '../../helpers/consent';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -280,6 +281,14 @@ export const test = base.extend<CustomFixtures>({
     const moviePage = new MoviePage(page);
     await use(moviePage);
   },
+});
+
+test.beforeEach(async ({ page }) => {
+  await ensureConsentClosed(page);
+});
+
+test.afterEach(async ({ page }) => {
+  await ensureConsentClosed(page);
 });
 
 export { expect } from '@playwright/test';

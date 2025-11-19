@@ -3,6 +3,7 @@ import { allure } from 'allure-playwright';
 import { expectedUrl } from './cookiespolicy.data';
 import { assertCookiesPolicyNavigation } from './cookiespolicy.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
+import { ensureConsentClosed } from '../../../../../helpers/consent';
 
 test.describe('Cookies Policy Tests', () => {
   test.beforeEach(async ({ footer }) => {
@@ -10,6 +11,10 @@ test.describe('Cookies Policy Tests', () => {
     await allure.feature('Footer - Site Navigation');
 
     await footer.navigateToHome();
+  });
+
+  test.afterEach(async ({ page }) => {
+    await ensureConsentClosed(page);
   });
 
   test(

@@ -2,6 +2,7 @@ import { expect, Page, Locator } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { CorsHandler } from './corsHandler';
 import { step, mask, truncate } from './steps';
+import { ensureConsentClosed } from '../../helpers/consent';
 
 /**
  * WebActions provides a unified, abstracted interface for all Playwright browser interactions.
@@ -113,6 +114,7 @@ export class WebActions {
 
     await step(`[NAV] Goto | URL=${urlPath} | Env=${env}`, async () => {
       await this.page.goto(url);
+      await ensureConsentClosed(this.page);
     });
   }
 

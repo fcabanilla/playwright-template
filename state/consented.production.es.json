@@ -77,7 +77,7 @@
       "path": "/",
       "expires": 1794587178,
       "httpOnly": false,
-      "secure": false,
+      "secure": true,
       "sameSite": "Lax"
     },
     {
@@ -137,7 +137,7 @@
       "path": "/",
       "expires": 1794587178,
       "httpOnly": false,
-      "secure": false,
+      "secure": true,
       "sameSite": "Lax"
     },
     {
