@@ -16,7 +16,7 @@ This guide documents the complete setup process for integrating Microsoft Playwr
 ### 1. Azure Resource Creation
 
 **Service Created:**
-- **Name**: SpainPTPlaywrightService  
+- **Name**: OCG-SPPT-PRD-PWT-WS  
 - **Type**: Microsoft Playwright Testing Service
 - **Resource Group**: OCG-WE-SPPT-PRD-RG-PLAYWRIGHT
 - **Region**: West Europe
@@ -130,7 +130,7 @@ See ADR-0017 for detailed access requirements and Azure permission setup.
 
 **Renewal Process:**
 1. Access Azure Portal
-2. Navigate to SpainPTPlaywrightService
+2. Navigate to OCG-SPPT-PRD-PWT-WS
 3. Generate new access token
 4. Update environment variables in scripts
 

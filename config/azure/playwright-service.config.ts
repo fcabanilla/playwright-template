@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Microsoft Playwright Testing Service Configuration
  * 
  * This configuration enables:
@@ -7,6 +7,12 @@
  * - Parallel execution across multiple browsers
  * - Team collaboration through shared reports
  */
+
+import { 
+  PLAYWRIGHT_WORKSPACE, 
+  getBrowserEndpoint, 
+  getApiBaseUrl 
+} from './playwright-service.constants';
 
 export interface PlaywrightServiceConfig {
   /** Base API endpoint for Playwright Testing Service */
@@ -27,10 +33,10 @@ export interface PlaywrightServiceConfig {
 
 /** Production Playwright Testing Service Configuration */
 export const playwrightServiceConfig: PlaywrightServiceConfig = {
-  baseEndpoint: 'https://westeurope.api.playwright.microsoft.com/playwrightworkspaces/9a9f6272-8172-4490-a5c6-156fc12ff7da',
-  browserEndpoint: 'wss://westeurope.api.playwright.microsoft.com/playwrightworkspaces/9a9f6272-8172-4490-a5c6-156fc12ff7da/browsers',
-  workspaceId: '9a9f6272-8172-4490-a5c6-156fc12ff7da',
-  region: 'westeurope',
+  baseEndpoint: getApiBaseUrl(),
+  browserEndpoint: getBrowserEndpoint(),
+  workspaceId: PLAYWRIGHT_WORKSPACE.id,
+  region: PLAYWRIGHT_WORKSPACE.region,
   enabled: process.env.USE_PLAYWRIGHT_SERVICE === 'true'
 };
 

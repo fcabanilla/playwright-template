@@ -163,7 +163,7 @@ PLAYWRIGHT_SERVICE_ACCESS_TOKEN=...  # JWT authentication token
 ### For Team Members
 
 **Required Azure Permissions:**
-- **Reader** access to resource: `SpainPTPlaywrightService`
+- **Reader** access to resource: `OCG-SPPT-PRD-PWT-WS`
 - **Resource Group**: `OCG-WE-SPPT-PRD-RG-PLAYWRIGHT`
 - **Subscription**: `SPPT-Prod (OCG-Sub-SPPT-Prod)`
 
@@ -171,13 +171,13 @@ PLAYWRIGHT_SERVICE_ACCESS_TOKEN=...  # JWT authentication token
 ```
 User: [team-member-email]
 Role: Reader
-Scope: /subscriptions/6ad94225-bb48-492d-b77c-73379cba1ec8/resourceGroups/OCG-WE-SPPT-PRD-RG-PLAYWRIGHT/providers/Microsoft.AzurePlaywrightService/accounts/SpainPTPlaywrightService
+Scope: /subscriptions/6ad94225-bb48-492d-b77c-73379cba1ec8/resourceGroups/OCG-WE-SPPT-PRD-RG-PLAYWRIGHT/providers/Microsoft.AzurePlaywrightService/accounts/OCG-SPPT-PRD-PWT-WS
 ```
 
 ### For Administrators
 
 **Current Configuration:**
-- **Service Name**: SpainPTPlaywrightService
+- **Service Name**: OCG-SPPT-PRD-PWT-WS
 - **Workspace ID**: 9a9f6272-8172-4490-a5c6-156fc12ff7da
 - **Region**: West Europe
 - **Access Token**: Valid until 2026-11-17
@@ -187,7 +187,7 @@ Scope: /subscriptions/6ad94225-bb48-492d-b77c-73379cba1ec8/resourceGroups/OCG-WE
 ### Related Links
 
 - [Microsoft Playwright Testing Documentation](https://docs.microsoft.com/en-us/azure/playwright-testing/)
-- [Azure Resource](https://portal.azure.com/#@odeoncinemas.onmicrosoft.com/resource/subscriptions/6ad94225-bb48-492d-b77c-73379cba1ec8/resourceGroups/OCG-WE-SPPT-PRD-RG-PLAYWRIGHT/providers/Microsoft.AzurePlaywrightService/accounts/SpainPTPlaywrightService/overview)
+- [Azure Resource](https://portal.azure.com/#@odeoncinemas.onmicrosoft.com/resource/subscriptions/6ad94225-bb48-492d-b77c-73379cba1ec8/resourceGroups/OCG-WE-SPPT-PRD-RG-PLAYWRIGHT/providers/Microsoft.AzurePlaywrightService/accounts/OCG-SPPT-PRD-PWT-WS/overview)
 - [Configuration Guide](../config/azure/README.md)
 
 ### Update
