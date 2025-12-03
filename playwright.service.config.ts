@@ -1,98 +1,140 @@
 /**
- * Playwright Configuration for Microsoft Playwright Testing Service
+ * Playwright Configuration for Azure Playwright Workspaces (Cloud Browsers)
  *
  * This config extends the base playwright.config.ts to enable cloud-based test execution.
  * Tests run on remote browsers in Azure West Europe datacenter.
  *
+ * Platform: Azure App Testing / Playwright Workspaces (GA - replaces deprecated Microsoft Playwright Testing)
+ *
  * Usage:
- *   npx playwright test --config=playwright.service.config.ts
+ *   npx playwright test --config=playwright.service.config.ts --workers=20
  *
  * Prerequisites:
  *   1. Install @azure/playwright: npm install --save-dev @azure/playwright
  *   2. Set environment variables in .env file:
- *      - PLAYWRIGHT_SERVICE_URL
- *      - PLAYWRIGHT_SERVICE_ACCESS_TOKEN
- *      - USE_PLAYWRIGHT_SERVICE=true
+ *      - PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/playwrightworkspaces/<workspace-id>/browsers
+ *      - PLAYWRIGHT_SERVICE_ACCESS_TOKEN=<your-access-token>
+ *      - USE_PLAYWRIGHT_SERVICE=true (optional - for conditional logic)
+ *
+ * Authentication Options:
+ *   - Access Token (current setup - token in .env)
+ *   - Microsoft Entra ID (recommended for production - requires `az login`)
  *
  * Documentation:
- *   https://learn.microsoft.com/en-us/azure/playwright-testing/
+ *   - Quickstart: https://aka.ms/pww/docs/quickstart
+ *   - CI/CD: https://aka.ms/pww/docs/ci
+ *   - Migration: https://aka.ms/pww/docs/migration
+ *
+ * Migration Notice:
+ *   Microsoft Playwright Testing is retiring March 8, 2026.
+ *   This config uses the new @azure/playwright package for Playwright Workspaces.
  */
 
 import { defineConfig, devices } from '@playwright/test';
 import config from './playwright.config';
-import { getServiceConfig, ServiceOS } from '@azure/playwright';
+import { createAzurePlaywrightConfig, ServiceOS, ServiceAuth } from '@azure/playwright';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env
 dotenv.config();
 
 /**
- * Validate required environment variables
+ * Validate required environment variables for cloud execution
  */
 function validateEnvironment(): void {
-  const required = [
-    'PLAYWRIGHT_SERVICE_URL',
-    'PLAYWRIGHT_SERVICE_ACCESS_TOKEN',
-  ];
+  const required = ['PLAYWRIGHT_SERVICE_URL'];
+  
+  // Access token is required if not using Entra ID
+  // (Entra ID authentication uses Azure CLI: az login)
+  if (!process.env.PLAYWRIGHT_SERVICE_ACCESS_TOKEN) {
+    console.warn(
+      '⚠️  PLAYWRIGHT_SERVICE_ACCESS_TOKEN not found.\n' +
+      'Falling back to Microsoft Entra ID authentication.\n' +
+      'Make sure you have run: az login\n'
+    );
+  }
+
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
     throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}\n` +
-        'Please configure them in your .env file.'
+      `❌ Missing required environment variables: ${missing.join(', ')}\n` +
+        'Please configure them in your .env file.\n' +
+        'See: https://aka.ms/pww/docs/quickstart'
     );
   }
 }
 
-// Validate before running
-if (process.env.USE_PLAYWRIGHT_SERVICE === 'true') {
+// Validate environment before running
+if (process.env.USE_PLAYWRIGHT_SERVICE === 'true' || process.env.PLAYWRIGHT_SERVICE_URL) {
   validateEnvironment();
 }
 
 /**
- * Merge base config with cloud-specific settings
+ * Azure Playwright Workspaces Configuration
+ *
+ * The createAzurePlaywrightConfig function merges base config with cloud-specific settings.
+ * It handles:
+ *   - WebSocket connection to Azure cloud browsers
+ *   - Authentication (Access Token or Entra ID)
+ *   - OS selection (Windows, Linux, macOS)
+ *   - Parallelization and reporting
  */
 export default defineConfig(
   config,
-  getServiceConfig(config, {
-    serviceOs: ServiceOS.WINDOWS, // Run on Windows browsers in cloud
-    runId: `cloud-run-${Date.now()}`, // Unique identifier for this test run
+  createAzurePlaywrightConfig(config, {
+    // OS for cloud browsers
+    os: ServiceOS.LINUX, // Options: WINDOWS, LINUX (macOS not yet supported)
 
-    // Optional: Enable enhanced reporting
-    exposeNetwork: '<loopback>', // Expose localhost for apps running locally
-    timeout: 60000, // Cloud browsers may need more time for initial connection
+    // Authentication type
+    // ACCESS_TOKEN: uses PLAYWRIGHT_SERVICE_ACCESS_TOKEN from .env
+    // ENTRA_ID: uses Azure CLI authentication (az login)
+    serviceAuthType: process.env.PLAYWRIGHT_SERVICE_ACCESS_TOKEN 
+      ? ServiceAuth.ACCESS_TOKEN 
+      : ServiceAuth.ENTRA_ID,
+
+    // Optional: Run ID for tracking test executions in Azure portal
+    runId: process.env.GITHUB_RUN_ID || `local-${Date.now()}`,
+
+    // Optional: Connection timeout for cloud browser operations (default: 30000ms)
+    connectTimeout: 60000, // 60 seconds for initial cloud connection
+
+    // Optional: Expose local network to cloud browsers
+    // Useful if testing apps running on localhost
+    // exposeNetwork: '<loopback>', // Uncomment if needed
   }),
   {
-    // Override workers for cloud execution
-    // Cloud can handle more parallelism than local
-    workers: process.env.CI ? 20 : 15, // CI: 20 workers, Local: 15 workers
+    // Override settings for cloud execution
+    // Cloud can handle much higher parallelization than local browsers
+    workers: process.env.CI ? 20 : 15, // CI: 20 parallel workers, Local: 15 workers
 
-    // Disable fullyParallel to avoid overwhelming the service
+    // Enable fully parallel execution for maximum speed
     fullyParallel: true,
 
     // Extend timeouts for cloud latency
-    timeout: 90000, // 90 seconds per test
+    timeout: 90000, // 90 seconds per test (cloud has network overhead)
 
     use: {
-      // Cloud-specific settings
-      trace: 'on-first-retry', // Upload traces on retry
+      // Cloud-specific artifact settings
+      trace: 'on-first-retry', // Upload traces only on retry (saves bandwidth)
       video: 'retain-on-failure', // Upload videos only on failure
-      screenshot: 'only-on-failure', // Upload screenshots on failure
+      screenshot: 'only-on-failure', // Screenshots on failure only
 
-      // Keep existing settings from base config
+      // Keep base config timeouts
       actionTimeout: 30000,
       navigationTimeout: 30000,
     },
 
-    // Projects - use same projects as base config
-    // Cloud execution supports all browser combinations
+    // Projects for cloud execution
+    // Azure Playwright Workspaces supports multiple OS-browser combinations
     projects: [
-      // Cinesa projects
+      // Cinesa - Cloud Chromium
       {
         name: 'Cinesa Cloud - Chromium',
         testMatch: /.*cinesa.*\.spec\.ts/,
         use: { ...devices['Desktop Chrome'] },
       },
+      // UCI - Cloud Chromium
       {
         name: 'UCI Cloud - Chromium',
         testMatch: /.*uci.*\.spec\.ts/,
