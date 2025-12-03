@@ -87,6 +87,7 @@
   },
   "homepage": "https://github.com/fcabanilla/playwright-template#readme",
   "devDependencies": {
+    "@azure/identity": "^4.13.0",
     "@azure/playwright": "^1.0.0",
     "@playwright/test": "^1.50.1",
     "@types/dotenv": "^6.1.1",
