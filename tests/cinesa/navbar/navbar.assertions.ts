@@ -85,7 +85,8 @@ export class NavbarAssertions {
     await allure.step(
       `Clicking on nav element and verifying navigation to ${expectedUrl}`,
       async () => {
-        await this.page.click(selector);
+        // Use force:true to bypass OneTrust modal that blocks clicks
+        await this.page.click(selector, { force: true });
         await expect(this.page).toHaveURL(expectedUrl);
       }
     );

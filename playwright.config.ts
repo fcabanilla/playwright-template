@@ -27,7 +27,7 @@ export default defineConfig({
 
   // Configuración base que se aplicará a todos los proyectos
   use: {
-    headless: true, // Default headless (puedes override con --headed en comando)
+    headless: false, // Default headless (puedes override con --headed en comando)
     screenshot: 'only-on-failure',
     video: 'retain-on-failure', // Graba y retiene solo si falla (más eficiente que 'on')
     trace: 'retain-on-failure', // Traces solo en fallos
@@ -106,7 +106,7 @@ export default defineConfig({
     },
     {
       ...getCinesaProject(),
-      //dependencies: ['setup'],
+      dependencies: ['setup'],
     },
     {
       ...getCinesaPortugalProject(),
