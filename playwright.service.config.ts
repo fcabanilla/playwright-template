@@ -60,7 +60,7 @@ export default defineConfig(
       // Diagnostic project without setup dependencies
       {
         name: 'Diagnostic',
-        testMatch: '**/tmp_standalone_diagnostic.spec.ts',
+        testMatch: '**/infrastructure/remote-browser-diagnostic.spec.ts',
         use: {
           headless: false,
         },

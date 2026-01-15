@@ -8,10 +8,10 @@ import {
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
-import { 
-  shouldUsePlaywrightService, 
+import {
+  shouldUsePlaywrightService,
   getServiceConnectionOptions,
-  playwrightServiceConfig 
+  playwrightServiceConfig,
 } from './config/azure/playwright-service.config';
 
 // Load environment variables from .env file
@@ -36,13 +36,15 @@ export default defineConfig({
 
     // Microsoft Playwright Testing Service Configuration
     // When enabled, tests run in cloud with online reporting
-    ...(getServiceConnectionOptions() ? {
-      connectOptions: getServiceConnectionOptions()
-    } : {}),
+    ...(getServiceConnectionOptions()
+      ? {
+          connectOptions: getServiceConnectionOptions(),
+        }
+      : {}),
 
     // Configuraciones agresivas para evadir Cloudflare
     userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 ocgtest.es',
     viewport: { width: 1920, height: 1080 },
     locale: 'es-ES',
     permissions: ['clipboard-read', 'clipboard-write'],
@@ -150,8 +152,12 @@ export default defineConfig({
           Browser: 'Chromium',
           'Node Version': process.version,
           OS: `${os.platform()} ${os.release()}`,
-          'Playwright Service': shouldUsePlaywrightService() ? 'Enabled (Cloud)' : 'Disabled (Local)',
-          'Service Region': shouldUsePlaywrightService() ? playwrightServiceConfig.region : 'N/A',
+          'Playwright Service': shouldUsePlaywrightService()
+            ? 'Enabled (Cloud)'
+            : 'Disabled (Local)',
+          'Service Region': shouldUsePlaywrightService()
+            ? playwrightServiceConfig.region
+            : 'N/A',
         },
       },
     ],
