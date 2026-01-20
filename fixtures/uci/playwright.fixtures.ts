@@ -29,7 +29,16 @@ export const test = base.extend<CustomFixtures>({
     const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
     const config = getUCIConfig(env);
 
-    const context = await browser.newContext();
+    // 1. Get native User Agent from the current browser
+    const tempContext = await browser.newContext();
+    const tempPage = await tempContext.newPage();
+    const originalUA = await tempPage.evaluate(() => navigator.userAgent);
+    await tempContext.close();
+
+    const suffix = process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : '';
+    const finalUserAgent = originalUA + suffix;
+
+    const context = await browser.newContext({ userAgent: finalUserAgent });
 
     // Apply consent seeds if NO storageState is configured
     // This eliminates cookie banner interaction when storageState files don't exist
