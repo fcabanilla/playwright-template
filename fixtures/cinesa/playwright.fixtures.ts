@@ -71,26 +71,74 @@ type CustomFixtures = {
 export const test = base.extend<CustomFixtures>({
   // Override context fixture to auto-inject Cloudflare headers when credentials exist
   // AND apply consent seeds when storageState is not available
-  context: async ({ browser }, use) => {
+  context: async ({ browser }, use, testInfo) => {
     const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
     const config = getCinesaConfig(env);
     const headers = getCloudflareHeaders(env);
 
-    const context = await browser.newContext();
+    // Get storageState path from project configuration
+    const { getCinesaStorageStatePath } = await import(
+      '../../config/projects/storageState.helper'
+    );
+    const storageStatePath = getCinesaStorageStatePath(env);
 
-    // Auto-inject Cloudflare headers if credentials are available for this environment
+    // 1. Get native User Agent from the current browser (Chrome, Firefox, or WebKit)
+    // We launch a temporary context to get the default UA string
+    const tempContext = await browser.newContext();
+    const tempPage = await tempContext.newPage();
+    const originalUA = await tempPage.evaluate(() => navigator.userAgent);
+    await tempContext.close();
+
+    // 2. Dynamic User Agent Injection
+    // Append the suffix (if needed for Cloudflare bypass) to the NATIVE User Agent
+    // This ensures we don't force a Chrome UA on Firefox/Safari
+    const suffix = process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : '';
+    const finalUserAgent = originalUA + suffix;
+
+    // Create context WITH storageState if available AND injected User Agent
+    const context = await browser.newContext({
+      userAgent: finalUserAgent,
+      ...(storageStatePath ? { storageState: storageStatePath } : {})
+    });
+
+    // CLOUDFLARE BYPASS: Inject credentials as BOTH cookies AND headers
+    // Per Joey Lee:
+    // - Cookie with secret only → bypasses Cloudflare WAF
+    // - Headers with Id + Secret → bypasses Cloudflare Access
+    // Official credentials work for Spain environments (preprod, lab, production)
     if (headers) {
+      // 1) Inject as HTTP HEADERS (for Cloudflare Access) - BOTH Id and Secret
       await context.setExtraHTTPHeaders(headers);
       console.log(`✅ [Cloudflare] Headers auto-injected for env=${env}`);
+
+      // 2) Inject as COOKIE (for Cloudflare WAF bypass) - SECRET ONLY
+      const clientSecret = headers['CF-Access-Client-Secret'];
+
+      if (clientSecret) {
+        await context.addCookies([
+          {
+            name: 'CF-Access-Client-Secret',
+            value: clientSecret,
+            domain: '.ocgtest.es', // Preprod/Lab/Staging
+            path: '/',
+            httpOnly: false,
+            secure: true,
+            sameSite: 'Lax',
+          },
+        ]);
+        console.log(
+          `✅ [Cloudflare Bypass] Cookie injected (Secret only) for .ocgtest.es`
+        );
+      }
     } else {
       console.log(
-        `ℹ️  [Cloudflare] No credentials found for env=${env}, skipping header injection`
+        `ℹ️  [Cloudflare] No credentials found for env=${env}, skipping injection`
       );
     }
 
     // Apply consent seeds if NO storageState is configured
     // This eliminates cookie banner interaction when storageState files don't exist
-    const hasStorageState = context.storageState !== undefined;
+    const hasStorageState = storageStatePath !== undefined;
     if (!hasStorageState) {
       const page = await context.newPage();
       const webActions = new WebActions(page);

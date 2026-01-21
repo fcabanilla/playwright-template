@@ -163,7 +163,9 @@ export class WebActions {
   async click(selector: string, targetName?: string): Promise<void> {
     const target = targetName || selector;
     await step(`[ACT] Click | Target=${target}`, async () => {
-      await this.page.locator(selector).click();
+      // Use force:true to bypass OneTrust Privacy Center modal that blocks clicks
+      // even when consent cookies are loaded via storageState
+      await this.page.locator(selector).click({ force: true });
     });
   }
 

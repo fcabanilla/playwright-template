@@ -31,7 +31,7 @@ export function getCinesaProject(): Project {
     testIgnore: TESTS_TO_IGNORE,
     outputDir: '.allure/playwright-artifacts', // Explicitly set output directory for this project
     use: {
-      headless: true,
+      headless: false,
       screenshot: 'only-on-failure',
       video: 'retain-on-failure', // Changed from 'on' - only retains video if test fails
       trace: 'retain-on-failure',

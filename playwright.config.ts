@@ -8,10 +8,10 @@ import {
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
 } from './config/projects';
-import { 
-  shouldUsePlaywrightService, 
+import {
+  shouldUsePlaywrightService,
   getServiceConnectionOptions,
-  playwrightServiceConfig 
+  playwrightServiceConfig,
 } from './config/azure/playwright-service.config';
 
 // Load environment variables from .env file
@@ -19,30 +19,33 @@ dotenv.config();
 
 export default defineConfig({
   name: 'Multi-Cinema Test Suite',
-  // Timeout global para cada test (90 segundos - para flujos E2E completos)
+  // Global timeout for each test (90 seconds - for complete E2E flows)
   timeout: 90000,
 
-  // Directorio de salida para videos, screenshots y traces
+  // Output directory for videos, screenshots, and traces
   outputDir: '.allure/playwright-artifacts',
 
-  // Configuración base que se aplicará a todos los proyectos
+  // Base configuration that will be applied to all projects
   use: {
-    headless: true, // Default headless (puedes override con --headed en comando)
+    headless: false, // Default headless (can be overridden with --headed in command)
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure', // Graba y retiene solo si falla (más eficiente que 'on')
-    trace: 'retain-on-failure', // Traces solo en fallos
-    actionTimeout: 30000, // Reducido a 30s (suficiente con auto-waiting)
-    navigationTimeout: 30000, // Reducido a 30s
+    video: 'retain-on-failure', // Record and retain only on failure (more efficient than 'on')
+    trace: 'retain-on-failure', // Traces only on failure
+    actionTimeout: 30000, // Reduced to 30s (sufficient with auto-waiting)
+    navigationTimeout: 30000, // Reduced to 30s
 
     // Microsoft Playwright Testing Service Configuration
     // When enabled, tests run in cloud with online reporting
-    ...(getServiceConnectionOptions() ? {
-      connectOptions: getServiceConnectionOptions()
-    } : {}),
+    ...(getServiceConnectionOptions()
+      ? {
+          connectOptions: getServiceConnectionOptions(),
+        }
+      : {}),
 
-    // Configuraciones agresivas para evadir Cloudflare
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    // Browser configuration
+    userAgent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36${
+      process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : ''
+    }`,
     viewport: { width: 1920, height: 1080 },
     locale: 'es-ES',
     permissions: ['clipboard-read', 'clipboard-write'],
@@ -88,10 +91,10 @@ export default defineConfig({
   },
 
   fullyParallel: true,
-  workers: process.env.CI ? 2 : 3, // CI: 2 workers, Local: 3 workers (balance estabilidad/velocidad)
+  workers: process.env.CI ? 2 : 3, // CI: 2 workers, Local: 3 workers (stability/speed balance)
 
-  // Proyectos separados para UCI, Cinesa España, Cinesa Portugal y un proyecto específico para
-  // diagnósticos de Cloudflare (solo tests en ./tests/cinesa/cloudflare)
+  // Separate projects for UCI, Cinesa Spain, Cinesa Portugal and a specific project for
+  // Cloudflare diagnostics (tests only in ./tests/cinesa/cloudflare)
   projects: [
     // Setup project - runs FIRST to generate storageState files with cookie consent
     {
@@ -106,7 +109,7 @@ export default defineConfig({
     },
     {
       ...getCinesaProject(),
-      //dependencies: ['setup'],
+      dependencies: ['setup'],
     },
     {
       ...getCinesaPortugalProject(),
@@ -122,17 +125,17 @@ export default defineConfig({
     },
   ],
 
-  // Reporter configurado para diferenciar proyectos
+  // Reporter configured to differentiate projects
   reporter: [
-    ['list'], // Console reporter más limpio que 'line'
+    ['list'], // Console reporter cleaner than 'line'
     [
       'allure-playwright',
       {
         resultsDir: '.allure/results',
-        detail: false, // Oculta steps internos de Playwright (browser, context, page, evaluate) para reportes más limpios
-        suiteTitle: true, // Agrupa tests por archivo en el reporte (default: true)
+        detail: false, // Hides internal Playwright steps (browser, context, page, evaluate) for cleaner reports
+        suiteTitle: true, // Groups tests by file in the report (default: true)
         links: {
-          // Plantillas para enlaces a JIRA, GitHub Issues, etc.
+          // Templates for links to JIRA, GitHub Issues, etc.
           issue: {
             urlTemplate: 'https://se-ocg.atlassian.net/browse/%s',
             nameTemplate: 'Issue #%s',
@@ -150,8 +153,12 @@ export default defineConfig({
           Browser: 'Chromium',
           'Node Version': process.version,
           OS: `${os.platform()} ${os.release()}`,
-          'Playwright Service': shouldUsePlaywrightService() ? 'Enabled (Cloud)' : 'Disabled (Local)',
-          'Service Region': shouldUsePlaywrightService() ? playwrightServiceConfig.region : 'N/A',
+          'Playwright Service': shouldUsePlaywrightService()
+            ? 'Enabled (Cloud)'
+            : 'Disabled (Local)',
+          'Service Region': shouldUsePlaywrightService()
+            ? playwrightServiceConfig.region
+            : 'N/A',
         },
       },
     ],
