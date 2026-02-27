@@ -5,16 +5,16 @@
 
 export const loginTestData = {
   validCredentials: {
-    email: 'matiasslpknt08@gmail.com',
-    password: 'EstoEsUnaPrueba.1'
+    email: process.env.TEST_USER_EMAIL || 'federico.cabanilla@gmail.com',
+    password: process.env.TEST_USER_PASSWORD || 'Cinesa123!',
   },
   invalidCredentials: {
     email: 'invalid@test.com',
-    password: 'wrongpassword'
+    password: 'wrongpassword',
   },
   expectedMessages: {
     invalidLogin: 'Credenciales incorrectas',
     emailRequired: 'El email es obligatorio',
-    passwordRequired: 'La contraseña es obligatoria'
-  }
+    passwordRequired: 'La contraseña es obligatoria',
+  },
 };

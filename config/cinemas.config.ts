@@ -10,9 +10,13 @@
  */
 export interface CinemaConfig {
   name: string;
-  selectMethod: 'selectOasizCinema' | 'selectGrancasaCinema';
+  selectMethod:
+    | 'selectOasizCinema'
+    | 'selectGrancasaCinema'
+    | 'selectPuertoVeneciaCinema'; // Extend as needed
   tags: string[];
   availableInEnvironments: string[]; // ['production', 'lab', 'preprod']
+  isDefault?: boolean;
 }
 
 /**
@@ -32,12 +36,22 @@ export const AVAILABLE_CINEMAS: CinemaConfig[] = [
     selectMethod: 'selectOasizCinema',
     tags: ['@oasiz'],
     availableInEnvironments: ['production', 'lab', 'preprod'],
+    //isDefault: true,
   },
+  // Grancasa removed as per requirement (TIM-1260 / user request)
+  // {
+  //   name: 'Grancasa',
+  //   selectMethod: 'selectGrancasaCinema',
+  //   tags: ['@grancasa'],
+  //   availableInEnvironments: ['production', 'lab'], // NOT in preprod
+  // },
+  // Puerto Venecia Cinema
   {
-    name: 'Grancasa',
-    selectMethod: 'selectGrancasaCinema',
-    tags: ['@grancasa'],
-    availableInEnvironments: ['production', 'lab'], // NOT in preprod
+    name: 'Puerto Venecia',
+    selectMethod: 'selectPuertoVeneciaCinema', // Reusing method for simplicity, can be updated if needed
+    tags: ['@puerto-venecia'],
+    availableInEnvironments: ['lab'],
+    isDefault: true,
   },
 ];
 
@@ -62,4 +76,27 @@ export function getCinemasForEnvironment(env?: string): CinemaConfig[] {
   return AVAILABLE_CINEMAS.filter((cinema) =>
     cinema.availableInEnvironments.includes(currentEnv)
   );
+}
+
+/**
+ * Get the default cinema to use for tests that don't need parametrized runs
+ * (e.g. smoke tests or single-run checks)
+ *
+ * @param env - Optional environment override. Defaults to TEST_ENV or 'production'
+ * @returns The default cinema config for the environment
+ * @throws Error if no cinemas are available in the environment
+ */
+export function getDefaultCinema(env?: string): CinemaConfig {
+  const availableCinemas = getCinemasForEnvironment(env);
+
+  if (availableCinemas.length === 0) {
+    const currentEnv = env || process.env.TEST_ENV || 'production';
+    throw new Error(
+      `No cinemas available for environment: ${currentEnv}. Check your configuration. Ensure cinemas are configured in config/cinemas.config.ts`
+    );
+  }
+
+  // Try to find one marked as default, otherwise return the first one
+  const defaultCinema = availableCinemas.find((c) => c.isDefault);
+  return defaultCinema ?? availableCinemas[0];
 }

@@ -11,6 +11,7 @@ export const cinemasData = {
   oasiz: 'oasiz',
   santander: 'santander',
   grancasa: 'grancasa',
+  puertoVenecia: 'puerto venecia',
 };
 
 const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
