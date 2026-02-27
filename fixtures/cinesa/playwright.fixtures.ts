@@ -204,7 +204,7 @@ export const test = base.extend<CustomFixtures>({
   },
   cinemaDetail: async ({ page }, use) => {
     const webActions = new WebActions(page);
-    const cinemaDetail = new CinemaDetail(webActions);
+    const cinemaDetail = new CinemaDetail(page, webActions);
     await use(cinemaDetail);
   },
   loginPage: async ({ page }, use) => {
