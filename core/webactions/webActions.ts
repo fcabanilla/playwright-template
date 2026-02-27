@@ -81,6 +81,8 @@ export class WebActions {
    * @since 1.1.0
    */
   updatePage(newPage: Page): void {
+    // SAFETY: Overrides readonly to switch browser context after tab navigation.
+    // This is intentional – see syncToLatestActivePage() and ADR-0009.
     (this as any).page = newPage;
     this.corsHandler = new CorsHandler(newPage);
     this.initializeCorsHandling();
