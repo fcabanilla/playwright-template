@@ -57,6 +57,13 @@ export class WebActions {
   }
 
   /**
+   * Get the current page URL.
+   */
+  getCurrentUrl(): string {
+    return this.page.url();
+  }
+
+  /**
    * Updates the page context to a new page (used for handling new tabs/windows).
    * This method allows continuing the same WebActions instance with a different page context.
    *
@@ -77,6 +84,40 @@ export class WebActions {
     (this as any).page = newPage;
     this.corsHandler = new CorsHandler(newPage);
     this.initializeCorsHandling();
+  }
+
+  /**
+   * If current page is closed, switch context to the latest active page.
+   */
+  async syncToLatestActivePage(): Promise<void> {
+    if (!this.page.isClosed()) {
+      return;
+    }
+
+    const activePages = this.page
+      .context()
+      .pages()
+      .filter((openPage) => !openPage.isClosed());
+
+    if (activePages.length === 0) {
+      throw new Error('No active page available in browser context');
+    }
+
+    this.updatePage(activePages[activePages.length - 1]);
+  }
+
+  /**
+   * Wait for URL matching a regex pattern.
+   */
+  async waitForUrlMatching(pattern: RegExp, timeout = 30000): Promise<boolean> {
+    try {
+      await this.page.waitForURL((url) => pattern.test(url.toString()), {
+        timeout,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**

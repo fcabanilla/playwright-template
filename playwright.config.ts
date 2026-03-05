@@ -131,7 +131,7 @@ export default defineConfig({
     [
       'allure-playwright',
       {
-        resultsDir: '.allure/results',
+        outputFolder: '.allure/results',
         detail: false, // Hides internal Playwright steps (browser, context, page, evaluate) for cleaner reports
         suiteTitle: true, // Groups tests by file in the report (default: true)
         links: {

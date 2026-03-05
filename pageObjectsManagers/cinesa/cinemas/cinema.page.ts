@@ -199,4 +199,20 @@ export class Cinema {
       return cinemasData.grancasa;
     });
   }
+
+  async selectPuertoVeneciaCinema(): Promise<string> {
+    return await allure.step('Selecting Puerto Venecia cinema', async () => {
+      await this.webActions.fill(
+        this.selectors.filterInput,
+        cinemasData.puertoVenecia
+      );
+      await this.webActions.wait(1000);
+      const cinemaElement = this.webActions
+        .getLocator(this.selectors.container)
+        .locator(this.selectors.cinemaElement)
+        .first();
+      await cinemaElement.click();
+      return cinemasData.puertoVenecia;
+    });
+  }
 }
