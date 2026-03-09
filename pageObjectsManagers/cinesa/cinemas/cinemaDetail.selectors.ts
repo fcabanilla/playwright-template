@@ -53,7 +53,8 @@ export const cinemaDetailSelectors: CinemaDetailSelectors = {
   filmItem: '.v-showtime-picker-film-list__item',
   filmName: '.v-showtime-picker-film-details .v-film-title__text',
   showtime: '.v-showtime-picker-site-list .v-showtime-button',
-  specialAttributes: '.v-attribute__icon--type-standard, .v-attribute__icon--type-hero',
+  specialAttributes:
+    '.v-attribute__icon--type-standard, .v-attribute__icon--type-hero',
   dboxIcon: 'img[alt="D-BOX"]',
   filmTitleLink: '.v-showtime-picker-film-details .v-film-title__text',
   duration: '.v-film-details__duration, .duration',

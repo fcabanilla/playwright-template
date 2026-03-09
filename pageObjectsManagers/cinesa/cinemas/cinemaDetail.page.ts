@@ -145,11 +145,14 @@ export class CinemaDetail {
     return await allure.step(
       `Selecting showtime by format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}] for film "${filmName}"`,
       async () => {
-        const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-          has: this.webActions.page.locator(this.selectors.filmName, {
-            hasText: filmName,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
 
         const showtimeLocator = this.getShowtimeLocatorByFormat(
           filmContainer,
@@ -291,7 +294,9 @@ export class CinemaDetail {
             // Example: "18:00 (IMAX)"
             const showtimeAttrs: string[] = [];
             // Check for internal icons/flags
-            const internalIcons = timeBtn.locator(this.selectors.showtimeInternalIcon);
+            const internalIcons = timeBtn.locator(
+              this.selectors.showtimeInternalIcon
+            );
             const iconCount = await internalIcons.count();
             for (let m = 0; m < iconCount; m++) {
               const alt = await internalIcons.nth(m).getAttribute('alt');
@@ -301,7 +306,9 @@ export class CinemaDetail {
             // Check if class indicates format
             const classList = (await timeBtn.getAttribute('class')) || '';
             let format = 'Standard';
-            for (const [className, label] of Object.entries(showtimeFormatMap)) {
+            for (const [className, label] of Object.entries(
+              showtimeFormatMap
+            )) {
               if (classList.includes(className)) {
                 format = label;
                 break;
@@ -418,14 +425,21 @@ export class CinemaDetail {
         const filmsWithNormalShowtimes: string[] = [];
 
         for (const name of names) {
-          const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-            has: this.webActions.page.locator(this.selectors.filmName, { hasText: name }),
-          });
+          const filmContainer = this.webActions.page.locator(
+            this.selectors.filmItem,
+            {
+              has: this.webActions.page.locator(this.selectors.filmName, {
+                hasText: name,
+              }),
+            }
+          );
 
           const normalShowtimes = await filmContainer
             .locator(this.selectors.showtime)
             .filter({
-              hasNot: this.webActions.page.locator(this.selectors.specialAttributes),
+              hasNot: this.webActions.page.locator(
+                this.selectors.specialAttributes
+              ),
             });
 
           if ((await normalShowtimes.count()) > 0) {
@@ -436,11 +450,14 @@ export class CinemaDetail {
         if (filmsWithNormalShowtimes.length === 0) {
           // Fallback: select any film with any showtime
           for (const name of names) {
-            const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-              has: this.webActions.page.locator(this.selectors.filmName, {
-                hasText: name,
-              }),
-            });
+            const filmContainer = this.webActions.page.locator(
+              this.selectors.filmItem,
+              {
+                has: this.webActions.page.locator(this.selectors.filmName, {
+                  hasText: name,
+                }),
+              }
+            );
 
             const anyShowtimes = await filmContainer.locator(
               this.selectors.showtime
@@ -483,11 +500,14 @@ export class CinemaDetail {
       'Getting list of showtimes for the selected film',
       async () => {
         // Get film container filtered by film name
-        const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-          has: this.webActions.page.locator(this.selectors.filmName, {
-            hasText: filmName,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
 
         // Find showtime elements within that container
         const showtimeLocator = filmContainer.locator(this.selectors.showtime);
@@ -565,11 +585,14 @@ export class CinemaDetail {
     return await allure.step(
       'Selecting a random normal showtime for the selected film',
       async () => {
-        const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-          has: this.webActions.page.locator(this.selectors.filmName, {
-            hasText: filmName,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
 
         // Locate all showtime buttons
         const showtimeLocator = filmContainer.locator(this.selectors.showtime);
@@ -641,11 +664,14 @@ export class CinemaDetail {
         }
         const randomIndex = Math.floor(Math.random() * names.length);
         const selectedFilm = names[randomIndex];
-        const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-          has: this.webActions.page.locator(this.selectors.filmName, {
-            hasText: selectedFilm,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: selectedFilm,
+            }),
+          }
+        );
         const filmTitleLink = filmContainer.locator(
           this.selectors.filmTitleLink
         );
@@ -694,9 +720,14 @@ export class CinemaDetail {
         const shuffledNames = names.sort(() => Math.random() - 0.5);
 
         for (const name of shuffledNames) {
-          const filmContainer = this.webActions.page.locator(this.selectors.filmItem, {
-            has: this.webActions.page.locator(this.selectors.filmName, { hasText: name }),
-          });
+          const filmContainer = this.webActions.page.locator(
+            this.selectors.filmItem,
+            {
+              has: this.webActions.page.locator(this.selectors.filmName, {
+                hasText: name,
+              }),
+            }
+          );
 
           // Locate D-BOX showtimes by checking for the presence of the D-BOX icon
           const dboxShowtimes = await filmContainer
