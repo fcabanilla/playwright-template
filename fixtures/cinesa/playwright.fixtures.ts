@@ -26,6 +26,7 @@ import { BookingConfirmationPage } from '../../pageObjectsManagers/cinesa/bookin
 import { BookingConfirmationAssertions } from '../../tests/cinesa/bookingConfirmation/bookingConfirmation.assertions';
 import { LivingTicketPage } from '../../pageObjectsManagers/cinesa/livingTicket/livingTicket.page';
 import { LivingTicketAssertions } from '../../tests/cinesa/livingTicket/livingTicket.assertions';
+import { RedsysPage } from '../../pageObjectsManagers/cinesa/paymentProviders/redsys/redsys.page';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -52,6 +53,7 @@ type CustomFixtures = {
   bookingConfirmationAssertions: BookingConfirmationAssertions;
   livingTicket: LivingTicketPage;
   livingTicketAssertions: LivingTicketAssertions;
+  redsysPage: RedsysPage;
   webActions: WebActions;
   whoarewe: Footer;
   workwithus: Footer;
@@ -241,6 +243,11 @@ export const test = base.extend<CustomFixtures>({
     const webActions = new WebActions(page);
     const paymentPage = new PaymentPage(webActions);
     await use(paymentPage);
+  },
+  redsysPage: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const redsysPage = new RedsysPage(webActions);
+    await use(redsysPage);
   },
   analyticsPage: async ({ page }, use) => {
     const webActions = new WebActions(page);
