@@ -366,9 +366,7 @@ export class BookingConfirmationPage {
         }
 
         if (!popupDetected) {
-          console.log(
-            `[BookingConfirmation] Webloyalty popup did not appear within ${maxWaitMs}ms — this is expected in some environments/timings`
-          );
+          // Webloyalty popup did not appear — expected in some environments/timings
           return;
         }
 
