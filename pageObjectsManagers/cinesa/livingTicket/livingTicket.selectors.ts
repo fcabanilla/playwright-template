@@ -32,6 +32,7 @@ export interface LivingTicketSelectors {
   totalPrice: string;
   managementFee: string;
   savings: string;
+  pageBody: string;
 }
 
 export const livingTicketSelectors: LivingTicketSelectors = {
@@ -97,4 +98,5 @@ export const livingTicketSelectors: LivingTicketSelectors = {
     '.movie-detailed-resume :text("Gastos de gestión"), .transaction-summary :text("Gastos de gestión"), .movie-detailed-resume :text("Management fee"), .transaction-summary :text("Management fee")',
   savings:
     '.movie-detailed-resume :text("Te has ahorrado"), .transaction-summary :text("Te has ahorrado"), .movie-detailed-resume :text("You saved"), .transaction-summary :text("You saved")',
+  pageBody: 'body',
 } as const;

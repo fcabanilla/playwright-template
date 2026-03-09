@@ -266,7 +266,7 @@ export class LivingTicketPage {
     if (!qrReference) {
       const pageText =
         ((await this.webActions
-          .getLocator('body')
+          .getLocator(this.selectors.pageBody)
           .first()
           .textContent()
           .catch(() => '')) || '') + ` ${heroText}`;
