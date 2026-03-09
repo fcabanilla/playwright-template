@@ -1,11 +1,14 @@
 // cinemaDetail.page.ts
-import { Page } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
   cinemaDetailSelectors,
   CinemaDetailSelectors,
+  showtimeFormatMap,
 } from './cinemaDetail.selectors';
+
+import { MovieMetadata, MovieShowtime } from './cinemaDetail.types';
 
 /**
  * CinemaDetail Page Object
@@ -34,18 +37,302 @@ import {
  * @see .github/copilot-instructions.md
  */
 export class CinemaDetail {
-  private readonly page: Page; // For complex locator filtering and allTextContents
   private readonly webActions: WebActions; // For standard Playwright operations
   private readonly selectors: CinemaDetailSelectors;
 
-  /**
-   * Creates a new CinemaDetail instance.
-   * @param page - The Playwright page object (used for complex filtering)
-   */
-  constructor(webActions: WebActions) {
-    this.page = webActions.getPage();
+  constructor(
+    webActions: WebActions,
+    selectors: CinemaDetailSelectors = cinemaDetailSelectors
+  ) {
     this.webActions = webActions;
-    this.selectors = cinemaDetailSelectors;
+    this.selectors = selectors;
+  }
+
+  private normalizeWhitespace(text: string): string {
+    return text.replace(/\s+/g, ' ').trim();
+  }
+
+  private extractRoomFromShowtimeText(
+    showtimeText: string
+  ): string | undefined {
+    const normalizedText = this.normalizeWhitespace(showtimeText);
+    const roomMatch = normalizedText.match(/sala\s*[a-z0-9-]+/i);
+    return roomMatch ? this.normalizeWhitespace(roomMatch[0]) : undefined;
+  }
+
+  private getShowtimeLocatorByFormat(
+    filmContainer: Locator,
+    requiredFormat: 'normal' | 'dbox' | 'any'
+  ): Locator {
+    const showtimeLocator = filmContainer.locator(this.selectors.showtime);
+
+    const page = this.webActions.page;
+
+    if (requiredFormat === 'normal') {
+      return showtimeLocator.filter({
+        hasNot: page.locator(this.selectors.specialAttributes),
+      });
+    }
+
+    if (requiredFormat === 'dbox') {
+      return showtimeLocator.filter({
+        has: page.locator(this.selectors.dboxIcon),
+      });
+    }
+
+    return showtimeLocator;
+  }
+
+  private async getAvailableRooms(showtimeLocator: Locator): Promise<string[]> {
+    const showtimeTexts = await showtimeLocator.allTextContents();
+    const parsedRooms = showtimeTexts
+      .map((showtimeText) => this.extractRoomFromShowtimeText(showtimeText))
+      .filter((room): room is string => Boolean(room));
+
+    return [...new Set(parsedRooms)];
+  }
+
+  private async findShowtimeByPreferredRooms(
+    showtimeLocator: Locator,
+    preferredRooms: string[]
+  ): Promise<{ index: number; text: string; room?: string } | null> {
+    const showtimeCount = await showtimeLocator.count();
+
+    if (showtimeCount === 0) {
+      return null;
+    }
+
+    const normalizedPreferredRooms = preferredRooms
+      .map((room) => this.normalizeWhitespace(room).toLowerCase())
+      .filter(Boolean);
+
+    const showtimeEntries: Array<{
+      index: number;
+      text: string;
+      room?: string;
+    }> = [];
+    for (let index = 0; index < showtimeCount; index++) {
+      const showtimeText = await showtimeLocator.nth(index).innerText();
+      showtimeEntries.push({
+        index,
+        text: this.normalizeWhitespace(showtimeText),
+        room: this.extractRoomFromShowtimeText(showtimeText),
+      });
+    }
+
+    for (const preferredRoom of normalizedPreferredRooms) {
+      const preferredRoomMatch = showtimeEntries.find((showtimeEntry) =>
+        this.normalizeWhitespace(showtimeEntry.text)
+          .toLowerCase()
+          .includes(preferredRoom)
+      );
+
+      if (preferredRoomMatch) {
+        return preferredRoomMatch;
+      }
+    }
+
+    return null;
+  }
+
+  async selectShowtimeByFormatAndRoom(
+    filmName: string,
+    criteria: {
+      requiredFormat: 'normal' | 'dbox' | 'any';
+      preferredRooms: string[];
+    }
+  ): Promise<{ showtime: string; room?: string }> {
+    return await allure.step(
+      `Selecting showtime by format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}] for film "${filmName}"`,
+      async () => {
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
+
+        const showtimeLocator = this.getShowtimeLocatorByFormat(
+          filmContainer,
+          criteria.requiredFormat
+        );
+
+        const showtimeCount = await showtimeLocator.count();
+        if (showtimeCount === 0) {
+          throw new Error(
+            `No showtimes available with format "${criteria.requiredFormat}" for film "${filmName}"`
+          );
+        }
+
+        const matchedShowtime = await this.findShowtimeByPreferredRooms(
+          showtimeLocator,
+          criteria.preferredRooms
+        );
+
+        if (!matchedShowtime) {
+          const availableRooms = await this.getAvailableRooms(showtimeLocator);
+          throw new Error(
+            `No showtime matched preferred rooms [${criteria.preferredRooms.join(', ')}] for film "${filmName}" with format "${criteria.requiredFormat}". Available rooms: [${availableRooms.join(', ')}]`
+          );
+        }
+
+        await showtimeLocator.nth(matchedShowtime.index).click();
+
+        return {
+          showtime: matchedShowtime.text,
+          room: matchedShowtime.room,
+        };
+      }
+    );
+  }
+
+  async selectFilmAndShowtimeByFormatAndRoom(criteria: {
+    requiredFormat: 'normal' | 'dbox' | 'any';
+    preferredRooms: string[];
+  }): Promise<{ film: string; showtime: string; room?: string }> {
+    return await allure.step(
+      `Selecting film and showtime by format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}]`,
+      async () => {
+        const filmNames = await this.getFilmNames();
+        if (filmNames.length === 0) {
+          throw new Error('No films found on the cinema detail page');
+        }
+
+        const shuffledFilmNames = [...filmNames].sort(
+          () => Math.random() - 0.5
+        );
+        const selectionErrors: string[] = [];
+
+        for (const filmName of shuffledFilmNames) {
+          try {
+            const showtimeSelection = await this.selectShowtimeByFormatAndRoom(
+              filmName,
+              criteria
+            );
+
+            return {
+              film: filmName,
+              showtime: showtimeSelection.showtime,
+              room: showtimeSelection.room,
+            };
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : 'Unknown selection error';
+            selectionErrors.push(`${filmName}: ${errorMessage}`);
+          }
+        }
+
+        throw new Error(
+          `Unable to find a film with required format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}]. Attempts: ${selectionErrors.join(' | ')}`
+        );
+      }
+    );
+  }
+
+  /**
+   * Scrapes detailed information for all films on the page.
+   * Extracts titles, metadata, and showtime info for data-driven testing.
+   * @returns Array of MovieMetadata objects
+   */
+  async extractAllMoviesData(): Promise<MovieMetadata[]> {
+    return await allure.step(
+      'Extracting full movie data from page',
+      async () => {
+        // Ensure films are visible before starting extraction
+        await this.webActions.waitForVisible(this.selectors.filmList);
+
+        const page = this.webActions.page;
+        const films = page.locator(this.selectors.filmItem);
+        const count = await films.count();
+        const movieData: MovieMetadata[] = [];
+
+        console.log(`Starting extraction for ${count} movies...`);
+
+        for (let i = 0; i < count; i++) {
+          const film = films.nth(i);
+
+          // 1. Basic Title
+          const title = await film
+            .locator(this.selectors.filmName)
+            .innerText()
+            .then((t) => t.trim());
+
+          // 2. Extra Metadata (Duration, Rating, etc.)
+          // Note: Selectors for metadata might need adjustment based on specific layout
+          // Assuming common structures:
+          // .v-film-details__duration, .v-film-details__rating
+          let duration = 'Unknown';
+          const durationLoc = film.locator(this.selectors.duration);
+          if ((await durationLoc.count()) > 0) {
+            duration = await durationLoc.innerText().then((t) => t.trim());
+          }
+
+          const attributes: string[] = [];
+          // Extraction of movie-level attributes (e.g. at the top of card)
+          const attrIcons = film.locator(this.selectors.attributeIcon);
+          const attrCount = await attrIcons.count();
+          for (let k = 0; k < attrCount; k++) {
+            const attrText =
+              (await attrIcons.nth(k).textContent())?.trim() || 'attribute';
+            attributes.push(attrText);
+          }
+
+          // 3. Showtimes
+          const showtimes: MovieShowtime[] = [];
+          const timeButtons = film.locator(this.selectors.showtime);
+          const timeCount = await timeButtons.count();
+
+          for (let j = 0; j < timeCount; j++) {
+            const timeBtn = timeButtons.nth(j);
+            const timeText = await timeBtn.innerText();
+
+            // Extract attributes specific to this showtime (e.g. Screen type inside the button or near it)
+            // Example: "18:00 (IMAX)"
+            const showtimeAttrs: string[] = [];
+            // Check for internal icons/flags
+            const internalIcons = timeBtn.locator(
+              this.selectors.showtimeInternalIcon
+            );
+            const iconCount = await internalIcons.count();
+            for (let m = 0; m < iconCount; m++) {
+              const alt = await internalIcons.nth(m).getAttribute('alt');
+              if (alt) showtimeAttrs.push(alt);
+            }
+
+            // Check if class indicates format
+            const classList = (await timeBtn.getAttribute('class')) || '';
+            let format = 'Standard';
+            for (const [className, label] of Object.entries(
+              showtimeFormatMap
+            )) {
+              if (classList.includes(className)) {
+                format = label;
+                break;
+              }
+            }
+
+            showtimes.push({
+              time: timeText.trim(),
+              format: format,
+              attributes: showtimeAttrs,
+            });
+          }
+
+          movieData.push({
+            title: title,
+            duration: duration !== 'Unknown' ? duration : undefined,
+            showtimes: showtimes,
+            attributes: attributes,
+          });
+        }
+
+        return movieData;
+      }
+    );
   }
 
   /**
@@ -63,11 +350,12 @@ export class CinemaDetail {
       'Getting list of film names from cinema detail page',
       async () => {
         // Wait for film list to be visible (pure async, no timeout)
-        const filmListLocator = this.page.locator(this.selectors.filmList);
+        const page = this.webActions.page;
+        const filmListLocator = page.locator(this.selectors.filmList);
         await filmListLocator.first().waitFor({ state: 'visible' });
 
         // Wait for at least one film name to be visible (pure async)
-        const filmNameLocator = this.page.locator(this.selectors.filmName);
+        const filmNameLocator = page.locator(this.selectors.filmName);
         await filmNameLocator.first().waitFor({ state: 'visible' });
 
         // Extract all film names
@@ -83,8 +371,9 @@ export class CinemaDetail {
    * @returns Locator for the film element.
    */
   private getFilmByName(name: string) {
-    return this.page.locator(this.selectors.filmItem, {
-      has: this.page.locator(this.selectors.filmName, { hasText: name }),
+    const page = this.webActions.page;
+    return page.locator(this.selectors.filmItem, {
+      has: page.locator(this.selectors.filmName, { hasText: name }),
     });
   }
 
@@ -136,14 +425,21 @@ export class CinemaDetail {
         const filmsWithNormalShowtimes: string[] = [];
 
         for (const name of names) {
-          const filmContainer = this.page.locator(this.selectors.filmItem, {
-            has: this.page.locator(this.selectors.filmName, { hasText: name }),
-          });
+          const filmContainer = this.webActions.page.locator(
+            this.selectors.filmItem,
+            {
+              has: this.webActions.page.locator(this.selectors.filmName, {
+                hasText: name,
+              }),
+            }
+          );
 
           const normalShowtimes = await filmContainer
             .locator(this.selectors.showtime)
             .filter({
-              hasNot: this.page.locator(this.selectors.specialAttributes),
+              hasNot: this.webActions.page.locator(
+                this.selectors.specialAttributes
+              ),
             });
 
           if ((await normalShowtimes.count()) > 0) {
@@ -154,11 +450,14 @@ export class CinemaDetail {
         if (filmsWithNormalShowtimes.length === 0) {
           // Fallback: select any film with any showtime
           for (const name of names) {
-            const filmContainer = this.page.locator(this.selectors.filmItem, {
-              has: this.page.locator(this.selectors.filmName, {
-                hasText: name,
-              }),
-            });
+            const filmContainer = this.webActions.page.locator(
+              this.selectors.filmItem,
+              {
+                has: this.webActions.page.locator(this.selectors.filmName, {
+                  hasText: name,
+                }),
+              }
+            );
 
             const anyShowtimes = await filmContainer.locator(
               this.selectors.showtime
@@ -201,11 +500,14 @@ export class CinemaDetail {
       'Getting list of showtimes for the selected film',
       async () => {
         // Get film container filtered by film name
-        const filmContainer = this.page.locator(this.selectors.filmItem, {
-          has: this.page.locator(this.selectors.filmName, {
-            hasText: filmName,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
 
         // Find showtime elements within that container
         const showtimeLocator = filmContainer.locator(this.selectors.showtime);
@@ -221,14 +523,32 @@ export class CinemaDetail {
 
   /**
    * Clicks on a showtime button that contains the given text.
-   * @param timeText - The showtime text to select (e.g., "16:10").
-   * @returns Promise that resolves when the click action is complete.
+   * Uses WebActions for consistency and overlay handling.
+   * @param timeText - The showtime text to match strictly (e.g., "17:35\nSala 1").
    */
   async selectShowtimeByText(timeText: string): Promise<void> {
     await allure.step(`Selecting showtime "${timeText}"`, async () => {
-      await this.page
-        .locator(this.selectors.showtime, { hasText: timeText })
-        .click();
+      // 1. Sanitize input: Remove newlines if passed, or just use substring matching
+      // The scraped data has "17:35\nSala 1", but the button might have structured HTML
+      // simpler approach: look for the time part if the full text fails
+
+      const timePart = timeText.split('\n')[0].trim(); // "17:35"
+
+      // 2. Try to click using exact text first, then fall back to time part
+      try {
+        await this.webActions.click(
+          `${this.selectors.showtime}:has-text("${timeText}")`,
+          `Showtime: ${timeText}`
+        );
+      } catch (e) {
+        console.log(
+          `Exact match click failed for ${timeText}, trying partial match: ${timePart}`
+        );
+        await this.webActions.click(
+          `${this.selectors.showtime}:has-text("${timePart}")`,
+          `Showtime: ${timePart}`
+        );
+      }
     });
   }
 
@@ -265,11 +585,14 @@ export class CinemaDetail {
     return await allure.step(
       'Selecting a random normal showtime for the selected film',
       async () => {
-        const filmContainer = this.page.locator(this.selectors.filmItem, {
-          has: this.page.locator(this.selectors.filmName, {
-            hasText: filmName,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: filmName,
+            }),
+          }
+        );
 
         // Locate all showtime buttons
         const showtimeLocator = filmContainer.locator(this.selectors.showtime);
@@ -279,7 +602,7 @@ export class CinemaDetail {
 
         // Filter out showtimes with special attributes (D-BOX, iSense, etc.)
         const normalShowtimes = await showtimeLocator.filter({
-          hasNot: this.page.locator(
+          hasNot: this.webActions.page.locator(
             '.v-attribute__icon--type-standard, .v-attribute__icon--type-hero'
           ),
         });
@@ -341,11 +664,14 @@ export class CinemaDetail {
         }
         const randomIndex = Math.floor(Math.random() * names.length);
         const selectedFilm = names[randomIndex];
-        const filmContainer = this.page.locator(this.selectors.filmItem, {
-          has: this.page.locator(this.selectors.filmName, {
-            hasText: selectedFilm,
-          }),
-        });
+        const filmContainer = this.webActions.page.locator(
+          this.selectors.filmItem,
+          {
+            has: this.webActions.page.locator(this.selectors.filmName, {
+              hasText: selectedFilm,
+            }),
+          }
+        );
         const filmTitleLink = filmContainer.locator(
           this.selectors.filmTitleLink
         );
@@ -394,15 +720,20 @@ export class CinemaDetail {
         const shuffledNames = names.sort(() => Math.random() - 0.5);
 
         for (const name of shuffledNames) {
-          const filmContainer = this.page.locator(this.selectors.filmItem, {
-            has: this.page.locator(this.selectors.filmName, { hasText: name }),
-          });
+          const filmContainer = this.webActions.page.locator(
+            this.selectors.filmItem,
+            {
+              has: this.webActions.page.locator(this.selectors.filmName, {
+                hasText: name,
+              }),
+            }
+          );
 
           // Locate D-BOX showtimes by checking for the presence of the D-BOX icon
           const dboxShowtimes = await filmContainer
             .locator(this.selectors.showtime)
             .filter({
-              has: this.page.locator(this.selectors.dboxIcon),
+              has: this.webActions.page.locator(this.selectors.dboxIcon),
             });
 
           if ((await dboxShowtimes.count()) > 0) {
@@ -442,7 +773,7 @@ export class CinemaDetail {
       await this.webActions.waitForLoadState('domcontentloaded');
 
       // Try React Helmet schema first
-      const reactHelmetJsonLd = this.page.locator(
+      const reactHelmetJsonLd = this.webActions.page.locator(
         'script[data-react-helmet="true"][type="application/ld+json"]'
       );
       const reactHelmetCount = await reactHelmetJsonLd.count();
@@ -462,7 +793,7 @@ export class CinemaDetail {
       }
 
       // Fallback: Try standard JSON-LD scripts
-      const jsonLdScripts = this.page.locator(
+      const jsonLdScripts = this.webActions.page.locator(
         'script[type="application/ld+json"]'
       );
       const jsonLdCount = await jsonLdScripts.count();

@@ -13,6 +13,7 @@ import { ticketTypeMappings } from '../ticketPicker/ticketPicker.data';
 import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPicker/ticketPicker.data';
 //import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 import { getCinemasForEnvironment } from './seatPicker.data';
+import { getGiftCardData } from '../paymentPage/paymentPage.data';
 
 // Get available cinemas for current environment
 const CINEMAS = getCinemasForEnvironment();
@@ -70,7 +71,8 @@ test.describe('Seat Picker - Seat Selection', () => {
           await ticketPicker.selectTicket();
           await barPage.skipBar();
           await purchaseSummary.acceptAndContinue();
-          await paymentPage.completePayment();
+          const { cardNumber, pin } = getGiftCardData();
+          await paymentPage.completePayment(cardNumber, pin);
         }
       );
     }
@@ -114,7 +116,8 @@ test.describe('Seat Picker - Seat Selection', () => {
           await ticketPicker.selectTicket(seatsToSelect);
           await barPage.skipBar();
           await purchaseSummary.acceptAndContinue();
-          await paymentPage.completePayment();
+          const { cardNumber, pin } = getGiftCardData();
+          await paymentPage.completePayment(cardNumber, pin);
         }
       );
     }

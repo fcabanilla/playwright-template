@@ -92,13 +92,15 @@ export const test = base.extend<CustomFixtures>({
     // 2. Dynamic User Agent Injection
     // Append the suffix (if needed for Cloudflare bypass) to the NATIVE User Agent
     // This ensures we don't force a Chrome UA on Firefox/Safari
-    const suffix = process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : '';
+    const suffix = process.env.USER_AGENT_SUFFIX
+      ? ` ${process.env.USER_AGENT_SUFFIX}`
+      : '';
     const finalUserAgent = originalUA + suffix;
 
     // Create context WITH storageState if available AND injected User Agent
     const context = await browser.newContext({
       userAgent: finalUserAgent,
-      ...(storageStatePath ? { storageState: storageStatePath } : {})
+      ...(storageStatePath ? { storageState: storageStatePath } : {}),
     });
 
     // CLOUDFLARE BYPASS: Inject credentials as BOTH cookies AND headers
