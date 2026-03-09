@@ -1,4 +1,4 @@
-import { WebActions } from '../../../core/webactions/webActions';
+import { WebActions } from '../../../../core/webactions/webActions';
 import { redsysSelectors } from './redsys.selectors';
 import { RedsysCreditCard } from './redsys.types';
 import { RedsysTestData } from './redsys.data';

@@ -1,7 +1,6 @@
 import { allure } from 'allure-playwright';
 import { WebActions } from '../../../core/webactions/webActions';
 import { paymentPageSelectors } from './paymentPage.selectors';
-import { getGiftCardData } from '../../../tests/cinesa/paymentPage/paymentPage.data';
 
 export class PaymentPage {
   private readonly selectors = paymentPageSelectors;
@@ -38,12 +37,7 @@ export class PaymentPage {
     });
   }
 
-  async enterCardData(cardNumber?: string, pin?: string): Promise<void> {
-    if (!cardNumber || !pin) {
-      const defaults = getGiftCardData();
-      cardNumber = cardNumber ?? defaults.cardNumber;
-      pin = pin ?? defaults.pin;
-    }
+  async enterCardData(cardNumber: string, pin: string): Promise<void> {
     await allure.step('Entering card data (card number & PIN)', async () => {
       await this.webActions.fill(
         this.selectors.giftCard.cardNumberInput,
@@ -92,7 +86,7 @@ export class PaymentPage {
    * @param cardNumber - Gift Card number (defaults to env var)
    * @param pin - Gift Card PIN (defaults to env var)
    */
-  async completePayment(cardNumber?: string, pin?: string): Promise<void> {
+  async completePayment(cardNumber: string, pin: string): Promise<void> {
     await this.expandGiftCardAccordionIfCollapsed();
     await this.enterCardData(cardNumber, pin);
     await this.clickAddGiftCard();
@@ -106,8 +100,8 @@ export class PaymentPage {
    * @param pin - Gift Card PIN (defaults to env var)
    */
   async completeGiftCardPayment(
-    cardNumber?: string,
-    pin?: string
+    cardNumber: string,
+    pin: string
   ): Promise<void> {
     await this.completePayment(cardNumber, pin);
     await this.clickCompleteOrder();
@@ -124,7 +118,7 @@ export class PaymentPage {
         await this.webActions.waitForVisible(
           this.selectors.mainPayment.completeOrderButton,
           15000,
-          'Complete Order Button'
+          'Complete Order Button (Pagar ahora)'
         );
         await this.webActions.click(
           this.selectors.mainPayment.completeOrderButton,
