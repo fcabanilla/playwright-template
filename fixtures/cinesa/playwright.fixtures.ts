@@ -22,6 +22,10 @@ import { Mailing } from '../../pageObjectsManagers/cinesa/mailing/mailing.page';
 import { AnalyticsPage } from '../../pageObjectsManagers/cinesa/analytics/analytics.page';
 import { MovieList } from '../../pageObjectsManagers/cinesa/movies/movies.page';
 import { MoviePage } from '../../pageObjectsManagers/cinesa/movie/movie.page';
+import { BookingConfirmationPage } from '../../pageObjectsManagers/cinesa/bookingConfirmation/bookingConfirmation.page';
+import { BookingConfirmationAssertions } from '../../tests/cinesa/bookingConfirmation/bookingConfirmation.assertions';
+import { LivingTicketPage } from '../../pageObjectsManagers/cinesa/livingTicket/livingTicket.page';
+import { LivingTicketAssertions } from '../../tests/cinesa/livingTicket/livingTicket.assertions';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -44,6 +48,10 @@ type CustomFixtures = {
   mailing: Mailing;
   movieList: MovieList;
   moviePage: MoviePage;
+  bookingConfirmation: BookingConfirmationPage;
+  bookingConfirmationAssertions: BookingConfirmationAssertions;
+  livingTicket: LivingTicketPage;
+  livingTicketAssertions: LivingTicketAssertions;
   webActions: WebActions;
   whoarewe: Footer;
   workwithus: Footer;
@@ -329,6 +337,24 @@ export const test = base.extend<CustomFixtures>({
   moviePage: async ({ page }, use) => {
     const moviePage = new MoviePage(page);
     await use(moviePage);
+  },
+  bookingConfirmation: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const bookingConfirmation = new BookingConfirmationPage(webActions);
+    await use(bookingConfirmation);
+  },
+  bookingConfirmationAssertions: async ({ bookingConfirmation }, use) => {
+    const assertions = new BookingConfirmationAssertions(bookingConfirmation);
+    await use(assertions);
+  },
+  livingTicket: async ({ page }, use) => {
+    const webActions = new WebActions(page);
+    const livingTicket = new LivingTicketPage(webActions);
+    await use(livingTicket);
+  },
+  livingTicketAssertions: async ({ livingTicket }, use) => {
+    const assertions = new LivingTicketAssertions(livingTicket);
+    await use(assertions);
   },
 });
 
