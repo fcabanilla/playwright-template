@@ -52,6 +52,61 @@ export class LivingTicketPage {
     return '';
   }
 
+  private async getFirstVisibleTextFromSelectors(
+    selectors: string[]
+  ): Promise<string> {
+    for (const selector of selectors) {
+      const text = await this.getFirstVisibleLocatorText(selector);
+      if (text) {
+        return text;
+      }
+    }
+
+    return '';
+  }
+
+  private async getHeroFieldValue(
+    selector: string,
+    fallbackSourceText: string,
+    patterns: RegExp[]
+  ): Promise<string> {
+    const selectorValue = await this.getFirstVisibleLocatorText(selector);
+    if (selectorValue) {
+      return selectorValue;
+    }
+
+    return this.extractFirstMatch(fallbackSourceText, patterns);
+  }
+
+  private async getHeroFieldValueFromListItem(
+    labelPatterns: RegExp[]
+  ): Promise<string> {
+    const items = this.webActions.getLocator(this.selectors.heroDetailItems);
+    const count = await items.count().catch(() => 0);
+
+    for (let index = 0; index < count; index += 1) {
+      const item = items.nth(index);
+      const itemText = this.normalizeText(
+        (await item.textContent().catch(() => '')) || ''
+      );
+
+      const matchingPattern = labelPatterns.find((pattern) =>
+        pattern.test(itemText)
+      );
+
+      if (!matchingPattern) {
+        continue;
+      }
+
+      const normalizedValue = itemText.replace(matchingPattern, '').trim();
+      if (normalizedValue) {
+        return normalizedValue;
+      }
+    }
+
+    return '';
+  }
+
   private async isAnyVisible(selector: string): Promise<boolean> {
     const locator = this.webActions.getLocator(selector);
     const count = await locator.count().catch(() => 0);
@@ -302,17 +357,51 @@ export class LivingTicketPage {
       cinemaName = this.normalizeText(cinemaMatch?.[1] || '');
     }
 
-    const roomValue = this.extractFirstMatch(heroText, [
-      /(?:sala|room)\s*[:\-]?\s*([a-z]?\d{1,3})\b/i,
-    ]);
+    const pageText = this.normalizeText(
+      (await this.webActions
+        .getLocator(this.selectors.pageBody)
+        .first()
+        .textContent()
+        .catch(() => '')) || ''
+    );
+    const fallbackSourceText = `${heroText} ${pageText}`;
 
-    const areaValue = this.extractFirstMatch(heroText, [
-      /(?:[áa]rea|area|zone)\s*[:\-]?\s*([\p{L}\d\- ]{2,30}?)(?=\s+(?:fila|row|cambiar|devolver)|$)/iu,
-    ]);
+    const roomValue =
+      (await this.getHeroFieldValueFromListItem([
+        /^(?:sala|room)\b\s*[:\-]?\s*/i,
+      ])) ||
+      (await this.getHeroFieldValue(
+        this.selectors.roomValue,
+        fallbackSourceText,
+        [
+          /(?:sala|room)\s*[:\-]?\s*([a-z]?\d{1,3})\b/i,
+          /\b([a-z]?\d{1,3})\b(?=\s*(?:[áa]rea|area|fila|row|butacas|seats))/iu,
+        ]
+      ));
 
-    const seatRowValue = this.extractFirstMatch(heroText, [
-      /(?:fila[-\s]*butacas|row[-\s]*seats|seats?)\s*[:\-]?\s*([a-z]?\d+\s*[-,]\s*[a-z]?\d+)/i,
-    ]);
+    const areaValue =
+      (await this.getHeroFieldValueFromListItem([
+        /^(?:[áa]rea|area|zone)\b\s*[:\-]?\s*/iu,
+      ])) ||
+      (await this.getHeroFieldValue(
+        this.selectors.areaValue,
+        fallbackSourceText,
+        [
+          /(?:[áa]rea|area|zone)\s*[:\-]?\s*([\p{L}\d\- ]{2,30}?)(?=\s+(?:fila|row|cambiar|devolver)|$)/iu,
+        ]
+      ));
+
+    const seatRowValue =
+      (await this.getHeroFieldValueFromListItem([
+        /^(?:fila[-\s]*butacas|row[-\s]*seats|seats?)\b\s*[:\-]?\s*/i,
+      ])) ||
+      (await this.getHeroFieldValue(
+        this.selectors.seatRowValue,
+        fallbackSourceText,
+        [
+          /(?:fila[-\s]*butacas|row[-\s]*seats|seats?)\s*[:\-]?\s*([a-z]?\d+\s*[-,]\s*[a-z]?\d+)/i,
+        ]
+      ));
 
     return {
       qrReference,
@@ -369,33 +458,101 @@ export class LivingTicketPage {
       this.selectors.transactionSummaryContainer
     );
     const summaryText = this.normalizeText(summaryTextRaw);
+    const heroText = this.normalizeText(
+      await this.getFirstVisibleLocatorText(this.selectors.heroContainer)
+    );
+    const pageText = this.normalizeText(
+      (await this.webActions
+        .getLocator(this.selectors.pageBody)
+        .first()
+        .textContent()
+        .catch(() => '')) || ''
+    );
+    const combinedTransactionText = `${summaryText} ${heroText} ${pageText}`;
 
-    const transactionId = this.extractFirstMatch(summaryText, [
-      /(identificador\s+de\s+la\s+transacci[oó]n\s*:\s*\d+)/i,
-      /(transaction\s+id\s*:\s*\d+)/i,
+    const transactionId =
+      (await this.getFirstVisibleTextFromSelectors([
+        this.selectors.transactionId,
+        '.movie-detailed-resume :text("Identificador")',
+        '.transaction-summary :text("Identificador")',
+        '.v-journey-details-section :text("Identificador")',
+        '.movie-detailed-resume :text("Transaction")',
+      ])) ||
+      this.extractFirstMatch(summaryText, [
+        /(identificador\s+de\s+la\s+transacci[oó]n\s*:\s*\d+)/i,
+        /(transaction\s+id\s*:\s*\d+)/i,
+      ]);
+
+    const movieTitle =
+      (await this.getFirstVisibleTextFromSelectors([
+        this.selectors.movieTitle,
+        '.movie-detailed-resume .movie-title',
+        '.transaction-summary .movie-title',
+        '.movie-detailed-resume h3',
+        '.movie-detailed-resume strong',
+      ])) ||
+      this.extractFirstMatch(summaryText, [
+        /(?:resumen\s+de\s+la\s+compra|purchase\s+summary)\s*([\p{L}\d\s:'’\-.,]{3,80})/iu,
+      ]);
+
+    const sessionInfo =
+      (await this.getFirstVisibleTextFromSelectors([
+        this.selectors.sessionInfo,
+        '.movie-detailed-resume .session-info',
+        '.transaction-summary .session-info',
+        '.movie-detailed-resume [class*="session"]',
+        '.transaction-summary [class*="session"]',
+      ])) ||
+      this.extractFirstMatch(combinedTransactionText, [
+        /((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)[^\n]{5,120})/i,
+        /((?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)[^\n]{5,120})/i,
+      ]);
+
+    const ticketLineLabel =
+      (await this.getFirstVisibleTextFromSelectors([
+        this.selectors.ticketLineLabel,
+        '.v-journey-summary :text("Tus entradas")',
+        '.v-journey-summary :text("1x")',
+        '.movie-detailed-resume :text("Adult")',
+        '.movie-detailed-resume :text("Tus entradas")',
+        '.movie-detailed-resume :text("Tickets")',
+        '.transaction-summary :text("Tickets")',
+      ])) ||
+      this.extractFirstMatch(summaryText, [
+        /(\d+x\s*[\p{L}\s]{2,30})/iu,
+        /(tus\s+entradas|your\s+tickets)/i,
+      ]);
+
+    const selectorTicketLinePrice = await this.getFirstVisibleTextFromSelectors(
+      [this.selectors.ticketLinePrice]
+    );
+    const selectorTotalPrice = await this.getFirstVisibleTextFromSelectors([
+      this.selectors.totalPrice,
+      '.v-journey-summary :text("Total")',
+      '.movie-detailed-resume :text("Total")',
+      '.transaction-summary :text("Total")',
+      '.v-journey-details-section :text("Total")',
     ]);
-
-    const movieTitle = this.extractFirstMatch(summaryText, [
-      /(?:resumen\s+de\s+la\s+compra|purchase\s+summary)\s*([\p{L}\d\s:'’\-.,]{3,80})/iu,
-    ]);
-
-    const sessionInfo = this.extractFirstMatch(summaryText, [
-      /((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)[^\n]{5,120})/i,
-      /((?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)[^\n]{5,120})/i,
-    ]);
-
-    const ticketLineLabel = this.extractFirstMatch(summaryText, [
-      /(\d+x\s*[\p{L}\s]{2,30})/iu,
-      /(tus\s+entradas|your\s+tickets)/i,
+    const selectorManagementFee = await this.getFirstVisibleTextFromSelectors([
+      this.selectors.managementFee,
+      '.v-journey-summary :text("Gastos de gestión")',
+      '.movie-detailed-resume :text("Gastos de gestión")',
+      '.transaction-summary :text("Gastos de gestión")',
+      '.movie-detailed-resume :text("Management fee")',
+      '.transaction-summary :text("Management fee")',
     ]);
 
     const monetaryMatches =
       summaryText.match(/\d+[.,]\d{2}\s*€|€\s*\d+[.,]\d{2}/g) || [];
-    const ticketLinePrice = this.normalizeText(monetaryMatches[0] || '');
-    const totalPrice = this.normalizeText(
-      monetaryMatches[1] || monetaryMatches[0] || ''
+    const ticketLinePrice = this.normalizeText(
+      selectorTicketLinePrice || monetaryMatches[0] || ''
     );
-    const managementFee = this.normalizeText(monetaryMatches[2] || '');
+    const totalPrice = this.normalizeText(
+      selectorTotalPrice || monetaryMatches[1] || monetaryMatches[0] || ''
+    );
+    const managementFee = this.normalizeText(
+      selectorManagementFee || monetaryMatches[2] || ''
+    );
     const savings = this.normalizeText(monetaryMatches[3] || '');
 
     return {

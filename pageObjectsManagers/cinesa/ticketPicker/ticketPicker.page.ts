@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { WebActions } from '../../../core/webactions/webActions';
 import { TICKET_PICKER_SELECTORS } from './ticketPicker.selectors';
 import { allure } from 'allure-playwright';
@@ -33,9 +33,109 @@ import { allure } from 'allure-playwright';
 export class TicketPicker {
   private readonly page: Page; // Only for force clicks and state checks
   private readonly selectors = TICKET_PICKER_SELECTORS;
+  private readonly preferredTicketDescriptionPatterns = [
+    /adult/i,
+    /normal/i,
+    /general/i,
+    /entrada/i,
+  ];
+  private readonly excludedTicketDescriptionPatterns = [
+    /mycinesa/i,
+    /pack/i,
+    /menu/i,
+    /bundle/i,
+    /inicia sesi[oó]n/i,
+  ];
 
   constructor(private readonly webActions: WebActions) {
     this.page = webActions.page;
+  }
+
+  private async getSelectableTicketRows(): Promise<Locator[]> {
+    const ticketRows = this.page.locator(this.selectors.ticketRow);
+    const rowCount = await ticketRows.count();
+    const prioritizedRows: Array<{ row: Locator; priority: number }> = [];
+
+    for (let index = 0; index < rowCount; index += 1) {
+      const row = ticketRows.nth(index);
+      const plusButton = row.locator(this.selectors.incrementButton).first();
+      const quantityInput = row.locator(this.selectors.quantityInput).first();
+
+      const hasPlusButton = await plusButton.isVisible().catch(() => false);
+      if (!hasPlusButton) {
+        continue;
+      }
+
+      const isDisabled = await plusButton.isDisabled().catch(() => true);
+      if (isDisabled) {
+        continue;
+      }
+
+      const descriptionText = (
+        (await row
+          .locator(this.selectors.ticketDescription)
+          .first()
+          .textContent()
+          .catch(() => '')) || ''
+      ).trim();
+
+      if (
+        this.excludedTicketDescriptionPatterns.some((pattern) =>
+          pattern.test(descriptionText)
+        )
+      ) {
+        continue;
+      }
+
+      const currentValue = Number(
+        (await quantityInput.getAttribute('value').catch(() => '0')) || '0'
+      );
+      const maxValue = Number(
+        (await quantityInput.getAttribute('max').catch(() => '1')) || '1'
+      );
+
+      if (Number.isFinite(maxValue) && currentValue >= maxValue) {
+        continue;
+      }
+
+      const priority = this.preferredTicketDescriptionPatterns.some((pattern) =>
+        pattern.test(descriptionText)
+      )
+        ? 0
+        : 1;
+
+      prioritizedRows.push({ row, priority });
+    }
+
+    return prioritizedRows
+      .sort((left, right) => left.priority - right.priority)
+      .map(({ row }) => row);
+  }
+
+  private async clickIncrementForRow(row: Locator): Promise<void> {
+    const plusButton = row.locator(this.selectors.incrementButton).first();
+
+    try {
+      await plusButton.click();
+    } catch {
+      await plusButton.click({ force: true });
+    }
+  }
+
+  private async getRemainingCapacityForRow(row: Locator): Promise<number> {
+    const quantityInput = row.locator(this.selectors.quantityInput).first();
+    const currentValue = Number(
+      (await quantityInput.getAttribute('value').catch(() => '0')) || '0'
+    );
+    const maxValue = Number(
+      (await quantityInput.getAttribute('max').catch(() => '1')) || '1'
+    );
+
+    if (!Number.isFinite(maxValue)) {
+      return 1;
+    }
+
+    return Math.max(0, maxValue - currentValue);
   }
 
   /**
@@ -64,29 +164,39 @@ export class TicketPicker {
 
         const clickCount = typeof seats === 'number' && seats > 0 ? seats : 1;
 
-        for (let i = 0; i < clickCount; i++) {
-          try {
-            // Primary strategy: Use WebActions (framework compliance)
-            await this.webActions.click(this.selectors.incrementButton);
+        let ticketsAdded = 0;
+        const selectableRows = await this.getSelectableTicketRows();
+
+        if (selectableRows.length === 0) {
+          throw new Error(
+            'No selectable ticket rows were found in ticket picker'
+          );
+        }
+
+        for (const row of selectableRows) {
+          if (ticketsAdded >= clickCount) {
+            break;
+          }
+
+          const remainingCapacity = await this.getRemainingCapacityForRow(row);
+          const clicksForRow = Math.min(
+            remainingCapacity,
+            clickCount - ticketsAdded
+          );
+
+          for (let index = 0; index < clicksForRow; index += 1) {
+            await this.clickIncrementForRow(row);
+            ticketsAdded += 1;
 
             // Check for modal after each click (may appear during selection)
             await this.handleGlassesModalImmediately();
-          } catch (error) {
-            // Fallback: Try force click if standard click fails
-            // Note: Using page.locator() here as WebActions doesn't expose force click
-            try {
-              const incrementButton = this.page
-                .locator(this.selectors.incrementButton)
-                .first();
-              await incrementButton.click({ force: true });
-            } catch (fallbackError) {
-              // Final fallback: Try any plus button
-              const genericPlusButton = this.page
-                .locator('button:has-text("+")')
-                .first();
-              await genericPlusButton.click({ force: true });
-            }
           }
+        }
+
+        if (ticketsAdded < clickCount) {
+          throw new Error(
+            `Unable to add requested tickets. Requested=${clickCount}, Added=${ticketsAdded}`
+          );
         }
       }
     );

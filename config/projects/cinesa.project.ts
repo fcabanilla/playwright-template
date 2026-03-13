@@ -9,6 +9,7 @@ import { getCinesaStorageStatePath } from './storageState.helper';
  */
 export function getCinesaProject(): Project {
   const env = process.env.TEST_ENV;
+  const isHeaded = process.env.PW_HEADED === '1';
 
   // Globs are resolved from testDir; keep them short and explicit.
   const TESTS_TO_IGNORE = [
@@ -31,7 +32,7 @@ export function getCinesaProject(): Project {
     testIgnore: TESTS_TO_IGNORE,
     outputDir: '.allure/playwright-artifacts', // Explicitly set output directory for this project
     use: {
-      headless: false,
+      headless: !isHeaded,
       screenshot: 'only-on-failure',
       video: 'retain-on-failure', // Changed from 'on' - only retains video if test fails
       trace: 'retain-on-failure',
