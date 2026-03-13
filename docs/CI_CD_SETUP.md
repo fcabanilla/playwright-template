@@ -28,6 +28,20 @@ This project is prepared to run on Azure DevOps using Playwright Workspaces insi
 
 `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` is optional. The pipeline is designed to use Microsoft Entra authentication by default.
 
+## Environment variables in Azure DevOps
+
+Do not copy the full local `.env` file into Azure DevOps.
+
+Use only the subset required by the jobs you want to run:
+
+- Always required for cloud execution: `PLAYWRIGHT_SERVICE_URL`
+- Recommended for consistent runtime metadata: `USE_PLAYWRIGHT_SERVICE=true`
+- Required only for `preprod` jobs: `CF_ACCESS_CLIENT_ID_PREPROD`, `CF_ACCESS_CLIENT_SECRET_PREPROD`
+- Required only for `lab` jobs: `CF_ACCESS_CLIENT_ID_LAB`, `CF_ACCESS_CLIENT_SECRET_LAB`
+- Optional only if you choose token auth instead of Microsoft Entra: `PLAYWRIGHT_SERVICE_ACCESS_TOKEN`
+
+Only replicate test-account variables from the local `.env` if the suites you plan to run in Azure DevOps actually need login, checkout, or identity data.
+
 ## Recommended Azure DevOps variable groups
 
 Create one shared variable group for cloud execution:

@@ -85,6 +85,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
@@ -159,6 +160,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
@@ -233,6 +235,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
@@ -309,6 +312,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
@@ -385,6 +389,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
@@ -461,6 +466,7 @@ stages:
                 export npm_config_cache="$(Pipeline.Workspace)/.npm"
                 npm ci
                 npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
                 export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
                 export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
                 export TEST_ENV="$(TEST_ENV)"
