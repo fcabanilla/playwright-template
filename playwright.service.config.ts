@@ -51,6 +51,16 @@ if (!hasAccessToken) {
   );
 }
 
+function getCloudRunId(): string {
+  return (
+    process.env.PLAYWRIGHT_RUN_ID ||
+    process.env.BUILD_BUILDID ||
+    process.env.BUILD_BUILDNUMBER ||
+    process.env.GITHUB_RUN_ID ||
+    randomUUID()
+  );
+}
+
 /* Learn more about service configuration at https://aka.ms/pww/docs/config */
 export default defineConfig(
   {
@@ -84,7 +94,7 @@ export default defineConfig(
     connectTimeout: 3 * 60 * 1000,
 
     // Optional: Unique run identifier (must be a valid GUID)
-    // Use GITHUB_RUN_ID if in CI, otherwise generate a random UUID
-    runId: process.env.GITHUB_RUN_ID || randomUUID(),
+    // Prefer CI-provided identifiers so remote runs can be correlated with Azure DevOps.
+    runId: getCloudRunId(),
   })
 );

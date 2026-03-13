@@ -12,6 +12,7 @@
     "ui": "npx playwright test --ui",
     "_____REPORTING_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
     "report": "npm run report:copy-categories && npm run report:copy-history && npm run report:generate && npm run report:open",
+    "report:ci": "npm run report:copy-categories && npm run report:copy-history && npm run report:generate",
     "report:generate": "npx allure generate .allure/results --output .allure/report --clean",
     "report:copy-categories": "mkdir -p .allure/results && cp .allure/categories.json .allure/results/categories.json",
     "report:copy-history": "mkdir -p .allure/results/history && (cp -r .allure/report/history/* .allure/results/history/ 2>/dev/null || true)",
