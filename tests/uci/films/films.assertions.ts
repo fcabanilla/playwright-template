@@ -1,4 +1,4 @@
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { Films } from '../../../pageObjectsManagers/uci/films/films.page';
 
 /**
@@ -17,7 +17,7 @@ export class FilmsAssertions {
   async assertFilmsCountGreaterThan(
     expectedMinimum: number = 0
   ): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Assert films count is greater than ${expectedMinimum}`,
       async () => {
         const actualCount = await this.filmsPage.getFilmsCount();
@@ -40,7 +40,7 @@ export class FilmsAssertions {
         };
 
         // Attach detailed assertion data to report
-        await allure.test.step('Films Count Assertion Details', async () => {
+        await allure.step('Films Count Assertion Details', async () => {
           console.log(
             `Films Count Full Data: ${JSON.stringify(assertionData, null, 2)}`
           );
@@ -62,7 +62,7 @@ export class FilmsAssertions {
   async assertFilmTitlesMinimumLength(
     expectedMinimum: number = 0
   ): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Assert film titles length is greater than ${expectedMinimum}`,
       async () => {
         const actualTitles = await this.filmsPage.getFilmTitles();
@@ -84,7 +84,7 @@ export class FilmsAssertions {
         };
 
         // Attach detailed assertion data to report
-        await allure.test.step('Film Titles Assertion Details', async () => {
+        await allure.step('Film Titles Assertion Details', async () => {
           console.log(
             `Film Titles Full Data: ${JSON.stringify(assertionData, null, 2)}`
           );
@@ -104,7 +104,7 @@ export class FilmsAssertions {
    * Combines visibility and content availability checks
    */
   async assertFilmsPageHasContent(): Promise<void> {
-    await allure.test.step('Assert films page has content', async () => {
+    await allure.step('Assert films page has content', async () => {
       // Check visibility first
       await this.filmsPage.verifyFilmsVisible();
 

@@ -11,14 +11,13 @@ export interface NavbarSelectors {
 }
 
 export const navbarSelectors: NavbarSelectors = {
-  logo: ".logo a",
+  logo: "header .logo a:first-child",
   cines: 'nav.header-nav a[href="/cines/"]',
   peliculas: 'nav.header-nav a[href="/peliculas/"]',
   promociones: 'nav.header-nav a[href="/promociones/"]',
   experiencias: 'nav.header-nav a[href="/experiencias/"]',
   programas: 'nav.header-nav a[href="/programas/"]',
-  bonos:
-    'nav.header-nav a[target="_blank"][href="https://www.cinesabusiness.es/promociones.html"]',
+  bonos: 'nav.header-nav a[target="_blank"][href*="cinesabusiness.es/promociones"]',
   signup: '.header-sign-up',
   signin: '.header-sign-in',
 };

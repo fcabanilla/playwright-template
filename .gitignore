@@ -1,5 +1,6 @@
 node_modules/
 .allure/
+!.allure/categories.json
 dist/
 
 # Environment variables (contienen credenciales sensibles)
@@ -9,4 +10,23 @@ dist/
 
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
-notLoggedInState.json
+sessionState*.json
+state/*.json
+
+# Test result files
+artifacts/
+artifacts/cloudflare-check/
+test-results/
+reports/
+playwright-report/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.svg
+*.webp
+
+# Temporary files
+allure-results/
+*.DS_Store

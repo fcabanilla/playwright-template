@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   cinemaDetailSelectors,
   CinemaDetailSelectors,
@@ -38,7 +38,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to an array of film names.
    */
   async getFilmNames(): Promise<string[]> {
-    return await allure.test.step(
+    return await allure.step(
       'Getting list of film names from UCI cinema detail page',
       async () => {
         // Wait for film list to be visible with increased timeout
@@ -63,7 +63,7 @@ export class CinemaDetail {
    * @returns Promise that resolves when the click action is complete.
    */
   async selectFilmByName(name: string): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Selecting UCI film with name "${name}"`,
       async () => {
         // Try multiple approaches to find and click the film
@@ -84,7 +84,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the name of the selected film.
    */
   async selectRandomFilm(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting a random film from UCI cinema detail page',
       async () => {
         const names = await this.getFilmNames();
@@ -108,7 +108,7 @@ export class CinemaDetail {
    * @returns Promise that resolves when a showtime is selected.
    */
   async selectRandomShowtime(filmName?: string): Promise<void> {
-    await allure.test.step(
+    await allure.step(
       `Selecting random showtime${filmName ? ` for film "${filmName}"` : ''}`,
       async () => {
         if (filmName) {
@@ -142,7 +142,7 @@ export class CinemaDetail {
     film: string;
     showtime: string;
   }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting random film and showtime from UCI cinema',
       async () => {
         const selectedFilm = await this.selectRandomFilm();
@@ -168,7 +168,7 @@ export class CinemaDetail {
     film: string;
     showtime: string;
   }> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting first available film and showtime from UCI cinema',
       async () => {
         // Click first film
@@ -202,7 +202,7 @@ export class CinemaDetail {
   async selectRandomFilmForDetails(
     filmName?: string
   ): Promise<{ film: string }> {
-    return await allure.test.step(
+    return await allure.step(
       `Navigating to UCI film details${filmName ? ` for "${filmName}"` : ''}`,
       async () => {
         if (filmName) {
@@ -238,7 +238,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to true if page is valid.
    */
   async verifyCinemaDetailPageLoaded(): Promise<boolean> {
-    return await allure.test.step(
+    return await allure.step(
       'Verifying UCI cinema detail page is loaded',
       async () => {
         try {
@@ -259,7 +259,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to the cinema name.
    */
   async getCinemaName(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Getting UCI cinema name from detail page',
       async () => {
         try {
@@ -296,7 +296,7 @@ export class CinemaDetail {
    * @returns Promise that resolves to schema data.
    */
   async extractCinemaSchema(): Promise<any> {
-    return await allure.test.step('Extracting UCI cinema schema', async () => {
+    return await allure.step('Extracting UCI cinema schema', async () => {
       // This is a placeholder for schema extraction
       // Implementation would depend on actual UCI schema structure
       return {

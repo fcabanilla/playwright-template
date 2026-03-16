@@ -1,0 +1,32 @@
+[
+  {
+    "name": "UI: Timeouts",
+    "matchedStatuses": ["failed","broken"],
+    "messageRegex": ".*\\[CAT:UI\\.Timeouts\\].*|locator\\.(click|fill|waitFor).*Timeout|Timeout .* exceeded|toBeVisible.*timeout"
+  },
+  {
+    "name": "UI: Selectors / Strict Mode",
+    "matchedStatuses": ["failed","broken"],
+    "messageRegex": ".*\\[CAT:UI\\.Selectors\\].*|strict mode violation|detached from DOM|waiting for locator\\(.*\\) to be visible.*resolved to hidden|locator resolved to"
+  },
+  {
+    "name": "Network / HTTP",
+    "matchedStatuses": ["failed","broken"],
+    "traceRegex": "HTTP 5\\d\\d|ECONNRESET|ETIMEDOUT|Navigation failed|net::ERR|socket hang up"
+  },
+  {
+    "name": "Infra / Playwright",
+    "matchedStatuses": ["broken"],
+    "traceRegex": "Target closed|browserType\\.launch|Context closed|Unhandled promise rejection"
+  },
+  {
+    "name": "Grancasa Cinema Issues",
+    "matchedStatuses": ["failed","broken"],
+    "traceRegex": "\\bGrancasa\\b",
+    "messageRegex": "^(?!.*(Timeout .* exceeded|locator\\.(click|fill|waitFor))).*$"
+  },
+  {
+    "name": "Product Defects",
+    "matchedStatuses": ["failed"]
+  }
+]

@@ -1,25 +1,51 @@
 import { defineConfig } from '@playwright/test';
 import * as os from 'node:os';
+import * as dotenv from 'dotenv';
+import {
+  getUCICinemasProject,
+  getCinesaProject,
+  getCinesaPortugalProject,
+  getCloudflareOnlyProject,
+  getCinesaCloudflareProject,
+} from './config/projects';
+import {
+  shouldUsePlaywrightService,
+  getServiceConnectionOptions,
+  playwrightServiceConfig,
+} from './config/azure/playwright-service.config';
+
+// Load environment variables from .env file
+dotenv.config();
 
 export default defineConfig({
-  name: 'UCI Cinemas',
-  // Timeout global para cada test (60 segundos)
-  timeout: 60000,
+  name: 'Multi-Cinema Test Suite',
+  // Global timeout for each test (90 seconds - for complete E2E flows)
+  timeout: 90000,
 
-  // Directorio de salida para videos, screenshots y traces
+  // Output directory for videos, screenshots, and traces
   outputDir: '.allure/playwright-artifacts',
 
-  // Configuración base que se aplicará a todos los proyectos
+  // Base configuration that will be applied to all projects
   use: {
-    headless: false, // Ejecuta el navegador con interfaz gráfica para parecer más humano
+    headless: false, // Default headless (can be overridden with --headed in command)
     screenshot: 'only-on-failure',
-    video: 'on',
-    actionTimeout: 60000,
-    navigationTimeout: 60000,
+    video: 'retain-on-failure', // Record and retain only on failure (more efficient than 'on')
+    trace: 'retain-on-failure', // Traces only on failure
+    actionTimeout: 30000, // Reduced to 30s (sufficient with auto-waiting)
+    navigationTimeout: 30000, // Reduced to 30s
 
-    // Configuraciones agresivas para evadir Cloudflare
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    // Microsoft Playwright Testing Service Configuration
+    // When enabled, tests run in cloud with online reporting
+    ...(getServiceConnectionOptions()
+      ? {
+          connectOptions: getServiceConnectionOptions(),
+        }
+      : {}),
+
+    // Browser configuration
+    userAgent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36${
+      process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : ''
+    }`,
     viewport: { width: 1920, height: 1080 },
     locale: 'es-ES',
     permissions: ['clipboard-read', 'clipboard-write'],
@@ -65,137 +91,74 @@ export default defineConfig({
   },
 
   fullyParallel: true,
-  workers: 5, // Optimized for stability and performance balance
+  workers: process.env.CI ? 2 : 3, // CI: 2 workers, Local: 3 workers (stability/speed balance)
 
-  // Proyectos separados para UCI y Cinesa
+  // Separate projects for UCI, Cinesa Spain, Cinesa Portugal and a specific project for
+  // Cloudflare diagnostics (tests only in ./tests/cinesa/cloudflare)
   projects: [
+    // Setup project - runs FIRST to generate storageState files with cookie consent
     {
-      name: 'UCI Cinemas',
-      testDir: './tests/uci',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : process.env.TEST_ENV === 'lab'
-              ? 'loggedInState.lab.json'
-              : 'loggedInState.json',
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+
+    // Main projects - depend on setup to have storageState ready
+    {
+      ...getUCICinemasProject(),
+      dependencies: ['setup'],
     },
     {
-      name: 'Cinesa',
-      testDir: './tests/cinesa',
-      use: {
-        ...{
-          headless: true,
-          screenshot: 'only-on-failure',
-          video: 'on',
-          actionTimeout: 60000,
-          navigationTimeout: 60000,
-          // Usa el estado guardado para saltar login/cloudflare en preprod
-          storageState: process.env.TEST_ENV === 'preprod'
-            ? 'loggedInState.preprod.json'
-            : process.env.TEST_ENV === 'lab'
-              ? 'loggedInState.lab.json'
-              : undefined,
-          // Configuraciones específicas para evadir detección
-          launchOptions: {
-            args: [
-              '--disable-blink-features=AutomationControlled',
-              '--disable-features=VizDisplayCompositor',
-              '--disable-extensions',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-accelerated-2d-canvas',
-              '--no-first-run',
-              '--no-zygote',
-              '--disable-gpu',
-              '--disable-background-timer-throttling',
-              '--disable-backgrounding-occluded-windows',
-              '--disable-renderer-backgrounding',
-            ],
-          },
-        },
-      },
+      ...getCinesaProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCinesaPortugalProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCloudflareOnlyProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getCinesaCloudflareProject(),
+      dependencies: ['setup'],
     },
   ],
 
-  // Reporter configurado para diferenciar proyectos
+  // Reporter configured to differentiate projects
   reporter: [
-    ['line'],
+    ['list'], // Console reporter cleaner than 'line'
     [
       'allure-playwright',
       {
-        resultsDir: '.allure/results',
-        detail: true,
-        suiteTitle: false,
-        categories: [
-          {
-            name: '🔒 Cloudflare Protection Issues',
-            messageRegex: '.*(cloudflare|protection|challenge|captcha).*',
-            traceRegex: '.*(cloudflare|TimeoutError|Navigation timeout).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+        outputFolder: '.allure/results',
+        detail: false, // Hides internal Playwright steps (browser, context, page, evaluate) for cleaner reports
+        suiteTitle: true, // Groups tests by file in the report (default: true)
+        links: {
+          // Templates for links to JIRA, GitHub Issues, etc.
+          issue: {
+            urlTemplate: 'https://se-ocg.atlassian.net/browse/%s',
+            nameTemplate: 'Issue #%s',
           },
-          {
-            name: '🎭 Modal & Overlay Issues',
-            messageRegex: '.*(modal|overlay|popup|banner|promotional).*',
-            traceRegex: '.*(click intercepted|element not found|not visible).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
+          tms: {
+            urlTemplate: 'https://se-ocg.atlassian.net/browse/%s',
+            nameTemplate: 'Test Case %s',
           },
-          {
-            name: '🧭 Navigation & URL Issues',
-            messageRegex: '.*(navigation|url|redirect|timeout).*',
-            traceRegex: '.*(goto|navigate|waitForURL|expect.*toHaveURL).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
-          },
-          {
-            name: '🎬 Film Content Issues',
-            messageRegex: '.*(film|movie|title|card).*',
-            traceRegex: '.*(getFilmTitles|selectFilm|film.*not found).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
-          },
-          {
-            name: '🏢 Cinema Selection Issues',
-            messageRegex: '.*(cinema|location|venue).*',
-            traceRegex: '.*(getCinemaNames|selectCinema|cinema.*not found).*',
-            matchedStatuses: ['FAILED', 'BROKEN'],
-          },
-        ],
+        },
+        // Categories are defined in .allure/categories.json (copied to results/ before report generation)
+        // See docs/ALLURE_CATEGORIES.md for details
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
-          Environment: 'Test',
-          Browser: 'Chromium (Headless)',
-          Note: 'UCI Phase 1 Automation - Clean Test Names',
-          os_platform: os.platform(),
-          os_release: os.release(),
-          os_version: os.version(),
-          node_version: process.version,
-          arch: os.arch(),
+          Environment: process.env.TEST_ENV || 'production',
+          Browser: 'Chromium',
+          'Node Version': process.version,
+          OS: `${os.platform()} ${os.release()}`,
+          'Playwright Service': shouldUsePlaywrightService()
+            ? 'Enabled (Cloud)'
+            : 'Disabled (Local)',
+          'Service Region': shouldUsePlaywrightService()
+            ? playwrightServiceConfig.region
+            : 'N/A',
         },
       },
     ],

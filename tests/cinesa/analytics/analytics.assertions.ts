@@ -1,10 +1,17 @@
 import { expect, TestInfo } from '@playwright/test';
+import type {
+  DataLayerEvent,
+  AddToCartEvent,
+  BeginCheckoutEvent,
+} from '../../../pageObjectsManagers/cinesa/analytics/analytics.types';
 
 /**
  * Validates that dataLayer events were captured successfully
  * @param allEvents Array of captured dataLayer events
  */
-export async function assertEventsWereCaptured(allEvents: any[]): Promise<void> {
+export async function assertEventsWereCaptured(
+  allEvents: DataLayerEvent[]
+): Promise<void> {
   expect(allEvents.length).toBeGreaterThan(0);
 }
 
@@ -12,9 +19,18 @@ export async function assertEventsWereCaptured(allEvents: any[]): Promise<void> 
  * Validates critical e-commerce events exist in captured events
  * @param allEvents Array of captured dataLayer events
  */
-export async function assertCriticalEventsExist(allEvents: any[]): Promise<{ addToCartEvents: any[], beginCheckoutEvents: any[] }> {
-  const addToCartEvents = allEvents.filter(event => event.event === 'add_to_cart');
-  const beginCheckoutEvents = allEvents.filter(event => event.event === 'begin_checkout');
+export async function assertCriticalEventsExist(
+  allEvents: DataLayerEvent[]
+): Promise<{
+  addToCartEvents: AddToCartEvent[];
+  beginCheckoutEvents: BeginCheckoutEvent[];
+}> {
+  const addToCartEvents = allEvents.filter(
+    (event): event is AddToCartEvent => event.event === 'add_to_cart'
+  );
+  const beginCheckoutEvents = allEvents.filter(
+    (event): event is BeginCheckoutEvent => event.event === 'begin_checkout'
+  );
 
   expect(addToCartEvents.length).toBeGreaterThan(0);
   expect(beginCheckoutEvents.length).toBeGreaterThan(0);
@@ -26,10 +42,12 @@ export async function assertCriticalEventsExist(allEvents: any[]): Promise<{ add
  * Validates the structure of a begin_checkout event
  * @param latestBeginCheckout The latest begin_checkout event
  */
-export async function assertBeginCheckoutEventStructure(latestBeginCheckout: any): Promise<void> {
+export async function assertBeginCheckoutEventStructure(
+  latestBeginCheckout: BeginCheckoutEvent
+): Promise<void> {
   expect(latestBeginCheckout).toHaveProperty('event');
   expect(latestBeginCheckout).toHaveProperty('ecommerce');
-  
+
   if (latestBeginCheckout.ecommerce) {
     expect(latestBeginCheckout.ecommerce).toHaveProperty('currency');
     expect(latestBeginCheckout.ecommerce).toHaveProperty('value');
@@ -43,22 +61,30 @@ export async function assertBeginCheckoutEventStructure(latestBeginCheckout: any
 
 /**
  * Validates analytics total values are reasonable
- * @param analyticsTotal The total value from analytics
+ * @param beginCheckoutEvent The begin_checkout event to validate
  */
-export async function assertAnalyticsTotalIsReasonable(analyticsTotal: number): Promise<void> {
+export async function assertAnalyticsTotalIsReasonable(
+  beginCheckoutEvent: BeginCheckoutEvent
+): Promise<void> {
+  const analyticsTotal = beginCheckoutEvent.ecommerce?.value || 0;
   expect(analyticsTotal).toBeGreaterThan(0);
   expect(analyticsTotal).toBeLessThan(100); // Reasonable upper bound
 }
 
 /**
  * Validates the structure of ecommerce items
- * @param items Array of ecommerce items
+ * @param beginCheckoutEvent The begin_checkout event containing items
  */
-export async function assertEcommerceItemsStructure(items: any[]): Promise<void> {
-  for (const item of items) {
-    expect(item).toHaveProperty('item_name');
-    expect(item).toHaveProperty('price');
-    expect(item.price).toBeGreaterThan(0);
+export async function assertEcommerceItemsStructure(
+  beginCheckoutEvent: BeginCheckoutEvent
+): Promise<void> {
+  if (beginCheckoutEvent.ecommerce?.items) {
+    const items = beginCheckoutEvent.ecommerce.items;
+    for (const item of items) {
+      expect(item).toHaveProperty('item_name');
+      expect(item).toHaveProperty('price');
+      expect(item.price).toBeGreaterThan(0);
+    }
   }
 }
 
@@ -68,15 +94,19 @@ export async function assertEcommerceItemsStructure(items: any[]): Promise<void>
  * @param allEvents Array of captured events
  * @param latestBeginCheckout Latest begin_checkout event
  */
-export async function attachEventsToReport(testInfo: TestInfo, allEvents: any[], latestBeginCheckout: any): Promise<void> {
+export async function attachEventsToReport(
+  testInfo: TestInfo,
+  allEvents: DataLayerEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
+): Promise<void> {
   await testInfo.attach('All captured dataLayer events', {
     body: JSON.stringify(allEvents, null, 2),
-    contentType: 'application/json'
+    contentType: 'application/json',
   });
 
   await testInfo.attach('Latest Begin Checkout Event', {
     body: JSON.stringify(latestBeginCheckout, null, 2),
-    contentType: 'application/json'
+    contentType: 'application/json',
   });
 }
 
@@ -87,35 +117,23 @@ export async function attachEventsToReport(testInfo: TestInfo, allEvents: any[],
  * @param allEvents Array of all captured events
  * @param addToCartEvents Array of add_to_cart events
  * @param beginCheckoutEvents Array of begin_checkout events
- * @param analyticsTotal Total value from analytics
- * @param itemsTotal Calculated total from items
  * @param latestBeginCheckout Latest begin_checkout event
  */
 export async function logAnalyticsSummary(
   cinemaName: string,
   menuType: string,
-  allEvents: any[],
-  addToCartEvents: any[],
-  beginCheckoutEvents: any[],
-  analyticsTotal: number,
-  itemsTotal: number,
-  latestBeginCheckout: any
+  allEvents: DataLayerEvent[],
+  addToCartEvents: AddToCartEvent[],
+  beginCheckoutEvents: BeginCheckoutEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
-  console.log('=== ANALYTICS VALIDATION SUMMARY ===');
-  console.log(`🎬 Cinema: ${cinemaName}`);
-  console.log(`🍿 Menu: ${menuType}`);
-  console.log(`📊 Total events captured: ${allEvents.length}`);
-  console.log(`🛒 Add to cart events: ${addToCartEvents.length}`);
-  console.log(`💳 Begin checkout events: ${beginCheckoutEvents.length}`);
-  console.log(`💰 Analytics total: €${analyticsTotal}`);
-  console.log(`📝 Items total: €${itemsTotal}`);
-  console.log(`📋 Items count: ${latestBeginCheckout.ecommerce?.items?.length || 0}`);
-  
   // List all items
   if (latestBeginCheckout.ecommerce?.items) {
     console.log('🎫 Items breakdown:');
-    latestBeginCheckout.ecommerce.items.forEach((item: any, index: number) => {
-      console.log(`   ${index + 1}. ${item.item_name}: €${item.price} x ${item.quantity || 1}`);
+    latestBeginCheckout.ecommerce.items.forEach((item, index) => {
+      console.log(
+        `   ${index + 1}. ${item.item_name}: €${item.price} x ${item.quantity || 1}`
+      );
     });
   }
 
@@ -126,11 +144,13 @@ export async function logAnalyticsSummary(
  * Logs simplified analytics summary for Grancasa
  */
 export async function logGrancasaAnalyticsSummary(
-  allEvents: any[],
-  addToCartEvents: any[],
-  beginCheckoutEvents: any[],
-  analyticsTotal: number
+  allEvents: DataLayerEvent[],
+  addToCartEvents: AddToCartEvent[],
+  beginCheckoutEvents: BeginCheckoutEvent[],
+  latestBeginCheckout: BeginCheckoutEvent
 ): Promise<void> {
+  const analyticsTotal = latestBeginCheckout.ecommerce?.value || 0;
+
   console.log('=== GRANCASA ANALYTICS VALIDATION SUMMARY ===');
   console.log(`✅ Total events captured: ${allEvents.length}`);
   console.log(`✅ Add to cart events: ${addToCartEvents.length}`);

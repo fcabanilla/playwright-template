@@ -1,24 +1,101 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
 import {
+  assertFooterCoreElementsVisible,
   assertFooterElementsVisible,
   assertNavigateToBlog,
+  assertFooterCompanyNavigation,
+  assertFooterSocialMediaLinks,
+  assertFooterLegalLinks,
+  assertFooterAppLinks,
 } from './footer.assertions';
 
 test.describe('Cinesa Footer Tests', () => {
-  test.beforeEach(async ({ page, footer, cookieBanner }) => {
+  test.beforeEach(async ({ footer, promotionalModal }) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Footer - Site Navigation');
+
     await footer.navigateToHome();
+    await promotionalModal.closeModalIfVisible();
+  });
 
-    const acceptButton = page.locator('#onetrust-accept-btn-handler');
-    if (await acceptButton.isVisible()) {
-      await cookieBanner.acceptCookies();
+  test(
+    'Footer · Navigation · Display · Essential elements',
+    { tag: ['@smoke', '@critical', '@footer', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Essential footer elements visibility');
+      await assertFooterCoreElementsVisible(
+        webActions.getPage(),
+        footer.selectors
+      );
     }
-  });
+  );
 
-  test('should display all footer elements', async ({ page, footer }) => {
-    await assertFooterElementsVisible(page, footer.selectors);
-  });
+  test(
+    'Footer · Navigation · Display · All elements',
+    { tag: ['@regression', '@footer', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Comprehensive footer elements display');
+      await assertFooterElementsVisible(webActions.getPage(), footer.selectors);
+    }
+  );
 
-  test('should navigate to Cinesa blog page and validate URL', async ({ page, footer }) => {
-    await assertNavigateToBlog(page, footer.selectors);
-  });
+  test(
+    'Footer · Navigation · Navigate · Blog (validate URL)',
+    { tag: ['@smoke', '@footer', '@navigation', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Blog navigation from footer');
+
+      // Page Object determines the correct selector for the environment
+      const blogSelector = footer.getBlogSelector();
+
+      // Import baseUrl from data file
+      const { baseUrl } = await import('./footer.data');
+
+      // Assertions receive the selector determined by Page Object
+      await assertNavigateToBlog(webActions.getPage(), blogSelector, baseUrl);
+    }
+  );
+
+  test(
+    'Footer · Navigation · Navigate · Company pages',
+    { tag: ['@smoke', '@footer', '@company', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Company pages navigation');
+      await assertFooterCompanyNavigation(
+        webActions.getPage(),
+        footer.selectors
+      );
+    }
+  );
+
+  test(
+    'Footer · Social · Display · All links',
+    { tag: ['@fast', '@footer', '@social', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Social media links display');
+      await assertFooterSocialMediaLinks(
+        webActions.getPage(),
+        footer.selectors
+      );
+    }
+  );
+
+  test(
+    'Footer · Legal Docs · Display · Links',
+    { tag: ['@medium', '@footer', '@legal', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Legal documentation links');
+      await assertFooterLegalLinks(webActions.getPage(), footer.selectors);
+    }
+  );
+
+  test(
+    'Footer · Mobile Apps · Display · Download links',
+    { tag: ['@medium', '@footer', '@apps', '@cinesa'] },
+    async ({ webActions, footer }) => {
+      await allure.story('Mobile app download links');
+      await assertFooterAppLinks(webActions.getPage(), footer.selectors);
+    }
+  );
 });

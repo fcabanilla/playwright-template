@@ -5,7 +5,7 @@ export const BAR_SELECTORS = {
   modal: 'aside.v-modal',
   modalButton: 'aside.v-modal button',
   barMainButton: '.v-button.v-button--color-primary.v-button--size-medium.button-skip',
-  menusTab: 'button.v-tab__button:has-text("MENUS")',
+  menusTab: 'button.v-tab__button >> nth=1', // Second tab (MENUS) - position-based for multi-language
   menuItems: 'ul.v-item-picker-grid li.v-item-picker-item-button',
   menuItemName: '.v-item-details__name',
   menuItemButton: '.v-item-picker-item-button__button',

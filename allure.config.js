@@ -1,13 +1,13 @@
 import { defineConfig } from 'allure';
 
 export default defineConfig({
-  name: 'UCI Phase 1 Automation Report',
+  name: 'Multi-Cinema Test Automation Report',
   output: '.allure/report',
   historyPath: '.allure/history.jsonl',
   plugins: {
     awesome: {
       options: {
-        reportName: 'UCI Cinema Automation - Phase 1',
+        reportName: 'Cinesa & UCI Cinema Automation',
         theme: 'dark',
         reportLanguage: 'es',
         logo: null,
@@ -15,7 +15,7 @@ export default defineConfig({
         ci: {
           type: 'github',
           url: 'https://github.com/fcabanilla/playwright-template',
-          name: 'UCI Phase 1 Automation',
+          name: 'Multi-Cinema Test Automation',
         },
         groupBy: 'titlepath',
       },

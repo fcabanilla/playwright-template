@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 // @ts-ignore
 import { ImapFlow } from 'imapflow';
 import * as dotenv from 'dotenv';
+import { allure } from 'allure-playwright';
 import {
   smtpHost,
   smtpPort,
@@ -25,76 +26,89 @@ export class Mailing {
   }
 
   async sendEmail(subject: string, text: string, to: string) {
-    console.log(this.user);
-    console.log(this.pass);
+    await allure.step('Send email via SMTP', async () => {
+      console.log(this.user);
+      console.log(this.pass);
 
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: false,
-      auth: {
-        user: this.user,
-        pass: this.pass,
-      },
-    });
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: false,
+        auth: {
+          user: this.user,
+          pass: this.pass,
+        },
+      });
 
-    await transporter.sendMail({
-      from: this.user,
-      to,
-      subject,
-      text,
+      await transporter.sendMail({
+        from: this.user,
+        to,
+        subject,
+        text,
+      });
     });
   }
 
   async getLastEmailWithSubject(subject: string, from: string) {
-    const client = new ImapFlow({
-      host: imapHost,
-      port: imapPort,
-      secure: true,
-      auth: {
-        user: this.user,
-        pass: this.pass,
-      },
-    });
+    return await allure.step(
+      'Get last email with subject from IMAP',
+      async () => {
+        const client = new ImapFlow({
+          host: imapHost,
+          port: imapPort,
+          secure: true,
+          auth: {
+            user: this.user,
+            pass: this.pass,
+          },
+        });
 
-    await client.connect();
-    let result: { from: string; subject: string } | null = null;
-    let lock = await client.getMailboxLock('INBOX');
-    try {
-      const searchCriteria = [
-        ['UNSEEN'],
-        ['HEADER', 'SUBJECT', subject],
-        ['HEADER', 'FROM', from],
-      ];
-      // TODO: Fix IMAP library types - searchCriteria needs proper SearchObject type
-      // @ts-expect-error - IMAP library types need to be fixed
-      const messages = await client.search(searchCriteria, { uid: true });
+        await client.connect();
+        let result: { from: string; subject: string } | null = null;
+        let lock = await client.getMailboxLock('INBOX');
+        try {
+          const searchCriteria = [
+            ['UNSEEN'],
+            ['HEADER', 'SUBJECT', subject],
+            ['HEADER', 'FROM', from],
+          ];
+          // TODO: Fix IMAP library types - searchCriteria needs proper SearchObject type
+          // @ts-expect-error - IMAP library types need to be fixed
+          const messages = await client.search(searchCriteria, { uid: true });
 
-      if (!messages || typeof messages === 'boolean' || messages.length === 0) {
-        return null;
+          if (
+            !messages ||
+            typeof messages === 'boolean' ||
+            messages.length === 0
+          ) {
+            return null;
+          }
+          const messageUid = messages[messages.length - 1];
+          for await (let msg of client.fetch(messageUid, { envelope: true })) {
+            // Null-safe access to envelope properties
+            const from = msg.envelope?.from?.[0]?.address || 'unknown';
+            const subject = msg.envelope?.subject || '';
+
+            result = {
+              from,
+              subject,
+            };
+          }
+        } finally {
+          lock.release();
+          await client.logout();
+        }
+
+        return result;
       }
-      const messageUid = messages[messages.length - 1];
-      for await (let msg of client.fetch(messageUid, { envelope: true })) {
-        // Null-safe access to envelope properties
-        const from = msg.envelope?.from?.[0]?.address || 'unknown';
-        const subject = msg.envelope?.subject || '';
-
-        result = {
-          from,
-          subject,
-        };
-      }
-    } finally {
-      lock.release();
-      await client.logout();
-    }
-
-    return result;
+    );
   }
 
   async sendAndValidateEmail(subject: string, text: string, to: string) {
-    await this.sendEmail(subject, text, to);
-    await new Promise((res) => setTimeout(res, 10000));
-    return await this.getLastEmailWithSubject(subject, this.user);
+    return await allure.step('Send and validate email', async () => {
+      await this.sendEmail(subject, text, to);
+      await new Promise((res) => setTimeout(res, 10000));
+      return await this.getLastEmailWithSubject(subject, this.user);
+    });
   }
 }

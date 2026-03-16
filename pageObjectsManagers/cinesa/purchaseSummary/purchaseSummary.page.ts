@@ -1,23 +1,48 @@
-import { Page, expect } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import { PURCHASE_SUMMARY_SELECTORS } from './purchaseSummary.selectors';
 import { purchaseSummaryTestData } from './purchaseSummary.data';
+import { promotionalModalSelectors } from '../promotionalModal/promotionalModal.selectors';
 
 /**
  * The PurchaseSummary Page Object Model.
  * Contains methods to interact with the purchase summary page.
  */
 export class PurchaseSummary {
-  readonly page: Page;
+  readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
+  }
+
+  /**
+   * Verifies that the Purchase Summary page is loaded.
+   */
+  async verifyPageLoaded(): Promise<void> {
+    await allure.step('Verify Purchase Summary page loaded', async () => {
+      // Defensive: Clear potential promotional modals that appear in LAB environment
+      try {
+        const modal = this.webActions.getLocator(promotionalModalSelectors.modal);
+        if (await modal.isVisible({ timeout: 2000 })) {
+          await this.webActions.click(promotionalModalSelectors.closeButton, 'Close blocking modal');
+          await this.webActions.wait(500);
+        }
+      } catch (e) {
+        // No modal or close button failed, proceed with caution
+      }
+
+      await this.webActions.waitForVisible(
+        PURCHASE_SUMMARY_SELECTORS.firstNameInput,
+        60000
+      );
+    });
   }
 
   /**
    * Accepts terms and conditions and clicks the continue button.
    */
   async acceptAndContinue(): Promise<void> {
+    await this.verifyPageLoaded();
     const { firstName, lastName, email, phone } = purchaseSummaryTestData;
     await this.fillForm(firstName, lastName, email, phone);
     await this.acceptTermsAndConditions();
@@ -30,14 +55,12 @@ export class PurchaseSummary {
    * @private
    */
   private async acceptTermsAndConditions(): Promise<void> {
-    await allure.test.step('Accepting terms and conditions', async () => {
-      await this.page.waitForSelector(PURCHASE_SUMMARY_SELECTORS.termsCheckbox, { state: 'attached' });
-      await this.page.evaluate((selector) => {
-        const el = document.querySelector(selector);
-        if (el) {
-          el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-        }
-      }, PURCHASE_SUMMARY_SELECTORS.termsCheckbox);
+    await allure.step('Accepting terms and conditions', async () => {
+      // Wait for terms checkbox and click it using WebActions
+      await this.webActions.click(
+        PURCHASE_SUMMARY_SELECTORS.termsCheckbox,
+        'Accept terms and conditions'
+      );
     });
   }
 
@@ -46,8 +69,11 @@ export class PurchaseSummary {
    * @private
    */
   private async clickContinue(): Promise<void> {
-    await allure.test.step('Clicking the continue button', async () => {
-      await this.page.locator(PURCHASE_SUMMARY_SELECTORS.continueButton).click();
+    await allure.step('Clicking the continue button', async () => {
+      await this.webActions.click(
+        PURCHASE_SUMMARY_SELECTORS.continueButton,
+        'Click continue button'
+      );
     });
   }
 
@@ -56,11 +82,15 @@ export class PurchaseSummary {
    * @private
    */
   private async confirmPopup(): Promise<void> {
-    await allure.test.step('Confirming popup', async () => {
-      const confirmButton = this.page.locator(PURCHASE_SUMMARY_SELECTORS.confirmPopupButton);
-      await confirmButton.waitFor({ state: 'visible' });
-      await expect(confirmButton).toBeEnabled();
-      await confirmButton.click();
+    await allure.step('Confirming popup', async () => {
+      // Wait for confirm button to be visible and enabled, then click it
+      await this.webActions.expectVisible(
+        PURCHASE_SUMMARY_SELECTORS.confirmPopupButton
+      );
+      await this.webActions.click(
+        PURCHASE_SUMMARY_SELECTORS.confirmPopupButton,
+        'Confirm popup'
+      );
     });
   }
 
@@ -71,12 +101,24 @@ export class PurchaseSummary {
    * @param email - The email to enter.
    * @param phone - The phone number to enter.
    */
-  private async fillForm(firstName: string, lastName: string, email: string, phone: string): Promise<void> {
-    await allure.test.step('Filling out the form', async () => {
-      await this.page.locator(PURCHASE_SUMMARY_SELECTORS.firstNameInput).fill(firstName);
-      await this.page.locator(PURCHASE_SUMMARY_SELECTORS.lastNameInput).fill(lastName);
-      await this.page.locator(PURCHASE_SUMMARY_SELECTORS.emailInput).fill(email);
-      await this.page.locator(PURCHASE_SUMMARY_SELECTORS.phoneInput).fill(phone);
+  private async fillForm(
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string
+  ): Promise<void> {
+    await allure.step('Filling out the form', async () => {
+      // Use WebActions fill method for full ADR-0009 compliance
+      await this.webActions.fill(
+        PURCHASE_SUMMARY_SELECTORS.firstNameInput,
+        firstName
+      );
+      await this.webActions.fill(
+        PURCHASE_SUMMARY_SELECTORS.lastNameInput,
+        lastName
+      );
+      await this.webActions.fill(PURCHASE_SUMMARY_SELECTORS.emailInput, email);
+      await this.webActions.fill(PURCHASE_SUMMARY_SELECTORS.phoneInput, phone);
     });
   }
 }

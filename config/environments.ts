@@ -8,6 +8,10 @@ export interface EnvironmentConfig {
   baseUrl: string;
   /** API endpoints if any */
   apiBaseUrl?: string;
+  /** Region/locale identifier (es, pt, it) */
+  region?: string;
+  /** Locale for the environment (es-ES, pt-PT, it-IT) */
+  locale?: string;
   /** Timeout configurations */
   timeouts: {
     /** Default timeout for page loads */
@@ -29,11 +33,14 @@ export interface EnvironmentConfig {
 }
 
 /**
- * Cinesa environment configurations
+ * Cinesa environment configurations (España + Portugal)
  */
 export const cinesaEnvironments = {
+  // España - Environments
   production: {
     baseUrl: 'https://www.cinesa.es',
+    region: 'es',
+    locale: 'es-ES',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -46,7 +53,9 @@ export const cinesaEnvironments = {
     },
   },
   staging: {
-    baseUrl: 'https://staging.cinesa.es',
+    baseUrl: 'https://stage-web.ocgtest.es',
+    region: 'es',
+    locale: 'es-ES',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -60,6 +69,8 @@ export const cinesaEnvironments = {
   },
   preprod: {
     baseUrl: 'https://preprod-web.ocgtest.es',
+    region: 'es',
+    locale: 'es-ES',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -73,6 +84,8 @@ export const cinesaEnvironments = {
   },
   lab: {
     baseUrl: 'https://lab-web.ocgtest.es',
+    region: 'es',
+    locale: 'es-ES',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -86,6 +99,8 @@ export const cinesaEnvironments = {
   },
   development: {
     baseUrl: 'https://dev.cinesa.es',
+    region: 'es',
+    locale: 'es-ES',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -97,6 +112,52 @@ export const cinesaEnvironments = {
       cookieBanners: true,
     },
   },
+  // Portugal - Environments
+  'production-pt': {
+    baseUrl: 'https://www.ucicinemas.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+    timeouts: {
+      pageLoad: 30000,
+      element: 10000,
+      modal: 15000,
+    },
+    features: {
+      analytics: true,
+      promotionalModals: true,
+      cookieBanners: true,
+    },
+  },
+  'preprod-pt': {
+    baseUrl: 'https://preprod-web.ocgtest.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+    timeouts: {
+      pageLoad: 30000,
+      element: 10000,
+      modal: 15000,
+    },
+    features: {
+      analytics: false,
+      promotionalModals: true,
+      cookieBanners: true,
+    },
+  },
+  'lab-pt': {
+    baseUrl: 'https://lab-web.cinesa.pt',
+    region: 'pt',
+    locale: 'pt-PT',
+    timeouts: {
+      pageLoad: 30000,
+      element: 10000,
+      modal: 15000,
+    },
+    features: {
+      analytics: false,
+      promotionalModals: true,
+      cookieBanners: true,
+    },
+  },
 } as const satisfies Record<string, EnvironmentConfig>;
 
 /**
@@ -105,6 +166,8 @@ export const cinesaEnvironments = {
 export const uciEnvironments = {
   production: {
     baseUrl: 'https://ucicinemas.it',
+    region: 'it',
+    locale: 'it-IT',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -118,6 +181,8 @@ export const uciEnvironments = {
   },
   staging: {
     baseUrl: 'https://staging.ucicinemas.it',
+    region: 'it',
+    locale: 'it-IT',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -131,6 +196,8 @@ export const uciEnvironments = {
   },
   development: {
     baseUrl: 'https://dev.ucicinemas.it',
+    region: 'it',
+    locale: 'it-IT',
     timeouts: {
       pageLoad: 30000,
       element: 10000,
@@ -150,6 +217,26 @@ export const uciEnvironments = {
 export type CinesaEnvironment = keyof typeof cinesaEnvironments;
 export type UCIEnvironment = keyof typeof uciEnvironments;
 export type Environment = CinesaEnvironment | UCIEnvironment;
+
+/**
+ * Region types
+ */
+export type Region = 'es' | 'pt' | 'it';
+
+/**
+ * Extracts region from environment name
+ * @example 'production-pt' -> 'pt', 'production' -> 'es', 'staging' -> 'it' (for UCI)
+ */
+export function getRegionFromEnvironment(
+  env: Environment,
+  namespace: 'cinesa' | 'uci'
+): Region {
+  if (namespace === 'uci') return 'it';
+
+  // For Cinesa: extract region suffix from environment name
+  if (env.endsWith('-pt')) return 'pt';
+  return 'es'; // Default to Spain for Cinesa
+}
 
 /**
  * Gets the current environment from environment variables or defaults to production
