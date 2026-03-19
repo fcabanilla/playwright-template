@@ -431,8 +431,8 @@ interface DataSources {
 |---------------|----------------|----------|-----------|
 | **Session State** | `loggedInState.*.json` | Por sesión de testing | Bypass de autenticación |
 | **Test Results** | `.allure/results/` | Hasta limpieza manual | Generación de reportes |
-| **Screenshots** | `test-results/` | 30 días | Debug y evidencia |
-| **Videos** | `test-results/` | 30 días | Análisis de fallos |
+| **Screenshots** | `.allure/playwright-artifacts/` | 30 días | Debug y evidencia |
+| **Videos** | `.allure/playwright-artifacts/` | 30 días | Análisis de fallos |
 | **Logs** | Console output | Por ejecución | Debugging |
 
 ## 📊 Observabilidad

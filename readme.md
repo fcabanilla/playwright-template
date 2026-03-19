@@ -39,8 +39,7 @@ playwright-template/
 ├── 📁 tests/                 # Test cases by platform
 │   ├── cinesa/               # Cinesa end-to-end tests
 │   └── uci/                  # UCI end-to-end tests
-├── 📁 test-results/          # Test execution artifacts
-├── 📁 allure-report/         # Visual reports (generated)
+├── 📁 .allure/               # Reporting: results, report, artifacts
 └── 📄 playwright.config.ts   # Main Playwright configuration
 ```
 

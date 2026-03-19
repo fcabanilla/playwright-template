@@ -4,74 +4,44 @@
 
 This document describes the Allure test categories system used to automatically classify test failures in the Cinesa Playwright test framework. Categories help identify patterns in test failures and prioritize fixes.
 
-**Location:** `config/allure/categories.config.ts` (TypeScript configuration)
+**Location:** `.allure/categories.json` (JSON configuration, versioned in git)
 
-**Usage:** Imported and used in `playwright.config.ts` via `getAllureCategories()`
+**Usage:** Copied to `.allure/results/categories.json` before report generation via `npm run report:copy-categories`
 
 **Official Documentation:** <https://allurereport.org/docs/categories/>
 
 ## Architecture
 
-### TypeScript-First Approach
+### JSON-Based Approach
 
-Categories are defined as TypeScript functions (similar to project configurations) for:
-
-✅ **Type Safety** - Interface validation at compile time  
-✅ **IntelliSense** - Auto-completion in VS Code  
-✅ **Documentation** - JSDoc comments inline with code  
-✅ **Maintainability** - Refactoring support, find usages  
-✅ **No Build Step** - Categories applied directly by allure-playwright reporter
+Categories are defined as a JSON file in `.allure/categories.json` and copied into the results directory before each report generation. This is the standard Allure approach.
 
 **File Structure:**
 
 ```
-config/allure/
-└── categories.config.ts         # getAllureCategories() function
-playwright.config.ts              # imports and uses categories
-docs/ALLURE_CATEGORIES.md         # This documentation
+.allure/
+├── categories.json              # Category definitions (versioned)
+├── results/                     # Test results (gitignored)
+│   └── categories.json          # Copied here before report generation
+└── report/                      # Generated HTML report
 ```
 
-**Implementation Pattern:**
+**Workflow:**
 
-```typescript
-// config/allure/categories.config.ts
-export function getAllureCategories(): AllureCategory[] {
-  return [
-    {
-      name: 'Test Timeouts',
-      matchedStatuses: ['broken'],
-      messageRegex: '.*Test timeout of 90000ms exceeded.*',
-    },
-    // ... more categories
-  ];
-}
+```bash
+# Before report generation, categories are copied automatically:
+npm run report:copy-categories   # cp .allure/categories.json .allure/results/categories.json
 
-// playwright.config.ts
-import { getAllureCategories } from './config/allure/categories.config';
-
-reporter: [
-  [
-    'allure-playwright',
-    {
-      categories: getAllureCategories(), // ✅ Applied here
-    },
-  ],
-];
+# Full report workflow (includes copy automatically):
+npm run report                   # copy-categories → copy-history → generate → open
 ```
 
-### Why Not JSON?
+**Why JSON (not TypeScript):**
 
-**Previous approach (removed):**
-
-- `.allure/categories.json` → required `git add -f` to version
-- Needed `npm run report:copy-categories` script
-- No type validation, easy to break with typos
-
-**Current approach:**
-
-- TypeScript file in `config/` → versioned normally
-- No copy script needed
-- Validated at compile time
+- Standard Allure mechanism — no custom build step needed
+- Versioned in git via `.gitignore` exception (`!.allure/categories.json`)
+- Simple to edit and validate
+- Copied to results dir by a single `cp` command in npm scripts
 
 ## How Categories Work
 

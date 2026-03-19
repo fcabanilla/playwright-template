@@ -27,9 +27,9 @@ playwright-template/
 │   ├── 📁 cinesa/         # Cinesa platform tests
 │   └── 📁 uci/            # UCI platform tests
 ├── 📁 docs/               # Project documentation
-├── 📁 allure-results/     # Test execution results
-├── 📁 allure-report/      # Generated HTML reports
-└── 📁 test-results/       # Playwright native results
+├── 📁 .allure/results/    # Test execution results (current run)
+├── 📁 .allure/report/     # Generated HTML reports
+└── 📁 .allure/playwright-artifacts/ # Videos, screenshots, traces
 ```
 
 ## 🎯 Project Scope & Objectives

@@ -3,7 +3,6 @@ import { defineConfig } from 'allure';
 export default defineConfig({
   name: 'Multi-Cinema Test Automation Report',
   output: '.allure/report',
-  historyPath: '.allure/history.jsonl',
   plugins: {
     awesome: {
       options: {

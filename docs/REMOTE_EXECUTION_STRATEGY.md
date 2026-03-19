@@ -56,7 +56,7 @@ npm run test:cloud:cinesa
 
 Artifacts (Traces, Videos, Screenshots) are handled differently in remote mode:
 1. **Streaming:** Video/Trace acts are streamed to the local client.
-2. **Storage:** Stored in `./allure-results` just like local runs.
+2. **Storage:** Stored in `.allure/results` and `.allure/playwright-artifacts` just like local runs.
 3. **CI Integration:** No special step needed; the existing Allure report generator works because the artifacts are downloaded to the runner during execution.
 
 ---
