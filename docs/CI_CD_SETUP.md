@@ -100,4 +100,3 @@ If Portugal or deployment-specific Cloudflare credentials are needed later, add 
 - The YAML duplicates job steps per environment to keep the first version explicit and easy to debug.
 - Allure history is generated locally from current artifacts only; long-term trend persistence can be improved later by downloading artifacts from previous runs.
 - The pipeline assumes Microsoft-hosted Ubuntu agents.
-

@@ -93,6 +93,22 @@ export class PaymentPage {
   }
 
   /**
+   * Detects whether the gift card covered the full order amount.
+   * When coverage is 100%, the dedicated "Pagar ahora" button becomes visible.
+   */
+  async isGiftCardCoveringFullAmount(): Promise<boolean> {
+    return await allure.step(
+      'Checking whether Gift Card covers the full order amount',
+      async () => {
+        await this.webActions.wait(2000);
+        return await this.webActions.isVisible(
+          this.selectors.mainPayment.completeOrderButton
+        );
+      }
+    );
+  }
+
+  /**
    * Full gift card payment: adds the card AND clicks "Pagar ahora".
    * Use only when the gift card covers 100% of the order amount.
    *

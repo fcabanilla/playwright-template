@@ -5,6 +5,7 @@ import { checkoutShowtimeSelectionCriteria } from './checkout.data';
 import { getGiftCardData } from '../paymentPage/paymentPage.data';
 
 const CINEMAS = getCinemasForEnvironment();
+const OASIZ_CINEMA = CINEMAS.find((cinema) => cinema.name === 'Oasiz');
 
 test.describe('Checkout Gift Card Tests', () => {
   test.describe.configure({ timeout: 180000 });
@@ -90,4 +91,92 @@ test.describe('Checkout Gift Card Tests', () => {
       }
     );
   }
+
+  test(
+    'Checkout · Gift Card · Nine Seats · Full Purchase with Post-Payment Verification — Oasiz',
+    {
+      tag: [
+        '@checkout',
+        '@giftcard',
+        '@cinesa',
+        '@e2e',
+        '@booking',
+        '@oasiz',
+      ],
+    },
+    async ({
+      navbar,
+      cinema: cinemaPage,
+      cinemaDetail,
+      seatPicker,
+      ticketPicker,
+      loginPage,
+      barPage,
+      purchaseSummary,
+      paymentPage,
+      redsysPage,
+      bookingConfirmation,
+      bookingConfirmationAssertions,
+      livingTicket,
+      livingTicketAssertions,
+    }) => {
+      test.skip(
+        (process.env.TEST_ENV || 'production') !== 'lab',
+        'This scenario is targeted to lab only'
+      );
+      test.skip(!OASIZ_CINEMA, 'Oasiz is not available in the current environment');
+
+      const seatsToSelect = 9;
+
+      await allure.story(
+        'Gift card full purchase with post-payment verification - nine seats - Oasiz'
+      );
+      await allure.parameter('Cinema', 'Oasiz');
+      await allure.parameter('Seats', String(seatsToSelect));
+      await allure.parameter(
+        'Payment Method',
+        'Gift Card with automatic Credit Card fallback'
+      );
+      await allure.parameter('Environment Target', 'lab');
+
+      await navbar.navigateToCinemas();
+      await cinemaPage[OASIZ_CINEMA!.selectMethod]();
+      await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+        checkoutShowtimeSelectionCriteria
+      );
+
+      await seatPicker.selectLastAvailableSeats(seatsToSelect);
+      await seatPicker.confirmSeats();
+
+      await loginPage.clickContinueAsGuest();
+
+      await ticketPicker.selectTicket(seatsToSelect);
+      await barPage.skipBar();
+      await purchaseSummary.acceptAndContinue();
+
+      const { cardNumber, pin } = getGiftCardData();
+      await paymentPage.completePayment(cardNumber, pin);
+
+      const isFullGiftCardCoverage =
+        await paymentPage.isGiftCardCoveringFullAmount();
+
+      if (isFullGiftCardCoverage) {
+        await paymentPage.clickCompleteOrder();
+      } else {
+        await paymentPage.payWithCreditCard();
+        await redsysPage.completePayment(undefined, 'accept');
+      }
+
+      await bookingConfirmation.waitForBookingConfirmationLoaded();
+      await bookingConfirmationAssertions.expectBookingConfirmationUrl();
+      await bookingConfirmationAssertions.expectBookingConfirmationBaseContent();
+      await bookingConfirmationAssertions.expectCountdownContract();
+      await bookingConfirmationAssertions.expectWebloyaltyContractIfPresent();
+
+      await bookingConfirmation.navigateToReviewTicketSafely();
+
+      await livingTicket.waitForLoaded();
+      await livingTicketAssertions.expectLivingTicketContract();
+    }
+  );
 });

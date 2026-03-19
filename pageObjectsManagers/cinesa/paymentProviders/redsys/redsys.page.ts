@@ -87,6 +87,8 @@ export class RedsysPage {
         await this.accept3DSSimulator();
         break;
     }
+
+    await this.waitFor3DSSimulatorExit();
   }
 
   /**
@@ -297,5 +299,45 @@ export class RedsysPage {
       'Redsys 3DS simulator did not expose a clear progress signal before timeout'
     );
     return false;
+  }
+
+  private async waitFor3DSSimulatorExit(timeoutMs = 30000): Promise<void> {
+    const startedAt = Date.now();
+    const page = this.webActions.page;
+    const simulatorUrlPattern =
+      /sis-simulador-web\/authenticationRequest\.jsp/i;
+
+    while (Date.now() - startedAt < timeoutMs) {
+      if (page.isClosed()) {
+        return;
+      }
+
+      const currentUrl = page.url();
+      const simulatorHeaderVisible = await page
+        .locator(this.selectors.threeDSSimulator.header)
+        .isVisible()
+        .catch(() => false);
+      const simulatorSubmitVisible = await page
+        .locator(this.selectors.threeDSSimulator.submitButton)
+        .first()
+        .isVisible()
+        .catch(() => false);
+
+      const stillOnSimulator =
+        simulatorUrlPattern.test(currentUrl) ||
+        simulatorHeaderVisible ||
+        simulatorSubmitVisible;
+
+      if (!stillOnSimulator) {
+        await page.waitForLoadState('domcontentloaded').catch(() => {});
+        return;
+      }
+
+      await page.waitForTimeout(500);
+    }
+
+    throw new Error(
+      'Redsys 3DS simulator did not exit within the expected timeout'
+    );
   }
 }
