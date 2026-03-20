@@ -2,540 +2,141 @@
 
 ## Project Context
 
-This is a **multi-platform Playwright test automation framework** for cinema chains (Cinesa, UCI) with strict architectural patterns. The framework emphasizes maintainability, type safety, and separation of concerns through enforced layer boundaries.
+Multi-platform Playwright test automation framework for cinema chains (Cinesa, UCI) with strict architectural patterns. Emphasizes maintainability, type safety, and separation of concerns through enforced layer boundaries.
 
-## Critical Architecture Rules (MUST FOLLOW)
+> **Layer-specific rules are in `.github/instructions/`** — they load automatically when editing matching files. This file covers cross-cutting rules only.
 
-### 1. **Page Objects NEVER Access Playwright API Directly**
+## Critical Architecture Rules
 
-**✅ CORRECT:**
-
-```typescript
-export class NavbarPage {
-  constructor(private readonly webActions: WebActions) {} // Only WebActions
-
-  async clickLogo(): Promise<void> {
-    await this.webActions.click(this.selectors.logo); // Delegate to WebActions
-  }
-}
-```
-
-**❌ FORBIDDEN:**
-
-```typescript
-export class NavbarPage {
-  constructor(private readonly page: Page) {} // ❌ Never inject page
-
-  async clickLogo(): Promise<void> {
-    await this.page.click('[data-testid="logo"]'); // ❌ Never use page API
-  }
-}
-```
-
-**Rationale:** All Playwright API access goes through `WebActions` (core/webactions/) for consistency, maintainability, and centralized error handling.
-
-**Note:** Some legacy Page Objects still access `page` directly. These need to be refactored to use `WebActions`. See `docs/adrs/0009-page-object-architecture-rules.md`.
-
-### 2. **Selectors MUST Live in Separate `.selectors.ts` Files**
-
-**✅ CORRECT:**
-
-```typescript
-// navbar.selectors.ts
-export const navbarSelectors = {
-  logo: '[data-testid="navbar-logo"]',
-  menuButton: '[data-testid="navbar-menu"]',
-} as const;
-
-// navbar.page.ts
-import { navbarSelectors } from './navbar.selectors';
-export class NavbarPage {
-  private readonly selectors = navbarSelectors;
-}
-```
-
-**❌ FORBIDDEN:**
-
-```typescript
-// navbar.page.ts
-export class NavbarPage {
-  async clickLogo() {
-    await this.webActions.click('[data-testid="navbar-logo"]'); // ❌ No inline selectors
-  }
-}
-```
-
-### 3. **Complete Component Structure Pattern**
-
-Every component follows this layered structure:
+### Layered Architecture (ADR-0009)
 
 ```
-📁 pageObjectsManagers/cinesa/componentName/
-├── componentName.page.ts       # Business logic, uses WebActions ONLY
+Tests/Assertions ──→ Page Objects ──→ WebActions ──→ Playwright API
+```
+
+| Rule                    | Summary                                                                                                  | Details in                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **WebActions-only**     | Page Objects NEVER access `page` directly — all Playwright API calls go through `WebActions`             | `instructions/page-objects.instructions.md` |
+| **Selector separation** | All selectors live in `*.selectors.ts` files — no inline selectors in POMs or tests                      | `instructions/selectors.instructions.md`    |
+| **Fixture injection**   | Tests import `test` from `fixtures/`, never from `@playwright/test`. Never instantiate POMs directly     | `instructions/fixtures.instructions.md`     |
+| **Assertions layer**    | Assertions receive `Page` directly (only exception to WebActions rule), use `allure.step()` + `expect()` | `instructions/assertions.instructions.md`   |
+
+### Component Structure
+
+```
+📁 pageObjectsManagers/[platform]/componentName/
+├── componentName.page.ts       # Business logic (WebActions ONLY)
 ├── componentName.selectors.ts  # All CSS/XPath selectors
 └── componentName.types.ts      # TypeScript interfaces (optional)
 
-📁 tests/cinesa/componentName/
+📁 tests/[platform]/componentName/
 ├── componentName.spec.ts       # Test cases
-├── componentName.assertions.ts # Component-specific assertions (with Allure steps)
-├── componentName.data.ts       # Test data: URLs, expected values, nav items
+├── componentName.assertions.ts # Assertions (with Allure steps)
+├── componentName.data.ts       # Test data: URLs, expected values
 └── componentName.helpers.ts    # Test utilities (optional)
 ```
 
-**Key Locations:**
-
-- **Selectors:** `pageObjectsManagers/[platform]/[component]/[component].selectors.ts`
-- **Page Objects:** `pageObjectsManagers/[platform]/[component]/[component].page.ts`
-- **Test Data:** `tests/[platform]/[component]/[component].data.ts`
-- **Assertions:** `tests/[platform]/[component]/[component].assertions.ts`
-- **WebActions:** `core/webactions/webActions.ts` (only layer accessing Playwright API)
-- **Fixtures:** `fixtures/[platform]/playwright.fixtures.ts`
+Use the `# new-component` prompt in Copilot Chat to scaffold a complete component.
 
 ## Multi-Platform Architecture
 
-### Platform Separation
+### Platforms
 
-- **Cinesa:** `tests/cinesa/`, `pageObjectsManagers/cinesa/`, `fixtures/cinesa/`
-- **UCI:** `tests/uci/`, `pageObjectsManagers/uci/`, `fixtures/uci/`
+| Platform           | Tests           | POMs                          | Fixtures                                 |
+| ------------------ | --------------- | ----------------------------- | ---------------------------------------- |
+| **Cinesa** (ES/PT) | `tests/cinesa/` | `pageObjectsManagers/cinesa/` | `fixtures/cinesa/playwright.fixtures.ts` |
+| **UCI** (IT)       | `tests/uci/`    | `pageObjectsManagers/uci/`    | `fixtures/uci/playwright.fixtures.ts`    |
 
-### Environment Configuration
-
-Set environment via `TEST_ENV`:
+### Environments
 
 ```bash
-TEST_ENV=preprod npm test      # preprod: https://preprod-web.ocgtest.es
-TEST_ENV=lab npm test          # lab: https://lab-web.ocgtest.es
-TEST_ENV=production npm test   # production: https://www.cinesa.es
+TEST_ENV=production npm test   # https://www.cinesa.es (default)
+TEST_ENV=preprod npm test      # https://preprod-web.ocgtest.es
+TEST_ENV=lab npm test          # https://lab-web.ocgtest.es
 ```
 
-**Configuration Files:**
+Configuration: `config/environments.ts` (baseUrl, timeouts, features per env/platform).
+URLs: `config/urls.ts` (`getCinesaUrls()`, `getUCIUrls()` — adapt to `TEST_ENV` automatically).
 
-- `config/environments.ts` - Environment configs (baseUrl, timeouts, features) for both platforms
-- `config/urls.ts` - Centralized URL management with functions:
-  - `getCinesaUrls()` - Returns NavigationUrls object for Cinesa
-  - `getUCIUrls()` - Returns NavigationUrls object for UCI
-  - Dynamic URLs adapt to `TEST_ENV` automatically
+### Cloudflare Protection (preprod/lab)
 
-**URL Usage Pattern:**
+Cloudflare is present on preprod/lab environments. Use `--headed --workers=1`:
 
-```typescript
-// In test data files (*.data.ts)
-import { getCinesaConfig } from '../../../config/environments';
-
-const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
-const config = getCinesaConfig(env);
-const baseUrl = config.baseUrl;
-
-// Use dynamic URLs
-export const internalNavItems: NavItem[] = [
-  { selectorKey: 'cines', expectedUrl: `${baseUrl}/cines/` },
-  { selectorKey: 'peliculas', expectedUrl: `${baseUrl}/peliculas/` },
-];
-```
-
-## Fixture System (Dependency Injection)
-
-Tests use custom fixtures for automatic setup:
-
-```typescript
-// fixtures/cinesa/playwright.fixtures.ts
-export const test = base.extend<{
-  navbar: NavbarPage;
-  moviePage: MoviePage;
-}>({
-  navbar: async ({ page }, use) => {
-    const webActions = new WebActions(page);
-    await use(new NavbarPage(webActions));
-  },
-  moviePage: async ({ page }, use) => {
-    const webActions = new WebActions(page);
-    await use(new MoviePage(webActions));
-  },
-});
-
-// In tests
-test('should display navbar', async ({ navbar }) => {
-  await navbar.navigateToHome(); // Fixture injected automatically
-});
-```
-
-**20+ fixtures available** covering all components. Always import from fixtures, never instantiate Page Objects directly.
-
-## Cloudflare Protection Handling
-
-Cloudflare is present on preprod/lab environments. Use specific patterns:
-
-```typescript
-// For Cloudflare-protected environments
-await webActions.navigateToWithCloudflareHandling(url);
-
-// Commands for Cloudflare
+```bash
 npm run test:cinesa:cloudflare    # Headed mode, workers=1
 npm run test:uci:cloudflare
 ```
 
-See `docs/CLOUDFLARE_HANDLING.md` for bypass strategies. Use `--headed --workers=1` for Cloudflare environments.
+See `docs/CLOUDFLARE_HANDLING.md` for bypass strategies.
 
-## Test Organization Patterns
+## Test Organization
 
-### Test File Naming
+### File Naming
 
-- `*.spec.ts` - Standard tests
-- `*.quick.spec.ts` - Fast smoke tests (<2min)
-- `*.integration.spec.ts` - Cross-component flows
-- `*-cloudflare.spec.ts` - Tests with Cloudflare handling
-- `*.assertions.ts` - Component-specific assertions with Allure steps
-- `*.data.ts` - Test data (URLs, expected values, configurations)
-- `*.helpers.ts` - Reusable test utilities
+| Pattern                 | Purpose                        |
+| ----------------------- | ------------------------------ |
+| `*.spec.ts`             | Standard tests                 |
+| `*.quick.spec.ts`       | Fast smoke tests (<2min)       |
+| `*.integration.spec.ts` | Cross-component flows          |
+| `*-cloudflare.spec.ts`  | Tests with Cloudflare handling |
 
-### Test Tags (Use in test names)
+### Test Naming Convention
+
+Use middot (·) as separator: `'Component · Section · Action · Details — Cinema (optional)'`
+
+### Tags
+
+| Category      | Tags                                                       |
+| ------------- | ---------------------------------------------------------- |
+| **Priority**  | `@smoke`, `@critical`, `@fast`, `@medium`, `@low-priority` |
+| **Type**      | `@regression`, `@integration`, `@e2e`                      |
+| **Platform**  | `@cinesa`, `@uci`                                          |
+| **Component** | `@navbar`, `@films`, `@booking`, `@payment`, etc.          |
+
+```bash
+npx playwright test --grep "@smoke"              # Run by tag
+npx playwright test --grep "@cinesa.*@navbar"    # Multiple tags
+npm run test:cinesa:smoke                        # NPM shortcut
+```
+
+### Parametrization
+
+Use data-driven patterns for test variants (cinemas, formats, promo codes). Never copy-paste tests for each cinema — use `getCinemasForEnvironment()` from `config/cinemas.config.ts`. Details in `instructions/test-specs.instructions.md`.
+
+## Allure 2 Reporting
+
+### API (CRITICAL)
 
 ```typescript
-// Critical smoke tests
-test('@smoke @critical @navbar @cinesa should display all navbar elements', ...);
-
-// Fast tests for quick feedback
-test('@fast @navbar @cinesa should click logo', ...);
-
-// By feature area
-test('@films @uci @content @medium Verify films catalog', ...);
-
-// By priority
-test('@high-priority @regression @booking should complete purchase', ...);
-```
-
-**Common Tags:**
-
-- **Priority:** `@smoke`, `@critical`, `@fast`, `@medium`, `@low-priority`
-- **Type:** `@regression`, `@integration`, `@e2e`
-- **Platform:** `@cinesa`, `@uci`
-- **Component:** `@navbar`, `@films`, `@booking`, `@payment`, etc.
-
-**Running by tags:**
-
-```bash
-npm run test:uci:smoke      # Run @smoke tests
-npm run test:uci:critical   # Run @critical tests
-npm run test:uci:fast       # Run @fast tests
-npx playwright test --grep "@smoke"     # Custom grep
-npx playwright test --grep "@cinesa.*@navbar"  # Multiple tags
-```
-
-### Test Structure with Fixtures
-
-```typescript
-import { test } from '../../fixtures/cinesa/playwright.fixtures';
-
-test.describe('Navbar Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
-  });
-
-  test('@smoke @navbar should display logo', async ({ navbar }) => {
-    await navbar.verifyLogoVisible();
-  });
-});
-```
-
-### Assertions Pattern
-
-```typescript
-// Component-specific assertions in *.assertions.ts
-export class NavbarAssertions {
-  constructor(private readonly page: Page) {}
-
-  async expectNavbarElementsVisible(): Promise<void> {
-    await allure.test.step('Verifying navbar elements visibility', async () => {
-      await expect(this.page.locator(this.selectors.cines)).toBeVisible();
-      // ... more assertions with Allure steps
-    });
-  }
-}
-
-// Use in tests
-const assertions = new NavbarAssertions(page);
-await assertions.expectNavbarElementsVisible();
-```
-
-## Common Workflows
-
-### Running Tests
-
-```bash
-# Specific components
-npm run test:navbar
-npm run test:seatpicker
-npm run test:movies
-
-# By platform
-npm run test:cinesa
-npm run test:uci
-
-# With environment
-TEST_ENV=preprod npm run test:cinesa
-```
-
-### Generating Reports
-
-```bash
-npm run report             # Complete workflow: copy history + generate + open
-npm run report:generate    # Generate Allure report from results
-npm run report:open        # Open report in browser
-npm run report:clean       # Clean all Allure artifacts (results + reports + videos)
-npm run report:clean:results  # Clean ONLY results (before new test execution)
-```
-
-**Directory Structure:**
-
-- `.allure/results/` - Test execution results (JSON files generated by allure-playwright)
-- `.allure/report/` - Generated HTML report (created by allure generate)
-- `.allure/playwright-artifacts/` - Videos, screenshots, traces from Playwright
-
-See `docs/ALLURE_DIRECTORY_STRUCTURE.md` for complete documentation.
-
-### ⚠️ CRITICAL: Allure Results Accumulation Behavior
-
-Allure accumulates results by design. According to official documentation:
-
-> "If the directory already exists, the new files will be added to the existing ones, so that a future report will be based on them all."
-
-**Problem:** Running 1 test without cleaning results shows accumulated totals (e.g., 268 old + 1 new = 269 tests).
-
-**Solution: Always clean results before each new test execution**
-
-#### Correct Workflow for Single Test Execution
-
-```bash
-# Step 1: Clear old results (MANDATORY before each test run)
-npm run report:clean:results
-
-# Step 2: Run your test(s)
-TEST_ENV=preprod npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts:406:3 --project='Cinesa'
-
-# Step 3: Generate report with history preservation
-npm run report
-```
-
-#### Correct Workflow for Full Test Suite
-
-```bash
-# Step 1: Clear old results
-npm run report:clean:results
-
-# Step 2: Run complete suite
-npm run test:cinesa:preprod
-
-# Step 3: Generate report
-npm run report
-```
-
-#### Understanding the Two Directories
-
-**`.allure/results/` (Current Execution Data)**
-
-- Contains JSON files from current test run
-- **MUST be cleared** before each new execution to avoid accumulation
-- Command: `npm run report:clean:results` (runs `rm -rf .allure/results/*`)
-
-**`.allure/report/history/` (Historical Trend Data)**
-
-- Contains trend data for TREND graph (last 20 executions)
-- **MUST be preserved** and copied before report generation
-- Command: `npm run report:copy-history` (copies `.allure/report/history/` → `.allure/results/history/`)
-
-#### NPM Script Order (CRITICAL)
-
-**✅ CORRECT ORDER (Current Configuration):**
-
-```json
-"report": "npm run report:copy-history && npm run report:generate && npm run report:open"
-```
-
-**❌ WRONG ORDER (Previous Bug):**
-
-```json
-"report": "npm run report:clean && npm run report:copy-history && ..."  // ❌ Deletes history before copy
-```
-
-#### TREND Graph Behavior
-
-- Each column in TREND graph = one complete test execution
-- NOT cumulative totals
-- Shows test count evolution across runs
-- Example:
-  - Column 1: Execution with 269 tests
-  - Column 2: Execution with 1 test (focused debugging)
-  - This is expected behavior, not a bug
-
-#### Common Mistake: Wrong Script Used
-
-**❌ WRONG - Old script definition:**
-
-```json
-"report:clean:results": "rm -rf .allure/playwright-artifacts/*"  // ❌ Deletes videos, NOT results
-```
-
-**✅ CORRECT - Fixed script:**
-
-```json
-"report:clean:results": "rm -rf .allure/results/*"  // ✅ Deletes JSON results
-```
-
-### Debugging
-
-```bash
-npx playwright test --debug              # Step-through debugging
-npx playwright test --headed             # Visual mode
-npx playwright test --trace on           # Record trace
-npx playwright codegen https://cinesa.es # Generate selectors
-```
-
-## Component-Specific Conventions
-
-### Booking Flow Components
-
-The complete booking flow follows this sequence:
-
-1. **Movies** → Select film
-2. **Cinemas** → Choose cinema
-3. **SeatPicker** → Select seats (30 tests, 100% coverage)
-4. **TicketPicker** → Choose ticket types
-5. **Bar** → Food & Beverages
-6. **PurchaseSummary** → Review order
-7. **Payment** → Complete purchase
-
-Each component has implicit coverage through full booking tests even without explicit tests.
-
-### Session State Management
-
-Use storage state for authenticated sessions:
-
-```typescript
-// playwright.config.ts
-storageState: process.env.TEST_ENV === 'preprod'
-  ? 'loggedInState.preprod.json'
-  : undefined;
-```
-
-## Code Quality Standards
-
-### Allure 2 Reporting Integration
-
-This project uses **Allure 2** (`allure-playwright@2.15.1`) for test reporting.
-
-**Correct API Usage:**
-
-```typescript
-// ✅ CORRECT - Allure 2 API
+// ✅ CORRECT
 import { allure } from 'allure-playwright';
-
 await allure.step('Step description', async () => {
-  // Your code here
+  /* ... */
 });
 
-await allure.parameter('paramName', 'paramValue');
-await allure.attachment('name', data, { contentType: 'image/png' });
-```
-
-**Common Mistakes:**
-
-```typescript
-// ❌ WRONG - Allure 3 API (not supported)
+// ❌ WRONG — Allure 3 API not supported
 import * as allure from 'allure-playwright';
 await allure.test.step('...', async () => {}); // Property 'test' does not exist
-
-// ❌ WRONG - Old import style
-import * as allure from 'allure-playwright'; // Use named import instead
 ```
 
-**Where to Use Allure Steps:**
+### Hierarchical Labels (MANDATORY)
 
-- **Page Objects:** Can use `allure.step()` for high-level business actions
-- **Assertions (`*.assertions.ts`):** Should use `allure.step()` for validation steps
-- **WebActions (optional):** Some methods support custom step messages via parameters
-- **Tests:** Can use `allure.step()` for test-level flow steps
-
-**Example - Page Object with Allure 2:**
+All tests MUST include `epic`, `feature`, and `story`:
 
 ```typescript
-import { allure } from 'allure-playwright';
-import { WebActions } from '../../../core/webactions/webActions';
+test.beforeEach(async () => {
+  await allure.epic('Cinesa Platform'); // Platform level — in beforeEach
+  await allure.feature('Navbar - Main Navigation'); // Component level — in beforeEach
+});
 
-export class NavbarPage {
-  constructor(private readonly webActions: WebActions) {}
-
-  async navigateToMovies(): Promise<void> {
-    await allure.step('Navigate to Movies page', async () => {
-      await this.webActions.click(this.selectors.peliculas);
-    });
-  }
-}
-```
-
-**Example - WebActions with Optional Steps:**
-
-```typescript
-// WebActions supports optional step messages
-await webActions.click(selector, 'Click on movie card'); // Creates Allure step
-await webActions.navigateTo(url, 'Navigate to home'); // Creates Allure step
-```
-
-### Allure Hierarchical Labels (EPIC, FEATURE, STORY)
-
-**CRITICAL: All tests MUST include hierarchical labels for proper organization in Allure reports.**
-
-Allure supports 3-level hierarchy for test organization:
-
-- **EPIC:** Highest level (e.g., "Cinesa Platform")
-- **FEATURE:** Component/module level (e.g., "Navbar - Main Navigation", "Movies - Content Catalog")
-- **STORY:** Individual test scenario (e.g., "User login with valid credentials", "Movie schema validation")
-
-**Standard Pattern:**
-
-```typescript
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { allure } from 'allure-playwright';
-
-test.describe('Component Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner }) => {
-    // Add EPIC and FEATURE in beforeEach (applies to all tests in describe block)
-    await allure.epic('Cinesa Platform');
-    await allure.feature('Component Name - Purpose');
-
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
-  });
-
-  test('should perform action', async ({ component }) => {
-    // Add STORY per test for specific scenario
-    await allure.story('Action description');
-    await component.performAction();
-  });
+test('...', async () => {
+  await allure.story('Display navbar elements'); // Scenario level — per test
 });
 ```
 
-**Including JIRA Tags in Stories:**
+**Standardized Feature Names:**
 
-When tests have JIRA tags (e.g., `@OCG-3316`, `@COMS-7212`), include them in the story label:
-
-```typescript
-test(
-  'Movie Schema URL validation test',
-  {
-    tag: ['@movies', '@schema', '@OCG-3316', '@fix-test'],
-  },
-  async ({ moviePage }) => {
-    // Include JIRA tag in story for traceability
-    await allure.story('OCG-3316 - Movie Schema URL validation');
-    await moviePage.validateSchema();
-  }
-);
-```
-
-**Standardized Feature Names by Component:**
-
-| Component       | FEATURE Label                   |
+| Component       | Feature Label                   |
 | --------------- | ------------------------------- |
 | navbar          | Navbar - Main Navigation        |
 | footer          | Footer - Site Navigation        |
@@ -555,460 +156,149 @@ test(
 | analytics       | Analytics - Tracking            |
 | mailing         | Mailing - Communications        |
 
-**Example - Complete Implementation:**
+Include JIRA tags in stories: `await allure.story('OCG-3316 - Movie Schema URL validation');`
 
-```typescript
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { allure } from 'allure-playwright';
+### Results Accumulation (CRITICAL)
 
-test.describe('Cinesa Movies Tests', () => {
-  test.beforeEach(async ({ navbar, cookieBanner, promotionalModal }) => {
-    await allure.epic('Cinesa Platform');
-    await allure.feature('Movies - Content Catalog');
+Allure accumulates results by design. **Always clean before each new execution:**
 
-    await navbar.navigateToHome();
-    await cookieBanner.acceptAllCookies();
-    await promotionalModal.closeModalIfVisible();
-  });
+```bash
+# 1. Clear old results (MANDATORY)
+npm run report:clean:results
 
-  test(
-    'Movies page display and layout',
-    { tag: ['@movies', '@cinesa', '@smoke'] },
-    async ({ navbar }) => {
-      await allure.story('Movies catalog page display and layout');
-      await navbar.navigateToMovies();
-    }
-  );
+# 2. Run test(s)
+npx playwright test tests/cinesa/seatPicker/seatPicker.spec.ts --project='Cinesa'
 
-  test(
-    'Movie Schema URL validation',
-    { tag: ['@movies', '@schema', '@OCG-3316', '@fix-test'] },
-    async ({ moviePage }) => {
-      await allure.story('OCG-3316 - Movie Schema URL validation');
-      const schema = await moviePage.extractMovieSchema();
-      await moviePage.validateSchemaURLs(schema);
-    }
-  );
-});
+# 3. Generate report (preserves history for TREND graph)
+npm run report
 ```
 
-**Benefits:**
+**Directories:**
 
-- **Organized Reports:** Tests grouped by EPIC → FEATURE → STORY hierarchy
-- **Traceability:** JIRA tags linked to specific test scenarios
-- **Business Visibility:** Clear mapping between tests and business requirements
-- **Filtering:** Easy filtering by epic/feature in Allure UI
+| Directory                       | Purpose                     | Action                       |
+| ------------------------------- | --------------------------- | ---------------------------- |
+| `.allure/results/`              | Current execution JSON      | MUST clean before each run   |
+| `.allure/report/history/`       | TREND graph data            | MUST preserve — never delete |
+| `.allure/report/`               | Generated HTML report       | Regenerated each time        |
+| `.allure/playwright-artifacts/` | Videos, screenshots, traces | Auto-managed                 |
 
-**Common Mistakes:**
+See `docs/ALLURE_CATEGORIES.md` for full details.
 
-```typescript
-// ❌ WRONG - Missing labels
-test.describe('Tests', () => {
-  test.beforeEach(async ({ navbar }) => {
-    // Missing allure.epic() and allure.feature()
-    await navbar.navigateToHome();
-  });
+## Booking Flow
 
-  test('should work', async ({ component }) => {
-    // Missing allure.story()
-    await component.doSomething();
-  });
-});
+Complete sequence:
 
-// ❌ WRONG - Labels in wrong place
-test('should work', async ({ component }) => {
-  await allure.epic('Cinesa Platform'); // Should be in beforeEach
-  await allure.feature('Component'); // Should be in beforeEach
-  await allure.story('Story'); // ✅ Correct place
-});
+1. **Movies** → Select film
+2. **Cinemas** → Choose cinema
+3. **SeatPicker** → Select seats
+4. **TicketPicker** → Choose ticket types
+5. **Bar** → Food & Beverages
+6. **PurchaseSummary** → Review order
+7. **Payment** → Complete purchase
+
+Each component has implicit coverage through full booking tests even without explicit tests.
+
+## Common Workflows
+
+### Running Tests
+
+```bash
+npm run test:cinesa              # All Cinesa tests
+npm run test:uci                 # All UCI tests
+npm run test:navbar              # Specific component
+TEST_ENV=preprod npm run test:cinesa  # Specific environment
 ```
 
-### TypeScript Strict Mode
+### Debugging
 
-- All files use strict TypeScript
-- No `any` types without justification
-- Prefer interfaces over types for objects
-
-### Language and Naming Standards
-
-**CRITICAL: All code MUST be written in English**
-
-**✅ CORRECT:**
-
-```typescript
-// Test names and descriptions in English
-test('Should display navbar elements correctly', async ({ navbar }) => {
-  await allure.step('Verify logo is visible', async () => {
-    // Implementation
-  });
-});
-
-// Variables, functions, comments in English
-const selectedSeats = await seatPicker.selectLastAvailableSeat();
-// Check if confirmation button is enabled
-await assertConfirmButtonEnabled(page);
+```bash
+npx playwright test --debug              # Step-through
+npx playwright test --headed             # Visual mode
+npx playwright test --trace on           # Record trace
+npx playwright codegen https://cinesa.es # Generate selectors
 ```
 
-**❌ FORBIDDEN:**
+### Reports
 
-```typescript
-// ❌ Test names in Spanish
-test('Debe mostrar elementos de la barra de navegación', async ({ navbar }) => {
-  // ❌ Spanish step descriptions
-  await allure.step('Verificar que el logo es visible', async () => {
-    // Implementation
-  });
-});
-
-// ❌ Spanish variable names
-const butacasSeleccionadas = await seatPicker.selectLastAvailableSeat();
-// ❌ Spanish comments
-// Verificar si el botón de confirmación está habilitado
-await assertConfirmButtonEnabled(page);
+```bash
+npm run report                   # Full workflow: copy-history → generate → open
+npm run report:generate          # Generate only
+npm run report:clean:results     # Clean results (before new run)
+npm run report:clean             # Clean all artifacts
 ```
 
-**Exceptions (Spanish allowed):**
-
-- Allure report labels for business visibility (via `allure.parameter()`)
-- Test data representing real Spanish content (e.g., cinema names, movie titles)
-- Documentation explicitly targeting Spanish-speaking stakeholders
-
-**Rationale:**
-
-- **Searchability:** English enables global search across codebase
-- **Telemetry:** CI/CD systems parse English keywords better
-- **Maintainability:** International teams can contribute
-- **Industry Standard:** Aligns with open-source best practices
-
-### Test Parametrization and Data-Driven Testing
-
-**Avoid test duplication by using data-driven patterns**
-
-**✅ CORRECT - Parametrized Tests:**
-
-```typescript
-// Define cinema configurations in *.data.ts
-export const AVAILABLE_CINEMAS = [
-  {
-    name: 'Oasiz',
-    selectMethod: 'selectOasizCinema',
-    tags: ['@oasiz'],
-    availableInEnvironments: ['production', 'lab', 'preprod'],
-  },
-  {
-    name: 'Grancasa',
-    selectMethod: 'selectGrancasaCinema',
-    tags: ['@grancasa'],
-    availableInEnvironments: ['production', 'lab'], // Not in preprod
-  },
-];
-
-// Get cinemas for current environment
-const CINEMAS = getCinemasForEnvironment();
-
-// Parametrized test loop
-for (const cinema of CINEMAS) {
-  test(
-    `Full purchase - ${cinema.name}`,
-    {
-      tag: ['@e2e', '@booking', ...cinema.tags],
-    },
-    async ({ cinemaPage, seatPicker }) => {
-      await cinemaPage[cinema.selectMethod]();
-      await seatPicker.selectLastAvailableSeat();
-    }
-  );
-}
-```
-
-**❌ FORBIDDEN - Duplicated Tests:**
-
-```typescript
-// ❌ Copy-pasted test for each cinema
-test('Full purchase - Oasiz', async ({ cinema, seatPicker }) => {
-  await cinema.selectOasizCinema();
-  await seatPicker.selectLastAvailableSeat();
-});
-
-test('Full purchase - Grancasa', async ({ cinema, seatPicker }) => {
-  await cinema.selectGrancasaCinema();
-  await seatPicker.selectLastAvailableSeat();
-});
-```
-
-**Benefits:**
-
-- **Less Maintenance:** Add new cinema by adding one configuration object
-- **Consistency:** Same test logic applied uniformly across variants
-- **Environment Awareness:** Tests only run for available cinemas in each environment
-- **Readability:** Test intent separated from cinema configurations
-
-**When to Parametrize:**
-
-- Multiple cinemas with same test scenarios
-- Multiple formats (Normal, D-BOX, 4DX, IMAX) executing same validations
-- Multiple promo codes tested with same flow
-- Any scenario where logic is identical but data varies
-
-**Environment-Aware Cinema Configuration:**
-
-```typescript
-// In *.data.ts file
-export function getCinemasForEnvironment(env?: string) {
-  const currentEnv = env || process.env.TEST_ENV || 'production';
-  return AVAILABLE_CINEMAS.filter((cinema) =>
-    cinema.availableInEnvironments.includes(currentEnv)
-  );
-}
-
-// Usage in tests
-const CINEMAS = getCinemasForEnvironment();
-// preprod: returns only [Oasiz]
-// lab/production: returns [Oasiz, Grancasa]
-```
-
-### ESLint Configuration
-
-Run `npm run lint` before commits. Key rules:
-
-- No unused variables
-- Consistent naming (camelCase for variables, PascalCase for classes)
-- No console.logs in production code
-- All code in English (enforced via review, not automated)
-
-### Commit Conventions
-
-Follow conventional commits:
-
-```
-feat: Add cinema selection tests
-fix: Resolve timeout in seat picker
-docs: Update architecture decision record
-test: Add loyalty program smoke tests
-```
-
-## Common Pitfalls to Avoid
-
-❌ **Don't** access `page` directly in Page Objects (use `WebActions` only)
-❌ **Don't** use inline selectors (extract to `.selectors.ts` files)
-❌ **Don't** hardcode URLs (use `config/urls.ts` and `*.data.ts` files)
-❌ **Don't** create assertions in test files (use `*.assertions.ts` with Allure steps)
-❌ **Don't** ignore Cloudflare on preprod/lab environments
-❌ **Don't** run parallel tests on Cloudflare (`--workers=1` required)
-❌ **Don't** forget to add test tags (@smoke, @critical, @fast, @platform)
-❌ **Don't** skip fixture registration (add new Page Objects to fixtures)
-❌ **Don't** instantiate Page Objects directly (always use fixtures)
-❌ **Don't** use `allure.test.step()` (Allure 3 API) - use `allure.step()` (Allure 2 API)
-❌ **Don't** use `import * as allure` - use `import { allure }` instead
-❌ **Don't** run tests without cleaning results first (`npm run report:clean:results`)
-❌ **Don't** delete `.allure/report/history/` (needed for TREND graphs)
-❌ **Don't** write test names, descriptions, or comments in Spanish
-❌ **Don't** duplicate tests for different cinemas/variants (use parametrization)
-❌ **Don't** hardcode test data in spec files (extract to `*.testData.ts`)
-❌ **Don't** forget Allure labels (`epic`, `feature`, `story`) - tests will appear "loose" in reports
-
-✅ **Do** use `WebActions` for ALL Playwright API interactions in Page Objects
-✅ **Do** use fixtures for all component dependencies
-✅ **Do** separate selectors (`*.selectors.ts`), data (`*.data.ts`), and assertions (`*.assertions.ts`)
-✅ **Do** inject `page` in assertions only (for test-level validations)
-✅ **Do** add Allure steps in assertions for better reporting
-✅ **Do** make URLs dynamic based on `TEST_ENV` in `*.data.ts` files
-✅ **Do** tag tests appropriately for filtering and reporting
-✅ **Do** check environment with `process.env.TEST_ENV` for conditional logic
-✅ **Do** handle cookie banners in `beforeEach` hooks
-✅ **Do** use Allure 2 API: `import { allure } from 'allure-playwright'` and `allure.step()`
-✅ **Do** clean results before each test execution: `npm run report:clean:results`
-✅ **Do** write ALL code in English (test names, variables, comments, functions)
-✅ **Do** use data-driven parametrization for test variants (cinemas, formats, etc.)
-✅ **Do** store test data in separate `*.testData.ts` files for reusability
-✅ **Do** add Allure hierarchical labels: `epic` in beforeEach, `feature` in beforeEach, `story` per test
-✅ **Do** include JIRA tags in story labels when applicable (e.g., "OCG-3316 - Description")
-
-## Key Files Reference
-
-### Architecture & Patterns
-
-- **Architecture:** `docs/ARCHITECTURE.md`, `docs/adrs/0009-page-object-architecture-rules.md`
-- **Style Guide:** `docs/STYLEGUIDE.md`
-
-### Core Framework
-
-- **WebActions:** `core/webactions/webActions.ts` (Playwright API wrapper)
-- **Cloudflare Handler:** `core/webactions/cloudflareHandler.ts`
-- **CORS Handler:** `core/webactions/corsHandler.ts`
-
-### Configuration
-
-- **Playwright Config:** `playwright.config.ts`
-- **Environments:** `config/environments.ts` (baseUrl, timeouts, features per environment)
-- **URLs:** `config/urls.ts` (centralized URL functions: `getCinesaUrls()`, `getUCIUrls()`)
-
-### Fixtures (Dependency Injection)
-
-- **Cinesa:** `fixtures/cinesa/playwright.fixtures.ts` (20+ fixtures)
-- **UCI:** `fixtures/uci/playwright.fixtures.ts`
-
-### Component Structure (Example: Navbar)
-
-- **Page Object:** `pageObjectsManagers/cinesa/navbar/navbar.page.ts`
-- **Selectors:** `pageObjectsManagers/cinesa/navbar/navbar.selectors.ts`
-- **Tests:** `tests/cinesa/navbar/navbar.spec.ts`
-- **Assertions:** `tests/cinesa/navbar/navbar.assertions.ts`
-- **Test Data:** `tests/cinesa/navbar/navbar.data.ts`
-
-### Reporting
-
-- **Allure Config:** `allure.config.js`
-- **Results Directory:** `.allure/results/` (configured via `ALLURE_RESULTS_DIR` env var)
-- **Reports Directory:** `.allure/report/`
-- **Artifacts:** `.allure/playwright-artifacts/` (videos, screenshots, traces)
-- **Documentation:**
-  - `docs/ALLURE_DIRECTORY_STRUCTURE.md` - Complete directory structure guide
-  - `docs/ALLURE_WORKFLOW_CRITICAL.md` - **CRITICAL: Results accumulation behavior and workflow**
-
-## When Creating New Components
-
-### 1. Create Page Object Structure
-
-```
-pageObjectsManagers/cinesa/newComponent/
-├── newComponent.page.ts        # Business logic
-├── newComponent.selectors.ts   # All selectors
-└── newComponent.types.ts       # Interfaces (optional)
-```
-
-**Example - newComponent.selectors.ts:**
-
-```typescript
-export interface NewComponentSelectors {
-  container: string;
-  actionButton: string;
-  title: string;
-}
-
-export const newComponentSelectors: NewComponentSelectors = {
-  container: '[data-testid="new-component"]',
-  actionButton: '[data-testid="action-btn"]',
-  title: '.component-title',
-} as const;
-```
-
-**Example - newComponent.page.ts:**
-
-```typescript
-import { WebActions } from '../../../core/webactions/webActions';
-import { newComponentSelectors } from './newComponent.selectors';
-
-export class NewComponentPage {
-  constructor(private readonly webActions: WebActions) {}
-  private readonly selectors = newComponentSelectors;
-
-  async performAction(): Promise<void> {
-    await this.webActions.click(this.selectors.actionButton);
-  }
-
-  async getTitle(): Promise<string> {
-    return await this.webActions.getText(this.selectors.title);
-  }
-}
-```
-
-### 2. Create Test Structure
-
-```
-tests/cinesa/newComponent/
-├── newComponent.spec.ts        # Test cases
-├── newComponent.assertions.ts  # Assertions with Allure steps
-├── newComponent.data.ts        # Test data and URLs
-└── newComponent.helpers.ts     # Utilities (optional)
-```
-
-**Example - newComponent.data.ts:**
-
-```typescript
-import {
-  getCinesaConfig,
-  CinesaEnvironment,
-} from '../../../config/environments';
-
-const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
-const config = getCinesaConfig(env);
-
-export const componentUrls = {
-  base: `${config.baseUrl}/new-component`,
-  detail: (id: string) => `${config.baseUrl}/new-component/${id}`,
-};
-
-export const expectedValues = {
-  title: 'Component Title',
-  buttonText: 'Click Me',
-};
-```
-
-**Example - newComponent.assertions.ts:**
-
-```typescript
-import { Page, expect } from '@playwright/test';
-import * as allure from 'allure-playwright';
-
-export class NewComponentAssertions {
-  constructor(private readonly page: Page) {}
-
-  async expectComponentVisible(): Promise<void> {
-    await allure.test.step('Verify component is visible', async () => {
-      await expect(
-        this.page.locator('[data-testid="new-component"]')
-      ).toBeVisible();
-    });
-  }
-}
-```
-
-### 3. Add to Fixtures
-
-Update `fixtures/cinesa/playwright.fixtures.ts`:
-
-```typescript
-import { NewComponentPage } from '../../pageObjectsManagers/cinesa/newComponent/newComponent.page';
-
-type CustomFixtures = {
-  // ... existing fixtures
-  newComponent: NewComponentPage;
-};
-
-export const test = base.extend<CustomFixtures>({
-  // ... existing fixtures
-  newComponent: async ({ page }, use) => {
-    const webActions = new WebActions(page);
-    await use(new NewComponentPage(webActions));
-  },
-});
-```
-
-### 4. Write Tests
-
-```typescript
-import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-
-test.describe('New Component Tests', () => {
-  test('@smoke @critical @newComponent should display component', async ({
-    newComponent,
-    cookieBanner,
-  }) => {
-    await cookieBanner.acceptAllCookies();
-    await newComponent.performAction();
-  });
-});
-```
+## Code Quality Standards
+
+- **Language:** ALL code in English (test names, variables, comments, functions). Spanish allowed only in test data representing real content.
+- **TypeScript:** Strict mode, no `any` without justification, prefer interfaces over types.
+- **ESLint:** Run `npm run lint` before commits. camelCase variables, PascalCase classes, no `console.log`.
+- **Commits:** Conventional format: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`.
+
+## Quick Reference — Do's and Don'ts
+
+❌ Access `page` in Page Objects — use `WebActions`
+❌ Inline selectors — extract to `*.selectors.ts`
+❌ Hardcode URLs — use `config/environments.ts` + `*.data.ts`
+❌ Import `test` from `@playwright/test` — use fixtures
+❌ `import * as allure` — use `import { allure }`
+❌ `allure.test.step()` — use `allure.step()`
+❌ Skip Allure labels — add `epic`/`feature`/`story`
+❌ Run tests without `npm run report:clean:results` first
+❌ Delete `.allure/report/history/` — needed for TREND
+❌ Code in Spanish
+❌ Duplicate tests for variants — use parametrization
+
+✅ `WebActions` for ALL Playwright interactions in POMs
+✅ Fixtures for all dependencies
+✅ Separate files: selectors, data, assertions
+✅ Dynamic URLs based on `TEST_ENV`
+✅ Tags: `@smoke`, `@critical`, `@cinesa`, etc.
+✅ Allure 2 API: `import { allure }` + `allure.step()`
+✅ `allure.epic()` + `allure.feature()` in `beforeEach`
+✅ Data-driven parametrization for cinema/format variants
+✅ Clean results before each test run
+✅ All code in English
+
+## Key Files
+
+| Category       | File                                               | Purpose                                                  |
+| -------------- | -------------------------------------------------- | -------------------------------------------------------- |
+| **Core**       | `core/webactions/webActions.ts`                    | Playwright API wrapper (ONLY layer accessing Playwright) |
+| **Config**     | `config/environments.ts`                           | baseUrl, timeouts, features per env                      |
+| **Config**     | `config/urls.ts`                                   | `getCinesaUrls()`, `getUCIUrls()`                        |
+| **Config**     | `config/cinemas.config.ts`                         | Cinema parametrization                                   |
+| **Fixtures**   | `fixtures/cinesa/playwright.fixtures.ts`           | 30+ Cinesa fixtures                                      |
+| **Fixtures**   | `fixtures/uci/playwright.fixtures.ts`              | UCI fixtures                                             |
+| **Playwright** | `playwright.config.ts`                             | Test configuration                                       |
+| **Allure**     | `allure.config.js`                                 | Report configuration                                     |
+| **ADRs**       | `docs/adrs/0009-page-object-architecture-rules.md` | Architecture rules                                       |
+| **Reporting**  | `docs/ALLURE_CATEGORIES.md`                        | Allure categories & results behavior                     |
+| **Cloudflare** | `docs/CLOUDFLARE_HANDLING.md`                      | Bypass strategies                                        |
+| **Style**      | `docs/STYLEGUIDE.md`                               | Coding style guide                                       |
+
+## Path-Specific Instructions
+
+Layer-specific rules load **automatically** when editing matching files:
+
+| File                           | Activates for                           | Key rules                                             |
+| ------------------------------ | --------------------------------------- | ----------------------------------------------------- |
+| `page-objects.instructions.md` | `pageObjectsManagers/**/*.page.ts`      | WebActions-only, constructor pattern, `allure.step()` |
+| `selectors.instructions.md`    | `pageObjectsManagers/**/*.selectors.ts` | Interface + const, `data-testid` priority             |
+| `test-specs.instructions.md`   | `tests/**/*.spec.ts`                    | Fixture imports, Allure labels, middot naming, tags   |
+| `assertions.instructions.md`   | `tests/**/*.assertions.ts`              | `Page` injection, `allure.step()`, `expect()`         |
+| `test-data.instructions.md`    | `tests/**/*.data.ts`                    | Dynamic URLs, `getCinesaConfig()`, typed exports      |
+| `webactions.instructions.md`   | `core/webactions/**`                    | Step taxonomy `[NAV]/[ACT]/[WAIT]/[ASSERT]/[DATA]`    |
+| `fixtures.instructions.md`     | `fixtures/**/*.ts`                      | DI pattern, context override chain                    |
+| `config.instructions.md`       | `config/**`                             | Interfaces, getter functions, multi-market            |
+| `uci-platform.instructions.md` | `**/uci/**`                             | UCI-specific: Italian URLs, `getUCIConfig()`          |
 
 ## Documentation
 
-When code changes require documentation updates, also update:
+Update when making changes:
 
-- `README.md` - If adding major features
-- `docs/adrs/` - If making architectural decisions
-- `TEST_COVERAGE_REPORT_OPTIMISTIC.md` - If adding new test coverage
+- `README.md` — Major features
+- `docs/adrs/` — Architectural decisions
 
 ---
 
-**Remember:** This framework prioritizes **maintainability over convenience**. The strict separation ensures the codebase scales to 500+ tests without becoming unmaintainable.
+**This framework prioritizes maintainability over convenience.** The strict separation ensures the codebase scales to 500+ tests without becoming unmaintainable.
