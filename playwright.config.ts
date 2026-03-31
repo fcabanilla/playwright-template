@@ -7,6 +7,7 @@ import {
   getCinesaPortugalProject,
   getCloudflareOnlyProject,
   getCinesaCloudflareProject,
+  getPraetorCinesaProject,
 } from './config/projects';
 import {
   shouldUsePlaywrightService,
@@ -121,6 +122,10 @@ export default defineConfig({
     },
     {
       ...getCinesaCloudflareProject(),
+      dependencies: ['setup'],
+    },
+    {
+      ...getPraetorCinesaProject(),
       dependencies: ['setup'],
     },
   ],
