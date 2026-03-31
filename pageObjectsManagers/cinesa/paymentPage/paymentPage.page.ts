@@ -95,15 +95,25 @@ export class PaymentPage {
   /**
    * Detects whether the gift card covered the full order amount.
    * When coverage is 100%, the dedicated "Pagar ahora" button becomes visible.
+   * Polls every 500ms for up to 10s to handle variable processing times.
    */
   async isGiftCardCoveringFullAmount(): Promise<boolean> {
     return await allure.step(
       'Checking whether Gift Card covers the full order amount',
       async () => {
-        await this.webActions.wait(2000);
-        return await this.webActions.isVisible(
-          this.selectors.mainPayment.completeOrderButton
-        );
+        const maxWait = 10000;
+        const pollInterval = 500;
+        const startTime = Date.now();
+
+        while (Date.now() - startTime < maxWait) {
+          const isVisible = await this.webActions.isVisible(
+            this.selectors.mainPayment.completeOrderButton
+          );
+          if (isVisible) return true;
+          await this.webActions.wait(pollInterval);
+        }
+
+        return false;
       }
     );
   }
@@ -120,7 +130,9 @@ export class PaymentPage {
     pin: string
   ): Promise<void> {
     await this.completePayment(cardNumber, pin);
-    await this.clickCompleteOrder();
+    // The blue "Pagar" button inside the gift card form processes the payment.
+    // When the gift card covers 100%, the system redirects to booking confirmation.
+    // No additional button click is needed — do NOT click the external credit card button.
   }
 
   /**

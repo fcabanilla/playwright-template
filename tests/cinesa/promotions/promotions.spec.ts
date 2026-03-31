@@ -14,7 +14,16 @@ test.describe('Cinesa Promotions Tests', () => {
 
   test(
     'Promotions · Page · Display & Layout',
-    { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-fail',
+        '@promotions',
+        '@cinesa',
+        '@regression',
+        '@medium',
+      ],
+    },
     async ({ page, navbar, webActions }, testInfo) => {
       await allure.story('Promotions page display and layout');
       await navbar.navigateToPromotions();
@@ -29,7 +38,16 @@ test.describe('Cinesa Promotions Tests', () => {
 
   test(
     'Promotions · Page · Navigate · Redirect',
-    { tag: ['@promotions', '@cinesa', '@regression', '@medium'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-fail',
+        '@promotions',
+        '@cinesa',
+        '@regression',
+        '@medium',
+      ],
+    },
     async ({ page, navbar, webActions }) => {
       await allure.story('Promotions page URL redirection validation');
       await navbar.navigateToPromotions();

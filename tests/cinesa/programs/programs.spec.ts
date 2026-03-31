@@ -21,7 +21,14 @@ test.describe(
     test(
       'Programs · Unlimited · Display & Layout · From URL',
       {
-        tag: ['@smoke', '@fast', '@COMS-11226', '@broken-prod'],
+        tag: [
+          '@lab-pass',
+          '@preprod-fail',
+          '@smoke',
+          '@fast',
+          '@COMS-11226',
+          '@broken-prod',
+        ],
       },
       async ({
         page,
@@ -42,7 +49,7 @@ test.describe(
     test(
       'Programs · Unlimited · Display & Layout · From Home',
       {
-        tag: ['@smoke', '@fast', '@COMS-11226'],
+        tag: ['@lab-pass', '@preprod-pass', '@smoke', '@fast', '@COMS-11226'],
       },
       async ({ page, programsPage, unlimitedProgramsPage, navbar }) => {
         await allure.story('COMS-11226 - Unlimited programs page from home');
@@ -61,7 +68,7 @@ test.describe(
     test(
       'Programs · Page · Display & Layout',
       {
-        tag: ['@regression', '@medium'],
+        tag: ['@lab-pass', '@preprod-pass', '@regression', '@medium'],
       },
       async ({ page, navbar }, testInfo) => {
         await allure.story('Programs page display and layout');
@@ -77,7 +84,7 @@ test.describe(
     test(
       'Programs · Page · Navigate · Redirect',
       {
-        tag: ['@regression', '@medium'],
+        tag: ['@lab-pass', '@preprod-pass', '@regression', '@medium'],
       },
       async ({ page, navbar }) => {
         await allure.story('Programs page URL redirection validation');

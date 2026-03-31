@@ -48,16 +48,69 @@ npm run report                   # copy-categories → copy-history → generate
 Allure categories automatically classify failed/broken tests based on:
 
 - **Status:** `broken` (infrastructure/test issues) or `failed` (product defects)
-- **Error Messages:** Regex patterns matching exception messages
-- **Stack Traces:** Regex patterns matching stack traces
+- **Error Messages:** Regex patterns matching exception messages (`messageRegex`)
 
 When a test fails, Allure evaluates categories **in order** and assigns the **first matching** category.
 
 ## Current Categories (Priority Order)
 
-### 1. Test Timeouts
+### 1. Network / Environment
 
-**Priority:** 🔴 Critical - Infrastructure Issue
+**Priority:** 🔴 Critical — Infrastructure Issue
+
+**Pattern:**
+
+```json
+{
+  "name": "Network / Environment",
+  "matchedStatuses": ["failed", "broken"],
+  "messageRegex": ".*(?:net::ERR_|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up).*"
+}
+```
+
+**Characteristics:**
+
+- DNS resolution failures (`net::ERR_NAME_NOT_RESOLVED`)
+- Connection resets or refused (`ECONNRESET`, `ECONNREFUSED`)
+- Network changes mid-test (`net::ERR_NETWORK_CHANGED`)
+- More common in lab/preprod due to environment instability
+
+**Action Required:** Retry the test run. If persistent, escalate to infrastructure team.
+
+---
+
+### 2. Data / Content Availability
+
+**Priority:** 🟡 Medium — Test Data Issue
+
+**Pattern:**
+
+```json
+{
+  "name": "Data / Content Availability",
+  "matchedStatuses": ["failed"],
+  "messageRegex": ".*(?:No D-BOX films|No suitable seats found|No .* found on the cinema).*"
+}
+```
+
+**Characteristics:**
+
+- Tests expecting specific content (D-BOX films, seat layouts) not available in the environment
+- Expected in some cinemas that don't carry certain formats
+- Not a product bug — a data/environment issue
+
+**Affected Tests:**
+
+- `seatPicker/seatPicker.spec.ts` — D-BOX seat selection tests
+- `seatPicker/seatPicker.spec.ts` — Seat group selection tests
+
+**Action Required:** Verify cinema capabilities before running format-specific tests. Use `config/cinemas.config.ts` to scope parametrization.
+
+---
+
+### 3. Test Timeouts
+
+**Priority:** 🔴 Critical — Infrastructure Issue
 
 **Pattern:**
 
@@ -65,245 +118,104 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 {
   "name": "Test Timeouts",
   "matchedStatuses": ["broken"],
-  "messageRegex": ".*Test timeout of 90000ms exceeded.*"
+  "messageRegex": ".*(?:Test timeout of \\d+ms exceeded).*"
 }
 ```
 
 **Characteristics:**
 
-- Tests exceeding 90-second timeout
-- Usually affects Grancasa cinema tests
+- Full test exceeded its timeout budget (usually 90s)
+- Marked as `broken` (not `failed`) because the test didn't complete
 - Indicates severe performance or infrastructure problems
-
-**Affected Tests:**
-
-- `bar/bar.spec.ts` - Classic menu tests (Grancasa)
-- `seatPicker/seatPicker.spec.ts` - Multiple seat selection (Grancasa)
 
 **Action Required:** Investigate infrastructure issues, consider increasing timeout for specific tests, or optimize page load performance.
 
 ---
 
-### 2. Page Closed Errors
+### 4. UI: Interaction Timeouts
 
-**Priority:** 🔴 Critical - Stability Issue
-
-**Pattern:**
-
-```json
-{
-  "name": "Page Closed Errors",
-  "matchedStatuses": ["broken", "failed"],
-  "messageRegex": ".*(Target page, context or browser has been closed).*"
-}
-```
-
-**Characteristics:**
-
-- Unexpected browser/page/context closure
-- 100% of cases occur in Grancasa cinema tests
-- Happens during seat retrieval from DOM
-
-**Affected Tests:**
-
-- `bar/bar.spec.ts` - Buy ticket with Classic menu (Grancasa)
-- `seatPicker/seatPicker.spec.ts` - Full purchase with multiple seats (Grancasa)
-
-**Root Cause:** Grancasa cinema page may have JavaScript errors or unexpected navigation during seat loading.
-
-**Action Required:** Add browser console error logging, implement retry logic for seat retrieval, investigate Grancasa-specific frontend issues.
-
----
-
-### 3. D-BOX Availability Issues
-
-**Priority:** 🟡 Medium - Test Data Issue
+**Priority:** 🟠 High — Stability Issue
 
 **Pattern:**
 
 ```json
 {
-  "name": "D-BOX Availability Issues",
-  "matchedStatuses": ["failed"],
-  "messageRegex": ".*No D-BOX films with showtimes found on the cinema detail page.*"
+  "name": "UI: Interaction Timeouts",
+  "matchedStatuses": ["failed", "broken"],
+  "messageRegex": ".*(?:Timeout \\d+ms exceeded).*"
 }
 ```
 
 **Characteristics:**
 
-- Tests expecting D-BOX format films
-- Grancasa cinema doesn't have D-BOX showtimes available
-- Expected behavior in production
-
-**Affected Tests:**
-
-- `seatPicker/seatPicker.spec.ts` - D-BOX sofa seat selection tests (Grancasa)
+- A specific Playwright action timed out: `locator.click`, `locator.waitFor`, `page.waitForSelector`, `browserContext.waitForEvent`
+- Element did not appear or become interactive within the configured timeout
+- Common in slow environments (lab, preprod)
+- Covers both locator timeouts and context event timeouts (e.g. waiting for new tab)
 
 **Action Required:**
 
-- Skip D-BOX tests for cinemas without this format
-- Update test parametrization to check cinema capabilities before execution
-- Consider using cinema configuration in `config/cinemas.config.ts`
+- Check if element selectors are still valid (use `npx playwright codegen`)
+- Consider increasing individual action timeouts for known slow pages
+- Verify the page under test is functional manually
 
 ---
 
-### 4. Promotional Code Issues
+### 5. UI: Selectors / Strict Mode
 
-**Priority:** 🟠 High - Product Defect (Potential)
+**Priority:** 🟠 High — Test Quality Issue
 
 **Pattern:**
 
 ```json
 {
-  "name": "Promotional Code Issues",
-  "matchedStatuses": ["failed"],
-  "messageRegex": ".*(waiting for locator.*ABCD.*to be visible).*"
+  "name": "UI: Selectors / Strict Mode",
+  "matchedStatuses": ["failed", "broken"],
+  "messageRegex": ".*(?:strict mode violation|resolved to \\d+ elements|detached from DOM).*"
 }
 ```
 
 **Characteristics:**
 
-- Tests failing when selecting promotional codes
-- Dropdown options (e.g., "ABCD") not appearing
-- Cookie banner may be interfering (see history: passed after cookie accepted)
-
-**Affected Tests:**
-
-- `seatPicker/seatPicker.spec.ts` - Full purchase with standard promotional code (Oasiz)
+- Selector matches multiple elements (strict mode violation)
+- Element was removed from DOM during interaction
+- Requires more specific selectors
 
 **Action Required:**
 
-- Verify promotional codes are active in production
-- Add explicit wait for dropdown to be fully loaded
-- Investigate if cookie banner overlay blocks interaction
-
----
-
-### 5. Seat Selection Logic Errors
-
-**Priority:** 🟠 High - Product Defect
-
-**Pattern:**
-
-```json
-{
-  "name": "Seat Selection Logic Errors",
-  "matchedStatuses": ["failed"],
-  "messageRegex": ".*(No suitable seats found for the group).*"
-}
-```
-
-**Characteristics:**
-
-- Algorithm fails to find seats matching criteria
-- Affects tests with complex seat selection rules (separating groups, companion seats)
-
-**Affected Tests:**
-
-- `seatPicker/seatPicker.spec.ts` - Select seats separating group in different rows (Grancasa)
-
-**Action Required:**
-
-- Review seat selection algorithm in `seatPicker.page.ts`
-- Add fallback logic for edge cases
-- Consider using less restrictive selection criteria in tests
-
----
-
-### 6. Cookie Banner Handling
-
-**Priority:** 🟢 Low - Non-Critical
-
-**Pattern:**
-
-```json
-{
-  "name": "Cookie Banner Handling",
-  "matchedStatuses": ["failed"],
-  "messageRegex": ".*waiting for locator.*onetrust-banner-sdk.*to be visible.*"
-}
-```
-
-**Characteristics:**
-
-- Cookie banner sometimes doesn't appear (already accepted in previous session)
-- Test continues normally after timeout (3 seconds)
-- Not a blocking failure
-
-**Affected Tests:**
-
-- Various tests with `cookieBanner.acceptAllCookies()` in beforeEach
-
-**Current Mitigation:** Implemented in `cookieBanner.page.ts` with 3-second timeout and graceful continuation.
-
-**Action Required:** None - working as designed.
-
----
-
-### 7. Strict Mode Violations
-
-**Priority:** 🟠 High - Test Quality Issue
-
-**Pattern:**
-
-```json
-{
-  "name": "Strict Mode Violations",
-  "matchedStatuses": ["failed"],
-  "messageRegex": ".*strict mode violation.*resolved to \\d+ elements.*"
-}
-```
-
-**Characteristics:**
-
-- Selector matches multiple elements
-- Playwright's strict mode prevents ambiguous clicks
-- Example: `.v-number-input__button--plus` matches 5 ticket type buttons
-
-**Affected Tests:**
-
-- `bar/bar.spec.ts` - Buy ticket with Classic menu (Oasiz)
-
-**Action Required:**
-
-- Refine selectors to be more specific
-- Use `first()`, `nth()`, or filter methods
+- Refine selectors to be more specific (use `first()`, `nth()`, or `filter()`)
 - Update `*.selectors.ts` files with unique selectors
+- If `detached from DOM`, add retry logic or wait for stable state
 
 ---
 
-### 8. Grancasa Cinema Issues
+### 6. Infra / Browser
 
-**Priority:** 🔴 Critical - Infrastructure
+**Priority:** 🔴 Critical — Infrastructure Issue
 
 **Pattern:**
 
 ```json
 {
-  "name": "Grancasa Cinema Issues",
-  "matchedStatuses": ["broken", "failed"],
-  "traceRegex": ".*Grancasa.*"
+  "name": "Infra / Browser",
+  "matchedStatuses": ["broken"],
+  "messageRegex": ".*(?:Target page, context or browser has been closed|Target closed|Context closed|browserType\\.launch).*"
 }
 ```
 
 **Characteristics:**
 
-- Catch-all category for Grancasa-specific problems
-- Combines timeouts, page closures, and stability issues
-- 90%+ failure rate in Grancasa vs. 5% in Oasiz
+- Browser, page, or context crashed or closed unexpectedly
+- `browserType.launch` failure indicates browser binary issues
+- Only matches `broken` status
 
-**Action Required:**
-
-- Isolate Grancasa tests in separate test runs
-- Add cinema-specific retry logic
-- Consider marking Grancasa tests with `@grancasa-unstable` tag
-- Escalate to Grancasa cinema technical team
+**Action Required:** Check browser installation (`npx playwright install`), investigate JavaScript errors on the page, review test isolation.
 
 ---
 
-### 9. Product Defects
+### 7. Product Defects
 
-**Priority:** 🔴 Critical - Development Team
+**Priority:** 🔴 Critical — Development Team
 
 **Pattern:**
 
@@ -316,34 +228,13 @@ When a test fails, Allure evaluates categories **in order** and assigns the **fi
 
 **Characteristics:**
 
-- Genuine bugs in the application
-- Tests correctly identify incorrect behavior
-- Requires developer fix
+- Catch-all for test failures that don't match any specific pattern
+- Genuine assertion failures: wrong URLs, incorrect values, missing elements
+- Tests correctly identify incorrect behavior in the application
 
 **Action Required:** Create JIRA tickets, assign to development team.
 
 ---
-
-### 10. Test Infrastructure Issues
-
-**Priority:** 🟡 Medium - Test Maintenance
-
-**Pattern:**
-
-```json
-{
-  "name": "Test Infrastructure Issues",
-  "matchedStatuses": ["broken"]
-}
-```
-
-**Characteristics:**
-
-- Test framework problems
-- Configuration issues
-- Flaky test patterns
-
-**Action Required:** Refactor tests, improve webActions reliability, review Playwright configuration.
 
 ---
 
@@ -366,9 +257,9 @@ Navigate to:
 
 Categories help answer:
 
-- **What's the main issue?** (e.g., "70% failures are Test Timeouts")
-- **Which cinema is problematic?** (e.g., "Grancasa Cinema Issues" category)
-- **Are failures test bugs or product bugs?** (e.g., "Product Defects" vs. "Test Infrastructure Issues")
+- **What's the main issue?** (e.g., "50% failures are UI: Interaction Timeouts")
+- **Is it a real bug or environment noise?** (e.g., "Product Defects" vs. "Network / Environment")
+- **Is content missing?** (e.g., "Data / Content Availability" — D-BOX, seats)
 
 ---
 
@@ -390,17 +281,19 @@ Categories are evaluated **top-to-bottom**. More specific categories should come
 
 ```json
 [
-  { "name": "D-BOX Availability Issues", "messageRegex": ".*D-BOX.*" }, // Specific
-  { "name": "Product Defects", "matchedStatuses": ["failed"] } // Generic (catches all)
+  { "name": "Data / Content Availability", "messageRegex": ".*(?:No D-BOX films|No suitable seats).*" },
+  { "name": "UI: Interaction Timeouts", "messageRegex": ".*(?:Timeout \\d+ms exceeded).*" },
+  { "name": "Product Defects", "matchedStatuses": ["failed"] }
 ]
 ```
 
 ### Regex Pattern Tips
 
-- **Escape special characters:** `\.`, `\(`, `\)`
-- **Case-insensitive:** Most patterns use `.*` to match any prefix/suffix
-- **Multi-line support:** Use `.*` to span multiple lines
-- **Test regex:** Use https://regex101.com/ with sample error messages
+- **Full-match semantics:** Allure Java uses `Pattern.matches()` — the regex must match the **entire** message. Always wrap patterns with `.*(?:...).*`
+- **DOTALL mode:** Allure compiles with `DOTALL` flag — `.` matches newlines too
+- **Case sensitive:** Java regex is case-sensitive by default
+- **Test regex:** Use https://regex101.com/ (Java flavor) with sample error messages
+- **Validate locally:** Run `node scripts/extract-errors.cjs` to test patterns against real results
 
 ---
 
@@ -408,20 +301,54 @@ Categories are evaluated **top-to-bottom**. More specific categories should come
 
 Categories complement the tag system:
 
-| Tag            | Allure Category                    | Purpose                                 |
-| -------------- | ---------------------------------- | --------------------------------------- |
-| `@broken-prod` | Test Timeouts, Page Closed Errors  | Severe failures requiring urgent fix    |
-| `@failed-prod` | Product Defects, Seat Logic Errors | Minor failures requiring investigation  |
-| `@grancasa`    | Grancasa Cinema Issues             | Cinema-specific problems                |
-| `@smoke`       | N/A                                | Critical path tests (should never fail) |
+| Tag        | Likely Allure Category         | Purpose                              |
+| ---------- | ------------------------------ | ------------------------------------ |
+| `@smoke`   | Product Defects (if failing)   | Critical path — should never fail    |
+| `@e2e`     | UI: Interaction Timeouts       | Long flows more prone to timeouts    |
+| `@fast`    | Product Defects                | Quick tests — timeouts are unlikely  |
+| `@oasiz`   | Data / Content Availability    | Cinema-specific content issues       |
 
 ---
 
 ## Examples from Recent Execution
 
-### Test Timeout Example
+### D-BOX Content Not Available
 
-**Test:** `bar/bar.spec.ts` - Buy multiple tickets with Classic menu (Oasiz)
+**Test:** `seatPicker/seatPicker.spec.ts` — D-BOX sofa seat selection (Oasiz)
+
+**Error:**
+
+```
+Error: No D-BOX films with showtimes found on the cinema detail page
+```
+
+**Category Assigned:** `Data / Content Availability`
+
+**Action:** Verify D-BOX showtimes exist in the cinema. Skip test if format not available.
+
+---
+
+### Locator Timeout
+
+**Test:** `bar/bar.spec.ts` — F&B Classic Menu purchase (Oasiz)
+
+**Error:**
+
+```
+TimeoutError: locator.waitFor: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator('button.v-button.button-review') to be visible
+```
+
+**Category Assigned:** `UI: Interaction Timeouts`
+
+**Action:** Check if the element selector is still valid, increase timeout if environment is slow.
+
+---
+
+### Test-Level Timeout
+
+**Test:** `seatPicker/seatPicker.spec.ts` — Wheelchair seat selection (Oasiz)
 
 **Error:**
 
@@ -431,41 +358,7 @@ Test timeout of 90000ms exceeded.
 
 **Category Assigned:** `Test Timeouts`
 
-**Action:** Increase timeout to 120s or optimize page load.
-
----
-
-### Page Closed Example
-
-**Test:** `seatPicker/seatPicker.spec.ts` - Full purchase with multiple seats (Grancasa)
-
-**Error:**
-
-```
-Error: locator.getAttribute: Target page, context or browser has been closed
-Call log:
-  - waiting for locator('.v-seat-picker-seat').nth(119)
-```
-
-**Category Assigned:** `Page Closed Errors`
-
-**Action:** Add browser console logging to capture JavaScript errors.
-
----
-
-### D-BOX Availability Example
-
-**Test:** `seatPicker/seatPicker.spec.ts` - D-BOX sofa seat selection (Grancasa)
-
-**Error:**
-
-```
-Error: No D-BOX films with showtimes found on the cinema detail page
-```
-
-**Category Assigned:** `D-BOX Availability Issues`
-
-**Action:** Skip test for cinemas without D-BOX support.
+**Action:** Investigate performance, consider increasing test timeout or optimizing flow.
 
 ---
 
@@ -473,15 +366,22 @@ Error: No D-BOX films with showtimes found on the cinema detail page
 
 - **Allure Official Docs:** https://allurereport.org/docs/categories/
 - **Test Tags Strategy:** `docs/TEST_TAGS_STRATEGY.md`
-- **Allure Workflow:** `docs/ALLURE_WORKFLOW_CRITICAL.md`
-- **Allure Directory Structure:** `docs/ALLURE_DIRECTORY_STRUCTURE.md`
 
 ---
 
 ## Changelog
 
+### 2025-03-25 - Category Redesign
+
+- Reduced to 7 cross-environment categories (was 10 with cinema-specific categories)
+- Switched from `traceRegex` to `messageRegex` for reliable matching
+- All regex patterns use `.*(?:...).*` wrapper (Allure Java full-match semantics)
+- All regex patterns validated against real Allure result files
+- Removed Grancasa-specific category (cinema removed from active testing)
+- Added `Data / Content Availability` for D-BOX/seat content issues
+- Added validation script: `scripts/extract-errors.cjs`
+
 ### 2025-01-11 - Initial Categories
 
 - Created 10 categories based on production test results analysis
 - Prioritized by failure frequency and impact
-- Aligned with @broken-prod and @failed-prod tags

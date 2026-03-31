@@ -9,11 +9,12 @@ const CINEMAS = getCinemasForEnvironment();
 test.describe('Checkout E2E Tests', () => {
   test.describe.configure({ timeout: 180000 });
 
-  test.beforeEach(async ({ navbar }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Checkout - End to End');
 
     await navbar.navigateToHome();
+    await promotionalModal.closeModalIfVisible();
   });
 
   test.describe('Single Seat Purchase', () => {
@@ -25,7 +26,15 @@ test.describe('Checkout E2E Tests', () => {
       test(
         `Checkout · E2E · Single Seat · Gift Card — ${cinema.name}`,
         {
-          tag: ['@checkout', '@e2e', '@cinesa', '@booking', ...cinema.tags],
+          tag: [
+            '@lab-pass',
+            '@preprod-fail',
+            '@checkout',
+            '@e2e',
+            '@cinesa',
+            '@booking',
+            ...cinema.tags,
+          ],
         },
         async ({
           navbar,
@@ -69,7 +78,15 @@ test.describe('Checkout E2E Tests', () => {
       test(
         `Checkout · E2E · Multiple Seats · Gift Card — ${cinema.name}`,
         {
-          tag: ['@checkout', '@e2e', '@cinesa', '@booking', ...cinema.tags],
+          tag: [
+            '@lab-fail',
+            '@preprod-fail',
+            '@checkout',
+            '@e2e',
+            '@cinesa',
+            '@booking',
+            ...cinema.tags,
+          ],
         },
         async ({
           navbar,

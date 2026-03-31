@@ -8,6 +8,12 @@ dist/
 .env.local
 .env.*.local
 
+# MCP config with secrets (generated from .env via scripts/generate-mcp-config.cjs)
+config/mcp/*.config.json
+
+# MCP browser session artifacts (screenshots, snapshots)
+.playwright-mcp/
+
 # Session state files (contienen tokens y cookies sensibles)
 loggedInState*.json
 sessionState*.json

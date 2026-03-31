@@ -36,7 +36,7 @@ export const AVAILABLE_CINEMAS: CinemaConfig[] = [
     selectMethod: 'selectOasizCinema',
     tags: ['@oasiz'],
     availableInEnvironments: ['production', 'lab', 'preprod'],
-    //isDefault: true,
+    isDefault: true,
   },
   // Grancasa removed as per requirement (TIM-1260 / user request)
   // {
@@ -45,14 +45,13 @@ export const AVAILABLE_CINEMAS: CinemaConfig[] = [
   //   tags: ['@grancasa'],
   //   availableInEnvironments: ['production', 'lab'], // NOT in preprod
   // },
-  // Puerto Venecia Cinema
-  {
-    name: 'Puerto Venecia',
-    selectMethod: 'selectPuertoVeneciaCinema', // Reusing method for simplicity, can be updated if needed
-    tags: ['@puerto-venecia'],
-    availableInEnvironments: ['lab'],
-    isDefault: true,
-  },
+  // Puerto Venecia Cinema — removed from lab (only Oasiz is available in lab)
+  // {
+  //   name: 'Puerto Venecia',
+  //   selectMethod: 'selectPuertoVeneciaCinema',
+  //   tags: ['@puerto-venecia'],
+  //   availableInEnvironments: ['production'],
+  // },
 ];
 
 /**

@@ -12,7 +12,16 @@ test.describe('Login', () => {
 
   test(
     'Login · Auth · Login · Valid credentials',
-    { tag: ['@login', '@cinesa', '@smoke', '@fast'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@login',
+        '@cinesa',
+        '@smoke',
+        '@fast',
+      ],
+    },
     async ({ loginPage, navbar }) => {
       await allure.story('User login with valid credentials');
       await navbar.navigateToSignIn();
@@ -23,7 +32,16 @@ test.describe('Login', () => {
 
   test(
     'Login · Form · Display · Structure',
-    { tag: ['@login', '@cinesa', '@smoke', '@fast'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@login',
+        '@cinesa',
+        '@smoke',
+        '@fast',
+      ],
+    },
     async ({ webActions, navbar }) => {
       await allure.story('Login form display validation');
       await navbar.navigateToSignIn();

@@ -14,7 +14,16 @@ test.describe('Cinesa Experiences Tests', () => {
 
   test(
     'Experiences · Page · Display & Layout',
-    { tag: ['@experiences', '@cinesa', '@smoke', '@medium'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@experiences',
+        '@cinesa',
+        '@smoke',
+        '@medium',
+      ],
+    },
     async ({ webActions, navbar }) => {
       await allure.story('Experiences page display and layout');
       await navbar.navigateToExperiences();
@@ -28,7 +37,16 @@ test.describe('Cinesa Experiences Tests', () => {
 
   test(
     'Experiences · Navigation · Redirect',
-    { tag: ['@experiences', '@cinesa', '@navigation', '@fast'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@experiences',
+        '@cinesa',
+        '@navigation',
+        '@fast',
+      ],
+    },
     async ({ webActions, navbar }) => {
       await allure.story('Experiences page URL redirection validation');
       await navbar.navigateToExperiences();

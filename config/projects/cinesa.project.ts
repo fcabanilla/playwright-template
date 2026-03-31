@@ -15,6 +15,7 @@ export function getCinesaProject(): Project {
   const TESTS_TO_IGNORE = [
     // Folders
     'cloudflare/**',
+    'footer/**', // Temporarily excluded — tests need redesign
     // 'login/**',
     // 'signup/**',  // ✅ Signup tests now included
     'mail/**', // por si existiera

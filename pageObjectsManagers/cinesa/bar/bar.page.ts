@@ -87,7 +87,7 @@ export class BarPage {
         const sectionCount = await sections.count();
         let selectedAnyOption = false;
 
-        for (let i = 0; i < Math.min(2, sectionCount); i++) {
+        for (let i = 0; i < sectionCount; i++) {
           const section = sections.nth(i);
           const options = section.locator(BAR_SELECTORS.modalSectionOptions);
           const optionCount = await options.count();

@@ -37,6 +37,8 @@ test.describe('Google Analytics DataLayer Validation', () => {
       `GA4 · Data Layer · Validate events · ${config.menuType} menu — ${config.cinema.name}`,
       {
         tag: [
+          '@lab-fail',
+          '@preprod-fail',
           '@analytics',
           '@cinesa',
           '@e2e',

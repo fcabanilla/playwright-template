@@ -35,7 +35,9 @@ export const test = base.extend<CustomFixtures>({
     const originalUA = await tempPage.evaluate(() => navigator.userAgent);
     await tempContext.close();
 
-    const suffix = process.env.USER_AGENT_SUFFIX ? ` ${process.env.USER_AGENT_SUFFIX}` : '';
+    const suffix = process.env.USER_AGENT_SUFFIX
+      ? ` ${process.env.USER_AGENT_SUFFIX}`
+      : '';
     const finalUserAgent = originalUA + suffix;
 
     const context = await browser.newContext({ userAgent: finalUserAgent });

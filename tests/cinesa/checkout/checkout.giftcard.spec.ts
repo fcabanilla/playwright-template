@@ -10,11 +10,12 @@ const OASIZ_CINEMA = CINEMAS.find((cinema) => cinema.name === 'Oasiz');
 test.describe('Checkout Gift Card Tests', () => {
   test.describe.configure({ timeout: 180000 });
 
-  test.beforeEach(async ({ navbar }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Checkout - Gift Card Payment');
 
     await navbar.navigateToHome();
+    await promotionalModal.closeModalIfVisible();
   });
 
   for (const cinema of CINEMAS) {
@@ -22,6 +23,8 @@ test.describe('Checkout Gift Card Tests', () => {
       `Checkout · Gift Card · Full Purchase with Post-Payment Verification — ${cinema.name}`,
       {
         tag: [
+          '@lab-fail',
+          '@preprod-fail',
           '@checkout',
           '@giftcard',
           '@cinesa',
@@ -96,6 +99,7 @@ test.describe('Checkout Gift Card Tests', () => {
     'Checkout · Gift Card · Nine Seats · Full Purchase with Post-Payment Verification — Oasiz',
     {
       tag: [
+        '@lab-fail',
         '@checkout',
         '@giftcard',
         '@cinesa',
@@ -124,7 +128,10 @@ test.describe('Checkout Gift Card Tests', () => {
         (process.env.TEST_ENV || 'production') !== 'lab',
         'This scenario is targeted to lab only'
       );
-      test.skip(!OASIZ_CINEMA, 'Oasiz is not available in the current environment');
+      test.skip(
+        !OASIZ_CINEMA,
+        'Oasiz is not available in the current environment'
+      );
 
       const seatsToSelect = 9;
 

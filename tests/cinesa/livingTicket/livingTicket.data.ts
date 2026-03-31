@@ -41,8 +41,8 @@ export const livingTicketValidationData: LivingTicketValidationData = {
   ],
   qrReferencePattern: /^[A-Z0-9-]{5,}$/i,
   roomPattern: /^(?:sala|room)?\s*\d{1,3}$/i,
-  areaPattern: /[áa]rea|area|luxe|premium|vip/i,
-  seatRowPattern: /^[a-z]?\d+\s*[-,]\s*[a-z]?\d+$/i,
+  areaPattern: /[áa]rea|area|luxe|premium|vip|recliner\+?/i,
+  seatRowPattern: /^\d+-\d+(\s+a\s+\d+-\d+)?(,\s*\d+-\d+(\s+a\s+\d+-\d+)?)*$/i,
   currencyPattern: /^\d+[.,]\d{2}\s*€$|^€\s*\d+[.,]\d{2}$/,
   transactionIdPattern: /identificador\s+de\s+la\s+transacci[oó]n:\s*\d+/i,
   requiredTransactionFields: [

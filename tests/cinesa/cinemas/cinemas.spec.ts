@@ -20,7 +20,16 @@ test.describe('Cinesa Cinemas Tests', () => {
 
   test(
     'Cinemas · Page · Display & Layout',
-    { tag: ['@cinemas', '@cinesa', '@smoke', '@medium'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@cinemas',
+        '@cinesa',
+        '@smoke',
+        '@medium',
+      ],
+    },
     async ({ webActions, navbar }) => {
       await allure.story('Cinemas page display and layout');
       await navbar.navigateToCinemas();
@@ -32,7 +41,16 @@ test.describe('Cinesa Cinemas Tests', () => {
 
   test(
     'Cinemas · Page · Navigate · Redirect',
-    { tag: ['@cinemas', '@cinesa', '@navigation', '@fast'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@cinemas',
+        '@cinesa',
+        '@navigation',
+        '@fast',
+      ],
+    },
     async ({ webActions, navbar }) => {
       await allure.story('Cinemas page URL redirection validation');
       await navbar.navigateToCinemas();
@@ -47,6 +65,8 @@ test.describe('Cinesa Cinemas Tests', () => {
       `Cinemas · Schema · Validate · ${cinema.name}`,
       {
         tag: [
+          '@lab-pass',
+          '@preprod-pass',
           '@cinemas',
           '@cinesa',
           '@schema',

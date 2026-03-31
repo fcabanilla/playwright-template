@@ -17,10 +17,6 @@ export class RedsysPage {
     const cardData = card ?? RedsysTestData.getValidVisa();
 
     await allure.step('Fill Redsys credit card details', async () => {
-      // Redsys often uses a single input for date (MM/YY) or two separate ones.
-      // Assuming standard ID based inputs for now based on 'clean' environment.
-      // We use type instead of fill ensuring key events are triggered for masks.
-
       await this.webActions.fill(
         this.selectors.cardNumber,
         cardData.number,
@@ -30,19 +26,34 @@ export class RedsysPage {
       // Wait for card validation/masking
       await this.webActions.wait(1000);
 
-      // Handle Expiration Date - Two-step fill MM then type YY
-      // We explicitly fill month first
-      await this.webActions.fill(
-        this.selectors.expirationDate,
-        cardData.expirationMonth,
-        'Expiration Month'
+      // Expiration Date — Redsys uses a masked input (MMYY) that:
+      //   - Rejects pressSequentially (synthetic keystrokes ignored by mask)
+      //   - Accepts fill() momentarily, but mask clears value on blur
+      // Solution: Use native value setter + input/change events to bypass
+      // React's controlled input and satisfy the mask's validation.
+      const expirationValue =
+        cardData.expirationMonth + cardData.expirationYear;
+      await allure.step(
+        `[ACT] Fill masked input | Field=Expiration Date | Value=${expirationValue}`,
+        async () => {
+          const locator = this.webActions.page.locator(
+            this.selectors.expirationDate
+          );
+          await locator.click();
+          await locator.evaluate((el: HTMLInputElement, value: string) => {
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLInputElement.prototype,
+              'value'
+            )?.set;
+            nativeInputValueSetter?.call(el, value);
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          }, expirationValue);
+        }
       );
 
-      // Wait a bit and type the year
+      // Brief wait to let mask process the value before moving focus to CVV
       await this.webActions.wait(500);
-      await this.webActions.page
-        .locator(this.selectors.expirationDate)
-        .type(cardData.expirationYear);
 
       await this.webActions.fill(this.selectors.cvv, cardData.cvv, 'CVV');
     });

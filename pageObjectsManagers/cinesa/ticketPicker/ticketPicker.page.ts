@@ -413,10 +413,15 @@ export class TicketPicker {
    *
    * @param promo - Promotional code to apply
    */
-  async selectPromotionalCode(promo: string): Promise<void> {
+  async selectPromotionalCode(
+    promo: string,
+    comboOptionText?: string
+  ): Promise<void> {
     await this.openPromoAccordion();
     await this.fillPromoInput(promo);
-    await this.selectPromoComboOption(promo);
+    if (comboOptionText) {
+      await this.selectPromoComboOption(comboOptionText);
+    }
     await this.clickPromoContinue();
   }
 }

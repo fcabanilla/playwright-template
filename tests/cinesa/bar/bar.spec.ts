@@ -23,6 +23,8 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
         `F&B · Classic Menu · Purchase · Single ticket — ${menuConfig.cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-fail',
             '@bar',
             '@cinesa',
             '@e2e',
@@ -71,6 +73,8 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
         `F&B · Classic Menu · Purchase · Multiple tickets — ${menuConfig.cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-broken',
             '@bar',
             '@cinesa',
             '@e2e',

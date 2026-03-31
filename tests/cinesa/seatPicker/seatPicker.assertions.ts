@@ -15,7 +15,9 @@ export async function assertWarningMessageDisplayed(page: Page): Promise<void> {
  * Asserts that the red warning message is NOT displayed.
  * @param page Playwright Page object.
  */
-export async function assertWarningMessageNotDisplayed(page: Page): Promise<void> {
+export async function assertWarningMessageNotDisplayed(
+  page: Page
+): Promise<void> {
   const warningMessage = page.locator(SEAT_PICKER_SELECTORS.warningMessage);
   await expect(warningMessage).not.toBeVisible();
 }
@@ -78,27 +80,35 @@ export function assertTicketTypeNamesMatchExpectedTexts(
 ): void {
   // Common ticket type patterns that should be valid
   const validTicketPatterns = [
-    /.*Luxe$/,           // Any ticket ending with "Luxe"
-    /.*D-BOX$/,          // Any ticket ending with "D-BOX"
-    /.*Sofa$/,           // Any ticket ending with "Sofa"
+    /.*Luxe$/, // Any ticket ending with "Luxe"
+    /.*D-BOX$/, // Any ticket ending with "D-BOX"
+    /.*Sofa$/, // Any ticket ending with "Sofa"
+    /VIP Bed/, // VIP Bed premium seats
+    /LUXE Premium/, // LUXE Premium seats
+    /LUXE Plus/, // LUXE Plus seats
+    /Recliner Extra/, // Recliner Extra seats
     /Bonificada Senior/, // Senior discount tickets
-    /Fiesta del cine/,   // Festival tickets
-    /^-?Normal/,         // Normal tickets
-    /^-?Menores/,        // Children tickets
-    /^-?Carnet Joven/,   // Youth card tickets
-    /^-?Estudiante/,     // Student tickets
-    /^-?Paro/,           // Unemployed tickets
-    /^-?Discapacitado/,  // Disability tickets
+    /Fiesta del cine/, // Festival tickets
+    /Dimecres al Cinema/, // Wednesday cinema promo (Catalan)
+    /^-?Normal/, // Normal tickets
+    /^-?Menores/, // Children tickets
+    /^-?Carnet Joven/, // Youth card tickets
+    /^-?Estudiante/, // Student tickets
+    /^-?Paro/, // Unemployed tickets
+    /^-?Discapacitado/, // Disability tickets
     /^-?Familia Numerosa/, // Large family tickets
+    /^-?Adult$/i, // English ticket name (Lab environment)
   ];
 
   for (const name of ticketTypeNames) {
-    const isValidPattern = validTicketPatterns.some(pattern => pattern.test(name));
-    
+    const isValidPattern = validTicketPatterns.some((pattern) =>
+      pattern.test(name)
+    );
+
     if (!isValidPattern) {
       // If it doesn't match a pattern, check the old logic as fallback
-      const found = ticketTypeMappings.some(mapping =>
-        mapping.expectedTicketText.some(expectedText =>
+      const found = ticketTypeMappings.some((mapping) =>
+        mapping.expectedTicketText.some((expectedText) =>
           name.includes(expectedText)
         )
       );

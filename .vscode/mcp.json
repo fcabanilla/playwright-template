@@ -1,0 +1,24 @@
+{
+  "servers": {
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "playwright-cf": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--config",
+        "config/mcp/mcp-cloudflare.config.json",
+        "--user-agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 ocgtest.es",
+        "--isolated",
+        "--no-sandbox",
+        "--ignore-https-errors"
+      ]
+    }
+  },
+  "inputs": []
+}

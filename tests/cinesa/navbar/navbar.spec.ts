@@ -19,7 +19,7 @@ test.describe('Navbar - Navegación Principal', () => {
     test(
       'Navbar · Visibility · Display · All elements',
       {
-        tag: ['@navbar', '@cinesa', '@smoke'],
+        tag: ['@lab-pass', '@preprod-pass', '@navbar', '@cinesa', '@smoke'],
       },
       async () => {
         await allure.story('Verificar elementos visibles del navbar');
@@ -37,7 +37,7 @@ test.describe('Navbar - Navegación Principal', () => {
     test(
       'Navbar · Navigation · Click logo · Stay on home',
       {
-        tag: ['@navbar', '@cinesa', '@smoke'],
+        tag: ['@lab-pass', '@preprod-pass', '@navbar', '@cinesa', '@smoke'],
       },
       async ({ navbar }) => {
         await allure.story('Click en logo mantiene home');
@@ -52,34 +52,36 @@ test.describe('Navbar - Navegación Principal', () => {
   });
 
   test.describe('Navegación Completa - DEMO', () => {
-    test('Navbar · Navigation · Click each element · Navigate accordingly — DEMO', async ({
-      navbar,
-    }) => {
-      await allure.story('Navegación por todos los elementos del navbar');
-      const { internalNavItems, externalNavItem } = getNavbarData();
+    test(
+      'Navbar · Navigation · Click each element · Navigate accordingly — DEMO',
+      { tag: ['@lab-pass', '@preprod-broken'] },
+      async ({ navbar }) => {
+        await allure.story('Navegación por todos los elementos del navbar');
+        const { internalNavItems, externalNavItem } = getNavbarData();
 
-      await allure.parameter(
-        'Internal Items',
-        internalNavItems.length.toString()
-      );
-      await allure.parameter('External Items', '1');
+        await allure.parameter(
+          'Internal Items',
+          internalNavItems.length.toString()
+        );
+        await allure.parameter('External Items', '1');
 
-      for (const item of internalNavItems) {
-        await allure.step(`Navigate to ${item.selectorKey}`, async () => {
-          await navbarAssertions.expectNavClick(
-            navbar.selectors[item.selectorKey],
-            item.expectedUrl
+        for (const item of internalNavItems) {
+          await allure.step(`Navigate to ${item.selectorKey}`, async () => {
+            await navbarAssertions.expectNavClick(
+              navbar.selectors[item.selectorKey],
+              item.expectedUrl
+            );
+            await navbar.navigateToHome();
+          });
+        }
+
+        await allure.step('Navigate to external promociones', async () => {
+          await navbarAssertions.expectExternalNavClick(
+            navbar.selectors[externalNavItem.selectorKey],
+            externalNavItem.expectedUrl
           );
-          await navbar.navigateToHome();
         });
       }
-
-      await allure.step('Navigate to external promociones', async () => {
-        await navbarAssertions.expectExternalNavClick(
-          navbar.selectors[externalNavItem.selectorKey],
-          externalNavItem.expectedUrl
-        );
-      });
-    });
+    );
   });
 });

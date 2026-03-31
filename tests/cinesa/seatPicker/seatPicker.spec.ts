@@ -19,11 +19,12 @@ import { getGiftCardData } from '../paymentPage/paymentPage.data';
 const CINEMAS = getCinemasForEnvironment();
 
 test.describe('Seat Picker - Seat Selection', () => {
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Seat Picker - Seat Selection');
 
     await navbar.navigateToHome();
+    await promotionalModal.closeModalIfVisible();
     //await assertNoCloudflareProtection(page, 'beforeEach setup');
   });
 
@@ -38,6 +39,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Complete Purchase · Purchase · Single seat — ${cinema.name}`,
         {
           tag: [
+            '@lab-fail',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@e2e',
@@ -82,6 +85,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Complete Purchase · Purchase · Multiple seats — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@e2e',
@@ -133,6 +138,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Attempt selection · Leave empty gap — ${cinema.name}`,
         {
           tag: [
+            '@lab-fail',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -158,6 +164,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Attempt selection · Separate group same row — ${cinema.name}`,
         {
           tag: [
+            '@lab-fail',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -184,6 +192,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Select seats · Separate group different rows — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -210,6 +220,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Validate · No seats selected — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -233,6 +245,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Select seats · Over capacity — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -266,6 +280,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Accessibility · Select seats · Companion only — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@accessibility',
@@ -291,6 +307,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Accessibility · Select seats · Companion + Wheelchair — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@accessibility',
@@ -318,6 +336,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Accessibility · Select seats · Wheelchair only — ${cinema.name}`,
         {
           tag: [
+            '@lab-fail',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@accessibility',
@@ -348,7 +368,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Seat Picker · D-BOX · Select sofa · Single seat — ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
+        {
+          tag: [
+            '@lab-pass',
+            '@preprod-pass',
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
@@ -369,6 +398,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Select sofa · Leave 1 gap — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@dbox',
@@ -395,6 +426,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Attempt selection · Leave empty gap — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@dbox',
@@ -422,6 +455,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Attempt selection · Separate group same row — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@dbox',
@@ -446,7 +481,16 @@ test.describe('Seat Picker - Seat Selection', () => {
     for (const cinema of CINEMAS) {
       test(
         `Seat Picker · D-BOX · Select sofa · Separate group different rows — ${cinema.name}`,
-        { tag: ['@seatpicker', '@cinesa', '@dbox', ...cinema.tags] },
+        {
+          tag: [
+            '@lab-pass',
+            '@preprod-pass',
+            '@seatpicker',
+            '@cinesa',
+            '@dbox',
+            ...cinema.tags,
+          ],
+        },
         async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
@@ -467,6 +511,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Display · Regular & sofa ticket types — ${cinema.name}`,
         {
           tag: [
+            '@lab-fail',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@dbox',
@@ -522,6 +568,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Promotional Codes · Purchase · Standard — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@promo',
@@ -550,7 +598,8 @@ test.describe('Seat Picker - Seat Selection', () => {
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
           await ticketPicker.selectPromotionalCode(
-            PROMO_CODE_OPTIONS[0].values[0]
+            PROMO_CODE_OPTIONS[0].values[0],
+            PROMO_CODE_OPTIONS[0].name
           );
         }
       );
@@ -561,6 +610,8 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Promotional Codes · Purchase · La Vanguardia — ${cinema.name}`,
         {
           tag: [
+            '@lab-pass',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@promo',
@@ -589,7 +640,8 @@ test.describe('Seat Picker - Seat Selection', () => {
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
           await ticketPicker.selectPromotionalCode(
-            PROMO_CODE_OPTIONS[1].values[0]
+            PROMO_CODE_OPTIONS[1].values[0],
+            PROMO_CODE_OPTIONS[1].name
           );
         }
       );

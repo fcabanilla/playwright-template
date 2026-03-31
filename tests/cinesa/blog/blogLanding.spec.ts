@@ -17,7 +17,17 @@ test.describe('Blog Landing Page Tests', () => {
 
   test(
     'Blog · Landing · Display · Article cards',
-    { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-fail',
+        '@blog',
+        '@cinesa',
+        '@display',
+        '@fast',
+        '@OCG-2009',
+      ],
+    },
     async () => {
       await allure.story('OCG-2009 - Article cards count validation');
       await blogLandingAssertions.expectArticleCardsCount(
@@ -28,7 +38,17 @@ test.describe('Blog Landing Page Tests', () => {
 
   test(
     'Blog · Landing · Display · All article cards visible',
-    { tag: ['@blog', '@cinesa', '@display', '@fast', '@OCG-2009'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@blog',
+        '@cinesa',
+        '@display',
+        '@fast',
+        '@OCG-2009',
+      ],
+    },
     async () => {
       await allure.story('OCG-2009 - Article cards visibility');
       await blogLandingAssertions.expectArticleCardsVisible();
@@ -39,6 +59,7 @@ test.describe('Blog Landing Page Tests', () => {
     'Blog · Landing · Navigate · Related articles roundtrip',
     {
       tag: [
+        '@lab-fail',
         '@blog',
         '@cinesa',
         '@navigation',

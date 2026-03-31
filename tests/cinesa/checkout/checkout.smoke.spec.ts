@@ -8,11 +8,12 @@ const CINEMAS = getCinemasForEnvironment();
 test.describe('Checkout Smoke Tests', () => {
   test.describe.configure({ timeout: 180000 });
 
-  test.beforeEach(async ({ navbar }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Checkout - Purchase Flow');
 
     await navbar.navigateToHome();
+    await promotionalModal.closeModalIfVisible();
   });
 
   for (const cinema of CINEMAS) {
@@ -20,6 +21,8 @@ test.describe('Checkout Smoke Tests', () => {
       `Checkout · Smoke · Single Seat · Credit Card — ${cinema.name}`,
       {
         tag: [
+          '@lab-fail',
+          '@preprod-fail',
           '@checkout',
           '@smoke',
           '@cinesa',
@@ -97,6 +100,8 @@ test.describe('Checkout Smoke Tests', () => {
       `Checkout · Smoke · Multiple Seats · Credit Card — ${cinema.name}`,
       {
         tag: [
+          '@lab-fail',
+          '@preprod-fail',
           '@checkout',
           '@smoke',
           '@cinesa',

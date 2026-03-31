@@ -4,7 +4,14 @@ import { assertCouponsRedirection } from './coupons.assertions';
 import { COUPONS_URL } from './coupons.data';
 import { WebActions } from '../../../core/webactions/webActions';
 
+const env = process.env.TEST_ENV || 'production';
+
 test.describe('Cinesa Coupons Tests', () => {
+  test.skip(
+    env === 'lab' || env === 'preprod',
+    'Coupons (Bonos) link not available in lab/preprod environments'
+  );
+
   test.beforeEach(async ({ navbar, promotionalModal }) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Coupons - Discount System');

@@ -24,9 +24,13 @@ export interface CinemaDetailSelectors {
    */
   specialAttributes: string;
   /**
-   * Selector for the D-BOX icon within a showtime.
+   * Selector for the D-BOX showtime screen name containing 'D-BOX' text.
    */
   dboxIcon: string;
+  /**
+   * Selector for the screen name element inside a showtime button.
+   */
+  showtimeScreenName: string;
   /**
    * Selector for the film title link that navigates to the movie details page.
    */
@@ -55,7 +59,8 @@ export const cinemaDetailSelectors: CinemaDetailSelectors = {
   showtime: '.v-showtime-picker-site-list .v-showtime-button',
   specialAttributes:
     '.v-attribute__icon--type-standard, .v-attribute__icon--type-hero',
-  dboxIcon: 'img[alt="D-BOX"]',
+  dboxIcon: '.v-showtime-button__screen-name',
+  showtimeScreenName: '.v-showtime-button__screen-name',
   filmTitleLink: '.v-showtime-picker-film-details .v-film-title__text',
   duration: '.v-film-details__duration, .duration',
   attributeIcon: '.v-attribute-icon, .icon-attribute',

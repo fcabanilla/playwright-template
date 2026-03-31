@@ -43,7 +43,10 @@ const configs = getAuthSetupConfigs();
 
 const REQUIRED_CONSENT_COOKIES = ['OptanonConsent', 'OptanonAlertBoxClosed'];
 
-async function waitForOneTrustReady(page: Page, timeoutMs: number = 15000): Promise<void> {
+async function waitForOneTrustReady(
+  page: Page,
+  timeoutMs: number = 15000
+): Promise<void> {
   const candidates = ['#onetrust-banner-sdk', '#onetrust-consent-sdk'];
   const deadline = Date.now() + timeoutMs;
 
@@ -121,8 +124,8 @@ for (const config of configs) {
       // Navigate to base URL
       console.log('🌐 Navigating to baseUrl...');
       await page.goto(config.baseUrl, {
-        waitUntil: 'networkidle',
-        timeout: 30000,
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
       });
 
       // Wait for OneTrust to be ready (async polling)
@@ -138,7 +141,11 @@ for (const config of configs) {
       await cookieBanner.acceptAllCookies();
 
       // Validate captured consent cookies before saving
-      await validateConsentCookies(context, config.platform, config.environment);
+      await validateConsentCookies(
+        context,
+        config.platform,
+        config.environment
+      );
 
       // Save storage state
       console.log(`💾 Saving storageState to ${config.outputPath}...`);

@@ -76,7 +76,7 @@ export class CinemaDetail {
 
     if (requiredFormat === 'dbox') {
       return showtimeLocator.filter({
-        has: page.locator(this.selectors.dboxIcon),
+        has: page.locator(this.selectors.dboxIcon, { hasText: 'D-BOX' }),
       });
     }
 
@@ -188,6 +188,42 @@ export class CinemaDetail {
     );
   }
 
+  private async getEligibleFilmsForFormat(
+    requiredFormat: 'normal' | 'dbox' | 'any'
+  ): Promise<Array<{ filmName: string; showtimeCount: number }>> {
+    return await allure.step(
+      `Filtering films with "${requiredFormat}" format showtimes`,
+      async () => {
+        const page = this.webActions.page;
+        const filmContainers = page.locator(this.selectors.filmItem);
+        const totalFilms = await filmContainers.count();
+
+        const eligible: Array<{ filmName: string; showtimeCount: number }> = [];
+
+        for (let i = 0; i < totalFilms; i++) {
+          const container = filmContainers.nth(i);
+          const filmName = await container
+            .locator(this.selectors.filmName)
+            .innerText();
+          const showtimeLocator = this.getShowtimeLocatorByFormat(
+            container,
+            requiredFormat
+          );
+          const showtimeCount = await showtimeLocator.count();
+
+          if (showtimeCount > 0) {
+            eligible.push({
+              filmName: this.normalizeWhitespace(filmName),
+              showtimeCount,
+            });
+          }
+        }
+
+        return eligible;
+      }
+    );
+  }
+
   async selectFilmAndShowtimeByFormatAndRoom(criteria: {
     requiredFormat: 'normal' | 'dbox' | 'any';
     preferredRooms: string[];
@@ -195,17 +231,29 @@ export class CinemaDetail {
     return await allure.step(
       `Selecting film and showtime by format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}]`,
       async () => {
-        const filmNames = await this.getFilmNames();
-        if (filmNames.length === 0) {
+        const allFilmNames = await this.getFilmNames();
+        if (allFilmNames.length === 0) {
           throw new Error('No films found on the cinema detail page');
         }
 
-        const shuffledFilmNames = [...filmNames].sort(
+        const eligibleFilms = await this.getEligibleFilmsForFormat(
+          criteria.requiredFormat
+        );
+
+        if (eligibleFilms.length === 0) {
+          throw new Error(
+            `No films have "${criteria.requiredFormat}" format showtimes. ` +
+              `Total films on page: ${allFilmNames.length}. ` +
+              `Films checked: [${allFilmNames.join(', ')}]`
+          );
+        }
+
+        const shuffledEligible = [...eligibleFilms].sort(
           () => Math.random() - 0.5
         );
         const selectionErrors: string[] = [];
 
-        for (const filmName of shuffledFilmNames) {
+        for (const { filmName } of shuffledEligible) {
           try {
             const showtimeSelection = await this.selectShowtimeByFormatAndRoom(
               filmName,
@@ -227,7 +275,10 @@ export class CinemaDetail {
         }
 
         throw new Error(
-          `Unable to find a film with required format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}]. Attempts: ${selectionErrors.join(' | ')}`
+          `${eligibleFilms.length} of ${allFilmNames.length} films have "${criteria.requiredFormat}" format, ` +
+            `but none matched preferred rooms [${criteria.preferredRooms.join(', ')}]. ` +
+            `Eligible films: [${eligibleFilms.map((f) => f.filmName).join(', ')}]. ` +
+            `Details: ${selectionErrors.join(' | ')}`
         );
       }
     );
@@ -709,17 +760,14 @@ export class CinemaDetail {
     showtime: string;
   }> {
     return await allure.step(
-      'Selecting a random D-BOX film and showtime',
+      'Selecting a D-BOX film and showtime deterministically',
       async () => {
         const names = await this.getFilmNames();
         if (names.length === 0) {
           throw new Error('No films found on the cinema detail page');
         }
 
-        // Shuffle the list of film names to add randomness
-        const shuffledNames = names.sort(() => Math.random() - 0.5);
-
-        for (const name of shuffledNames) {
+        for (const name of names) {
           const filmContainer = this.webActions.page.locator(
             this.selectors.filmItem,
             {
@@ -729,23 +777,22 @@ export class CinemaDetail {
             }
           );
 
-          // Locate D-BOX showtimes by checking for the presence of the D-BOX icon
-          const dboxShowtimes = await filmContainer
+          // Filter showtimes whose screen-name contains "D-BOX"
+          const dboxShowtimes = filmContainer
             .locator(this.selectors.showtime)
             .filter({
-              has: this.webActions.page.locator(this.selectors.dboxIcon),
+              has: this.webActions.page.locator(
+                this.selectors.showtimeScreenName,
+                { hasText: 'D-BOX' }
+              ),
             });
 
-          if ((await dboxShowtimes.count()) > 0) {
+          const count = await dboxShowtimes.count();
+          if (count > 0) {
             await this.selectFilmByName(name);
-            const showtimeTexts = await dboxShowtimes.allTextContents();
-            const randomIndex = Math.floor(
-              Math.random() * showtimeTexts.length
-            );
-            const selectedShowtime = showtimeTexts[randomIndex];
-            await dboxShowtimes.nth(randomIndex).click();
-            console.log('film: ' + name + ' showtime: ' + selectedShowtime);
-            return { film: name, showtime: selectedShowtime };
+            const showtimeText = await dboxShowtimes.first().innerText();
+            await dboxShowtimes.first().click();
+            return { film: name, showtime: showtimeText.trim() };
           }
         }
 

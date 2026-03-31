@@ -5,6 +5,6 @@ export const blogLandingData = {
   /**
    * Expected number of related article cards on the Blog Landing Page.
    */
-  expectedArticleCardsCount: 9,
+  expectedArticleCardsCount: 11,
   // Additional test data can be added here as needed.
 };

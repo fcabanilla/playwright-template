@@ -1,32 +1,55 @@
 [
   {
-    "name": "UI: Timeouts",
-    "matchedStatuses": ["failed","broken"],
-    "messageRegex": ".*\\[CAT:UI\\.Timeouts\\].*|locator\\.(click|fill|waitFor).*Timeout|Timeout .* exceeded|toBeVisible.*timeout"
+    "name": "Network / Environment",
+    "description": "Connectivity or DNS failures caused by environment instability",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(?:net::ERR_|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|Cloudflare).*"
+  },
+  {
+    "name": "Blocking Modal (RESTRICTED ZONE)",
+    "description": "Unexpected modal dialog blocked interaction — typically the RESTRICTED ZONAL ZONE modal with I can't wait! button",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(?:Timeout \\d+ms exceeded.*(?:seat|confirm|v-seat|selected-seats|checkout)|waiting for seats|close.*modal|blocking modal).*"
+  },
+  {
+    "name": "Data / Content Availability",
+    "description": "Expected content or data not available in the environment (e.g. D-BOX showtimes, seats, schema)",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(?:No D-BOX films|No suitable seats found|No .* found on the cinema|No films found|No showtimes available|Unable to find a film|undefined|not contain 'undefined').*"
+  },
+  {
+    "name": "Feature Removed / Unavailable",
+    "description": "Feature or navigation target does not exist in the current environment (e.g. Bonos link in lab)",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(?:cinesabusiness|bonos|promociones|navigateToCoupons).*"
+  },
+  {
+    "name": "Test Timeouts",
+    "description": "Full test exceeded its timeout budget (usually 90-180s). Severe blocker or infrastructure issue",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(?:Test timeout of \\d+ms exceeded).*"
+  },
+  {
+    "name": "UI: Interaction Timeouts",
+    "description": "A specific Playwright action (click, waitFor, fill, waitForEvent) timed out waiting for an element or event",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(?:Timeout \\d+ms exceeded).*"
   },
   {
     "name": "UI: Selectors / Strict Mode",
-    "matchedStatuses": ["failed","broken"],
-    "messageRegex": ".*\\[CAT:UI\\.Selectors\\].*|strict mode violation|detached from DOM|waiting for locator\\(.*\\) to be visible.*resolved to hidden|locator resolved to"
+    "description": "Selector resolved to multiple elements (strict mode) or element detached from DOM",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(?:strict mode violation|resolved to \\d+ elements|detached from DOM).*"
   },
   {
-    "name": "Network / HTTP",
-    "matchedStatuses": ["failed","broken"],
-    "traceRegex": "HTTP 5\\d\\d|ECONNRESET|ETIMEDOUT|Navigation failed|net::ERR|socket hang up"
-  },
-  {
-    "name": "Infra / Playwright",
+    "name": "Infra / Browser",
+    "description": "Browser, page, or context crashed or closed unexpectedly",
     "matchedStatuses": ["broken"],
-    "traceRegex": "Target closed|browserType\\.launch|Context closed|Unhandled promise rejection"
-  },
-  {
-    "name": "Grancasa Cinema Issues",
-    "matchedStatuses": ["failed","broken"],
-    "traceRegex": "\\bGrancasa\\b",
-    "messageRegex": "^(?!.*(Timeout .* exceeded|locator\\.(click|fill|waitFor))).*$"
+    "messageRegex": ".*(?:Target page, context or browser has been closed|Target closed|Context closed|browserType\\.launch).*"
   },
   {
     "name": "Product Defects",
+    "description": "Genuine assertion failures indicating a bug in the application under test",
     "matchedStatuses": ["failed"]
   }
 ]

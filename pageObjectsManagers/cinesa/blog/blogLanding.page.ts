@@ -5,6 +5,7 @@ import {
   blogLandingSelectors,
   BlogLandingSelectors,
 } from './blogLanding.selectors';
+import { getCinesaConfig } from '../../../config/environments';
 
 /**
  * Represents the Blog Landing Page.
@@ -13,9 +14,9 @@ import {
 export class BlogLanding {
   /**
    * Base URL of the Blog Landing Page.
-   * Adjust this value based on the testing environment.
+   * Dynamically resolved from environment configuration.
    */
-  private readonly url: string = 'https://www.cinesa.es/blog-cinesa/';
+  private readonly url: string;
 
   /**
    * WebActions instance for page interactions.
@@ -41,6 +42,8 @@ export class BlogLanding {
     this.webActions = webActions;
     this.page = webActions.page;
     this.selectors = blogLandingSelectors;
+    const config = getCinesaConfig();
+    this.url = `${config.baseUrl}/blog-cinesa/`;
   }
 
   /**
@@ -98,7 +101,9 @@ export class BlogLanding {
    * @returns A Promise that resolves with the number of article cards.
    */
   async countArticleCards(): Promise<number> {
-    await this.webActions.waitForSelector(this.selectors.articleCard, { timeout: 10000 });
+    await this.webActions.waitForSelector(this.selectors.articleCard, {
+      timeout: 10000,
+    });
     return await this.getArticleCardsLocator().count();
   }
 }

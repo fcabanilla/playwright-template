@@ -18,9 +18,11 @@ export const paymentPageSelectors = {
     cardNumberInput: '#v-gift-card-payment-form-field__card-number-input',
     pinInput: '#v-gift-card-payment-form-field__pin-input',
 
-    // Button to ADD the gift card (inside the gift card form)
+    // Blue "Pagar" button inside the gift card accordion (NOT the external credit card button)
     addButton:
-      '.payment-method-accordion-item:has(span:text("Gift Card")) button[type="submit"], form.v-gift-card-payment-form button[type="submit"]',
+      '.payment-method-accordion-item:has(span:text("Gift Card")) button[type="submit"], ' +
+      '.accordion-plus:has(.generic-header:has-text("tarjeta regalo")) button[type="submit"], ' +
+      'form.v-gift-card-payment-form button[type="submit"]',
   },
 
   mainPayment: {

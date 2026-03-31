@@ -15,7 +15,17 @@ test.describe('Signup', () => {
 
   test(
     'Signup · Form · Display & Layout',
-    { tag: ['@signup', '@cinesa', '@smoke', '@fast', '@COMS-7212'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@signup',
+        '@cinesa',
+        '@smoke',
+        '@fast',
+        '@COMS-7212',
+      ],
+    },
     async ({ page, navbar }, testInfo) => {
       await allure.story('COMS-7212 - Signup form display and layout');
       await navbar.navigateToSignup();
@@ -29,7 +39,17 @@ test.describe('Signup', () => {
 
   test(
     'Signup · Form · Validate · Mandatory fields',
-    { tag: ['@signup', '@cinesa', '@regression', '@medium', '@COMS-7217'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@signup',
+        '@cinesa',
+        '@regression',
+        '@medium',
+        '@COMS-7217',
+      ],
+    },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('COMS-7217 - Mandatory fields validation');
       await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-7217', async () => {});
@@ -45,7 +65,16 @@ test.describe('Signup', () => {
 
   test(
     'Signup · Form · Validate · Email field',
-    { tag: ['@signup', '@cinesa', '@regression', '@medium'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@signup',
+        '@cinesa',
+        '@regression',
+        '@medium',
+      ],
+    },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('Email field validation');
       await navbar.navigateToSignup();
@@ -60,7 +89,17 @@ test.describe('Signup', () => {
 
   test(
     'Signup · Form · Validate · Password field',
-    { tag: ['@signup', '@cinesa', '@regression', '@medium', '@COMS-7219'] },
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@signup',
+        '@cinesa',
+        '@regression',
+        '@medium',
+        '@COMS-7219',
+      ],
+    },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story('COMS-7219 - Password field validation');
       await navbar.navigateToSignup();
@@ -77,6 +116,8 @@ test.describe('Signup', () => {
     'Signup · Registration · Signup · Valid data + unique email',
     {
       tag: [
+        '@lab-pass',
+        '@preprod-fail',
         '@signup',
         '@cinesa',
         '@regression',
