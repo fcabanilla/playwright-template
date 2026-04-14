@@ -1,5 +1,9 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../core/allure/allureMetadata';
 import { getCinemasForSchemaTests } from './cinemas.data';
 import {
   assertCinemasRedirection,
@@ -10,9 +14,10 @@ import {
 const CINEMAS_FOR_SCHEMA = getCinemasForSchemaTests();
 
 test.describe('Cinesa Cinemas Tests', () => {
-  test.beforeEach(async ({ navbar, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Cinemas - Location Finder');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
@@ -78,6 +83,9 @@ test.describe('Cinesa Cinemas Tests', () => {
       },
       async ({ navbar, cinema: cinemaPage, cinemaDetail }) => {
         await allure.story(
+          `OCG-2550 - Cinema Schema validation - ${cinema.name}`
+        );
+        await linkJiraTickets(
           `OCG-2550 - Cinema Schema validation - ${cinema.name}`
         );
         await navbar.navigateToCinemas();

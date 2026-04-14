@@ -1,7 +1,8 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { getCinemasForEnvironment } from '../../../config/cinemas.config';
-import { checkoutShowtimeSelectionCriteria } from './checkout.data';
+import { getShowtimeSelectionForWorker } from '../../../config/showtimes.pool';
 import { getGiftCardData } from '../paymentPage/paymentPage.data';
 
 const CINEMAS = getCinemasForEnvironment();
@@ -9,16 +10,17 @@ const CINEMAS = getCinemasForEnvironment();
 test.describe('Checkout E2E Tests', () => {
   test.describe.configure({ timeout: 180000 });
 
-  test.beforeEach(async ({ navbar, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Checkout - End to End');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
   });
 
   test.describe('Single Seat Purchase', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('E2E single seat purchase');
     });
 
@@ -28,7 +30,7 @@ test.describe('Checkout E2E Tests', () => {
         {
           tag: [
             '@lab-pass',
-            '@preprod-fail',
+            '@preprod-pass',
             '@checkout',
             '@e2e',
             '@cinesa',
@@ -54,7 +56,7 @@ test.describe('Checkout E2E Tests', () => {
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
-            checkoutShowtimeSelectionCriteria
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
           );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
@@ -70,7 +72,7 @@ test.describe('Checkout E2E Tests', () => {
   });
 
   test.describe('Multiple Seats Purchase', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('E2E multiple seats purchase');
     });
 
@@ -80,7 +82,7 @@ test.describe('Checkout E2E Tests', () => {
         {
           tag: [
             '@lab-fail',
-            '@preprod-fail',
+            '@preprod-pass',
             '@checkout',
             '@e2e',
             '@cinesa',
@@ -108,7 +110,7 @@ test.describe('Checkout E2E Tests', () => {
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
           await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
-            checkoutShowtimeSelectionCriteria
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
           );
           await seatPicker.selectLastAvailableSeats(seatsToSelect);
           await seatPicker.confirmSeats();

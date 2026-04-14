@@ -1,20 +1,23 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { getBarMenuConfigs } from './bar.data';
+import { getShowtimeSelectionForWorker } from '../../../config/showtimes.pool';
 
 // Get available bar menu configurations for current environment
 const BAR_MENUS = getBarMenuConfigs();
 
 test.describe('Bar - Servicios de Comida y Bebida', () => {
-  test.beforeEach(async ({ navbar, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Bar & Food Services');
+    await enrichTestMetadata(testInfo);
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
   });
 
   test.describe('Menú Clásico - Single Ticket', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Compra con Menú Clásico - 1 entrada');
     });
 
@@ -23,8 +26,9 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
         `F&B · Classic Menu · Purchase · Single ticket — ${menuConfig.cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-pass',
-            '@preprod-fail',
+            '@preprod-broken',
             '@bar',
             '@cinesa',
             '@e2e',
@@ -51,7 +55,9 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
 
           await navbar.navigateToCinemas();
           await cinema[menuConfig.cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
@@ -64,7 +70,7 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
   });
 
   test.describe('Menú Clásico - Multiple Tickets', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Compra con Menú Clásico - múltiples entradas');
     });
 
@@ -73,6 +79,7 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
         `F&B · Classic Menu · Purchase · Multiple tickets — ${menuConfig.cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-pass',
             '@preprod-broken',
             '@bar',
@@ -103,7 +110,9 @@ test.describe('Bar - Servicios de Comida y Bebida', () => {
 
           await navbar.navigateToCinemas();
           await cinema[menuConfig.cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeats(seatsToSelect);
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();

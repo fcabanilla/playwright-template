@@ -1,5 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertProgramsRedirection } from './programs.assertions';
 
@@ -9,9 +10,10 @@ test.describe(
     tag: ['@programs', '@cinesa'],
   },
   () => {
-    test.beforeEach(async ({ page, promotionalModal, navbar }) => {
+    test.beforeEach(async ({ page, promotionalModal, navbar }, testInfo) => {
       await allure.epic('Cinesa Platform');
       await allure.feature('Loyalty Programs - Rewards');
+      await enrichTestMetadata(testInfo);
 
       await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
       await navbar.navigateToHome();
@@ -23,7 +25,7 @@ test.describe(
       {
         tag: [
           '@lab-pass',
-          '@preprod-fail',
+          '@preprod-pass',
           '@smoke',
           '@fast',
           '@COMS-11226',

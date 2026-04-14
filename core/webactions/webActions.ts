@@ -155,7 +155,8 @@ export class WebActions {
     const urlPath = this.extractPath(url);
 
     await step(`[NAV] Goto | URL=${urlPath} | Env=${env}`, async () => {
-      await this.page.goto(url);
+      await this.page.goto(url, { waitUntil: 'domcontentloaded' });
+      await this.assertNoCloudflareChallenge();
     });
   }
 
@@ -560,10 +561,21 @@ export class WebActions {
   }
 
   /**
-   * Navigate back in browser history
+   * Navigate back in browser history.
+   * Automatically creates Allure step: [NAV] Go back | WaitUntil=...
+   *
+   * @param {Object} [options] - Navigation options
+   * @param {'load' | 'domcontentloaded' | 'networkidle' | 'commit'} [options.waitUntil='domcontentloaded'] - When to consider navigation succeeded
+   * @param {number} [options.timeout] - Maximum time in milliseconds
    */
-  async goBack(): Promise<void> {
-    await this.page.goBack();
+  async goBack(
+    options?: { waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit'; timeout?: number }
+  ): Promise<void> {
+    const waitUntil = options?.waitUntil ?? 'domcontentloaded';
+    const timeout = options?.timeout;
+    await step(`[NAV] Go back | WaitUntil=${waitUntil}`, async () => {
+      await this.page.goBack({ waitUntil, timeout });
+    });
   }
 
   /**
@@ -577,8 +589,17 @@ export class WebActions {
   /**
    * Scroll element into view if needed
    */
-  async scrollIntoView(selector: string): Promise<void> {
-    await this.page.locator(selector).scrollIntoViewIfNeeded();
+  async scrollIntoView(
+    selector: string,
+    targetName?: string,
+    timeout?: number
+  ): Promise<void> {
+    const target = targetName || selector;
+    await step(`[ACT] Scroll into view | Target=${target}`, async () => {
+      await this.page
+        .locator(selector)
+        .scrollIntoViewIfNeeded({ timeout: timeout ?? 10000 });
+    });
   }
 
   /**
@@ -745,6 +766,33 @@ export class WebActions {
   async navigateToWithConsent(url: string): Promise<void> {
     await this.applyConsentSeedsFor(url);
     await this.navigateTo(url);
+  }
+
+  /**
+   * Checks if the current page is a Cloudflare challenge page and throws immediately
+   * instead of letting downstream selectors time out after 60s.
+   *
+   * @private
+   * @throws {Error} When Cloudflare challenge is detected with actionable guidance
+   */
+  private async assertNoCloudflareChallenge(): Promise<void> {
+    const isChallenge = await this.page
+      .locator('text=Verificación de seguridad en curso')
+      .or(this.page.locator('text=Checking your browser before accessing'))
+      .or(this.page.locator('text=Just a moment'))
+      .isVisible({ timeout: 500 })
+      .catch(() => false);
+
+    if (isChallenge) {
+      const currentUrl = this.page.url();
+      throw new Error(
+        `Cloudflare challenge detected at ${currentUrl}. ` +
+          'The browser was blocked by Cloudflare WAF. Possible causes:\n' +
+          '  1. Expired __cf_bm cookie in storage state → run: npx playwright test --project=setup\n' +
+          '  2. Headless mode on production → use: --headed --workers=1\n' +
+          '  3. IP reputation issue → try a VPN or request IP whitelisting',
+      );
+    }
   }
 
   /**

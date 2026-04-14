@@ -19,7 +19,7 @@ export class MoviePage {
   async waitForPageLoad(): Promise<void> {
     await allure.step('Wait for movie page to load', async () => {
       await this.page.waitForLoadState('domcontentloaded');
-      await this.page.waitForSelector(MOVIE_SELECTORS.title, {
+      await this.page.locator(MOVIE_SELECTORS.title).first().waitFor({
         state: 'visible',
         timeout: 10000,
       });
@@ -31,7 +31,7 @@ export class MoviePage {
    */
   async getMovieTitle(): Promise<string> {
     return await allure.step('Get movie title from page', async () => {
-      return await this.page.locator(MOVIE_SELECTORS.title).innerText();
+      return await this.page.locator(MOVIE_SELECTORS.title).first().innerText();
     });
   }
 

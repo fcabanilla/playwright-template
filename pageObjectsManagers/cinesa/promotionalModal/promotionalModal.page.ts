@@ -20,7 +20,9 @@ export class PromotionalModal {
    * Waits for the modal to be visible first, then clicks the close button
    */
   async closeModal(): Promise<void> {
-    await this.webActions.waitForSelector(this.selectors.modal, { timeout: 5000 });
+    await this.webActions.waitForSelector(this.selectors.modal, {
+      timeout: 5000,
+    });
     await this.webActions.click(this.selectors.closeButton);
     await this.webActions.wait(500); // Wait for modal close animation
   }
@@ -32,16 +34,27 @@ export class PromotionalModal {
    */
   async closeModalIfVisible(): Promise<void> {
     await allure.step('Close promotional modal (if visible)', async () => {
+      // Try aside.v-modal.global-popup first
       try {
-        // Wait max 2 seconds for modal to appear
         await this.webActions.waitForSelector(this.selectors.modal, {
           timeout: 2000,
         });
-        // If we get here, modal is visible, so close it
         await this.webActions.click(this.selectors.closeButton);
         await this.webActions.wait(500);
+        return;
       } catch {
-        // Modal not visible or timeout, that's ok, just continue
+        // Not the aside modal — try dialog variant below
+      }
+
+      // Try CMS-driven dialog modal (e.g. "MODAL TEST" promo)
+      try {
+        await this.webActions.waitForSelector(this.selectors.dialogModal, {
+          timeout: 1000,
+        });
+        await this.webActions.click(this.selectors.dialogCloseButton);
+        await this.webActions.wait(500);
+      } catch {
+        // No modal visible — continue
       }
     });
   }

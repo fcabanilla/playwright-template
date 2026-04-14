@@ -8,7 +8,7 @@ export default defineConfig({
       options: {
         reportName: 'Cinesa & UCI Cinema Automation',
         theme: 'dark',
-        reportLanguage: 'es',
+        reportLanguage: 'en',
         logo: null,
         singleFile: false,
         ci: {

@@ -3,16 +3,21 @@ import {
   expect,
 } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../../../core/allure/allureMetadata';
 import { expectedUrl } from './events.data';
 import { assertEventsNavigation } from './events.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Eventos Tests', () => {
-  test.beforeEach(async ({ page, events }) => {
+  test.beforeEach(async ({ page, footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
-    await events.navigateToHome();
+    await footer.navigateToHome();
   });
 
   test(
@@ -27,12 +32,13 @@ test.describe('Eventos Tests', () => {
         '@OCG-3287',
       ],
     },
-    async ({ page, events }, testInfo) => {
+    async ({ page, footer }, testInfo) => {
       await allure.story('OCG-3287 - Eventos page display and layout');
+      await linkJiraTickets('OCG-3287 - Eventos page display and layout');
       const context = page.context();
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        events.clickEventos(),
+        footer.clickEventos(),
       ]);
       await newPage.waitForLoadState('networkidle');
       await takeScreenshot(newPage, testInfo, 'Eventos display and layout');
@@ -52,12 +58,13 @@ test.describe('Eventos Tests', () => {
         '@OCG-3287',
       ],
     },
-    async ({ page, events }) => {
+    async ({ page, footer }) => {
       await allure.story('OCG-3287 - Eventos navigation and URL validation');
+      await linkJiraTickets('OCG-3287 - Eventos navigation and URL validation');
       const context = page.context();
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        events.clickEventos(),
+        footer.clickEventos(),
       ]);
       await newPage.waitForLoadState('networkidle');
       await assertEventsNavigation(newPage, expectedUrl);
@@ -77,12 +84,13 @@ test.describe('Eventos Tests', () => {
         '@OCG-3287',
       ],
     },
-    async ({ page, events }) => {
+    async ({ page, footer }) => {
       await allure.story('OCG-3287 - Eventos new tab and link validation');
+      await linkJiraTickets('OCG-3287 - Eventos new tab and link validation');
       const context = page.context();
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        events.clickEventos(),
+        footer.clickEventos(),
       ]);
       await newPage.waitForLoadState('networkidle');
       await expect(newPage).toHaveURL(expectedUrl);

@@ -1,5 +1,9 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../core/allure/allureMetadata';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { getCinemasForMovieTests } from './movies.data';
 import {
@@ -16,9 +20,10 @@ test.describe('Cinesa Movies Tests', () => {
   // Force serial execution (1 worker) to avoid concurrency issues
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeEach(async ({ page, navbar }) => {
+  test.beforeEach(async ({ page, navbar }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Movies - Content Catalog');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await assertNoCloudflareProtection(page, 'beforeEach setup');
@@ -29,7 +34,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-fail',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@smoke',
@@ -53,7 +58,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -73,7 +78,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -92,8 +97,9 @@ test.describe('Cinesa Movies Tests', () => {
     'Films · Navigation · Browse · Random from All Movies',
     {
       tag: [
+        '@rerun-cf',
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -112,7 +118,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -131,7 +137,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -150,7 +156,7 @@ test.describe('Cinesa Movies Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-skip',
+        '@preprod-pass',
         '@movies',
         '@cinesa',
         '@regression',
@@ -171,7 +177,7 @@ test.describe('Cinesa Movies Tests', () => {
       {
         tag: [
           '@lab-pass',
-          '@preprod-skip',
+          '@preprod-pass',
           '@movies',
           '@cinesa',
           '@schema',
@@ -207,6 +213,7 @@ test.describe('Cinesa Movies Tests', () => {
     },
     async ({ moviePage, navbar, cinema, cinemaDetail }) => {
       await allure.story('OCG-3316 - Movie Schema URL validation');
+      await linkJiraTickets('OCG-3316 - Movie Schema URL validation');
       await navbar.navigateToCinemas();
       await cinema.selectOasizCinema();
       await cinemaDetail.selectRandomFilmForDetails();

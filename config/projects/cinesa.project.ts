@@ -35,7 +35,7 @@ export function getCinesaProject(): Project {
     use: {
       headless: !isHeaded,
       screenshot: 'only-on-failure',
-      video: 'retain-on-failure', // Changed from 'on' - only retains video if test fails
+      video: 'retain-on-failure', // Record and retain only on failure
       trace: 'retain-on-failure',
       actionTimeout: COMMON_TIMEOUTS.action,
       navigationTimeout: COMMON_TIMEOUTS.navigation,

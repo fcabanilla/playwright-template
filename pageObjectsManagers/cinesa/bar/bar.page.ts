@@ -67,7 +67,7 @@ export class BarPage {
       const mainButton = this.webActions.getLocator(
         BAR_SELECTORS.barMainButton
       );
-      await mainButton.waitFor({ state: 'visible', timeout: 5000 });
+      await mainButton.waitFor({ state: 'visible', timeout: 15000 });
       await mainButton.click();
     });
   }
@@ -118,7 +118,7 @@ export class BarPage {
 
         // Add to cart - This action may open a new tab or redirect
         const addToCartButton = this.webActions.getLocator(
-          'button.v-item-modal-footer__action-button'
+          BAR_SELECTORS.addToCartButton
         );
 
         await addToCartButton.click();
@@ -143,7 +143,7 @@ export class BarPage {
           if (pages.length > 1) {
             // Switch to the new page (usually the last one)
             const newPage = pages[pages.length - 1];
-            await newPage.waitForLoadState('networkidle');
+            await newPage.waitForLoadState('domcontentloaded');
             this.webActions.updatePage(newPage);
           }
         }

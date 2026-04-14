@@ -1,12 +1,14 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { assertExperiencesRedirection } from './experiences.assertions';
 import { EXPERIENCES_URL } from './experiences.data';
 
 test.describe('Cinesa Experiences Tests', () => {
-  test.beforeEach(async ({ navbar, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Experiences - Premium Formats');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();

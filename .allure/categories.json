@@ -1,55 +1,108 @@
 [
   {
-    "name": "Network / Environment",
-    "description": "Connectivity or DNS failures caused by environment instability",
+    "name": "Network / Environment Issues",
+    "description": "Connectivity issues: DNS, timeout, connection refused, or Cloudflare block. Action: Re-run. If persistent, check VPN/DNS/Cloudflare credentials.",
     "matchedStatuses": ["failed", "broken"],
-    "messageRegex": ".*(?:net::ERR_|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|Cloudflare).*"
+    "messageRegex": "(?s).*(?:net::ERR_|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|Cloudflare).*",
+    "flaky": true
   },
   {
-    "name": "Blocking Modal (RESTRICTED ZONE)",
-    "description": "Unexpected modal dialog blocked interaction — typically the RESTRICTED ZONAL ZONE modal with I can't wait! button",
-    "matchedStatuses": ["failed", "broken"],
-    "messageRegex": ".*(?:Timeout \\d+ms exceeded.*(?:seat|confirm|v-seat|selected-seats|checkout)|waiting for seats|close.*modal|blocking modal).*"
+    "name": "Browser / Infrastructure Crash",
+    "description": "Browser, page, or context crashed unexpectedly. Action: Re-run. If persistent, check system resources or browser version.",
+    "matchedStatuses": ["broken"],
+    "messageRegex": "(?s).*(?:Target page, context or browser has been closed|Target closed|Context closed|browserType\\.launch).*",
+    "flaky": true
   },
   {
-    "name": "Data / Content Availability",
-    "description": "Expected content or data not available in the environment (e.g. D-BOX showtimes, seats, schema)",
+    "name": "Preprod Data Unavailable",
+    "description": "No films, showtimes, D-BOX sessions, or seats available in the environment. This is a data/scheduling issue, not a code defect. Action: Verify content exists for the test cinema and date.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:No D-BOX showtimes|No D-BOX films|No suitable seats found|No .* found on the cinema|No films found|No films available|No showtimes available|Unable to find a film|Failed across \\d+ day|HOY: No films).*"
+  },
+  {
+    "name": "Feature Not Available in Environment",
+    "description": "Feature/page does not exist in this environment (e.g., Bonos removed in lab). Action: Tag with @broken-prod or skip for this environment.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:cinesabusiness|bonos|promociones|navigateToCoupons).*"
+  },
+  {
+    "name": "Payment Provider Failure",
+    "description": "Redsys 3DS simulator or payment gateway did not respond in time. This is an external dependency issue. Action: Re-run. If persistent, check Redsys simulator availability.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Redsys 3DS simulator|redsys.*(?:timeout|did not exit)|payment.*(?:timeout|did not)).*"
+  },
+  {
+    "name": "Booking Verification Failed",
+    "description": "Post-payment verification failed: confirmation page did not load, or the ticket URL pattern was unexpected. Action: Check if the booking completed and review the trace.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Booking confirmation did not become visible|Living ticket URL did not match|review-ticket pattern|booking.*confirmation.*timeout).*"
+  },
+  {
+    "name": "Ticket Type Mapping Mismatch",
+    "description": "A ticket type name from the site (e.g., 'Adulto') doesn't match configured patterns. Action: Update ticket type mappings in test data if the site changed labels.",
     "matchedStatuses": ["failed"],
-    "messageRegex": ".*(?:No D-BOX films|No suitable seats found|No .* found on the cinema|No films found|No showtimes available|Unable to find a film|undefined|not contain 'undefined').*"
+    "messageRegex": "(?s).*(?:is not a valid ticket type pattern|not included in the mappings|ticketTypeName).*"
   },
   {
-    "name": "Feature Removed / Unavailable",
-    "description": "Feature or navigation target does not exist in the current environment (e.g. Bonos link in lab)",
+    "name": "Seat Selection State Error",
+    "description": "Seat picker state assertion failed: a seat was not in the expected state (selected/available/deselected). This may indicate a preprod UI timing issue.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*(?:should be deselected|seat.*state.*expected|seatState).*"
+  },
+  {
+    "name": "Known Limitations",
+    "description": "Feature with known issues or environment-specific restrictions. Tracked and expected to fail until resolved.",
     "matchedStatuses": ["failed", "broken"],
-    "messageRegex": ".*(?:cinesabusiness|bonos|promociones|navigateToCoupons).*"
+    "messageRegex": "(?s).*(?:@broken-prod|known.?limitation|not.?supported.?in).*"
   },
   {
-    "name": "Test Timeouts",
-    "description": "Full test exceeded its timeout budget (usually 90-180s). Severe blocker or infrastructure issue",
+    "name": "Navigation / Page Load Timeout",
+    "description": "page.goto, page.goBack, or waitForLoadState exceeded timeout. The page was too slow to load. Action: Check environment performance and review trace.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:page\\.(?:goto|goBack|waitForLoadState).*Timeout \\d+ms exceeded).*"
+  },
+  {
+    "name": "DOM State Error",
+    "description": "Element detached from DOM or not stable during interaction — a timing/race condition. Action: Add waits or stabilize the selector.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:not attached to the DOM|detached from DOM|Element is no longer attached|waiting for element to be stable).*"
+  },
+  {
+    "name": "Blocking Modal Interrupted Flow",
+    "description": "An unexpected popup/modal blocked the test flow. Action: Check for new promotional modals. May need updated dismiss handler.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Timeout \\d+ms exceeded.*(?:seat|confirm|v-seat|selected-seats|checkout)|waiting for seats|close.*modal|blocking modal).*",
+    "flaky": true
+  },
+  {
+    "name": "Cloudflare Challenge Block",
+    "description": "Cloudflare WAF blocked the browser with a security challenge page. The test never reached the actual site. Action: Regenerate storage state (npx playwright test --project=setup) or use --headed --workers=1.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Cloudflare challenge detected|Verificación de seguridad en curso|Checking your browser before accessing|Just a moment).*",
+    "flaky": true
+  },
+  {
+    "name": "Full Test Timeout",
+    "description": "Entire test exceeded max time (90-180s). Severe blocker: page never loaded or flow was stuck. Action: Review trace for where it stalled.",
     "matchedStatuses": ["broken"],
-    "messageRegex": ".*(?:Test timeout of \\d+ms exceeded).*"
+    "messageRegex": "(?s).*(?:Test timeout of \\d+ms exceeded).*"
   },
   {
-    "name": "UI: Interaction Timeouts",
-    "description": "A specific Playwright action (click, waitFor, fill, waitForEvent) timed out waiting for an element or event",
+    "name": "Element Interaction Timeout",
+    "description": "A specific UI action (click, fill, waitFor) timed out. Element did not appear or become interactive. Action: Review screenshot/trace for layout changes or loading spinners.",
     "matchedStatuses": ["failed", "broken"],
-    "messageRegex": ".*(?:Timeout \\d+ms exceeded).*"
+    "messageRegex": "(?s).*(?:Timeout \\d+ms exceeded).*"
   },
   {
-    "name": "UI: Selectors / Strict Mode",
-    "description": "Selector resolved to multiple elements (strict mode) or element detached from DOM",
+    "name": "Selector Mismatch",
+    "description": "CSS/XPath selector matched multiple elements (strict mode violation). Action: Update selector in *.selectors.ts to be more specific.",
     "matchedStatuses": ["failed", "broken"],
-    "messageRegex": ".*(?:strict mode violation|resolved to \\d+ elements|detached from DOM).*"
+    "messageRegex": "(?s).*(?:strict mode violation|resolved to \\d+ elements).*"
   },
   {
-    "name": "Infra / Browser",
-    "description": "Browser, page, or context crashed or closed unexpectedly",
-    "matchedStatuses": ["broken"],
-    "messageRegex": ".*(?:Target page, context or browser has been closed|Target closed|Context closed|browserType\\.launch).*"
-  },
-  {
-    "name": "Product Defects",
-    "description": "Genuine assertion failures indicating a bug in the application under test",
-    "matchedStatuses": ["failed"]
+    "name": "Assertion Failure",
+    "description": "An expect() assertion failed with an unexpected value. Not a timeout or infrastructure issue. Action: Review error details and trace.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*(?:expect\\(received\\)|Expected.*Received|toBe|toHave|toContain|toMatch|toEqual|AssertionError).*"
   }
 ]

@@ -827,51 +827,96 @@ export class SeatPicker {
   }
 
   /**
-   * Selects more than the maximum allowed seats.
-   * Returns the list of chosen seats.
+   * Selects more than the maximum allowed seats by dynamically detecting the max.
+   * Selects seats one by one until FIFO deselection is detected (first seat loses
+   * aria-pressed="true"), then selects extra seats to confirm FIFO behavior.
+   * Returns the list of all attempted seats with their final states.
    */
   async selectMoreThanMaxSeats(): Promise<Seat[]> {
     return await allure.step(
       `Selecting seats to exceed max capacity`,
       async () => {
-        const extraSeatsToTest = 3; // Number of extra seats to test
-        const seatCount = maxSeatSelection + extraSeatsToTest; // Total seats to select
+        const extraSeatsToTest = 3;
 
-        await this.page.waitForResponse(
-          (response) =>
-            response.url().includes('/seat-availability') &&
-            response.status() === 200
-        );
         await this.waitForSeatsToBeReady();
         const seatsMatrix = await this.getAvailableSeatsMatrix();
         const selectedSeats: Seat[] = [];
-        let totalSelected = 0;
 
-        for (let rowIndex = seatsMatrix.length - 1; rowIndex >= 0; rowIndex--) {
-          const row = seatsMatrix[rowIndex];
-          const sortedRow = row.sort((a, b) => a.seatNumber - b.seatNumber);
+        // Flatten available seats (from last row, sorted by seat number)
+        const allAvailable: Seat[] = [];
+        for (
+          let rowIndex = seatsMatrix.length - 1;
+          rowIndex >= 0;
+          rowIndex--
+        ) {
+          const sortedRow = seatsMatrix[rowIndex].sort(
+            (a, b) => a.seatNumber - b.seatNumber
+          );
+          allAvailable.push(...sortedRow);
+        }
 
-          for (const seat of sortedRow) {
-            if (totalSelected >= seatCount) break;
-            await this.selectSeat(seat);
-            selectedSeats.push(seat);
-            totalSelected++;
+        // Phase 1: Select seats until FIFO deselection is detected.
+        // The SPA auto-deselects the first seat when the max+1 seat is clicked.
+        // We detect this by checking aria-pressed on the first selected seat.
+        let detectedMax = 0;
+
+        for (const seat of allAvailable) {
+          await this.selectSeat(seat);
+          selectedSeats.push(seat);
+
+          // After selecting at least 2 seats, check if the first seat was deselected
+          if (selectedSeats.length >= 2) {
+            const firstSeatPressed =
+              await selectedSeats[0].locator.getAttribute('aria-pressed');
+            if (firstSeatPressed !== 'true') {
+              detectedMax = selectedSeats.length - 1;
+              break;
+            }
           }
-          if (totalSelected >= seatCount) break;
+
+          // Safety: don't select more than 25 seats
+          if (selectedSeats.length >= 25) {
+            throw new Error(
+              'Selected 25 seats without detecting FIFO deselection. ' +
+                'The room max seat limit may be higher than expected.'
+            );
+          }
         }
-        if (selectedSeats.length !== seatCount) {
+
+        if (detectedMax === 0) {
           throw new Error(
-            `Expected to select ${seatCount} seats, but only selected ${selectedSeats.length}`
+            'Could not detect max seat limit — FIFO deselection never triggered'
           );
         }
-        await this.page.waitForTimeout(500);
-        for (let i = 0; i < selectedSeats.length; i++) {
-          selectedSeats[i].seatState = await this.getSeatState(
-            selectedSeats[i].locator,
-            (await selectedSeats[i].locator.getAttribute('class')) || '',
-            await selectedSeats[i].locator.getAttribute('aria-pressed')
+
+        // Phase 2: Select extra seats past the max to confirm FIFO continues.
+        // We already have 1 extra (the one that triggered FIFO), need extraSeatsToTest - 1 more.
+        const extraNeeded = extraSeatsToTest - 1;
+        const startIdx = selectedSeats.length;
+        let extraSelected = 0;
+
+        for (
+          let i = startIdx;
+          i < allAvailable.length && extraSelected < extraNeeded;
+          i++
+        ) {
+          await this.selectSeat(allAvailable[i]);
+          selectedSeats.push(allAvailable[i]);
+          extraSelected++;
+        }
+
+        // Allow DOM transitions to complete
+        await this.webActions.wait(500);
+
+        // Read final states of all attempted seats
+        for (const seat of selectedSeats) {
+          seat.seatState = await this.getSeatState(
+            seat.locator,
+            (await seat.locator.getAttribute('class')) || '',
+            await seat.locator.getAttribute('aria-pressed')
           );
         }
+
         return selectedSeats;
       }
     );

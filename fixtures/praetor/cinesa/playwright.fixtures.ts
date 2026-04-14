@@ -1,78 +1,34 @@
 import { test as base } from '@playwright/test';
 import { WebActions } from '../../../core/webactions/webActions';
-import { getCloudflareHeaders } from '../../../core/cloudflare/cloudflareHeaders';
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
+import { createCinesaContext } from '../../shared/contextFactory';
+import { PraetorSeatPicker } from '../../../pageObjectsManagers/praetor/cinesa/checkout/seatPicker/seatPicker.page';
+import { PraetorLogin } from '../../../pageObjectsManagers/praetor/cinesa/checkout/login/login.page';
+import { PraetorTicketPicker } from '../../../pageObjectsManagers/praetor/cinesa/checkout/ticketPicker/ticketPicker.page';
+import { PraetorBar } from '../../../pageObjectsManagers/praetor/cinesa/checkout/bar/bar.page';
+import { PraetorPurchaseSummary } from '../../../pageObjectsManagers/praetor/cinesa/checkout/purchaseSummary/purchaseSummary.page';
+import { PraetorPayment } from '../../../pageObjectsManagers/praetor/cinesa/checkout/payment/payment.page';
 
 /**
  * PRAETOR fixtures — Cinesa España checkout flow.
  *
- * Reuses shared core (WebActions, config, Cloudflare) with checkout-specific POMs.
+ * Uses shared contextFactory for Cloudflare + consent + storageState.
  * New POMs will be added as each wave is implemented.
  */
 
 type PraetorFixtures = {
   webActions: WebActions;
+  seatPicker: PraetorSeatPicker;
+  loginPage: PraetorLogin;
+  purchaseSummary: PraetorPurchaseSummary;
+  paymentPage: PraetorPayment;
+  ticketPicker: PraetorTicketPicker;
+  barPage: PraetorBar;
 };
 
 export const test = base.extend<PraetorFixtures>({
-  // Override context to auto-inject Cloudflare headers + consent seeds
+  // Shared context: Cloudflare + consent + storageState
   context: async ({ browser }, use) => {
-    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
-    const config = getCinesaConfig(env);
-    const headers = getCloudflareHeaders(env);
-
-    // Get storageState path from project configuration
-    const { getCinesaStorageStatePath } = await import(
-      '../../../config/projects/storageState.helper'
-    );
-    const storageStatePath = getCinesaStorageStatePath(env);
-
-    // Get native User Agent from the current browser
-    const tempContext = await browser.newContext();
-    const tempPage = await tempContext.newPage();
-    const originalUA = await tempPage.evaluate(() => navigator.userAgent);
-    await tempContext.close();
-
-    const suffix = process.env.USER_AGENT_SUFFIX
-      ? ` ${process.env.USER_AGENT_SUFFIX}`
-      : '';
-    const finalUserAgent = originalUA + suffix;
-
-    // Create context WITH storageState if available
-    const context = await browser.newContext({
-      userAgent: finalUserAgent,
-      ...(storageStatePath ? { storageState: storageStatePath } : {}),
-    });
-
-    // Inject Cloudflare credentials (headers + cookie)
-    if (headers) {
-      await context.setExtraHTTPHeaders(headers);
-
-      const clientSecret = headers['CF-Access-Client-Secret'];
-      if (clientSecret) {
-        await context.addCookies([
-          {
-            name: 'CF-Access-Client-Secret',
-            value: clientSecret,
-            domain: '.ocgtest.es',
-            path: '/',
-            httpOnly: false,
-            secure: true,
-            sameSite: 'Lax',
-          },
-        ]);
-      }
-    }
-
-    // Apply consent seeds if NO storageState is configured
-    const hasStorageState = storageStatePath !== undefined;
-    if (!hasStorageState) {
-      const page = await context.newPage();
-      const webActions = new WebActions(page);
-      await webActions.applyConsentSeedsFor(config.baseUrl);
-      await page.close();
-    }
-
+    const context = await createCinesaContext(browser);
     await use(context);
     await context.close();
   },
@@ -81,6 +37,36 @@ export const test = base.extend<PraetorFixtures>({
   webActions: async ({ page }, use) => {
     const webActions = new WebActions(page);
     await use(webActions);
+  },
+
+  // SeatPicker POM
+  seatPicker: async ({ page }, use) => {
+    await use(new PraetorSeatPicker(page));
+  },
+
+  // Login POM
+  loginPage: async ({ page }, use) => {
+    await use(new PraetorLogin(page));
+  },
+
+  // TicketPicker POM
+  ticketPicker: async ({ page }, use) => {
+    await use(new PraetorTicketPicker(page));
+  },
+
+  // Bar POM
+  barPage: async ({ page }, use) => {
+    await use(new PraetorBar(page));
+  },
+
+  // PurchaseSummary POM
+  purchaseSummary: async ({ page }, use) => {
+    await use(new PraetorPurchaseSummary(page));
+  },
+
+  // Payment POM
+  paymentPage: async ({ page }, use) => {
+    await use(new PraetorPayment(page));
   },
 });
 

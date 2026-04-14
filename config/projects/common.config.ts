@@ -5,7 +5,7 @@
 
 export const COMMON_TIMEOUTS = {
   action: 60000,
-  navigation: 60000,
+  navigation: 30000,
 } as const;
 
 export const COMMON_SCREENSHOTS = {

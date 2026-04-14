@@ -1,5 +1,6 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
 import {
   assertWhistleblowingNavigation,
   assertWhistleblowingPDFDownload,
@@ -9,9 +10,10 @@ import { handlePDFInteraction } from './whistleblowing.helpers';
 import { expectedUrl } from './whistleblowing.data';
 
 test.describe('Whistleblowing Policy Tests', () => {
-  test.beforeEach(async ({ footer }) => {
+  test.beforeEach(async ({ footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
     await footer.navigateToHome();
   });

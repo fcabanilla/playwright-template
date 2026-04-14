@@ -47,6 +47,24 @@ export interface CinemaDetailSelectors {
    * Selector for internal icons/flags within a showtime button.
    */
   showtimeInternalIcon: string;
+  /**
+   * Selector for blocking modals (promotional dialogs) that overlay the cinema detail page.
+   */
+  blockingModal: string;
+  /**
+   * Selector for the close button inside blocking modals.
+   */
+  blockingModalCloseButton: string;
+  /** Selector for the date picker container. */
+  dayPickerContainer: string;
+  /** Selector for each day item in the date picker. */
+  dayPickerItem: string;
+  /** Selector for day picker buttons (clickable day elements). */
+  dayPickerButton: string;
+  /** Selector for the currently active/selected day button. */
+  dayPickerActiveButton: string;
+  /** Selector for the "Show all movies" checkbox in the showtime picker. */
+  showAllMoviesCheckbox: string;
 }
 
 /**
@@ -65,6 +83,16 @@ export const cinemaDetailSelectors: CinemaDetailSelectors = {
   duration: '.v-film-details__duration, .duration',
   attributeIcon: '.v-attribute-icon, .icon-attribute',
   showtimeInternalIcon: 'img, .icon, i',
+  blockingModal:
+    'dialog[open], aside.v-modal.secondary-attribute-message-modal',
+  blockingModalCloseButton:
+    'dialog button:has-text("Close modal"), aside.v-modal .v-modal-header__close-button',
+  dayPickerContainer: '.v-date-picker',
+  dayPickerItem: '.v-date-picker-date',
+  dayPickerButton: '.v-date-picker-date__button',
+  dayPickerActiveButton: '.v-date-picker-date__button--selected',
+  showAllMoviesCheckbox:
+    '.v-showtime-picker-show-all-movies input[type="checkbox"]',
 };
 
 /**

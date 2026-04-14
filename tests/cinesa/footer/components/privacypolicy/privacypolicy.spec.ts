@@ -1,13 +1,15 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
 import { expectedUrl } from './privacypolicy.data';
 import { assertPrivacyPolicyNavigation } from './privacypolicy.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Privacy Policy Tests', () => {
-  test.beforeEach(async ({ footer }) => {
+  test.beforeEach(async ({ footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
     await footer.navigateToHome();
   });

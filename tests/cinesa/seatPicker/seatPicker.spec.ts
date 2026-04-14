@@ -1,5 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import {
   assertWarningMessageDisplayed,
   assertConfirmButtonDisabled,
@@ -14,14 +15,16 @@ import { PROMO_CODE_OPTIONS } from '../../../pageObjectsManagers/cinesa/ticketPi
 //import { assertNoCloudflareProtection } from '../../helpers/cloudflareDetector';
 import { getCinemasForEnvironment } from './seatPicker.data';
 import { getGiftCardData } from '../paymentPage/paymentPage.data';
+import { getShowtimeSelectionForWorker } from '../../../config/showtimes.pool';
 
 // Get available cinemas for current environment
 const CINEMAS = getCinemasForEnvironment();
 
 test.describe('Seat Picker - Seat Selection', () => {
-  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Seat Picker - Seat Selection');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
@@ -29,7 +32,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Complete Purchase Flow', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Complete purchase from seat selection');
     });
 
@@ -39,8 +42,9 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Complete Purchase · Purchase · Single seat — ${cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-fail',
-            '@preprod-fail',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@e2e',
@@ -67,7 +71,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
@@ -86,7 +92,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-pass',
-            '@preprod-fail',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@e2e',
@@ -113,7 +119,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           const seatsToSelect = 4;
           await seatPicker.selectLastAvailableSeats(seatsToSelect);
           await seatPicker.confirmSeats();
@@ -129,7 +137,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Seat Selection Validation', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Seat selection validation rules');
     });
 
@@ -139,6 +147,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-fail',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -151,7 +160,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectSeatsWithEmptySpaceBetween();
           await assertWarningMessageDisplayed(seatPicker.page);
           await assertConfirmButtonDisabled(seatPicker.page);
@@ -165,7 +176,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-fail',
-            '@preprod-fail',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -179,7 +190,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectSeatsSeparatingGroupInSameRow();
           await assertWarningMessageDisplayed(seatPicker.page);
           await assertConfirmButtonDisabled(seatPicker.page);
@@ -206,7 +219,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectSeatsSeparatingGroupInDifferentRows();
           await assertWarningMessageNotDisplayed(seatPicker.page);
           await assertConfirmButtonEnabled(seatPicker.page);
@@ -221,7 +236,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-pass',
-            '@preprod-pass',
+            '@preprod-fail',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -234,7 +249,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await assertConfirmButtonDisabled(seatPicker.page);
         }
       );
@@ -245,8 +262,9 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Seat Selection · Select seats · Over capacity — ${cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-pass',
-            '@preprod-fail',
+            '@preprod-broken',
             '@seatpicker',
             '@cinesa',
             '@validation',
@@ -259,7 +277,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex, 'normal')
+          );
           const selectedSeats = await seatPicker.selectMoreThanMaxSeats();
           await assertWarningMessageNotDisplayed(seatPicker.page);
           await assertConfirmButtonEnabled(seatPicker.page);
@@ -271,7 +291,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Accessibility - Wheelchair and Companion Seats', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Wheelchair and companion seat selection');
     });
 
@@ -281,7 +301,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-pass',
-            '@preprod-broken',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@accessibility',
@@ -294,7 +314,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectCompanionSeat();
           await assertWarningMessageDisplayed(seatPicker.page);
           await assertConfirmButtonDisabled(seatPicker.page);
@@ -322,7 +344,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectCompanionAndWheelchairSeats();
           await assertWarningMessageNotDisplayed(seatPicker.page);
           await assertConfirmButtonEnabled(seatPicker.page);
@@ -337,7 +361,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-fail',
-            '@preprod-fail',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@accessibility',
@@ -350,7 +374,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectRandomAvailableWheelchairSeat();
           await assertWarningMessageNotDisplayed(seatPicker.page);
           await assertConfirmButtonEnabled(seatPicker.page);
@@ -361,7 +387,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('D-BOX Sofa Seat Selection', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('D-BOX sofa seat selection and validation');
     });
 
@@ -378,7 +404,13 @@ test.describe('Seat Picker - Seat Selection', () => {
             ...cinema.tags,
           ],
         },
-        async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
+        async ({
+          dboxLock,
+          navbar,
+          cinema: cinemaPage,
+          cinemaDetail,
+          seatPicker,
+        }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
           await navbar.navigateToCinemas();
@@ -407,7 +439,13 @@ test.describe('Seat Picker - Seat Selection', () => {
             ...cinema.tags,
           ],
         },
-        async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
+        async ({
+          dboxLock,
+          navbar,
+          cinema: cinemaPage,
+          cinemaDetail,
+          seatPicker,
+        }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
           await navbar.navigateToCinemas();
@@ -436,7 +474,13 @@ test.describe('Seat Picker - Seat Selection', () => {
             ...cinema.tags,
           ],
         },
-        async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
+        async ({
+          dboxLock,
+          navbar,
+          cinema: cinemaPage,
+          cinemaDetail,
+          seatPicker,
+        }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
           await navbar.navigateToCinemas();
@@ -455,8 +499,9 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Attempt selection · Separate group same row — ${cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-pass',
-            '@preprod-broken',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@dbox',
@@ -464,7 +509,13 @@ test.describe('Seat Picker - Seat Selection', () => {
             ...cinema.tags,
           ],
         },
-        async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
+        async ({
+          dboxLock,
+          navbar,
+          cinema: cinemaPage,
+          cinemaDetail,
+          seatPicker,
+        }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
           await navbar.navigateToCinemas();
@@ -491,7 +542,13 @@ test.describe('Seat Picker - Seat Selection', () => {
             ...cinema.tags,
           ],
         },
-        async ({ navbar, cinema: cinemaPage, cinemaDetail, seatPicker }) => {
+        async ({
+          dboxLock,
+          navbar,
+          cinema: cinemaPage,
+          cinemaDetail,
+          seatPicker,
+        }) => {
           test.step('TC: https://se-ocg.atlassian.net/browse/COMS-4853', async () => {});
 
           await navbar.navigateToCinemas();
@@ -511,6 +568,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · D-BOX · Display · Regular & sofa ticket types — ${cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-fail',
             '@preprod-fail',
             '@seatpicker',
@@ -522,6 +580,7 @@ test.describe('Seat Picker - Seat Selection', () => {
           ],
         },
         async ({
+          dboxLock,
           navbar,
           cinema: cinemaPage,
           cinemaDetail,
@@ -559,7 +618,7 @@ test.describe('Seat Picker - Seat Selection', () => {
   });
 
   test.describe('Promotional Codes', () => {
-    test.beforeEach(async () => {
+    test.beforeEach(async ({}, testInfo) => {
       await allure.story('Promotional code application in booking flow');
     });
 
@@ -568,8 +627,9 @@ test.describe('Seat Picker - Seat Selection', () => {
         `Seat Picker · Promotional Codes · Purchase · Standard — ${cinema.name}`,
         {
           tag: [
+            '@rerun-cf',
             '@lab-pass',
-            '@preprod-fail',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@promo',
@@ -593,7 +653,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();
@@ -611,7 +673,7 @@ test.describe('Seat Picker - Seat Selection', () => {
         {
           tag: [
             '@lab-pass',
-            '@preprod-broken',
+            '@preprod-pass',
             '@seatpicker',
             '@cinesa',
             '@promo',
@@ -635,7 +697,9 @@ test.describe('Seat Picker - Seat Selection', () => {
 
           await navbar.navigateToCinemas();
           await cinemaPage[cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();

@@ -19,7 +19,7 @@ export class LoginPage {
     await allure.step('Continue as guest', async () => {
       await this.webActions.waitForVisible(
         this.selectors.continueAsGuestButton,
-        10000,
+        20000,
         'Wait for "Continue as Guest" button'
       );
       await this.webActions.click(

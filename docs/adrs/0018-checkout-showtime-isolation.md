@@ -1,8 +1,10 @@
 # ADR-0018: Checkout Showtime Isolation Strategy
 
-**Status**: Proposed
+**Status**: Accepted (Phase 2 Implemented)
 
 **Date**: 2026-03-25
+
+**Updated**: 2026-06-13
 
 **Authors**: [@fcabanilla]
 
@@ -54,32 +56,50 @@ Both phases write to the same `.allure/results/` directory, so the final Allure 
 "test:es:regression:preprod": "cross-env TEST_ENV=preprod npm run test:es:regression"
 ```
 
-#### Phase 2 — Future: Showtime Claim Pool
+#### Phase 2 — Showtime Claim Pool (Implemented)
 
-Replace `--workers=1` with deterministic showtime-per-worker routing using `test.info().parallelIndex`:
+Replaced `--workers=1` and random showtime selection with deterministic room-per-worker routing using `test.info().parallelIndex`:
 
 ```typescript
-// config/showtimes.pool.ts (FUTURE — not yet implemented)
-const SHOWTIME_POOL = [
-  { cinema: 'Oasiz', film: 'Lightyear', time: '21:55', room: 'Sala 1' },
-  { cinema: 'Oasiz', film: 'Lightyear', time: '19:30', room: 'Sala 3' },
-  { cinema: 'Oasiz', film: 'Top Gun', time: '20:00', room: 'Sala 5' },
-  // ... more showtimes
+// config/showtimes.pool.ts
+const ROOM_POOLS: string[][] = [
+  ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4'], // Worker 0
+  ['Sala 5', 'Sala 6', 'Sala 7', 'Sala 8'], // Worker 1
+  ['Sala 9', 'Sala 10', 'Sala 11', 'Sala 12'], // Worker 2
 ];
 
-export function getShowtimeForWorker(): ShowtimeConfig {
-  const index = test.info().parallelIndex;
-  return SHOWTIME_POOL[index % SHOWTIME_POOL.length];
+export function getShowtimeSelectionForWorker(
+  workerIndex: number,
+  format: 'normal' | 'dbox' | 'any' = 'normal'
+): WorkerShowtimeConfig {
+  const poolIndex = workerIndex % ROOM_POOLS.length;
+  return {
+    requiredFormat: format,
+    preferredRooms: ROOM_POOLS[poolIndex],
+    workerIndex,
+  };
 }
 ```
 
 **How it works:**
 
-- `test.info().parallelIndex` is unique per Playwright worker (0, 1, 2, ...) and deterministic
-- Each worker gets a distinct showtime from the pool via modular arithmetic
+- Each worker gets an exclusive subset of 4 rooms (out of 12 standard rooms at Oasiz)
+- `selectFilmAndShowtimeByFormatAndRoom(criteria)` filters showtimes to only the worker's assigned rooms
 - No lockfile, no shared state, no IPC needed
-- Workers can run in full parallel without seat conflicts
-- Pool must have at least as many entries as `--workers` count
+- Workers run in full parallel (3 workers) without seat conflicts
+- Supports up to 3 isolated workers; wraps with modular arithmetic if more are used
+
+**Files updated:**
+
+- `config/showtimes.pool.ts` — New file with pool configuration and `getShowtimeSelectionForWorker()`
+- `tests/cinesa/seatPicker/seatPicker.spec.ts` — 12 normal showtime calls replaced with pool
+- `tests/cinesa/bar/bar.spec.ts` — 2 calls replaced with pool
+- `tests/cinesa/analytics/analytics.spec.ts` — 1 call replaced with pool
+- `tests/cinesa/checkout/checkout.smoke.spec.ts` — 2 calls replaced with pool
+- `tests/cinesa/checkout/checkout.e2e.spec.ts` — 2 calls replaced with pool
+- `tests/cinesa/checkout/checkout.giftcard.spec.ts` — 2 calls replaced with pool
+
+**D-BOX tests** remain using `selectDBoxRandomFilmAndShowtime()` because D-BOX rooms are separate from the standard Sala 1-12 pool and cannot be partitioned (typically only 1 D-BOX room per cinema).
 
 ### Considered Alternatives
 
@@ -130,18 +150,18 @@ export function getShowtimeForWorker(): ShowtimeConfig {
 2. Validate checkout tests pass with `--workers=1`
 3. Update CI pipeline to use `test:es:regression:lab` instead of `test:es:lab`
 
-### Phase 2 — Future (Backlog)
+### Phase 2 — Implemented
 
-1. Create `config/showtimes.pool.ts` with environment-specific showtime pools
-2. Modify `cinemaDetail.page.ts` to accept showtime config from pool instead of random selection
-3. Update checkout specs to call `getShowtimeForWorker()`
-4. Remove `--workers=1` constraint from regression scripts
-5. Add pool validation test that verifies all pool entries are valid showtimes
+1. ~~Create `config/showtimes.pool.ts` with environment-specific showtime pools~~ ✅
+2. ~~Modify `cinemaDetail.page.ts` to accept showtime config from pool instead of random selection~~ ✅ (already supported `selectFilmAndShowtimeByFormatAndRoom`)
+3. ~~Update checkout specs to call `getShowtimeForWorker()`~~ ✅ (all 21 booking tests updated)
+4. Remove `--workers=1` constraint from regression scripts (can now run with default workers)
+5. ~~Add pool validation test that verifies all pool entries are valid showtimes~~ (not needed — rooms are static at Oasiz)
 
 ### Success Criteria
 
-- Phase 1: All 6 checkout tests pass consistently with `test:es:regression:lab`
-- Phase 2: All 6 checkout tests pass with default workers (≥3) using showtime pool
+- Phase 1: All 6 checkout tests pass consistently with `test:es:regression:lab` ✅
+- Phase 2: All booking tests (21 normal + 6 checkout) pass with default workers (3) using room pool
 
 ### Rollback Plan
 

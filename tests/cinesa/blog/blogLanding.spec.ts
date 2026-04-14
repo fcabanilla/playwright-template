@@ -1,5 +1,9 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../core/allure/allureMetadata';
 import { BlogLandingAssertions } from './blogLanding.assertions';
 import { blogLandingData } from './blogLanding.data';
 
@@ -9,6 +13,7 @@ test.describe('Blog Landing Page Tests', () => {
   test.beforeEach(async ({ page, blogLanding, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Blog - Content Platform');
+    await enrichTestMetadata(testInfo);
 
     blogLandingAssertions = new BlogLandingAssertions(page, testInfo);
     await promotionalModal.closeModalIfVisible();
@@ -20,7 +25,7 @@ test.describe('Blog Landing Page Tests', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-fail',
+        '@preprod-pass',
         '@blog',
         '@cinesa',
         '@display',
@@ -30,6 +35,7 @@ test.describe('Blog Landing Page Tests', () => {
     },
     async () => {
       await allure.story('OCG-2009 - Article cards count validation');
+      await linkJiraTickets('OCG-2009 - Article cards count validation');
       await blogLandingAssertions.expectArticleCardsCount(
         blogLandingData.expectedArticleCardsCount
       );
@@ -51,6 +57,7 @@ test.describe('Blog Landing Page Tests', () => {
     },
     async () => {
       await allure.story('OCG-2009 - Article cards visibility');
+      await linkJiraTickets('OCG-2009 - Article cards visibility');
       await blogLandingAssertions.expectArticleCardsVisible();
     }
   );
@@ -59,7 +66,9 @@ test.describe('Blog Landing Page Tests', () => {
     'Blog · Landing · Navigate · Related articles roundtrip',
     {
       tag: [
+        '@rerun-cf',
         '@lab-fail',
+        '@preprod-pass',
         '@blog',
         '@cinesa',
         '@navigation',
@@ -70,6 +79,7 @@ test.describe('Blog Landing Page Tests', () => {
     },
     async () => {
       await allure.story('OCG-2030 - Related articles navigation flow');
+      await linkJiraTickets('OCG-2030 - Related articles navigation flow');
       await blogLandingAssertions.expectNavigationThroughRelatedArticles();
     }
   );

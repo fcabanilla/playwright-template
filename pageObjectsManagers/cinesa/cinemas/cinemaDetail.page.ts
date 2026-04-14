@@ -52,6 +52,33 @@ export class CinemaDetail {
     return text.replace(/\s+/g, ' ').trim();
   }
 
+  /**
+   * Dismisses any blocking promotional modal/dialog overlaying the cinema detail page.
+   * These modals appear non-deterministically (CMS-driven) and block clicks on films/showtimes.
+   * Uses a short timeout (1.5s) to avoid slowing tests when no modal is present.
+   */
+  private async dismissBlockingModalIfVisible(): Promise<void> {
+    try {
+      const closeBtn = this.webActions.page.locator(
+        this.selectors.blockingModalCloseButton
+      );
+      if (await closeBtn.first().isVisible({ timeout: 1500 })) {
+        await allure.step(
+          'Dismissing blocking modal on cinema detail',
+          async () => {
+            await closeBtn.first().click();
+            await this.webActions.page
+              .locator(this.selectors.blockingModal)
+              .first()
+              .waitFor({ state: 'hidden', timeout: 3000 });
+          }
+        );
+      }
+    } catch {
+      // No modal present or already dismissed — continue
+    }
+  }
+
   private extractRoomFromShowtimeText(
     showtimeText: string
   ): string | undefined {
@@ -92,6 +119,119 @@ export class CinemaDetail {
     return [...new Set(parsedRooms)];
   }
 
+  /**
+   * Returns the text labels of all available day buttons in the date picker.
+   * Example: ['HOY', 'sáb 11 abr', 'dom 12 abr', ...]
+   */
+  private async getAvailableDays(): Promise<string[]> {
+    return await allure.step('[DATA] Get available days', async () => {
+      const page = this.webActions.page;
+      // Wait for the showtime section to load before querying the day picker
+      try {
+        await page
+          .locator(this.selectors.filmList)
+          .first()
+          .waitFor({ state: 'visible', timeout: 20000 });
+      } catch {
+        // Film list may not be visible yet — still try the day picker
+      }
+      try {
+        await page
+          .locator(this.selectors.dayPickerButton)
+          .first()
+          .waitFor({ state: 'visible', timeout: 5000 });
+      } catch {
+        // Day picker may not exist on all pages — fall through
+      }
+      const dayButtons = page.locator(this.selectors.dayPickerButton);
+      const count = await dayButtons.count();
+      if (count === 0) {
+        return ['HOY']; // Fallback: assume current day if no picker found
+      }
+      const texts = await dayButtons.allTextContents();
+      return texts.map((t) => t.trim());
+    });
+  }
+
+  /**
+   * Clicks the day button at the given index in the date picker.
+   * Index 0 = first day (usually HOY), 1 = next day, etc.
+   * Waits for the film list to update after changing the day.
+   * @returns The text label of the selected day.
+   */
+  private async selectDayByIndex(dayIndex: number): Promise<string> {
+    return await allure.step(
+      `[ACT] Select day at index ${dayIndex}`,
+      async () => {
+        const page = this.webActions.page;
+        const dayButtons = page.locator(this.selectors.dayPickerButton);
+        const count = await dayButtons.count();
+        if (count === 0) {
+          return 'HOY'; // No day picker — page shows today by default
+        }
+
+        const dayButton = dayButtons.nth(dayIndex);
+        const dayText = (await dayButton.innerText()).trim();
+
+        // Skip click if this day is already selected
+        const isSelected = await dayButton.evaluate((el) =>
+          el.classList.contains('v-date-picker-date__button--selected')
+        );
+        if (!isSelected) {
+          await dayButton.click({ force: true });
+          // Wait for film list to refresh after day change
+          await page
+            .locator(this.selectors.filmList)
+            .first()
+            .waitFor({ state: 'visible', timeout: 10000 });
+        }
+
+        return dayText;
+      }
+    );
+  }
+
+  /**
+   * Ensures the "Show all movies" checkbox is checked.
+   * Some days may hide films by default; enabling this reveals all available content.
+   */
+  private async ensureShowAllMovies(): Promise<void> {
+    try {
+      const page = this.webActions.page;
+      const checkbox = page.locator(this.selectors.showAllMoviesCheckbox);
+      if (
+        (await checkbox.count()) > 0 &&
+        !(await checkbox.isChecked({ timeout: 2000 }))
+      ) {
+        await allure.step(
+          '[ACT] Enable "Show all movies" checkbox',
+          async () => {
+            await checkbox.check();
+          }
+        );
+      }
+    } catch {
+      // Checkbox not present or not interactive — continue
+    }
+  }
+
+  /**
+   * Quick check whether the current day has any films loaded.
+   * Uses a short timeout (5s) to avoid blocking the multi-day fallback loop.
+   */
+  private async hasFilmsOnCurrentDay(): Promise<boolean> {
+    try {
+      const page = this.webActions.page;
+      await page
+        .locator(this.selectors.filmName)
+        .first()
+        .waitFor({ state: 'visible', timeout: 5000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async findShowtimeByPreferredRooms(
     showtimeLocator: Locator,
     preferredRooms: string[]
@@ -118,6 +258,11 @@ export class CinemaDetail {
         text: this.normalizeWhitespace(showtimeText),
         room: this.extractRoomFromShowtimeText(showtimeText),
       });
+    }
+
+    // When no rooms are preferred (fallback mode), accept any available showtime
+    if (normalizedPreferredRooms.length === 0 && showtimeEntries.length > 0) {
+      return showtimeEntries[0];
     }
 
     for (const preferredRoom of normalizedPreferredRooms) {
@@ -178,6 +323,7 @@ export class CinemaDetail {
           );
         }
 
+        await this.dismissBlockingModalIfVisible();
         await showtimeLocator.nth(matchedShowtime.index).click();
 
         return {
@@ -224,61 +370,124 @@ export class CinemaDetail {
     );
   }
 
-  async selectFilmAndShowtimeByFormatAndRoom(criteria: {
+  /**
+   * Attempts film+showtime selection on the currently visible day.
+   * Extracted inner logic for multi-day iteration.
+   */
+  private async trySelectFilmOnCurrentDay(criteria: {
     requiredFormat: 'normal' | 'dbox' | 'any';
     preferredRooms: string[];
   }): Promise<{ film: string; showtime: string; room?: string }> {
+    const allFilmNames = await this.getFilmNames();
+    if (allFilmNames.length === 0) {
+      throw new Error('No films found on the cinema detail page');
+    }
+
+    const eligibleFilms = await this.getEligibleFilmsForFormat(
+      criteria.requiredFormat
+    );
+
+    if (eligibleFilms.length === 0) {
+      throw new Error(
+        `No films have "${criteria.requiredFormat}" format showtimes. ` +
+          `Total films on page: ${allFilmNames.length}. ` +
+          `Films checked: [${allFilmNames.join(', ')}]`
+      );
+    }
+
+    const shuffledEligible = [...eligibleFilms].sort(() => Math.random() - 0.5);
+    const selectionErrors: string[] = [];
+
+    for (const { filmName } of shuffledEligible) {
+      try {
+        const showtimeSelection = await this.selectShowtimeByFormatAndRoom(
+          filmName,
+          criteria
+        );
+
+        return {
+          film: filmName,
+          showtime: showtimeSelection.showtime,
+          room: showtimeSelection.room,
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown selection error';
+        selectionErrors.push(`${filmName}: ${errorMessage}`);
+      }
+    }
+
+    throw new Error(
+      `${eligibleFilms.length} of ${allFilmNames.length} films have "${criteria.requiredFormat}" format, ` +
+        `but none matched preferred rooms [${criteria.preferredRooms.join(', ')}]. ` +
+        `Eligible films: [${eligibleFilms.map((f) => f.filmName).join(', ')}]. ` +
+        `Details: ${selectionErrors.join(' | ')}`
+    );
+  }
+
+  /**
+   * Selects a film and showtime matching format and room criteria.
+   * Iterates through all available days if no match is found on the current day.
+   * Falls back to any room if preferred rooms are exhausted and fallbackToAnyRoom is enabled.
+   */
+  async selectFilmAndShowtimeByFormatAndRoom(criteria: {
+    requiredFormat: 'normal' | 'dbox' | 'any';
+    preferredRooms: string[];
+    fallbackToAnyRoom?: boolean;
+  }): Promise<{ film: string; showtime: string; room?: string; day?: string }> {
     return await allure.step(
       `Selecting film and showtime by format "${criteria.requiredFormat}" and preferred rooms [${criteria.preferredRooms.join(', ')}]`,
       async () => {
-        const allFilmNames = await this.getFilmNames();
-        if (allFilmNames.length === 0) {
-          throw new Error('No films found on the cinema detail page');
-        }
+        const availableDays = await this.getAvailableDays();
+        const dayErrors: string[] = [];
 
-        const eligibleFilms = await this.getEligibleFilmsForFormat(
-          criteria.requiredFormat
-        );
+        for (let dayIndex = 0; dayIndex < availableDays.length; dayIndex++) {
+          const dayLabel = await this.selectDayByIndex(dayIndex);
+          await this.ensureShowAllMovies();
 
-        if (eligibleFilms.length === 0) {
-          throw new Error(
-            `No films have "${criteria.requiredFormat}" format showtimes. ` +
-              `Total films on page: ${allFilmNames.length}. ` +
-              `Films checked: [${allFilmNames.join(', ')}]`
-          );
-        }
+          if (!(await this.hasFilmsOnCurrentDay())) {
+            dayErrors.push(`${dayLabel}: No films available`);
+            continue;
+          }
 
-        const shuffledEligible = [...eligibleFilms].sort(
-          () => Math.random() - 0.5
-        );
-        const selectionErrors: string[] = [];
-
-        for (const { filmName } of shuffledEligible) {
           try {
-            const showtimeSelection = await this.selectShowtimeByFormatAndRoom(
-              filmName,
-              criteria
-            );
-
-            return {
-              film: filmName,
-              showtime: showtimeSelection.showtime,
-              room: showtimeSelection.room,
-            };
+            const result = await this.trySelectFilmOnCurrentDay(criteria);
+            return { ...result, day: dayLabel };
           } catch (error) {
             const errorMessage =
-              error instanceof Error
-                ? error.message
-                : 'Unknown selection error';
-            selectionErrors.push(`${filmName}: ${errorMessage}`);
+              error instanceof Error ? error.message : 'Unknown error';
+            dayErrors.push(`${dayLabel}: ${errorMessage}`);
+          }
+        }
+
+        // Room fallback: retry on the first day with no room restriction
+        if (
+          criteria.fallbackToAnyRoom !== false &&
+          criteria.preferredRooms.length > 0
+        ) {
+          const dayLabel = await this.selectDayByIndex(0);
+          await this.ensureShowAllMovies();
+          try {
+            return await allure.step(
+              '[ACT] Room fallback — retrying with no room restriction',
+              async () => {
+                const result = await this.trySelectFilmOnCurrentDay({
+                  ...criteria,
+                  preferredRooms: [],
+                });
+                return { ...result, day: dayLabel };
+              }
+            );
+          } catch {
+            // Fall through to final error
           }
         }
 
         throw new Error(
-          `${eligibleFilms.length} of ${allFilmNames.length} films have "${criteria.requiredFormat}" format, ` +
-            `but none matched preferred rooms [${criteria.preferredRooms.join(', ')}]. ` +
-            `Eligible films: [${eligibleFilms.map((f) => f.filmName).join(', ')}]. ` +
-            `Details: ${selectionErrors.join(' | ')}`
+          `Failed across ${availableDays.length} day(s). ` +
+            `Format: "${criteria.requiredFormat}", ` +
+            `Rooms: [${criteria.preferredRooms.join(', ')}]. ` +
+            `Day errors: ${dayErrors.join(' | ')}`
         );
       }
     );
@@ -435,6 +644,7 @@ export class CinemaDetail {
    */
   async selectFilmByName(name: string): Promise<void> {
     await allure.step(`Selecting film with name "${name}"`, async () => {
+      await this.dismissBlockingModalIfVisible();
       const filmLocator = this.getFilmByName(name);
       await filmLocator.first().click();
     });
@@ -726,6 +936,7 @@ export class CinemaDetail {
         const filmTitleLink = filmContainer.locator(
           this.selectors.filmTitleLink
         );
+        await this.dismissBlockingModalIfVisible();
         await filmTitleLink.first().click();
         console.log(`Selected film: ${selectedFilm}`);
         return { film: selectedFilm };
@@ -755,49 +966,90 @@ export class CinemaDetail {
    * Selects a random D-BOX film and showtime.
    * @returns Promise that resolves to an object containing the selected film name and showtime text.
    */
-  async selectDBoxRandomFilmAndShowtime(): Promise<{
+  /**
+   * Attempts D-BOX film+showtime selection on the currently visible day.
+   * Extracted inner logic for multi-day iteration.
+   */
+  private async trySelectDBoxOnCurrentDay(): Promise<{
     film: string;
     showtime: string;
   }> {
-    return await allure.step(
-      'Selecting a D-BOX film and showtime deterministically',
-      async () => {
-        const names = await this.getFilmNames();
-        if (names.length === 0) {
-          throw new Error('No films found on the cinema detail page');
+    const names = await this.getFilmNames();
+    if (names.length === 0) {
+      throw new Error('No films found on the cinema detail page');
+    }
+
+    for (const name of names) {
+      const filmContainer = this.webActions.page.locator(
+        this.selectors.filmItem,
+        {
+          has: this.webActions.page.locator(this.selectors.filmName, {
+            hasText: name,
+          }),
         }
+      );
 
-        for (const name of names) {
-          const filmContainer = this.webActions.page.locator(
-            this.selectors.filmItem,
-            {
-              has: this.webActions.page.locator(this.selectors.filmName, {
-                hasText: name,
-              }),
-            }
-          );
+      // Filter showtimes whose screen-name contains "D-BOX"
+      const dboxShowtimes = filmContainer
+        .locator(this.selectors.showtime)
+        .filter({
+          has: this.webActions.page.locator(this.selectors.showtimeScreenName, {
+            hasText: 'D-BOX',
+          }),
+        });
 
-          // Filter showtimes whose screen-name contains "D-BOX"
-          const dboxShowtimes = filmContainer
-            .locator(this.selectors.showtime)
-            .filter({
-              has: this.webActions.page.locator(
-                this.selectors.showtimeScreenName,
-                { hasText: 'D-BOX' }
-              ),
-            });
+      const count = await dboxShowtimes.count();
+      if (count > 0) {
+        await this.selectFilmByName(name);
+        const showtimeText = await dboxShowtimes.first().innerText();
+        await this.dismissBlockingModalIfVisible();
+        await dboxShowtimes.first().click();
+        return { film: name, showtime: showtimeText.trim() };
+      }
+    }
 
-          const count = await dboxShowtimes.count();
-          if (count > 0) {
-            await this.selectFilmByName(name);
-            const showtimeText = await dboxShowtimes.first().innerText();
-            await dboxShowtimes.first().click();
-            return { film: name, showtime: showtimeText.trim() };
+    throw new Error(
+      'No D-BOX films with showtimes found on the cinema detail page'
+    );
+  }
+
+  /**
+   * Selects a D-BOX film and showtime.
+   * Iterates through all available days if no D-BOX content is found on the current day.
+   */
+  async selectDBoxRandomFilmAndShowtime(): Promise<{
+    film: string;
+    showtime: string;
+    day?: string;
+  }> {
+    return await allure.step(
+      'Selecting a D-BOX film and showtime with multi-day fallback',
+      async () => {
+        const availableDays = await this.getAvailableDays();
+        const dayErrors: string[] = [];
+
+        for (let dayIndex = 0; dayIndex < availableDays.length; dayIndex++) {
+          const dayLabel = await this.selectDayByIndex(dayIndex);
+          await this.ensureShowAllMovies();
+
+          if (!(await this.hasFilmsOnCurrentDay())) {
+            dayErrors.push(`${dayLabel}: No films available`);
+            continue;
+          }
+
+          try {
+            const result = await this.trySelectDBoxOnCurrentDay();
+            return { ...result, day: dayLabel };
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : 'Unknown error';
+            dayErrors.push(`${dayLabel}: ${errorMessage}`);
           }
         }
 
         throw new Error(
-          'No D-BOX films with showtimes found on the cinema detail page'
+          `No D-BOX showtimes found across ${availableDays.length} day(s). ` +
+            `Day errors: ${dayErrors.join(' | ')}`
         );
       }
     );

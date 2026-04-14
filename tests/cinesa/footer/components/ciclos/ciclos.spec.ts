@@ -1,30 +1,32 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
 import { expectedUrl } from './ciclos.data';
 import { assertCiclosNavigation } from './ciclos.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Ciclos Tests', () => {
-  test.beforeEach(async ({ page, ciclos }) => {
+  test.beforeEach(async ({ page, footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
-    await ciclos.navigateToHome();
+    await footer.navigateToHome();
   });
 
   test('Footer · Ciclos · Display & Layout', async ({
     page,
-    ciclos,
+    footer,
   }, testInfo) => {
     await allure.story('Ciclos page display and layout');
-    await ciclos.clickCiclos();
+    await footer.clickCiclos();
     await page.waitForLoadState('networkidle');
     await takeScreenshot(page, testInfo, 'Ciclos display and layout');
   });
 
-  test('Footer · Ciclos · Navigate · Redirect', async ({ page, ciclos }) => {
+  test('Footer · Ciclos · Navigate · Redirect', async ({ page, footer }) => {
     await allure.story('Ciclos navigation and URL validation');
-    await ciclos.clickCiclos();
+    await footer.clickCiclos();
     await page.waitForLoadState('networkidle');
     await assertCiclosNavigation(page, expectedUrl);
   });

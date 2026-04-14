@@ -1,15 +1,17 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
 import { expectedUrl } from './cinesabusiness.data';
 import { assertCinesaBusinessNavigation } from './cinesabusiness.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Cinesa Business Tests', () => {
-  test.beforeEach(async ({ page, cinesabusiness }) => {
+  test.beforeEach(async ({ page, footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
-    await cinesabusiness.navigateToHome();
+    await footer.navigateToHome();
   });
 
   test('Footer · Cinesa Business · Display & Layout', async ({

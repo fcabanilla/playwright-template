@@ -1,10 +1,12 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
 
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 test.describe('Login', () => {
-  test.beforeEach(async ({ navbar, promotionalModal }) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Authentication - User Access');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();

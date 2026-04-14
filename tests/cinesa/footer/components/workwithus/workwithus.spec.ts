@@ -1,15 +1,17 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
 import { expectedUrl } from './workwithus.data';
 import { assertWorkWithUsNavigation } from './workwithus.assertions';
 import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Work With Us Tests', () => {
-  test.beforeEach(async ({ page, workwithus }) => {
+  test.beforeEach(async ({ page, footer }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
 
-    await workwithus.navigateToHome();
+    await footer.navigateToHome();
   });
 
   test('Footer · Work With Us · Display & Layout', async ({

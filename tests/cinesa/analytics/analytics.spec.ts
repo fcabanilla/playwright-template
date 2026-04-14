@@ -1,5 +1,6 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { getAnalyticsTestConfigs } from './analytics.data';
 import {
   assertEventsWereCaptured,
@@ -11,6 +12,7 @@ import {
   logAnalyticsSummary,
 } from './analytics.assertions';
 import type { DataLayerEvent } from '../../../pageObjectsManagers/cinesa/analytics/analytics.types';
+import { getShowtimeSelectionForWorker } from '../../../config/showtimes.pool';
 
 // Get available analytics test configurations for current environment
 const ANALYTICS_CONFIGS = getAnalyticsTestConfigs();
@@ -24,9 +26,10 @@ declare global {
 }
 
 test.describe('Google Analytics DataLayer Validation', () => {
-  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Analytics - Tracking');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
@@ -38,7 +41,7 @@ test.describe('Google Analytics DataLayer Validation', () => {
       {
         tag: [
           '@lab-fail',
-          '@preprod-fail',
+          '@preprod-broken',
           '@analytics',
           '@cinesa',
           '@e2e',
@@ -69,7 +72,9 @@ test.describe('Google Analytics DataLayer Validation', () => {
         try {
           await navbar.navigateToCinemas();
           await cinema[config.cinema.selectMethod]();
-          await cinemaDetail.selectNormalRandomFilmAndShowtime();
+          await cinemaDetail.selectFilmAndShowtimeByFormatAndRoom(
+            getShowtimeSelectionForWorker(test.info().parallelIndex)
+          );
           await seatPicker.selectLastAvailableSeat();
           await seatPicker.confirmSeats();
           await loginPage.clickContinueAsGuest();

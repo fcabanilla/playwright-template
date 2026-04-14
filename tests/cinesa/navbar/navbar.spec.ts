@@ -1,14 +1,16 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { NavbarAssertions } from './navbar.assertions';
 import { getNavbarData } from './navbar.data';
 
 test.describe('Navbar - Navegación Principal', () => {
   let navbarAssertions: NavbarAssertions;
 
-  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Navbar - Main Navigation');
+    await enrichTestMetadata(testInfo);
 
     navbarAssertions = new NavbarAssertions(page);
     await navbar.navigateToHome();
@@ -23,6 +25,9 @@ test.describe('Navbar - Navegación Principal', () => {
       },
       async () => {
         await allure.story('Verificar elementos visibles del navbar');
+        await allure.description(
+          'Checks that all main navigation elements are visible on the navbar: Cinemas, Films, Experiences, Programs, and Promotions links.'
+        );
         await allure.parameter(
           'Elements',
           'Cines, Películas, Experiencias, Programas, Promociones'
@@ -41,6 +46,9 @@ test.describe('Navbar - Navegación Principal', () => {
       },
       async ({ navbar }) => {
         await allure.story('Click en logo mantiene home');
+        await allure.description(
+          'Clicks the Cinesa logo in the navbar and verifies the user stays on the homepage URL.'
+        );
         const { baseUrl } = getNavbarData();
 
         await allure.parameter('Expected URL', baseUrl);

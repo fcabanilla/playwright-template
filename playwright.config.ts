@@ -14,11 +14,29 @@ import {
   getServiceConnectionOptions,
   playwrightServiceConfig,
 } from './config/azure/playwright-service.config';
+import { testPlanFilter } from 'allure-playwright/dist/testplan.js';
+import { getCinesaStorageStatePath } from './config/projects/storageState.helper';
+import getCloudflareHeaders from './core/cloudflare/cloudflareHeaders';
 
 // Load environment variables from .env file
 dotenv.config();
 
+// Debug testplan
+const _tp = testPlanFilter();
+if (_tp)
+  console.log(
+    '[TESTPLAN DEBUG] grep filters:',
+    _tp.length,
+    'regexes. First:',
+    _tp[0]?.toString().slice(0, 100)
+  );
+else console.log('[TESTPLAN DEBUG] no testplan active');
+
 export default defineConfig({
+  // Allure TestPlan filtering: when ALLURE_TESTPLAN_PATH env var is set,
+  // only tests listed in the testplan.json are executed.
+  // When not set, testPlanFilter() returns undefined → no filtering applied.
+  grep: _tp,
   name: 'Multi-Cinema Test Suite',
   // Global timeout for each test (90 seconds - for complete E2E flows)
   timeout: 90000,
@@ -103,31 +121,31 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/,
     },
 
-    // Main projects - depend on setup to have storageState ready
+    // Showtimes discovery — run independently to refresh showtime IDs
+    // Usage: TEST_ENV=preprod npx playwright test --project=showtimes-setup
     {
-      ...getUCICinemasProject(),
-      dependencies: ['setup'],
+      name: 'showtimes-setup',
+      testMatch: /showtimes\.setup\.ts/,
+      use: {
+        storageState: getCinesaStorageStatePath(process.env.TEST_ENV),
+        extraHTTPHeaders: getCloudflareHeaders() || {},
+        // CF headers via extraHTTPHeaders are sent to ALL requests including
+        // cross-origin Vista API (preprod-vwc.ocgtest.es). CORS preflight
+        // rejects them → all API calls fail. Disable web security to bypass.
+        launchOptions: {
+          args: ['--disable-web-security'],
+        },
+      },
     },
-    {
-      ...getCinesaProject(),
-      dependencies: ['setup'],
-    },
-    {
-      ...getCinesaPortugalProject(),
-      dependencies: ['setup'],
-    },
-    {
-      ...getCloudflareOnlyProject(),
-      dependencies: ['setup'],
-    },
-    {
-      ...getCinesaCloudflareProject(),
-      dependencies: ['setup'],
-    },
-    {
-      ...getPraetorCinesaProject(),
-      dependencies: ['setup'],
-    },
+
+    // Main projects - storageState files persist across runs
+    // Run `npx playwright test --project=setup` manually if consent states expire
+    getUCICinemasProject(),
+    getCinesaProject(),
+    getCinesaPortugalProject(),
+    getCloudflareOnlyProject(),
+    getCinesaCloudflareProject(),
+    getPraetorCinesaProject(),
   ],
 
   // Reporter configured to differentiate projects
@@ -154,10 +172,14 @@ export default defineConfig({
         // See docs/ALLURE_CATEGORIES.md for details
         environmentInfo: {
           Project: 'Multi-Cinema Test Suite',
+          Platform: process.env.TEST_PLATFORM || 'Cinesa',
           Environment: process.env.TEST_ENV || 'production',
+          'Base URL': process.env.BASE_URL || 'https://www.cinesa.es',
           Browser: 'Chromium',
+          Workers: String(process.env.WORKERS || '3'),
           'Node Version': process.version,
           OS: `${os.platform()} ${os.release()}`,
+          'Run Date': new Date().toISOString(),
           'Playwright Service': shouldUsePlaywrightService()
             ? 'Enabled (Cloud)'
             : 'Disabled (Local)',

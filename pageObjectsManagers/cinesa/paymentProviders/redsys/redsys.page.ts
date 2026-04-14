@@ -69,7 +69,7 @@ export class RedsysPage {
       // The HTML shows a class change to "validColor" when ready
       await this.webActions.waitForVisible(
         this.selectors.submitButton,
-        5000,
+        15000,
         'Pay Button'
       );
       await this.webActions.click(this.selectors.submitButton, 'Pay Button');

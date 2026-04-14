@@ -113,13 +113,11 @@ export class MovieList {
     await allure.step(`Click movie: ${movie.title}`, async () => {
       try {
         // Scroll the movie element into view first
-        await this.webActions.scrollIntoView(
-          `${MOVIES_SELECTORS.allMoviesContainer}:nth-child(${movie.index + 1})`
-        );
-        await this.webActions.wait(500); // Wait for scroll to complete
+        const movieSelector = `${MOVIES_SELECTORS.allMoviesContainer}:nth-child(${movie.index + 1})`;
+        await this.webActions.scrollIntoView(movieSelector, movie.title);
 
         // Try clicking the movie link with overlay handling to bypass grid overlay issues
-        const movieLinkSelector = `${MOVIES_SELECTORS.allMoviesContainer}:nth-child(${movie.index + 1}) ${MOVIES_SELECTORS.movieLink}`;
+        const movieLinkSelector = `${movieSelector} ${MOVIES_SELECTORS.movieLink}`;
 
         // Use clickWithOverlayHandling to bypass overlay interception
         await this.webActions.clickWithOverlayHandling(movieLinkSelector);
@@ -218,29 +216,30 @@ export class MovieList {
    */
   async iterateAndClickMovies(): Promise<void> {
     await allure.step('Iterate and click top movies', async () => {
-      const movies = await this.getTopMovies();
-      let processedCount = 0;
-      const maxMoviesToProcess = Math.min(3, movies.length);
+      const maxMoviesToProcess = 3;
 
-      for (
-        let i = 0;
-        i < movies.length && processedCount < maxMoviesToProcess;
-        i++
-      ) {
-        const movie = movies[i];
+      for (let processedCount = 0; processedCount < maxMoviesToProcess; processedCount++) {
+        // Fresh DOM query each iteration — avoids stale indices after goBack in SPA
+        const movies = await this.getTopMovies();
+
+        if (processedCount >= movies.length) {
+          console.warn('No more top movies available.');
+          break;
+        }
+
+        const movie = movies[processedCount];
         try {
           await this.clickMovie(movie);
           await this.validateMovieTitle(movie.title);
-          await this.webActions.goBack();
+          await this.webActions.goBack({ waitUntil: 'commit' });
           await this.webActions.waitForLoadState('domcontentloaded');
           await this.loadTopMovies();
-          processedCount++;
         } catch (error) {
           const message =
             error instanceof Error ? error.message : String(error);
-          console.warn(`Failed to process movie ${i}: ${message}`);
+          console.warn(`Failed to process movie ${processedCount}: ${message}`);
           try {
-            await this.webActions.goBack();
+            await this.webActions.goBack({ waitUntil: 'commit' });
             await this.webActions.waitForLoadState('domcontentloaded');
             await this.loadTopMovies();
           } catch (backError) {
@@ -271,37 +270,38 @@ export class MovieList {
    */
   async navigateThroughRandomMovies(): Promise<void> {
     await allure.step('Navigate through random movies', async () => {
-      const movies = await this.getAllMovies();
-
-      if (movies.length === 0) {
-        console.warn('No movies found to navigate through.');
-        return;
-      }
-
-      // Reduce to max 3 movies to avoid context closure issues
-      const numberOfMoviesToVisit = Math.min(3, movies.length);
-      const shuffledMovies = movies.sort(() => 0.5 - Math.random());
-      const selectedMovies = shuffledMovies.slice(0, numberOfMoviesToVisit);
+      const moviesToVisit = 3;
+      const visitedTitles = new Set<string>();
 
       await this.webActions.waitForLoadState('domcontentloaded');
 
-      for (let i = 0; i < selectedMovies.length; i++) {
-        const movie = selectedMovies[i];
+      for (let i = 0; i < moviesToVisit; i++) {
+        // Fresh DOM query each iteration — avoids stale indices after goBack in SPA
+        const movies = await this.getAllMovies();
+        const candidates = movies.filter(
+          (m) => !visitedTitles.has(m.title)
+        );
+
+        if (candidates.length === 0) {
+          console.warn('No more unvisited movies available.');
+          break;
+        }
+
+        const movie = candidates[Math.floor(Math.random() * candidates.length)];
+        visitedTitles.add(movie.title);
+
         try {
           console.log(
-            `Visiting movie ${i + 1}/${selectedMovies.length}: ${movie.title}`
+            `Visiting movie ${i + 1}/${moviesToVisit}: ${movie.title}`
           );
 
           await this.clickMovie(movie);
           await this.webActions.waitForLoadState('domcontentloaded');
           await this.validateMovieTitle(movie.title);
 
-          // More robust back navigation
-          await this.webActions.goBack();
+          // SPA route change: use 'commit' to avoid waiting for 'load' event that never fires
+          await this.webActions.goBack({ waitUntil: 'commit' });
           await this.webActions.waitForLoadState('domcontentloaded');
-
-          // Small delay between movies to avoid overwhelming the browser
-          await this.webActions.wait(500);
         } catch (error) {
           const message =
             error instanceof Error ? error.message : String(error);
@@ -317,10 +317,9 @@ export class MovieList {
             break;
           }
 
-          // For other errors, try to continue with the next movie
+          // For other errors, try to recover and continue with the next movie
           try {
-            // Try to go back in case we're stuck on a movie page
-            await this.webActions.goBack();
+            await this.webActions.goBack({ waitUntil: 'commit' });
             await this.webActions.waitForLoadState('domcontentloaded');
           } catch (backError) {
             console.warn('Failed to go back after error. Stopping navigation.');

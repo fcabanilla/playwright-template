@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
 import { WebActions } from '../../core/webactions/webActions';
-import { getCloudflareHeaders } from '../../core/cloudflare/cloudflareHeaders';
+import { createCinesaContext } from '../shared/contextFactory';
 import { Navbar } from '../../pageObjectsManagers/cinesa/navbar/navbar.page';
 import { getCinesaConfig, CinesaEnvironment } from '../../config/environments';
 import { CookieBanner } from '../../pageObjectsManagers/cinesa/cookies/cookieBanner.page';
@@ -27,8 +27,10 @@ import { BookingConfirmationAssertions } from '../../tests/cinesa/bookingConfirm
 import { LivingTicketPage } from '../../pageObjectsManagers/cinesa/livingTicket/livingTicket.page';
 import { LivingTicketAssertions } from '../../tests/cinesa/livingTicket/livingTicket.assertions';
 import { RedsysPage } from '../../pageObjectsManagers/cinesa/paymentProviders/redsys/redsys.page';
+import { acquireLock } from '../../core/semaphore/fileSemaphore';
 
 type CustomFixtures = {
+  dboxLock: void;
   navbar: Navbar;
   cookieBanner: CookieBanner;
   promotionalModal: PromotionalModal;
@@ -55,122 +57,28 @@ type CustomFixtures = {
   livingTicketAssertions: LivingTicketAssertions;
   redsysPage: RedsysPage;
   webActions: WebActions;
-  whoarewe: Footer;
-  workwithus: Footer;
-  cinesabusiness: Footer;
-  customerservice: Footer;
-  transparency: Footer;
-  events: Footer;
-  cinesaluxe: Footer;
-  salaspremium: Footer;
-  infantil: Footer;
-  ciclos: Footer;
-  blogcinesa: Footer;
-  legalNotice: Footer;
-  purchaseConditions: Footer;
-  unlimitedConditions: Footer;
-  privacypolicy: Footer;
-  cookiespolicy: Footer;
-  modernSlavery: Footer;
-  codeOfConduct: Footer;
-  whistleblowing: Footer;
-  androidAppDownload: Footer;
-  appleAppDownload: Footer;
 };
 
 export const test = base.extend<CustomFixtures>({
-  // Override context fixture to auto-inject Cloudflare headers when credentials exist
-  // AND apply consent seeds when storageState is not available
-  context: async ({ browser }, use, testInfo) => {
-    const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
-    const config = getCinesaConfig(env);
-    const headers = getCloudflareHeaders(env);
+  // D-BOX semaphore: serializes access to the single D-BOX showtime across workers
+  // Only acquired when a test destructures `dboxLock` — no impact on non-D-BOX tests
+  dboxLock: [
+    async ({}, use) => {
+      const release = await acquireLock('dbox-showtime');
+      await use();
+      release();
+    },
+    { timeout: 90_000 },
+  ],
 
-    // Get storageState path from project configuration
-    const { getCinesaStorageStatePath } = await import(
-      '../../config/projects/storageState.helper'
-    );
-    const storageStatePath = getCinesaStorageStatePath(env);
-
-    // 1. Get native User Agent from the current browser (Chrome, Firefox, or WebKit)
-    // We launch a temporary context to get the default UA string
-    const tempContext = await browser.newContext();
-    const tempPage = await tempContext.newPage();
-    const originalUA = await tempPage.evaluate(() => navigator.userAgent);
-    await tempContext.close();
-
-    // 2. Dynamic User Agent Injection
-    // Append the suffix (if needed for Cloudflare bypass) to the NATIVE User Agent
-    // This ensures we don't force a Chrome UA on Firefox/Safari
-    const suffix = process.env.USER_AGENT_SUFFIX
-      ? ` ${process.env.USER_AGENT_SUFFIX}`
-      : '';
-    const finalUserAgent = originalUA + suffix;
-
-    // Create context WITH storageState if available AND injected User Agent
-    const context = await browser.newContext({
-      userAgent: finalUserAgent,
-      ...(storageStatePath ? { storageState: storageStatePath } : {}),
-    });
-
-    // CLOUDFLARE BYPASS: Inject credentials as BOTH cookies AND headers
-    // Per Joey Lee:
-    // - Cookie with secret only → bypasses Cloudflare WAF
-    // - Headers with Id + Secret → bypasses Cloudflare Access
-    // Official credentials work for Spain environments (preprod, lab, production)
-    if (headers) {
-      // 1) Inject as HTTP HEADERS (for Cloudflare Access) - BOTH Id and Secret
-      await context.setExtraHTTPHeaders(headers);
-      console.log(`✅ [Cloudflare] Headers auto-injected for env=${env}`);
-
-      // 2) Inject as COOKIE (for Cloudflare WAF bypass) - SECRET ONLY
-      const clientSecret = headers['CF-Access-Client-Secret'];
-
-      if (clientSecret) {
-        await context.addCookies([
-          {
-            name: 'CF-Access-Client-Secret',
-            value: clientSecret,
-            domain: '.ocgtest.es', // Preprod/Lab/Staging
-            path: '/',
-            httpOnly: false,
-            secure: true,
-            sameSite: 'Lax',
-          },
-        ]);
-        console.log(
-          `✅ [Cloudflare Bypass] Cookie injected (Secret only) for .ocgtest.es`
-        );
-      }
-    } else {
-      console.log(
-        `ℹ️  [Cloudflare] No credentials found for env=${env}, skipping injection`
-      );
-    }
-
-    // Apply consent seeds if NO storageState is configured
-    // This eliminates cookie banner interaction when storageState files don't exist
-    const hasStorageState = storageStatePath !== undefined;
-    if (!hasStorageState) {
-      const page = await context.newPage();
-      const webActions = new WebActions(page);
-
-      // Pre-seed consent cookies for baseUrl
-      await webActions.applyConsentSeedsFor(config.baseUrl);
-
-      await page.close();
-      console.log(
-        `✅ [Consent Seeds] Applied for ${config.baseUrl} (no storageState found)`
-      );
-    } else {
-      console.log(`ℹ️  [Consent Seeds] Skipped - storageState already loaded`);
-    }
-
+  // Shared context: Cloudflare + consent + storageState
+  context: async ({ browser }, use) => {
+    const context = await createCinesaContext(browser);
     await use(context);
     await context.close();
   },
 
-  // Shared WebActions instance - this will be used by all components
+  // Shared WebActions instance
   webActions: async ({ page }, use) => {
     const webActions = new WebActions(page);
     await use(webActions);
@@ -272,69 +180,6 @@ export const test = base.extend<CustomFixtures>({
   mailing: async ({ page }, use) => {
     const mailing = new Mailing(page);
     await use(mailing);
-  },
-  whoarewe: async ({ footer }, use) => {
-    await use(footer);
-  },
-  workwithus: async ({ footer }, use) => {
-    await use(footer);
-  },
-  cinesabusiness: async ({ footer }, use) => {
-    await use(footer);
-  },
-  customerservice: async ({ footer }, use) => {
-    await use(footer);
-  },
-  transparency: async ({ footer }, use) => {
-    await use(footer);
-  },
-  events: async ({ footer }, use) => {
-    await use(footer);
-  },
-  cinesaluxe: async ({ footer }, use) => {
-    await use(footer);
-  },
-  salaspremium: async ({ footer }, use) => {
-    await use(footer);
-  },
-  infantil: async ({ footer }, use) => {
-    await use(footer);
-  },
-  ciclos: async ({ footer }, use) => {
-    await use(footer);
-  },
-  blogcinesa: async ({ footer }, use) => {
-    await use(footer);
-  },
-  legalNotice: async ({ footer }, use) => {
-    await use(footer);
-  },
-  purchaseConditions: async ({ footer }, use) => {
-    await use(footer);
-  },
-  unlimitedConditions: async ({ footer }, use) => {
-    await use(footer);
-  },
-  privacypolicy: async ({ footer }, use) => {
-    await use(footer);
-  },
-  cookiespolicy: async ({ footer }, use) => {
-    await use(footer);
-  },
-  modernSlavery: async ({ footer }, use) => {
-    await use(footer);
-  },
-  codeOfConduct: async ({ footer }, use) => {
-    await use(footer);
-  },
-  whistleblowing: async ({ footer }, use) => {
-    await use(footer);
-  },
-  androidAppDownload: async ({ footer }, use) => {
-    await use(footer);
-  },
-  appleAppDownload: async ({ footer }, use) => {
-    await use(footer);
   },
   movieList: async ({ page }, use) => {
     const webActions = new WebActions(page);

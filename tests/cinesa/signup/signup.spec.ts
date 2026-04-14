@@ -1,13 +1,18 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
 import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../core/allure/allureMetadata';
 import { takeScreenshotForModal } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { SIGNUP_SELECTORS } from '../../../pageObjectsManagers/cinesa/signup/signup.selectors';
 import { defaultUser } from './signup.data';
 
 test.describe('Signup', () => {
-  test.beforeEach(async ({ page, navbar, promotionalModal }) => {
+  test.beforeEach(async ({ page, navbar, promotionalModal }, testInfo) => {
     await allure.epic('Cinesa Platform');
     await allure.feature('Registration - New Users');
+    await enrichTestMetadata(testInfo);
 
     await navbar.navigateToHome();
     await promotionalModal.closeModalIfVisible();
@@ -117,7 +122,7 @@ test.describe('Signup', () => {
     {
       tag: [
         '@lab-pass',
-        '@preprod-fail',
+        '@preprod-pass',
         '@signup',
         '@cinesa',
         '@regression',
@@ -128,6 +133,9 @@ test.describe('Signup', () => {
     },
     async ({ page, navbar, signupPage }, testInfo) => {
       await allure.story(
+        'OCG-3438 / COMS-7211 - Complete signup with valid data'
+      );
+      await linkJiraTickets(
         'OCG-3438 / COMS-7211 - Complete signup with valid data'
       );
       await navbar.navigateToSignup();

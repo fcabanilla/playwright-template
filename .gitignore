@@ -28,3 +28,10 @@ state/*.json
 *.svg
 *.webp
 *.DS_Store
+
+# Semaphore lock directories (test worker synchronization)
+.locks/
+
+# Generated testplan files (via scripts/generate-testplan.cjs)
+testplan.json
+testplan-*.json
