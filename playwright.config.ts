@@ -118,7 +118,15 @@ export default defineConfig({
     // Setup project - runs FIRST to generate storageState files with cookie consent
     {
       name: 'setup',
-      testMatch: /.*\.setup\.ts/,
+      testMatch: /auth\.setup\.ts/,
+    },
+
+    // Auth login setup — generates authenticated storageState (requires --headed for CAPTCHA)
+    // Usage: TEST_ENV=preprod npx playwright test --project=auth-login-setup --headed
+    {
+      name: 'auth-login-setup',
+      testMatch: /auth-login\.setup\.ts/,
+      dependencies: ['setup'], // Needs consent storageState first
     },
 
     // Showtimes discovery — run independently to refresh showtime IDs

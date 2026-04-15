@@ -43,6 +43,9 @@ export type FlowStop =
   | 'summary'
   | 'payment';
 
+/** Login strategy for the checkout flow */
+export type LoginStrategy = 'guest' | 'skip' | 'login';
+
 /** Configuration for a checkout flow run */
 export interface CheckoutFlowConfig {
   /** Base URL for checkout (from environment config) */
@@ -59,6 +62,17 @@ export interface CheckoutFlowConfig {
   skipBar?: boolean;
   /** Guest login timeout in ms (default: 15000) */
   loginTimeout?: number;
+  /**
+   * Login strategy (default: 'guest'):
+   * - 'guest': Click "Continue as guest" (default behavior)
+   * - 'skip': Skip the login step entirely (for sessions that auto-bypass login)
+   * - 'login': Fill credentials and submit (requires loginCredentials)
+   */
+  loginStrategy?: LoginStrategy;
+  /**
+   * Credentials for 'login' strategy. Required when loginStrategy is 'login'.
+   */
+  loginCredentials?: { email: string; password: string };
 }
 
 const FLOW_ORDER: FlowStop[] = [
@@ -93,6 +107,7 @@ export async function runCheckoutFlow(
   const stopAfter = config.stopAfter ?? 'payment';
   const skipBar = config.skipBar ?? true;
   const loginTimeout = config.loginTimeout ?? 15000;
+  const loginStrategy = config.loginStrategy ?? 'guest';
   const stopIndex = FLOW_ORDER.indexOf(stopAfter);
 
   // ── Step 1: Seats ──────────────────────────────────────────
@@ -118,9 +133,32 @@ export async function runCheckoutFlow(
   if (stopIndex <= 0) return { seatCount };
 
   // ── Step 2: Login ──────────────────────────────────────────
-  await allure.step('[FLOW] Login as guest', async () => {
-    await loginPage.tryLoginAsGuest(loginTimeout);
-  });
+  if (loginStrategy === 'skip') {
+    await allure.step(
+      '[FLOW] Skip login (authenticated session via storageState)',
+      async () => {
+        // With an authenticated storageState, the checkout flow should
+        // automatically bypass the login step. No action required.
+      },
+    );
+  } else if (loginStrategy === 'login') {
+    await allure.step('[FLOW] Login with credentials', async () => {
+      if (!config.loginCredentials) {
+        throw new Error(
+          'loginStrategy "login" requires loginCredentials { email, password }'
+        );
+      }
+      await loginPage.waitForLoginPage();
+      await loginPage.login(
+        config.loginCredentials.email,
+        config.loginCredentials.password,
+      );
+    });
+  } else {
+    await allure.step('[FLOW] Login as guest', async () => {
+      await loginPage.tryLoginAsGuest(loginTimeout);
+    });
+  }
   if (stopIndex <= 1) return { seatCount };
 
   // ── Step 3: Tickets ────────────────────────────────────────

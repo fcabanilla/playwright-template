@@ -124,6 +124,13 @@ export class PraetorSeatPicker {
             (await closeLocator.first().isVisible())
           ) {
             await closeLocator.first().click();
+          } else {
+            // Force-dismiss video modals (D-BOX/ScreenX) that have no accessible close button.
+            // These modals auto-close after ~60s; removing them via JS saves that wait.
+            await page.evaluate(() => {
+              document.querySelectorAll('aside.v-modal[role="dialog"]').forEach(el => el.remove());
+              document.querySelectorAll('.v-modal-overlay, .v-modal__backdrop, .v-modal__mask').forEach(el => el.remove());
+            });
           }
         }
         await this.webActions.wait(500);
@@ -213,7 +220,7 @@ export class PraetorSeatPicker {
           }
         }
 
-        await this.webActions.wait(1500);
+        await this.webActions.wait(500);
         await this.dismissBlockingModals();
 
         // Verify seat is actually selected (button never has disabled attr)
@@ -265,7 +272,7 @@ export class PraetorSeatPicker {
       );
       await seatLocator.scrollIntoViewIfNeeded();
       await seatLocator.click();
-      await this.webActions.wait(1500);
+      await this.webActions.wait(500);
       await this.dismissBlockingModals();
 
       const selected = await this.getSelectedSeats();

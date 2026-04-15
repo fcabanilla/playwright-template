@@ -169,9 +169,12 @@ export function allocateShowtimes(
     s.formats.some((f) => /d-?box/i.test(f));
   const isIsense = (s: DiscoveredShowtime) =>
     s.formats.some((f) => /isense/i.test(f));
+  const isScreenX = (s: DiscoveredShowtime) =>
+    s.formats.some((f) => /screenx/i.test(f));
   const is3D = (s: DiscoveredShowtime) =>
     s.formats.some((f) => /3d/i.test(f));
-  const isStandard = (s: DiscoveredShowtime) => !isDbox(s) && !is3D(s);
+  const hasVideoModal = (s: DiscoveredShowtime) => isDbox(s) || isScreenX(s);
+  const isStandard = (s: DiscoveredShowtime) => !hasVideoModal(s) && !is3D(s);
 
   // Categorize
   const dboxShowtimes = showtimes.filter(isDbox);
@@ -179,7 +182,7 @@ export function allocateShowtimes(
     (s) => isIsense(s) && !isDbox(s)
   );
   const standardShowtimes = showtimes.filter(isStandard);
-  const nonDboxShowtimes = showtimes.filter((s) => !isDbox(s));
+  const nonDboxShowtimes = showtimes.filter((s) => !hasVideoModal(s));
 
   // Track assigned IDs to avoid duplicates when possible
   const assigned = new Set<string>();

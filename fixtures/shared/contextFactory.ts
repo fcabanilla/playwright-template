@@ -33,19 +33,26 @@ import {
  * - Storage state restoration (if available)
  * - Consent seeds (if no storage state)
  * - Native User Agent preservation
+ *
+ * @param browser - Playwright Browser instance
+ * @param options - Optional overrides
+ * @param options.storageStatePath - Explicit storageState path (e.g., authenticated session).
+ *   Overrides the default consent storageState resolution.
  */
 export async function createCinesaContext(
   browser: Browser,
+  options?: { storageStatePath?: string },
 ): Promise<BrowserContext> {
   const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
   const config = getCinesaConfig(env);
   const headers = getCloudflareHeaders(env);
 
-  // Get storageState path from project configuration
+  // Get storageState path — use explicit override or resolve from project config
   const { getCinesaStorageStatePath } = await import(
     '../../config/projects/storageState.helper'
   );
-  const storageStatePath = getCinesaStorageStatePath(env);
+  const storageStatePath =
+    options?.storageStatePath ?? getCinesaStorageStatePath(env);
 
   // Get native User Agent from the current browser
   const tempContext = await browser.newContext();
