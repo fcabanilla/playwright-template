@@ -104,6 +104,10 @@ First concrete action to take once approved.
 - Run `npx playwright test` without `npm run report:clean:results` first
 - Create `.spec.ts` files without Allure labels (`epic`/`feature`/`story`)
 
+## Continuous Learning (ALWAYS ACTIVE)
+
+After EVERY response where you discovered something new (environment behavior, tool gotcha, infrastructure quirk, debugging insight, pattern that worked/failed), append a `💡 Suggested improvement` block. See `context-engineering.instructions.md` for the full template. **No exceptions** — if you learned it, suggest it.
+
 ## Key Files
 
 | File | Purpose |
