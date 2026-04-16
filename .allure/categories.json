@@ -1,0 +1,127 @@
+[
+  {
+    "name": "Network / Environment Issues",
+    "description": "Connectivity issues: DNS, timeout, connection refused, or Cloudflare block. Action: Re-run. If persistent, check VPN/DNS/Cloudflare credentials.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:net::ERR_|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|Cloudflare).*",
+    "flaky": true
+  },
+  {
+    "name": "Browser / Infrastructure Crash",
+    "description": "Browser, page, or context crashed unexpectedly. Action: Re-run. If persistent, check system resources or browser version.",
+    "matchedStatuses": ["broken"],
+    "messageRegex": "(?s).*(?:Target page, context or browser has been closed|Target closed|Context closed|browserType\\.launch).*",
+    "flaky": true
+  },
+  {
+    "name": "Preprod Data Unavailable",
+    "description": "No films, showtimes, D-BOX sessions, or seats available in the environment. This is a data/scheduling issue, not a code defect. Action: Verify content exists for the test cinema and date.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:No D-BOX showtimes|No D-BOX films|No suitable seats found|No .* found on the cinema|No films found|No films available|No showtimes available|Unable to find a film|Failed across \\d+ day|HOY: No films).*"
+  },
+  {
+    "name": "Feature Not Available in Environment",
+    "description": "Feature/page does not exist in this environment (e.g., Bonos removed in lab). Action: Tag with @broken-prod or skip for this environment.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:cinesabusiness|bonos|promociones|navigateToCoupons).*"
+  },
+  {
+    "name": "Payment Provider Failure",
+    "description": "Redsys 3DS simulator or payment gateway did not respond in time. This is an external dependency issue. Action: Re-run. If persistent, check Redsys simulator availability.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Redsys 3DS simulator|redsys.*(?:timeout|did not exit)|payment.*(?:timeout|did not)).*"
+  },
+  {
+    "name": "Booking Verification Failed",
+    "description": "Post-payment verification failed: confirmation page did not load, or the ticket URL pattern was unexpected. Action: Check if the booking completed and review the trace.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Booking confirmation did not become visible|Living ticket URL did not match|review-ticket pattern|booking.*confirmation.*timeout).*"
+  },
+  {
+    "name": "Ticket Type Mapping Mismatch",
+    "description": "A ticket type name from the site (e.g., 'Adulto') doesn't match configured patterns. Action: Update ticket type mappings in test data if the site changed labels.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*(?:is not a valid ticket type pattern|not included in the mappings|ticketTypeName).*"
+  },
+  {
+    "name": "Seat Selection State Error",
+    "description": "Seat picker state assertion failed: a seat was not in the expected state (selected/available/deselected). This may indicate a preprod UI timing issue.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*(?:should be deselected|seat.*state.*expected|seatState).*"
+  },
+  {
+    "name": "Showtime Expired / Unavailable",
+    "description": "A showtime discovered by showtimes-setup became expired or unavailable before the test ran. This is a timing issue with preprod data lifecycle. Action: Re-run showtimes-setup to refresh, or increase the discovery day offset.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Showtime \\S+ is expired or unavailable|esta sesión no está disponible|sesión.*expirad).*"
+  },
+  {
+    "name": "Authentication Token Expired",
+    "description": "The stored authentication token (vista-loyalty-member-authentication-token) has expired. Tests requiring pre-authenticated session cannot proceed. Action: Re-login via auth-login-setup --headed or regenerate state/authenticated.*.json manually.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:authentication.*(?:expired|invalid|token)|vista-loyalty-member|authenticated.*(?:state|storage).*(?:expired|missing|invalid)|login.*required.*authenticated).*"
+  },
+  {
+    "name": "Known Limitations",
+    "description": "Feature with known issues or environment-specific restrictions. Tracked and expected to fail until resolved.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:@broken-prod|known.?limitation|not.?supported.?in).*"
+  },
+  {
+    "name": "Checkout Step Transition Timeout",
+    "description": "page.waitForURL timed out during checkout flow transition (e.g., confirmSeats → login/tickets). The page did not navigate to the expected step URL within the timeout. Often caused by slow preprod response or a blocking modal. Action: Re-run. If persistent, review trace for spinners/modals and consider increasing the waitForURL timeout.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*page\\.waitForURL.*Timeout \\d+ms exceeded.*",
+    "flaky": true
+  },
+  {
+    "name": "Navigation / Page Load Timeout",
+    "description": "page.goto, page.goBack, or waitForLoadState exceeded timeout. The page was too slow to load. Action: Check environment performance and review trace.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:page\\.(?:goto|goBack|waitForLoadState).*Timeout \\d+ms exceeded).*"
+  },
+  {
+    "name": "DOM State Error",
+    "description": "Element detached from DOM or not stable during interaction — a timing/race condition. Action: Add waits or stabilize the selector.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:not attached to the DOM|detached from DOM|Element is no longer attached|waiting for element to be stable).*"
+  },
+  {
+    "name": "Blocking Modal Interrupted Flow",
+    "description": "An unexpected popup/modal blocked the test flow. Action: Check for new promotional modals. May need updated dismiss handler.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Timeout \\d+ms exceeded.*(?:seat|confirm|v-seat|selected-seats|checkout)|waiting for seats|close.*modal|blocking modal).*",
+    "flaky": true
+  },
+  {
+    "name": "Cloudflare Challenge Block",
+    "description": "Cloudflare WAF blocked the browser with a security challenge page. The test never reached the actual site. Action: Regenerate storage state (npx playwright test --project=setup) or use --headed --workers=1.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Cloudflare challenge detected|Verificación de seguridad en curso|Checking your browser before accessing|Just a moment).*",
+    "flaky": true
+  },
+  {
+    "name": "Full Test Timeout",
+    "description": "Entire test exceeded max time (90-180s). Severe blocker: page never loaded or flow was stuck. Action: Review trace for where it stalled.",
+    "matchedStatuses": ["broken"],
+    "messageRegex": "(?s).*(?:Test timeout of \\d+ms exceeded).*"
+  },
+  {
+    "name": "Element Interaction Timeout",
+    "description": "A specific UI action (click, fill, waitFor) timed out. Element did not appear or become interactive. Action: Review screenshot/trace for layout changes or loading spinners.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Timeout \\d+ms exceeded).*"
+  },
+  {
+    "name": "Selector Mismatch",
+    "description": "CSS/XPath selector matched multiple elements (strict mode violation). Action: Update selector in *.selectors.ts to be more specific.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:strict mode violation|resolved to \\d+ elements).*"
+  },
+  {
+    "name": "Assertion Failure",
+    "description": "An expect() assertion failed with an unexpected value. Not a timeout or infrastructure issue. Action: Review error details and trace.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*(?:expect\\(received\\)|Expected.*Received|toBe|toHave|toContain|toMatch|toEqual|AssertionError).*"
+  }
+]

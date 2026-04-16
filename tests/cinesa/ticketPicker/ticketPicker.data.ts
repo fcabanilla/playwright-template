@@ -20,7 +20,12 @@ export const ticketTypeMappings: TicketTypeMapping[] = [
       'Carnet Joven Luxe',
       'Estudiante Luxe',
       'Paro Luxe',
-      'Discapacitado Luxe'
+      'Discapacitado Luxe',
+      '-Pack Familia Luxe',
+      '-Mayores 65 Luxe',
+      '-Precio MyCinesa Luxe',
+      'Adulto',
+      'Infantil (<12)'
     ],
   },
   {
@@ -34,12 +39,18 @@ export const ticketTypeMappings: TicketTypeMapping[] = [
       '-Estudiante D-BOX',
       '-Paro D-BOX',
       '-Discapacitado D-BOX',
+      '-Precio MyCinesa DBOX',
+      '-Precio MyCinesa D-BOX',
       'Normal D-BOX',
       'Menores 12 D-BOX',
       'Carnet Joven D-BOX',
       'Estudiante D-BOX',
       'Paro D-BOX',
-      'Discapacitado D-BOX'
+      'Discapacitado D-BOX',
+      '-Pack Familia D-BOX',
+      '-Mayores 65 D-BOX',
+      'Adulto D-BOX',
+      'Infantil (<12) D-BOX'
     ],
   },
   {
@@ -53,6 +64,7 @@ export const ticketTypeMappings: TicketTypeMapping[] = [
       '-Estudiante Sofa',
       '-Paro Sofa',
       '-Discapacitado Sofa',
+      '-Precio MyCinesa Sofa',
       'Normal Sofa',
       'Menores 12 Sofa',
       'Carnet Joven Sofa',

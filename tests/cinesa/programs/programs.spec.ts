@@ -1,52 +1,98 @@
-import { getCinesaConfig, CinesaEnvironment } from '../../../config/environments';
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { ProgramsPage } from '../../../pageObjectsManagers/cinesa/programs/programs.page';
+import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
 import { assertProgramsRedirection } from './programs.assertions';
 
-test.describe('Programs Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
-  });
+test.describe(
+  'Programs Page',
+  {
+    tag: ['@programs', '@cinesa'],
+  },
+  () => {
+    test.beforeEach(async ({ page, promotionalModal, navbar }, testInfo) => {
+      await allure.epic('Cinesa Platform');
+      await allure.feature('Loyalty Programs - Rewards');
+      await enrichTestMetadata(testInfo);
 
-  test('Programs unlimited display and layout from URL', async ({ page, unlimitedProgramsPage, cookieBanner }) => {
-    await test.step('Navigate to Programs page', async () => {
-  const config = getCinesaConfig(process.env.TEST_ENV as CinesaEnvironment || 'production');
-  await page.goto(config.baseUrl + 'unlimited/informacion/');
-    });
-    await cookieBanner.acceptCookies();
-    await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
-    await takeScreenshot(page, test.info());
-  });
-
-  test('Programs unlimited display and layout from home page', async ({ page, unlimitedProgramsPage, cookieBanner, navbar }) => {
-    await test.step('Navigate to Home page', async () => {
+      await test.step('TC: https://se-ocg.atlassian.net/browse/COMS-16804', async () => {});
       await navbar.navigateToHome();
+      await promotionalModal.closeModalIfVisible();
     });
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToPrograms();
 
-    const programsPage = new ProgramsPage(page);
-    await programsPage.waitForProgramsPage();
-    await programsPage.clickUnlimitedButton();
+    test(
+      'Programs · Unlimited · Display & Layout · From URL',
+      {
+        tag: [
+          '@lab-pass',
+          '@preprod-pass',
+          '@smoke',
+          '@fast',
+          '@COMS-11226',
+          '@broken-prod',
+        ],
+      },
+      async ({
+        page,
+        unlimitedProgramsPage,
+        cookieBanner,
+        promotionalModal,
+      }) => {
+        await allure.story('COMS-11226 - Unlimited programs page from URL');
+        await test.step('Navigate to Programs Unlimited page', async () => {
+          await unlimitedProgramsPage.navigateToUnlimitedPrograms();
+        });
+        await promotionalModal.closeModalIfVisible();
+        await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
+        await takeScreenshot(page, test.info());
+      }
+    );
 
-    await unlimitedProgramsPage.waitForProgramsPage();
-    await takeScreenshot(page, test.info());
-  });
+    test(
+      'Programs · Unlimited · Display & Layout · From Home',
+      {
+        tag: ['@lab-pass', '@preprod-pass', '@smoke', '@fast', '@COMS-11226'],
+      },
+      async ({ page, programsPage, unlimitedProgramsPage, navbar }) => {
+        await allure.story('COMS-11226 - Unlimited programs page from home');
+        await navbar.navigateToPrograms();
 
-  test('Programs page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToPrograms();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Programs page display and layout');
-  });
+        await programsPage.waitForProgramsPage();
+        await programsPage.clickUnlimitedButton();
 
-  test('Cinesa Programs page redirection test', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToPrograms();
-    await page.waitForLoadState('networkidle');
-    assertProgramsRedirection(page);
-  });
-});
+        await unlimitedProgramsPage.waitForProgramsUnlimitedPage();
+        await test.step('Take screenshot', async () => {
+          await takeScreenshot(page, test.info());
+        });
+      }
+    );
+
+    test(
+      'Programs · Page · Display & Layout',
+      {
+        tag: ['@lab-pass', '@preprod-pass', '@regression', '@medium'],
+      },
+      async ({ page, navbar }, testInfo) => {
+        await allure.story('Programs page display and layout');
+        await navbar.navigateToPrograms();
+        await takeScreenshot(
+          page,
+          testInfo,
+          'Programs page display and layout'
+        );
+      }
+    );
+
+    test(
+      'Programs · Page · Navigate · Redirect',
+      {
+        tag: ['@lab-pass', '@preprod-pass', '@regression', '@medium'],
+      },
+      async ({ page, navbar }) => {
+        await allure.story('Programs page URL redirection validation');
+        await navbar.navigateToPrograms();
+        await assertProgramsRedirection(page);
+      }
+    );
+  }
+);

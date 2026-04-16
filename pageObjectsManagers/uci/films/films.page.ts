@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import { getUCIUrls } from '../../../config/urls';
 import { WebActions } from '../../../core/webactions/webActions';
 import {
@@ -95,7 +95,7 @@ export class Films {
    * @since 1.0.0
    */
   async navigateToFilms(): Promise<void> {
-    await allure.test.step('Navigating to Films page', async () => {
+    await allure.step('Navigating to Films page', async () => {
       await this.webActions.navigateTo(this.urls.navigation.movies);
     });
   }
@@ -115,7 +115,7 @@ export class Films {
    * @since 1.0.0
    */
   async getFilmTitles(): Promise<string[]> {
-    return await allure.test.step('Getting list of film titles', async () => {
+    return await allure.step('Getting list of film titles', async () => {
       try {
         // First try UCI-specific selector
         const uciTitles = await this._getUCIFilmTitles();
@@ -189,7 +189,7 @@ export class Films {
    * Selects a film by its title.
    */
   async selectFilmByTitle(filmTitle: string): Promise<void> {
-    await allure.test.step(`Selecting film: ${filmTitle}`, async () => {
+    await allure.step(`Selecting film: ${filmTitle}`, async () => {
       const filmSelector = await this._buildFilmSelector(filmTitle);
       await this.webActions.click(filmSelector);
     });
@@ -199,7 +199,7 @@ export class Films {
    * Selects the first available film.
    */
   async selectFirstFilm(): Promise<string> {
-    return await allure.test.step(
+    return await allure.step(
       'Selecting first available film',
       async () => {
         const firstFilmSelector = `${this.selectors.filmCard}${filmsConstants.firstChildSelector}`;
@@ -216,7 +216,7 @@ export class Films {
    * Searches for films using the search input.
    */
   async searchFilms(searchTerm: string): Promise<void> {
-    await allure.test.step(`Searching for films: ${searchTerm}`, async () => {
+    await allure.step(`Searching for films: ${searchTerm}`, async () => {
       await this.webActions.fill(this.selectors.searchInput, searchTerm);
       await this.webActions.wait(filmsConstants.searchWaitTime);
     });
@@ -226,7 +226,7 @@ export class Films {
    * Clicks on a film's booking button.
    */
   async clickBookNow(filmTitle?: string): Promise<void> {
-    await allure.test.step('Clicking book now button', async () => {
+    await allure.step('Clicking book now button', async () => {
       if (filmTitle) {
         const filmSelector = await this._buildFilmBookingSelector(filmTitle);
         await this.webActions.click(filmSelector);
@@ -257,7 +257,7 @@ export class Films {
    * Checks if the films page is loaded properly.
    */
   async isFilmsPageLoaded(): Promise<boolean> {
-    return await allure.test.step(
+    return await allure.step(
       'Checking if films page is loaded',
       async () => {
         try {
@@ -281,7 +281,7 @@ export class Films {
    * Gets the count of films currently displayed.
    */
   async getFilmsCount(): Promise<number> {
-    return await allure.test.step('Getting films count', async () => {
+    return await allure.step('Getting films count', async () => {
       // Try UCI-specific selector first
       const uciFilmCount = await this._getUCIFilmCount();
       if (uciFilmCount > 0) {
@@ -328,7 +328,7 @@ export class Films {
    * Verifies that films are visible on the page.
    */
   async verifyFilmsVisible(): Promise<boolean> {
-    return await allure.test.step('Verifying films are visible', async () => {
+    return await allure.step('Verifying films are visible', async () => {
       return await this.webActions.isVisible(this.selectors.filmCard);
     });
   }
@@ -344,7 +344,7 @@ export class Films {
    * Validate URL matches films page.
    */
   async validateFilmsPageUrl(): Promise<void> {
-    await allure.test.step('Validating films page URL', async () => {
+    await allure.step('Validating films page URL', async () => {
       await this.webActions.expectUrl(this.urls.navigation.movies);
     });
   }

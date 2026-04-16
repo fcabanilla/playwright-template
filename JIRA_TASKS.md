@@ -1,3 +1,37 @@
+# Tablero Kanban - Sprint Azure & Core Hardening
+
+## 🚀 DONE
+
+### **(MAINTENANCE) Documentation: Standardize playwright.config comments to English**
+**ID**: `TIM-1271`
+**Status**: ✅ DONE
+**Comentarios**:
+- Se han traducido y estandarizado todos los comentarios en `playwright.config.ts` y `playwright.service.config.ts`.
+- Alineado con la política de "English-only codebase".
+
+### **(CORE) Remote browsers pillar breakdown: Playwright Service execution model**
+**ID**: `TIM-1266`
+**Status**: ✅ DONE
+**Comentarios**:
+- Created `docs/REMOTE_EXECUTION_STRATEGY.md` covering architecture, artifacts, and backlog.
+- Verified entrypoints in `playwright.service.config.ts` and `package.json`.
+- Aligned User Agent strategy with the documented Cloudflare bypass plan.
+
+---
+
+## 🏗 IN PROGRESS -> MOVING TO DONE
+
+### **(CORE) Configuration: Parameterize Cloudflare User-Agent bypass via Environment Variables**
+**ID**: `TIM-1269`
+**Status**: ✅ DONE (Ready for Review)
+**Assignee**: GitHub Copilot
+**Comentarios**:
+- Implemented dynamic UserAgent injection in `fixtures/cinesa/playwright.fixtures.ts`.
+- Added `USER_AGENT_SUFFIX` support in `playwright.service.config.ts`.
+- Validated via local diagnostic test.
+
+---
+
 # Descripciones para Jira - Framework Multi-Cinema UCI
 
 ## 🏆 ÉPICA PRINCIPAL

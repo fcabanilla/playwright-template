@@ -9,6 +9,7 @@ import { Films } from '../../pageObjectsManagers/uci/films/films.page';
 import { FilmsAssertions } from '../../tests/uci/films/films.assertions';
 import { NavbarAssertions } from '../../tests/uci/navbar/navbar.assertions';
 import { CinemasAssertions } from '../../tests/uci/cinemas/cinemas.assertions';
+import { WebActions } from '../../core/webactions/webActions';
 
 type CustomFixtures = {
   navbar: Navbar;
@@ -23,6 +24,46 @@ type CustomFixtures = {
 };
 
 export const test = base.extend<CustomFixtures>({
+  // Override context fixture to apply consent seeds when storageState is not available
+  context: async ({ browser }, use) => {
+    const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
+    const config = getUCIConfig(env);
+
+    // 1. Get native User Agent from the current browser
+    const tempContext = await browser.newContext();
+    const tempPage = await tempContext.newPage();
+    const originalUA = await tempPage.evaluate(() => navigator.userAgent);
+    await tempContext.close();
+
+    const suffix = process.env.USER_AGENT_SUFFIX
+      ? ` ${process.env.USER_AGENT_SUFFIX}`
+      : '';
+    const finalUserAgent = originalUA + suffix;
+
+    const context = await browser.newContext({ userAgent: finalUserAgent });
+
+    // Apply consent seeds if NO storageState is configured
+    // This eliminates cookie banner interaction when storageState files don't exist
+    const hasStorageState = context.storageState !== undefined;
+    if (!hasStorageState) {
+      const page = await context.newPage();
+      const webActions = new WebActions(page);
+
+      // Pre-seed consent cookies for baseUrl
+      await webActions.applyConsentSeedsFor(config.baseUrl);
+
+      await page.close();
+      console.log(
+        `✅ [Consent Seeds] Applied for ${config.baseUrl} (no storageState found)`
+      );
+    } else {
+      console.log(`ℹ️  [Consent Seeds] Skipped - storageState already loaded`);
+    }
+
+    await use(context);
+    await context.close();
+  },
+
   navbar: async ({ page }, use) => {
     const env = (process.env.TEST_ENV as UCIEnvironment) || 'production';
     const config = getUCIConfig(env);
@@ -30,7 +71,8 @@ export const test = base.extend<CustomFixtures>({
     await use(navbar);
   },
   cookieBanner: async ({ page }, use) => {
-    const cookieBanner = new CookieBanner(page);
+    const webActions = new WebActions(page);
+    const cookieBanner = new CookieBanner(webActions);
     await use(cookieBanner);
   },
   promoModal: async ({ page }, use) => {

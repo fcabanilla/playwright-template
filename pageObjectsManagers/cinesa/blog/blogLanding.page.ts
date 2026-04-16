@@ -1,9 +1,11 @@
 import { Page, Locator } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
 import {
   blogLandingSelectors,
   BlogLandingSelectors,
 } from './blogLanding.selectors';
+import { getCinesaConfig } from '../../../config/environments';
 
 /**
  * Represents the Blog Landing Page.
@@ -12,14 +14,19 @@ import {
 export class BlogLanding {
   /**
    * Base URL of the Blog Landing Page.
-   * Adjust this value based on the testing environment.
+   * Dynamically resolved from environment configuration.
    */
-  private readonly url: string = 'https://www.cinesa.es/blog-cinesa/';
+  private readonly url: string;
 
   /**
-   * Playwright Page instance.
+   * WebActions instance for page interactions.
    */
-  readonly page: Page;
+  private readonly webActions: WebActions;
+
+  /**
+   * Playwright Page instance - public for test access.
+   */
+  public readonly page: Page;
 
   /**
    * Set of selectors for the page.
@@ -29,11 +36,14 @@ export class BlogLanding {
   /**
    * Creates a new instance of BlogLanding.
    *
-   * @param page - Playwright Page object.
+   * @param webActions - WebActions instance.
    */
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
+    this.page = webActions.page;
     this.selectors = blogLandingSelectors;
+    const config = getCinesaConfig();
+    this.url = `${config.baseUrl}/blog-cinesa/`;
   }
 
   /**
@@ -42,8 +52,8 @@ export class BlogLanding {
    * @returns A Promise that resolves when navigation is complete.
    */
   async navigateToPage(): Promise<void> {
-    await allure.test.step('Navigating to the Blog Landing Page', async () => {
-      await this.page.goto(this.url);
+    await allure.step('Navigating to the Blog Landing Page', async () => {
+      await this.webActions.navigateTo(this.url);
     });
   }
 
@@ -53,8 +63,8 @@ export class BlogLanding {
    * @returns A Promise that resolves when the click action is complete.
    */
   async clickLogo(): Promise<void> {
-    await allure.test.step('Clicking on the blog logo', async () => {
-      await this.page.click(this.selectors.logo);
+    await allure.step('Clicking on the blog logo', async () => {
+      await this.webActions.click(this.selectors.logo);
     });
   }
 
@@ -91,7 +101,9 @@ export class BlogLanding {
    * @returns A Promise that resolves with the number of article cards.
    */
   async countArticleCards(): Promise<number> {
-    await this.page.waitForSelector(this.selectors.articleCard, { timeout: 10000 });
+    await this.webActions.waitForSelector(this.selectors.articleCard, {
+      timeout: 10000,
+    });
     return await this.getArticleCardsLocator().count();
   }
 }

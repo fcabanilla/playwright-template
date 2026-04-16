@@ -8,4 +8,5 @@ export const MOVIES_SELECTORS = {
   movieTitle: '.v-film-title__text',
   nextButton: '.v-carousel-scroll-button.v-carousel-scroll-button--next',
   prevButton: '.v-carousel__prev-button',
+  movieDetailTitle: 'h1[data-testid="film-title"], h1.film-detail__title, .film-detail-header h1',
 };

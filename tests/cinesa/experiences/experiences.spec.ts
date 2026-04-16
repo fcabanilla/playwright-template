@@ -1,21 +1,59 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
-import { takeScreenshot } from '../../../pageObjectsManagers/cinesa/generic/generic';
+import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../core/allure/allureMetadata';
 import { assertExperiencesRedirection } from './experiences.assertions';
+import { EXPERIENCES_URL } from './experiences.data';
 
 test.describe('Cinesa Experiences Tests', () => {
-  test('Experiences page display and layout', async ({ page, navbar, cookieBanner }, testInfo) => {
+  test.beforeEach(async ({ navbar, promotionalModal }, testInfo) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Experiences - Premium Formats');
+    await enrichTestMetadata(testInfo);
+
     await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToExperiences();
-    await page.waitForLoadState('networkidle');
-    await takeScreenshot(page, testInfo, 'Experiences page display and layout');
+    await promotionalModal.closeModalIfVisible();
   });
 
-  test('Cinesa Experiences page redirection test', async ({ page, navbar, cookieBanner }) => {
-    await navbar.navigateToHome();
-    await cookieBanner.acceptCookies();
-    await navbar.navigateToExperiences();
-    await page.waitForLoadState('networkidle');
-    assertExperiencesRedirection(page);
-  });
+  test(
+    'Experiences · Page · Display & Layout',
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@experiences',
+        '@cinesa',
+        '@smoke',
+        '@medium',
+      ],
+    },
+    async ({ webActions, navbar }) => {
+      await allure.story('Experiences page display and layout');
+      await navbar.navigateToExperiences();
+      await webActions.waitForLoadState('domcontentloaded');
+      // Verify we're on the correct experiences URL
+      await webActions.expectUrl(EXPERIENCES_URL);
+      // Take screenshot for visual verification
+      await webActions.screenshot();
+    }
+  );
+
+  test(
+    'Experiences · Navigation · Redirect',
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@experiences',
+        '@cinesa',
+        '@navigation',
+        '@fast',
+      ],
+    },
+    async ({ webActions, navbar }) => {
+      await allure.story('Experiences page URL redirection validation');
+      await navbar.navigateToExperiences();
+      await webActions.waitForLoadState('domcontentloaded');
+      await assertExperiencesRedirection(webActions.getPage());
+    }
+  );
 });

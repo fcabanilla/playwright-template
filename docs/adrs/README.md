@@ -31,6 +31,7 @@ All ADRs follow the template defined in [`_template.md`](./_template.md).
 | [007](./0007-unlimited-subscription-testing-strategy.md) | Unlimited Subscription Testing Strategy             | Accepted | 2025-10-08 | @fcabanilla |
 | [008](./0008-my-account-area-testing-strategy.md)        | My Account Area Testing Strategy                    | Accepted | 2025-10-08 | @fcabanilla |
 | [009](./0009-page-object-architecture-rules.md)          | Page Object Architecture and Access Control Rules   | Accepted | 2025-10-08 | @fcabanilla |
+| [018](./0018-checkout-showtime-isolation.md)             | Checkout Showtime Isolation Strategy                | Proposed | 2025-03-25 | @fcabanilla |
 
 ## Decisions by Category
 

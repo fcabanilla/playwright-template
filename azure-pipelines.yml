@@ -1,0 +1,511 @@
+trigger:
+  branches:
+    include:
+      - main
+      - master
+      - develop
+
+pr:
+  branches:
+    include:
+      - main
+      - master
+      - develop
+
+parameters:
+  - name: azureServiceConnection
+    displayName: Azure service connection for Playwright Workspaces
+    type: string
+    default: Playwright-Workspaces-ServiceConnection
+
+  - name: grep
+    displayName: Playwright grep filter
+    type: string
+    default: '@smoke'
+
+  - name: workers
+    displayName: Parallel workers for cloud execution
+    type: string
+    default: '10'
+
+  - name: runUci
+    displayName: Include UCI jobs
+    type: string
+    default: 'true'
+
+  - name: runPreprod
+    displayName: Include preprod jobs
+    type: string
+    default: 'false'
+
+  - name: runLab
+    displayName: Include lab jobs
+    type: string
+    default: 'false'
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  NODE_VERSION: '22.x'
+
+stages:
+  - stage: PlaywrightWorkspaces
+    displayName: Playwright Workspaces Validation
+    jobs:
+      - job: Cinesa_Production
+        displayName: Cinesa production
+        variables:
+          TEST_ENV: production
+          PLAYWRIGHT_PROJECT: Cinesa
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-cinesa-production
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-cinesa-production
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-cinesa-production
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()
+
+      - job: UCI_Production
+        displayName: UCI production
+        condition: and(always(), eq('${{ parameters.runUci }}', 'true'))
+        variables:
+          TEST_ENV: production
+          PLAYWRIGHT_PROJECT: UCI Cinemas
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-uci-production
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-uci-production
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-uci-production
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()
+
+      - job: Cinesa_Preprod
+        displayName: Cinesa preprod
+        condition: and(always(), eq('${{ parameters.runPreprod }}', 'true'))
+        variables:
+          TEST_ENV: preprod
+          PLAYWRIGHT_PROJECT: Cinesa
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                export CF_ACCESS_CLIENT_ID_PREPROD="$(CF_ACCESS_CLIENT_ID_PREPROD)"
+                export CF_ACCESS_CLIENT_SECRET_PREPROD="$(CF_ACCESS_CLIENT_SECRET_PREPROD)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-cinesa-preprod
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-cinesa-preprod
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-cinesa-preprod
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()
+
+      - job: UCI_Preprod
+        displayName: UCI preprod
+        condition: and(always(), eq('${{ parameters.runPreprod }}', 'true'), eq('${{ parameters.runUci }}', 'true'))
+        variables:
+          TEST_ENV: preprod
+          PLAYWRIGHT_PROJECT: UCI Cinemas
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                export CF_ACCESS_CLIENT_ID_PREPROD="$(CF_ACCESS_CLIENT_ID_PREPROD)"
+                export CF_ACCESS_CLIENT_SECRET_PREPROD="$(CF_ACCESS_CLIENT_SECRET_PREPROD)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-uci-preprod
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-uci-preprod
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-uci-preprod
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()
+
+      - job: Cinesa_Lab
+        displayName: Cinesa lab
+        condition: and(always(), eq('${{ parameters.runLab }}', 'true'))
+        variables:
+          TEST_ENV: lab
+          PLAYWRIGHT_PROJECT: Cinesa
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                export CF_ACCESS_CLIENT_ID_LAB="$(CF_ACCESS_CLIENT_ID_LAB)"
+                export CF_ACCESS_CLIENT_SECRET_LAB="$(CF_ACCESS_CLIENT_SECRET_LAB)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-cinesa-lab
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-cinesa-lab
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-cinesa-lab
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()
+
+      - job: UCI_Lab
+        displayName: UCI lab
+        condition: and(always(), eq('${{ parameters.runLab }}', 'true'), eq('${{ parameters.runUci }}', 'true'))
+        variables:
+          TEST_ENV: lab
+          PLAYWRIGHT_PROJECT: UCI Cinemas
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(Pipeline.Workspace)/.npm
+
+          - task: AzureCLI@2
+            displayName: Run Playwright cloud tests
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set +e
+                export npm_config_cache="$(Pipeline.Workspace)/.npm"
+                npm ci
+                npm run report:clean:results
+                export USE_PLAYWRIGHT_SERVICE="true"
+                export PLAYWRIGHT_SERVICE_URL="$(PLAYWRIGHT_SERVICE_URL)"
+                export PLAYWRIGHT_RUN_ID="$(Build.BuildId)-$(System.JobName)"
+                export TEST_ENV="$(TEST_ENV)"
+                export CF_ACCESS_CLIENT_ID_LAB="$(CF_ACCESS_CLIENT_ID_LAB)"
+                export CF_ACCESS_CLIENT_SECRET_LAB="$(CF_ACCESS_CLIENT_SECRET_LAB)"
+                npx playwright test --config=playwright.service.config.ts --project="$(PLAYWRIGHT_PROJECT)" --workers=${{ parameters.workers }} --grep "${{ parameters.grep }}"
+                exit_code=$?
+                echo "##vso[task.setvariable variable=PLAYWRIGHT_EXIT_CODE]$exit_code"
+                exit 0
+
+          - script: |
+              set -e
+              npm run report:ci
+            displayName: Generate Allure report
+            condition: always()
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure results
+            condition: always()
+            inputs:
+              targetPath: .allure/results
+              artifact: allure-results-uci-lab
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Allure HTML report
+            condition: always()
+            inputs:
+              targetPath: .allure/report
+              artifact: allure-report-uci-lab
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Playwright artifacts
+            condition: always()
+            inputs:
+              targetPath: .allure/playwright-artifacts
+              artifact: playwright-artifacts-uci-lab
+
+          - script: |
+              exit_code="${PLAYWRIGHT_EXIT_CODE:-0}"
+              exit "$exit_code"
+            displayName: Fail job if tests failed
+            condition: always()

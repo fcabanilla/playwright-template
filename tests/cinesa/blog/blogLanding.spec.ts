@@ -1,24 +1,86 @@
 import { test } from '../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
+import {
+  enrichTestMetadata,
+  linkJiraTickets,
+} from '../../../core/allure/allureMetadata';
 import { BlogLandingAssertions } from './blogLanding.assertions';
 import { blogLandingData } from './blogLanding.data';
 
 test.describe('Blog Landing Page Tests', () => {
   let blogLandingAssertions: BlogLandingAssertions;
 
-  test.beforeEach(async ({ page, blogLanding }) => {
-    blogLandingAssertions = new BlogLandingAssertions(page);
+  test.beforeEach(async ({ page, blogLanding, promotionalModal }, testInfo) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Blog - Content Platform');
+    await enrichTestMetadata(testInfo);
+
+    blogLandingAssertions = new BlogLandingAssertions(page, testInfo);
+    await promotionalModal.closeModalIfVisible();
     await blogLanding.navigateToPage();
   });
 
-  test('should display the expected number of article cards', async () => {
-    await blogLandingAssertions.expectArticleCardsCount(blogLandingData.expectedArticleCardsCount);
-  });
+  test(
+    'Blog · Landing · Display · Article cards',
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@blog',
+        '@cinesa',
+        '@display',
+        '@fast',
+        '@OCG-2009',
+      ],
+    },
+    async () => {
+      await allure.story('OCG-2009 - Article cards count validation');
+      await linkJiraTickets('OCG-2009 - Article cards count validation');
+      await blogLandingAssertions.expectArticleCardsCount(
+        blogLandingData.expectedArticleCardsCount
+      );
+    }
+  );
 
-  test('should have all article cards visible', async () => {
-    await blogLandingAssertions.expectArticleCardsVisible();
-  });
+  test(
+    'Blog · Landing · Display · All article cards visible',
+    {
+      tag: [
+        '@lab-pass',
+        '@preprod-pass',
+        '@blog',
+        '@cinesa',
+        '@display',
+        '@fast',
+        '@OCG-2009',
+      ],
+    },
+    async () => {
+      await allure.story('OCG-2009 - Article cards visibility');
+      await linkJiraTickets('OCG-2009 - Article cards visibility');
+      await blogLandingAssertions.expectArticleCardsVisible();
+    }
+  );
 
-  test('should navigate through each related article and return to the Blog Landing page', async () => {
-    await blogLandingAssertions.expectNavigationThroughRelatedArticles();
-  });
+  test(
+    'Blog · Landing · Navigate · Related articles roundtrip',
+    {
+      tag: [
+        '@rerun-cf',
+        '@lab-fail',
+        '@preprod-pass',
+        '@blog',
+        '@cinesa',
+        '@navigation',
+        '@medium',
+        '@OCG-2030',
+        '@fix-test',
+      ],
+    },
+    async () => {
+      await allure.story('OCG-2030 - Related articles navigation flow');
+      await linkJiraTickets('OCG-2030 - Related articles navigation flow');
+      await blogLandingAssertions.expectNavigationThroughRelatedArticles();
+    }
+  );
 });

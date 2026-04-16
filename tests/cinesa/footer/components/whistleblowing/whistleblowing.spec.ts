@@ -1,33 +1,64 @@
 import { test } from '../../../../../fixtures/cinesa/playwright.fixtures';
+import { allure } from 'allure-playwright';
+import { enrichTestMetadata } from '../../../../../core/allure/allureMetadata';
+import {
+  assertWhistleblowingNavigation,
+  assertWhistleblowingPDFDownload,
+  assertWhistleblowingPDFPopup,
+} from './whistleblowing.assertions';
+import { handlePDFInteraction } from './whistleblowing.helpers';
 import { expectedUrl } from './whistleblowing.data';
-import { assertWhistleblowingNavigation } from './whistleblowing.assertions';
-import { takeScreenshot } from '../../../../../pageObjectsManagers/cinesa/generic/generic';
 
 test.describe('Whistleblowing Policy Tests', () => {
-  test.beforeEach(async ({ cookieBanner, whistleblowing }) => {
-    await whistleblowing.navigateToHome();
-    await cookieBanner.acceptCookies();
+  test.beforeEach(async ({ footer }, testInfo) => {
+    await allure.epic('Cinesa Platform');
+    await allure.feature('Footer - Site Navigation');
+    await enrichTestMetadata(testInfo);
+
+    await footer.navigateToHome();
   });
 
-  test('Whistleblowing Policy display and layout', async ({ page, footer }, testInfo) => {
-    const context = page.context();
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      footer.clickPoliticaDenuncia()  // (Optionally, later update method name if desired)
-    ]);
-    await newPage.waitForLoadState('networkidle');
-    await takeScreenshot(newPage, testInfo, 'Whistleblowing Policy display and layout');
-    await newPage.close();
-  });
+  test(
+    'Footer · Whistleblowing Policy · Display & Layout',
+    { tag: ['@fix-test'] },
+    async ({ webActions, footer }, testInfo) => {
+      await allure.story('Whistleblowing Policy PDF display and layout');
+      const { download, popup } = await handlePDFInteraction(
+        webActions,
+        async () => {
+          await footer.clickPoliticaDenuncia();
+        }
+      );
 
-  test('Whistleblowing Policy redirection test', async ({ page, footer }) => {
-    const context = page.context();
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      footer.clickPoliticaDenuncia()
-    ]);
-    await newPage.waitForLoadState('networkidle');
-    await assertWhistleblowingNavigation(newPage, expectedUrl);
-    await newPage.close();
-  });
+      if (download) {
+        await assertWhistleblowingPDFDownload(download);
+      } else if (popup) {
+        await assertWhistleblowingPDFPopup(popup, testInfo);
+        await popup.close();
+      }
+    }
+  );
+
+  test(
+    'Footer · Whistleblowing Policy · Navigate · Redirect',
+    { tag: ['@fix-test'] },
+    async ({ webActions, footer }) => {
+      await allure.story(
+        'Whistleblowing Policy PDF navigation and URL validation'
+      );
+      const { download, popup } = await handlePDFInteraction(
+        webActions,
+        async () => {
+          await footer.clickPoliticaDenuncia();
+        }
+      );
+
+      if (download) {
+        await assertWhistleblowingPDFDownload(download);
+      } else if (popup) {
+        await assertWhistleblowingNavigation(popup, expectedUrl);
+        await popup.close();
+      }
+    }
+  );
 });

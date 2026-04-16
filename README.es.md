@@ -45,8 +45,7 @@ playwright-template/
 │   ├── cinesa/               # Tests de Cinesa (33 casos)
 │   └── uci/                  # Tests de UCI (en desarrollo)
 ├── 📁 docs/                  # Documentación del proyecto
-├── 📁 allure-report/         # Reportes HTML generados
-└── 📁 test-results/          # Resultados nativos de Playwright
+└── 📁 .allure/               # Reporting (results, report, artifacts)
 ```
 
 ## ⚡ Inicio Rápido
@@ -511,9 +510,9 @@ playwright-template/
 │       ├── blog/
 │       ├── programs/
 │       └── mailing/
-├── allure-results/                  # Allure raw results
-├── allure-report/                   # Allure HTML reports
-├── test-results/                    # Playwright native results
+├── .allure/results/                  # Allure raw results (current run)
+├── .allure/report/                   # Allure HTML reports (generated)
+├── .allure/playwright-artifacts/     # Videos, screenshots, traces
 ├── playwright.config.ts             # Main config
 ├── eslint.config.js                 # ESLint config
 ├── package.json                     # Dependencies & scripts
@@ -831,9 +830,9 @@ playwright-template/
 │       ├── 📁 blog/                    # Tests del blog
 │       ├── 📁 programs/                # Tests de programas
 │       └── 📁 mailing/                 # Tests de mailing
-├── 📁 allure-results/                  # Resultados crudos de Allure
-├── 📁 allure-report/                   # Reportes HTML generados
-├── 📁 test-results/                    # Resultados nativos Playwright
+├── 📁 .allure/results/                  # Resultados de ejecución actual
+├── 📁 .allure/report/                   # Reportes HTML generados
+├── 📁 .allure/playwright-artifacts/     # Videos, screenshots, traces
 ├── 📄 playwright.config.ts             # Configuración principal
 ├── 📄 eslint.config.js                 # Configuración ESLint
 ├── 📄 package.json                     # Dependencias y scripts
@@ -910,7 +909,7 @@ reporter: [
     'allure-playwright',
     {
       detail: false,
-      outputFolder: 'allure-results',
+      outputFolder: '.allure/results',
       suiteTitle: false,
       links: {
         issue: {

@@ -1,16 +1,18 @@
-import { Page } from '@playwright/test';
+import { WebActions } from '../../../core/webactions/webActions';
 import { promotionalModalSelectors } from './promotionalModal.selectors';
+import { allure } from 'allure-playwright';
 
 /**
  * Page Object for handling the promotional modal/popup that appears on LAB environment
  * This modal shows "VENTA ANTICIPADA" message and needs to be closed before interacting with the page
+ * Follows ADR-0009: Uses WebActions abstraction, no direct Playwright API access.
  */
 export class PromotionalModal {
-  private readonly page: Page;
+  private readonly webActions: WebActions;
   private readonly selectors = promotionalModalSelectors;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
@@ -18,9 +20,11 @@ export class PromotionalModal {
    * Waits for the modal to be visible first, then clicks the close button
    */
   async closeModal(): Promise<void> {
-    await this.page.locator(this.selectors.modal).waitFor({ state: 'visible', timeout: 5000 });
-    await this.page.locator(this.selectors.closeButton).click();
-    await this.page.waitForTimeout(500); // Wait for modal close animation
+    await this.webActions.waitForSelector(this.selectors.modal, {
+      timeout: 5000,
+    });
+    await this.webActions.click(this.selectors.closeButton);
+    await this.webActions.wait(500); // Wait for modal close animation
   }
 
   /**
@@ -29,21 +33,36 @@ export class PromotionalModal {
    * Uses a short timeout to avoid hanging if modal doesn't appear
    */
   async closeModalIfVisible(): Promise<void> {
-    try {
-      // Wait max 2 seconds for modal to appear
-      await this.page.locator(this.selectors.modal).waitFor({ state: 'visible', timeout: 2000 });
-      // If we get here, modal is visible, so close it
-      await this.page.locator(this.selectors.closeButton).click();
-      await this.page.waitForTimeout(500);
-    } catch {
-      // Modal not visible or timeout, that's ok, just continue
-    }
+    await allure.step('Close promotional modal (if visible)', async () => {
+      // Try aside.v-modal.global-popup first
+      try {
+        await this.webActions.waitForSelector(this.selectors.modal, {
+          timeout: 2000,
+        });
+        await this.webActions.click(this.selectors.closeButton);
+        await this.webActions.wait(500);
+        return;
+      } catch {
+        // Not the aside modal — try dialog variant below
+      }
+
+      // Try CMS-driven dialog modal (e.g. "MODAL TEST" promo)
+      try {
+        await this.webActions.waitForSelector(this.selectors.dialogModal, {
+          timeout: 1000,
+        });
+        await this.webActions.click(this.selectors.dialogCloseButton);
+        await this.webActions.wait(500);
+      } catch {
+        // No modal visible — continue
+      }
+    });
   }
 
   /**
    * Checks if the promotional modal is currently visible
    */
   async isModalVisible(): Promise<boolean> {
-    return await this.page.locator(this.selectors.modal).isVisible();
+    return await this.webActions.isVisible(this.selectors.modal);
   }
 }

@@ -170,3 +170,56 @@ Revisar logs para:
 - "Cloudflare challenge detected"
 - "Cloudflare challenge resolved successfully"
 - "Cloudflare challenge not resolved within timeout"
+
+## Storage State & Cookie Lifecycle
+
+### `__cf_bm` Cookie Expiration
+
+Cloudflare's `__cf_bm` cookie (bot management) expires after approximately **30 minutes**. This means storage state files become stale quickly.
+
+**Impact:** If tests load an expired `__cf_bm` cookie from `state/consented.*.json`, Cloudflare will present a challenge page ("Verificación de seguridad en curso") and **every test will fail** with 60s timeouts because no site elements render on the challenge page.
+
+### Validation Before Running Tests
+
+Always validate storage state freshness before test execution:
+
+```bash
+# Validate current environment
+node scripts/validate-storage-state.cjs
+
+# Validate specific environment
+node scripts/validate-storage-state.cjs production es
+
+# Validate all state files
+npm run validate:state:all
+```
+
+The `pretest` npm hook runs validation automatically before `npm test`.
+
+### Regenerating Storage State
+
+When cookies are expired:
+
+```bash
+# Regenerate all storage states
+npx playwright test --project=setup
+
+# If Cloudflare blocks the setup itself, use headed mode:
+npx playwright test --project=setup --headed
+```
+
+### Early Detection in WebActions
+
+`WebActions.navigateTo()` automatically detects Cloudflare challenge pages after navigation and throws an immediate, descriptive error instead of letting downstream selectors time out after 60s. The error message includes actionable guidance:
+
+```
+Cloudflare challenge detected at https://www.cinesa.es/.
+The browser was blocked by Cloudflare WAF. Possible causes:
+  1. Expired __cf_bm cookie in storage state → run: npx playwright test --project=setup
+  2. Headless mode on production → use: --headed --workers=1
+  3. IP reputation issue → try a VPN or request IP whitelisting
+```
+
+### Allure Category
+
+Cloudflare blocks are auto-classified in Allure reports under **"Cloudflare Challenge Block"** (marked as flaky). This separates them from genuine "Element Interaction Timeout" failures.

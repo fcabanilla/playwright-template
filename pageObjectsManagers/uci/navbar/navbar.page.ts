@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { allure } from 'allure-playwright';
 import {
   navbarSelectors,
   NavbarSelectors,
@@ -116,7 +116,7 @@ export class Navbar {
    * @since 1.0.0
    */
   async navigateToHome(): Promise<void> {
-    await allure.test.step('Navigating to UCI Cinemas home', async () => {
+    await allure.step('Navigating to UCI Cinemas home', async () => {
       await this.webActions.navigateTo(this.url);
       await this._waitForNavigationComplete(navbarConstants.homePattern);
     });
@@ -141,7 +141,7 @@ export class Navbar {
    */
   /*
   async navigateToHomeWithCloudflareHandling(): Promise<boolean> {
-    return await allure.test.step(
+    return await allure.step(
       'Navigating to UCI Cinemas home with Cloudflare handling',
       async () => {
         const success = await this.webActions.navigateToWithCloudflareHandling(
@@ -160,7 +160,7 @@ export class Navbar {
    * Clicks on the UCI logo in the navbar (usually returns to the homepage).
    */
   async clickLogo(): Promise<void> {
-    await allure.test.step('Clicking on navbar logo', async () => {
+    await allure.step('Clicking on navbar logo', async () => {
       await this.webActions.click(this.selectors.logo);
       await this._waitForNavigationComplete(navbarConstants.homePattern);
     });
@@ -170,7 +170,7 @@ export class Navbar {
    * Navigates to the Cinemas section.
    */
   async navigateToCinemas(): Promise<void> {
-    await allure.test.step('Navigating to Cinemas page', async () => {
+    await allure.step('Navigating to Cinemas page', async () => {
       await this._handlePromoModalIfPresent();
       await this.webActions.click(this.selectors.cinemas);
       await this._waitForNavigationComplete(navbarConstants.cinemaPattern);
@@ -181,7 +181,7 @@ export class Navbar {
    * Navigates to the Movies section with robust fallback strategies.
    */
   async navigateToMovies(): Promise<void> {
-    await allure.test.step('Navigating to Movies page', async () => {
+    await allure.step('Navigating to Movies page', async () => {
       await this._handlePromoModalIfPresent();
 
       // Try direct navigation first, then dropdown
@@ -201,7 +201,7 @@ export class Navbar {
    * Navigates to the Promotions section.
    */
   async navigateToPromotions(): Promise<void> {
-    await allure.test.step('Navigating to Promotions page', async () => {
+    await allure.step('Navigating to Promotions page', async () => {
       await this._handlePromoModalIfPresent();
       await this.webActions.click(this.selectors.promotions);
     });
@@ -211,7 +211,7 @@ export class Navbar {
    * Navigates to the Experiences section with multiple fallback strategies.
    */
   async navigateToExperiences(): Promise<void> {
-    await allure.test.step('Navigating to Experiences page', async () => {
+    await allure.step('Navigating to Experiences page', async () => {
       await this._handlePromoModalIfPresent();
 
       // Try direct link first, then fallback strategies
@@ -231,7 +231,7 @@ export class Navbar {
    * Navigates to the Membership section.
    */
   async navigateToMembership(): Promise<void> {
-    await allure.test.step('Navigating to Membership page', async () => {
+    await allure.step('Navigating to Membership page', async () => {
       await this._handlePromoModalIfPresent();
       await this.webActions.click(this.selectors.membership);
       await this._waitForNavigationComplete(navbarConstants.membershipPattern);
@@ -242,7 +242,7 @@ export class Navbar {
    * Navigates to the eShop section (opens in a new tab).
    */
   async navigateToEShop(): Promise<void> {
-    await allure.test.step('Navigating to eShop page', async () => {
+    await allure.step('Navigating to eShop page', async () => {
       await this.webActions.click(this.selectors.eShop);
     });
   }
@@ -251,7 +251,7 @@ export class Navbar {
    * Navigates to the Sign In page (opens in a new tab).
    */
   async navigateToSignIn(): Promise<void> {
-    await allure.test.step('Navigating to Sign In page', async () => {
+    await allure.step('Navigating to Sign In page', async () => {
       await this.webActions.click(this.selectors.signin);
     });
   }

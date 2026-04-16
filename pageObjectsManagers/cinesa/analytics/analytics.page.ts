@@ -1,60 +1,29 @@
-import { Page } from '@playwright/test';
-import * as allure from 'allure-playwright';
+import { WebActions } from '../../../core/webactions/webActions';
+import { allure } from 'allure-playwright';
 import { ANALYTICS_SELECTORS } from './analytics.selectors';
+import type { DataLayerEvent, PriceSummary } from './analytics.types';
 
 // Extend window interface to include Google Analytics dataLayer and our custom properties
 declare global {
   interface Window {
-    dataLayer: any[];
-    dataLayerEvents: any[];
+    dataLayer: DataLayerEvent[];
+    dataLayerEvents: DataLayerEvent[];
   }
 }
 
-export interface DataLayerEvent {
-  event: string;
-  gtm?: {
-    startInTicks: number;
-  };
-  ecommerce?: {
-    items: Array<{
-      item_id: string;
-      item_name: string;
-      item_category: string;
-      price: number;
-      quantity?: number;
-      item_variant?: string;
-      cinema_name?: string;
-      performance_date?: string;
-      performance_time?: string;
-      showtime_id?: string;
-      [key: string]: any;
-    }>;
-    currency?: string;
-    value?: number;
-    transaction_id?: string;
-  };
-}
-
-export interface PriceSummary {
-  ticketPrice: number;
-  foodBeveragePrice: number;
-  totalPrice: number;
-  taxes: number;
-}
-
 export class AnalyticsPage {
-  readonly page: Page;
+  private readonly webActions: WebActions;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(webActions: WebActions) {
+    this.webActions = webActions;
   }
 
   /**
    * Initializes dataLayer capture for the current page
    */
   async initializeDataLayerCapture(): Promise<void> {
-    await allure.test.step('Initializing dataLayer capture', async () => {
-      await this.page.addInitScript(() => {
+    await allure.step('Initializing dataLayer capture', async () => {
+      await this.webActions.addInitScript(() => {
         // Create array to store ALL events (existing + new)
         window.dataLayerEvents = [];
 
@@ -104,8 +73,8 @@ export class AnalyticsPage {
    * Captures all dataLayer events that have been fired so far
    */
   async captureDataLayerEvents(): Promise<DataLayerEvent[]> {
-    return await allure.test.step('Capturing dataLayer events', async () => {
-      const events = await this.page.evaluate(() => {
+    return await allure.step('Capturing dataLayer events', async () => {
+      const events = await this.webActions.evaluate<DataLayerEvent[]>(() => {
         // Get both the original dataLayer content AND our captured events
         const originalEvents = window.dataLayer || [];
         const capturedEvents = window.dataLayerEvents || [];
@@ -130,8 +99,8 @@ export class AnalyticsPage {
    * Extracts price information from the current page UI
    */
   async extractUIPrices(): Promise<PriceSummary> {
-    return await allure.test.step('Extracting UI prices', async () => {
-      return await this.page.evaluate((selectors) => {
+    return await allure.step('Extracting UI prices', async () => {
+      return await this.webActions.evaluate<PriceSummary>((selectors: any) => {
         const summary: PriceSummary = {
           ticketPrice: 0,
           foodBeveragePrice: 0,
@@ -225,19 +194,19 @@ export class AnalyticsPage {
               element.parentElement?.textContent?.toLowerCase() || '';
             const contextText = (elementText + ' ' + parentText).toLowerCase();
             if (
-              selectors.contextKeywords.ticket.some((keyword) =>
+              selectors.contextKeywords.ticket.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
               summary.ticketPrice += price;
             } else if (
-              selectors.contextKeywords.foodBeverage.some((keyword) =>
+              selectors.contextKeywords.foodBeverage.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
               summary.foodBeveragePrice += price;
             } else if (
-              selectors.contextKeywords.total.some((keyword) =>
+              selectors.contextKeywords.total.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
@@ -245,7 +214,7 @@ export class AnalyticsPage {
                 summary.totalPrice = price;
               }
             } else if (
-              selectors.contextKeywords.tax.some((keyword) =>
+              selectors.contextKeywords.tax.some((keyword: string) =>
                 contextText.includes(keyword)
               )
             ) {
