@@ -1,5 +1,9 @@
 {
   "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
     "microsoft/playwright-mcp": {
       "type": "stdio",
       "command": "npx",

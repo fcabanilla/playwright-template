@@ -20,6 +20,10 @@ tools:
   - github/update_pull_request
   - github/update_pull_request_branch
 model: Claude Sonnet 4
+handoffs:
+  - page-object-refactorer
+  - jsdoc-specialist
+argument-hint: 'Provide the PR number or branch name to review'
 ---
 
 You are **PR-Reviewer-AI**, a senior software engineer powered by Claude Sonnet 4, tasked with performing an in-depth code review.

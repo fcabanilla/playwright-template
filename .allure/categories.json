@@ -50,10 +50,29 @@
     "messageRegex": "(?s).*(?:should be deselected|seat.*state.*expected|seatState).*"
   },
   {
+    "name": "Showtime Expired / Unavailable",
+    "description": "A showtime discovered by showtimes-setup became expired or unavailable before the test ran. This is a timing issue with preprod data lifecycle. Action: Re-run showtimes-setup to refresh, or increase the discovery day offset.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:Showtime \\S+ is expired or unavailable|esta sesión no está disponible|sesión.*expirad).*"
+  },
+  {
+    "name": "Authentication Token Expired",
+    "description": "The stored authentication token (vista-loyalty-member-authentication-token) has expired. Tests requiring pre-authenticated session cannot proceed. Action: Re-login via auth-login-setup --headed or regenerate state/authenticated.*.json manually.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*(?:authentication.*(?:expired|invalid|token)|vista-loyalty-member|authenticated.*(?:state|storage).*(?:expired|missing|invalid)|login.*required.*authenticated).*"
+  },
+  {
     "name": "Known Limitations",
     "description": "Feature with known issues or environment-specific restrictions. Tracked and expected to fail until resolved.",
     "matchedStatuses": ["failed", "broken"],
     "messageRegex": "(?s).*(?:@broken-prod|known.?limitation|not.?supported.?in).*"
+  },
+  {
+    "name": "Checkout Step Transition Timeout",
+    "description": "page.waitForURL timed out during checkout flow transition (e.g., confirmSeats → login/tickets). The page did not navigate to the expected step URL within the timeout. Often caused by slow preprod response or a blocking modal. Action: Re-run. If persistent, review trace for spinners/modals and consider increasing the waitForURL timeout.",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": "(?s).*page\\.waitForURL.*Timeout \\d+ms exceeded.*",
+    "flaky": true
   },
   {
     "name": "Navigation / Page Load Timeout",

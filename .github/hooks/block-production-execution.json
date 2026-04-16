@@ -1,0 +1,12 @@
+{
+  "event": "PreToolUse",
+  "description": "Block test execution against production unless explicitly confirmed",
+  "steps": [
+    {
+      "tool": "terminal",
+      "condition": "(command.matches('npx playwright test') || command.matches('npm run test')) && !command.matches('TEST_ENV=preprod') && !command.matches('TEST_ENV=lab')",
+      "action": "block",
+      "message": "⚠️ This command will run against PRODUCTION (default environment). Set TEST_ENV=preprod or TEST_ENV=lab, or confirm explicitly that you want to target production."
+    }
+  ]
+}

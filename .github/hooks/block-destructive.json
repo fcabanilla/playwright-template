@@ -1,0 +1,12 @@
+{
+  "event": "PreToolUse",
+  "description": "Block destructive terminal commands that could damage the workspace",
+  "steps": [
+    {
+      "tool": "terminal",
+      "condition": "command.matches('rm -rf') || command.matches('git push --force') || command.matches('git reset --hard') || command.matches('DROP TABLE') || command.matches('drop table')",
+      "action": "block",
+      "message": "Destructive command blocked. Please confirm with the user before running destructive operations."
+    }
+  ]
+}

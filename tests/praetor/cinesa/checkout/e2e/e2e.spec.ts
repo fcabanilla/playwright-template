@@ -110,11 +110,14 @@ test.describe('PRAETOR · Checkout · E2E · Oasiz Preprod', () => {
     }
   );
 
-  test(
+  test.skip(
     'Checkout · E2E · Gift card section visible on payment — Oasiz',
     {
       tag: ['@praetor', '@checkout', '@e2e', '@cinesa', '@giftcard'],
-      annotation: { type: 'rewrite', description: 'Rewrites cinesa checkout.giftcard.spec.ts:24 — validates gift card presence' },
+      annotation: [
+        { type: 'rewrite', description: 'Rewrites cinesa checkout.giftcard.spec.ts:24 — validates gift card presence' },
+        { type: 'issue', description: 'Skipped: waiting for new gift card from business team' },
+      ],
     },
     async ({ seatPicker, loginPage, ticketPicker, barPage, purchaseSummary, paymentPage }) => {
       await allure.story('Checkout E2E — Gift card section on payment page');

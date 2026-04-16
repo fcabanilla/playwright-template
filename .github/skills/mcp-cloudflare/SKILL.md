@@ -1,6 +1,7 @@
 ---
 name: mcp-cloudflare
 description: 'Configure and troubleshoot Playwright MCP/CLI browser for Cloudflare-protected environments (preprod/lab/staging). Use when: MCP browser gets blocked by Cloudflare Access, need to regenerate CF credentials config, setting up MCP for a new environment, or debugging CF bypass failures. Requires: .env file with CF credentials (CF_ACCESS_CLIENT_ID_PREPROD, etc.).'
+argument-hint: 'Describe the Cloudflare issue: blocked by Access, need config for new env, or bypass failing'
 ---
 
 # Playwright MCP & CLI — Cloudflare Bypass Configuration

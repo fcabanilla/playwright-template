@@ -1,6 +1,7 @@
 ---
 name: trace-analysis
 description: 'Analyze Playwright trace.zip files using the MCP browser tools and trace.playwright.dev. Use when: diagnosing test failures, inspecting DOM snapshots at each test step, understanding race conditions, debugging masked inputs, verifying element visibility/state changes during test execution. Requires: Playwright MCP server running.'
+argument-hint: 'Provide the path to the trace.zip file or the failing test name'
 ---
 
 # Playwright Trace Analysis

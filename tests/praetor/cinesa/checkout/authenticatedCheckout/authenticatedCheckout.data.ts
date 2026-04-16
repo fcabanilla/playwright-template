@@ -8,7 +8,7 @@ import {
   getCinesaConfig,
   CinesaEnvironment,
 } from '../../../../../config/environments';
-import { PREPROD_OASIZ_SHOWTIMES } from '../seatPicker/seatPicker.data';
+import { PREPROD_OASIZ_SHOWTIMES, deferredRecord } from '../seatPicker/seatPicker.data';
 
 const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
 const config = getCinesaConfig(env);
@@ -19,14 +19,12 @@ export const authenticatedCheckoutBaseUrl = baseUrl;
 
 /**
  * Showtime allocation for authenticated checkout tests.
- * Uses reserve3 and reserve4 to test with different showtimes per test case.
+ * Deferred until first access — after showtimes-setup dependency runs.
  */
-export const AUTH_SHOWTIMES = {
-  /** Authenticated full flow to payment */
+export const AUTH_SHOWTIMES = deferredRecord(() => ({
   fullFlow: PREPROD_OASIZ_SHOWTIMES.reserve4,
-  /** Authenticated summary verification */
   summaryVerify: PREPROD_OASIZ_SHOWTIMES.reserve3,
-} as const;
+}));
 
 /** Checkout flow URLs */
 export const authenticatedCheckoutUrls = {

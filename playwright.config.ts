@@ -129,11 +129,12 @@ export default defineConfig({
       dependencies: ['setup'], // Needs consent storageState first
     },
 
-    // Showtimes discovery — run independently to refresh showtime IDs
+    // Showtimes discovery — discovers live showtimes and writes allocation file
     // Usage: TEST_ENV=preprod npx playwright test --project=showtimes-setup
     {
       name: 'showtimes-setup',
       testMatch: /showtimes\.setup\.ts/,
+      dependencies: ['setup'], // Needs consent storageState first
       use: {
         storageState: getCinesaStorageStatePath(process.env.TEST_ENV),
         extraHTTPHeaders: getCloudflareHeaders() || {},

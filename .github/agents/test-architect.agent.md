@@ -7,6 +7,10 @@ tools:
   - search/textSearch
   - search/fileSearch
   - execute/runInTerminal
+handoffs:
+  - booking-flow-tester
+  - page-object-refactorer
+argument-hint: 'Describe the component or feature you need test coverage for'
 ---
 
 # Test Architect Agent

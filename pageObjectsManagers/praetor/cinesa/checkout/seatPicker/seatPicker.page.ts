@@ -36,7 +36,7 @@ export class PraetorSeatPicker {
         // Fail-fast: check for expired/unavailable session message before waiting for seats
         const page = this.webActions.page;
         const expiredMessage = page.locator(
-          'text=/esta sesión no está disponible|sesión.*expirad|no disponible/i'
+          'text=/esta sesión no está disponible|sesión.*expirad/i'
         );
         const seatLocator = page.locator(this.selectors.seat);
 

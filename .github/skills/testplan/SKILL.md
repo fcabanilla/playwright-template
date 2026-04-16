@@ -1,6 +1,7 @@
 ---
 name: testplan
 description: 'Generate and run Allure test plans for selective test execution. Use when: re-running failed tests from a previous execution, selecting tests by tag/component/status, creating custom test subsets, understanding ALLURE_TESTPLAN_PATH workflow, debugging why testplan filtering is not working.'
+argument-hint: 'Describe which tests to include: failed tests, a tag like @smoke, or a component name'
 ---
 
 # Allure Test Plan — Selective Test Execution

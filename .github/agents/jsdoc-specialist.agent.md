@@ -9,6 +9,7 @@ tools:
   - search/fileSearch
   - execute/runInTerminal
   - edit/editFiles
+argument-hint: 'Specify the file or directory to audit for JSDoc coverage'
 ---
 
 # JSDoc Specialist Agent

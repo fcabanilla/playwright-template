@@ -14,6 +14,7 @@ export function getPraetorCinesaProject(): Project {
 
   return {
     name: 'Praetor-Cinesa',
+    dependencies: ['setup', 'showtimes-setup'],
     testDir: './tests/praetor/cinesa',
     outputDir: '.allure/playwright-artifacts',
     use: {

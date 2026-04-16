@@ -35,3 +35,7 @@ state/*.json
 # Generated testplan files (via scripts/generate-testplan.cjs)
 testplan.json
 testplan-*.json
+
+# Allure report artifacts (legacy root-level directories)
+allure-report/
+allure-results/

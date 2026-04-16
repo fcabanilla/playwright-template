@@ -8,6 +8,9 @@ tools:
   - search/fileSearch
   - edit/editFiles
   - edit/createFile
+handoffs:
+  - jsdoc-specialist
+argument-hint: 'Provide the Page Object file path to refactor'
 ---
 
 # Page Object Refactorer Agent

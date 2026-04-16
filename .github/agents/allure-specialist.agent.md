@@ -8,6 +8,7 @@ tools:
   - search/fileSearch
   - execute/runInTerminal
   - edit/editFiles
+argument-hint: 'Describe the Allure reporting issue or the test file to fix labels in'
 ---
 
 # Allure Specialist Agent

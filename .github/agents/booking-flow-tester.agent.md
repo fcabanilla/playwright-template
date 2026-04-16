@@ -7,6 +7,9 @@ tools:
   - search/textSearch
   - search/fileSearch
   - execute/runInTerminal
+handoffs:
+  - test-debugger
+argument-hint: 'Describe the booking flow scenario or cinema to test'
 ---
 
 # Booking Flow Tester Agent

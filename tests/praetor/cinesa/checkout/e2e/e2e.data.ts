@@ -7,7 +7,7 @@ import {
   getCinesaConfig,
   CinesaEnvironment,
 } from '../../../../../config/environments';
-import { PREPROD_OASIZ_SHOWTIMES } from '../seatPicker/seatPicker.data';
+import { PREPROD_OASIZ_SHOWTIMES, deferredRecord } from '../seatPicker/seatPicker.data';
 
 const env = (process.env.TEST_ENV as CinesaEnvironment) || 'production';
 const config = getCinesaConfig(env);
@@ -24,25 +24,17 @@ export const checkoutUrls = {
   payment: `**/compra/pago-del-pedido/**`,
 } as const;
 
-/** Showtime allocation per E2E test — avoids seat contention between workers */
-export const E2E_SHOWTIMES = {
-  /** Bar E2E single seat */
+/** Showtime allocation per E2E test — deferred until first access */
+export const E2E_SHOWTIMES = deferredRecord(() => ({
   barSingleSeat: PREPROD_OASIZ_SHOWTIMES.bar,
-  /** Bar E2E multiple seats */
   barMultipleSeats: PREPROD_OASIZ_SHOWTIMES.reserve1,
-  /** Checkout E2E (credit card) */
   checkoutCreditCard: PREPROD_OASIZ_SHOWTIMES.checkout,
-  /** Checkout E2E (gift card) */
   checkoutGiftCard: PREPROD_OASIZ_SHOWTIMES.reserve2,
-  /** SeatPicker complete purchase */
   seatPickerComplete: PREPROD_OASIZ_SHOWTIMES.seatPicker,
-  /** Over capacity test */
   overCapacity: PREPROD_OASIZ_SHOWTIMES.reserve3,
-  /** D-BOX test */
   dbox: PREPROD_OASIZ_SHOWTIMES.dbox,
-  /** iSense reserve */
   isense: PREPROD_OASIZ_SHOWTIMES.isense,
-} as const;
+}));
 
 /** Base URL for constructing showtime URLs */
 export const checkoutBaseUrl = baseUrl;

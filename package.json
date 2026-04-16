@@ -79,6 +79,8 @@
     "test:auth:preprod": "cross-env TEST_ENV=preprod npm run test:auth --",
     "test:auth:lab": "cross-env TEST_ENV=lab npm run test:auth --",
     "_____PRAETOR_CHECKOUT_____": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "test:showtimes-setup": "npx playwright test --project=showtimes-setup",
+    "test:showtimes-setup:preprod": "cross-env TEST_ENV=preprod npm run test:showtimes-setup --",
     "test:praetor": "npx playwright test --project='Praetor-Cinesa'",
     "test:praetor:lab": "cross-env TEST_ENV=lab npm run test:praetor --",
     "test:praetor:preprod": "cross-env TEST_ENV=preprod npm run test:praetor --",

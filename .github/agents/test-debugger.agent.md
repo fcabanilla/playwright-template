@@ -7,6 +7,10 @@ tools:
   - search/textSearch
   - search/fileSearch
   - execute/runInTerminal
+handoffs:
+  - page-object-refactorer
+  - allure-specialist
+argument-hint: 'Describe the test failure, paste the error message, or provide the test file path'
 ---
 
 # Test Debugger Agent

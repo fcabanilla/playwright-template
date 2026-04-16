@@ -1,0 +1,11 @@
+{
+  "event": "PostToolUse",
+  "description": "Run ESLint after editing TypeScript files to catch issues early",
+  "steps": [
+    {
+      "tool": "terminal",
+      "condition": "toolName == 'editFiles' && filePath.endsWith('.ts')",
+      "command": "npx eslint --fix ${filePath}"
+    }
+  ]
+}

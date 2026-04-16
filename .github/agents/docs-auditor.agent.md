@@ -9,6 +9,7 @@ tools:
   - execute/runInTerminal
   - edit/createFile
   - edit/editFiles
+argument-hint: 'Specify the documentation files or directory to audit'
 ---
 
 # Documentation Auditor Agent
